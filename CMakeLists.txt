@@ -45,11 +45,11 @@ add_subdirectory(libs)
 if(APPLE)
 	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11")
   set(ICON_NAME "icon.icns")
-  set(ICON_PATH "${PROJECT_SOURCE_DIR}/icons/${ICON_NAME}")
+  set(ICON_PATH "${PROJECT_SOURCE_DIR}/IconThemes/DarkIconTheme/${ICON_NAME}")
   set(hand_ICON ${ICON_PATH})
   set_source_files_properties(${hand_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
   file(COPY ${ICON_PATH} DESTINATION "${PROJECT_NAME}.app/Contents/Resources")
-  file(COPY "${PROJECT_SOURCE_DIR}/icons" DESTINATION "${PROJECT_NAME}.app/Contents/Resources")
+  file(COPY "${PROJECT_SOURCE_DIR}/IconThemes" DESTINATION "${PROJECT_NAME}.app/Contents/Resources")
 
   add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${ICON_PATH} "${PROJECT_NAME}.app/Contents/Resources"
       main.cpp

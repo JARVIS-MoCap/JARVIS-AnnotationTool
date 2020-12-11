@@ -7,7 +7,7 @@ set(OpenCV_DIR "../libs/${STATIC_LIB_LOCATION}/opencv_static")
 set(OpenCV_STATIC ON)
 
 if(NOT WIN32)
-	#find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+	find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 endif()
 
 find_package(OpenCV REQUIRED)
