@@ -1,0 +1,14 @@
+prefix=/home/trackingsetup/Documents/Qt5static_v5.15.2
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 3DQuickExtras
+Description: Qt 3DQuickExtras module
+Version: 5.15.2
+Libs: -L${libdir} -lQt53DQuickExtras 
+Libs.private: /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt53DExtras.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt53DInput.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt53DQuick.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt53DRender.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt53DLogic.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt53DCore.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Gamepad.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Quick.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Gui.a -lGL -lpng16 -lharfbuzz /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5QmlModels.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Qml.a -lrt /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Network.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Concurrent.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Core.a -lm -lz -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -lpthread -lGL   
+Cflags: -DQT_3DQUICKEXTRAS_LIB -I${includedir}/Qt3DQuickExtras -I${includedir}
+Requires: Qt5Core Qt5Gui Qt5Qml Qt53DCore Qt53DInput Qt53DQuick Qt53DRender Qt53DLogic Qt53DExtras
+

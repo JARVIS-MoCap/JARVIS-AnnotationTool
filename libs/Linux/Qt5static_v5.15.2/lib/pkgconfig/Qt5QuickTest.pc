@@ -1,0 +1,14 @@
+prefix=/home/trackingsetup/Documents/Qt5static_v5.15.2
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 QuickTest
+Description: Qt QuickTest module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5QuickTest 
+Libs.private: /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Test.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Widgets.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Gui.a -lGL -lpng16 -lharfbuzz /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Core.a -lm -lz -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -lpthread /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Quick.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Gui.a -lpng16 -lharfbuzz /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5QmlModels.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Qml.a -lrt /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Network.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Core.a -lpthread -lm -lz -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -lGL   
+Cflags: -DQT_QMLTEST_LIB -I${includedir}/QtQuickTest -I${includedir}
+Requires: Qt5Core Qt5Test Qt5Widgets
+

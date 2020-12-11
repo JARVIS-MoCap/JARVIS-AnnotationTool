@@ -1,0 +1,7 @@
+QMAKE_PRL_BUILD_DIR = /home/trackingsetup/Documents/qt5/qtlocation/src/3rdparty/clipper
+QMAKE_PRO_INPUT = clipper.pro
+QMAKE_PRL_TARGET = libqt_clipper.a
+QMAKE_PRL_CONFIG = lex yacc exceptions depend_includepath testcase_targets import_plugins import_qpa_plugin prepare_docs qt_docs_targets qt_build_extra file_copies qmake_use release link_prl incremental release static linux unix posix gcc sse2 aesni sse3 ssse3 sse4_1 sse4_2 avx avx2 avx512f avx512bw avx512cd avx512dq avx512er avx512ifma avx512pf avx512vbmi avx512vl compile_examples enable_new_dtags f16c largefile rdrnd shani x86SimdAlways prefix_build force_independent utf8_source create_prl link_prl no_private_qt_headers_warning QTDIR_build qt_example_installs testcase_exceptions explicitlib done_config_gypsy done_config_winrt staticlib exceptions warn_off optimize_full git_build c++11 strict_c++ c++14 c++1z c99 c11 bsymbolic_functions hide_symbols c++11 have_target static staticlib
+QMAKE_PRL_VERSION = 1.0.0
+QMAKE_PRL_LIBS =
+QMAKE_PRL_LIBS_FOR_CMAKE = ;;;

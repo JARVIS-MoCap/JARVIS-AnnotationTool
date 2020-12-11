@@ -1,0 +1,14 @@
+prefix=/home/trackingsetup/Documents/Qt5static_v5.15.2
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 Sensors
+Description: Qt Sensors module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5Sensors 
+Libs.private: /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Core.a -lm -lz -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -lpthread    
+Cflags: -DQT_SENSORS_LIB -I${includedir}/QtSensors -I${includedir}
+Requires: Qt5Core
+

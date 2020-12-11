@@ -1,0 +1,14 @@
+prefix=/home/trackingsetup/Documents/qt5_minimal/Qt5static_v5.15.2_minimal
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 X11Extras
+Description: Qt X11Extras module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5X11Extras 
+Libs.private: /home/trackingsetup/Documents/qt5_minimal/Qt5static_v5.15.2_minimal/lib/libQt5Gui.a -lpng16 -lharfbuzz /home/trackingsetup/Documents/qt5_minimal/Qt5static_v5.15.2_minimal/lib/libQt5Core.a -lm -lz -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/trackingsetup/Documents/qt5_minimal/Qt5static_v5.15.2_minimal/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -lpthread /home/trackingsetup/Documents/qt5_minimal/Qt5static_v5.15.2_minimal/lib/libQt5Gui.a -lpng16 -lharfbuzz /home/trackingsetup/Documents/qt5_minimal/Qt5static_v5.15.2_minimal/lib/libQt5Core.a -lpthread -lm -lz -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/trackingsetup/Documents/qt5_minimal/Qt5static_v5.15.2_minimal/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0   
+Cflags: -DQT_X11EXTRAS_LIB -I${includedir}/QtX11Extras -I${includedir}
+Requires: Qt5Core Qt5Gui
+
