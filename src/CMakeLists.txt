@@ -6,7 +6,10 @@ set(CMAKE_PREFIX_PATH "../libs/${STATIC_LIB_LOCATION}")
 set(OpenCV_DIR "../libs/${STATIC_LIB_LOCATION}/opencv_static")
 set(OpenCV_STATIC ON)
 
-find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+if(NOT WIN32)
+	#find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+endif()
+
 find_package(OpenCV REQUIRED)
 message("OPENCV_DIR ${OpenCV_DIR}")
 

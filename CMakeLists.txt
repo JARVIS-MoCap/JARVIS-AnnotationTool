@@ -8,6 +8,8 @@ project(AnnotationTool VERSION 1.0.0  LANGUAGES CXX) #removed CUDA here!!
 
 if(APPLE)
   set(STATIC_LIB_LOCATION "Apple")
+elseif(WIN32)
+  set(STATIC_LIB_LOCATION "Windows")
 elseif(UNIX)
   set(STATIC_LIB_LOCATION "Linux")
 endif()
@@ -56,6 +58,12 @@ if(APPLE)
   )
 
   set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_ICONFILE ${ICON_NAME})
+elseif(WIN32)
+  add_executable(${PROJECT_NAME}
+      main.cpp
+      globals.hpp
+      gui/Qt-DarkStyle/darkstyle.qrc
+  )
 elseif (UNIX)
   add_executable(${PROJECT_NAME}
       main.cpp
