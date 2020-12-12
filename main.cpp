@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 	QApplication app (argc, argv);
 	app.setStyle(new DarkStyle);
 
-	QStringList themeSearchPaths = {"/home/trackingsetup/Documents/AnnotationToolbox/IconThemes", "IconThemes"};
+	QStringList themeSearchPaths = {"/home/trackingsetup/Documents/AnnotationToolbox/IconThemes", "IconThemes", "../IconThemes"};
 	QIcon::setThemeSearchPaths(themeSearchPaths);
 	QIcon::setThemeName("DarkIconTheme");
 	MainWindow m_window;
