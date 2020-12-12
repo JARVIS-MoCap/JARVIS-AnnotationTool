@@ -15,7 +15,7 @@
 class Dataset : public QObject {
 	Q_OBJECT
 	public:
-		explicit Dataset(const QString& datasetFolder);
+		explicit Dataset(const QString& datasetFolder, QList<QString> cameraNames = {});
 		static Dataset *dataset;
 		QList<ImgSet*> imgSets() {return m_imgSets;}
 		const QString& cameraName(int i) {return m_cameraNames[i];}

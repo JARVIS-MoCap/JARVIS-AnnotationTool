@@ -18,6 +18,7 @@
 #include <QSettings>
 #include <QToolBar>
 #include <QGroupBox>
+#include <QListWidget>
 
 class LoadDatasetWindow : public QWidget {
 	Q_OBJECT
@@ -30,6 +31,9 @@ class LoadDatasetWindow : public QWidget {
 		void datasetLoaded();
 
 	private:
+		void initCameraListFromSettings();
+		void updateCameraOrderList(const QString& dir);
+
 		QSettings *settings;
 
 		QGroupBox *datasetFolderBox;
@@ -37,10 +41,19 @@ class LoadDatasetWindow : public QWidget {
 		QPushButton *datasetFolderButton;
 		QPushButton *loadDatasetButton;
 
+		QGroupBox *cameraOrderBox;
+		QListWidget *cameraOrderList;
+		QPushButton *upButton;
+		QPushButton *downButton;
+
+		QList<QString> m_cameraNames;
+
 
 		private slots:
 			void datasetFolderClickedSlot();
 			void loadDatasetClickedSlot();
+			void moveLabelUpSlot();
+			void moveLabelDownSlot();
 };
 
 #endif

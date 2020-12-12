@@ -12,9 +12,7 @@
 ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 	settings = new QSettings();
 	m_colorMap = new ColorMap(ColorMap::Jet);
-	//this->setMaximumSize(10000,600);
 	QGridLayout *reprojectionlayout = new QGridLayout(this);
-	//reprojectionlayout->setMargin(0);
 
 	QLabel *reprojectionLabel = new QLabel("Reprojection Tool");
 	reprojectionLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
@@ -89,12 +87,19 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 	minViewsEdit = new QSpinBox();
 	minViewsEdit->setValue(2);
 	connect(minViewsEdit, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &ReprojectionWidget::minViewsChangedSlot);
-	QWidget *spacer = new QWidget();
-	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	QLabel *errorThresholdLabel = new QLabel("Repro Error Threshold");
+	errorThresholdEdit = new QDoubleSpinBox();
+	errorThresholdEdit->setValue(10.0);
+	connect(errorThresholdEdit, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ReprojectionWidget::errorThresholdChangedSlot);
+	reprojectionChartWidget = new ReprojectionChartWidget(this);
+
 	reprojectionsettingslayout->addWidget(minViewsLabel,0,0);
 	reprojectionsettingslayout->addWidget(minViewsEdit,0,1);
-	reprojectioncontrollerlayout->addWidget(reprojectionSettingsBox);
-	reprojectioncontrollerlayout->addWidget(spacer,1,0,1,2);
+	reprojectionsettingslayout->addWidget(errorThresholdLabel,1,0);
+	reprojectionsettingslayout->addWidget(errorThresholdEdit,1,1);
+
+	reprojectioncontrollerlayout->addWidget(reprojectionSettingsBox,0,0);
+	reprojectioncontrollerlayout->addWidget(reprojectionChartWidget,1,0);
 
 	stackedWidget->addWidget(intrinsicsSetup);
 	stackedWidget->addWidget(extrinsicsSetup);
@@ -108,7 +113,8 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 	//-> Incoming Signals
 
 	//<- Outgoing Signals
-
+	connect(this, &ReprojectionWidget::datasetLoaded, reprojectionChartWidget, &ReprojectionChartWidget::datasetLoadedSlot);
+	connect(this, &ReprojectionWidget::errorThresholdChanged, reprojectionChartWidget, &ReprojectionChartWidget::errorThresholdChanged);
 	//<-> Relayed Signals
 }
 
@@ -154,6 +160,10 @@ void ReprojectionWidget::datasetLoadedSlot() {
 	loadPaths();
 	stackedWidget->setCurrentWidget(intrinsicsSetup);
 	checkIntrinsicPathsAdded();
+	for (const auto& entity : Dataset::dataset->entitiesList()) {
+		m_reprojectionErrors[entity] = new std::vector<double>(Dataset::dataset->bodypartsList().size());
+	}
+	emit datasetLoaded();
 }
 
 
@@ -324,23 +334,28 @@ void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int c
 				if (camsToUse.size() >= m_minViews) {
 					cv::Mat X =  reprojectionTool->reconstructPoint3D(points, camsToUse);
 					QList<QPointF> reprojectedPoints = reprojectionTool->reprojectPoint(X);
+					double reprojectionError = 0;
 					for (int cam = 0; cam < reprojectedPoints.size(); cam ++) {
 						QSize imgSize = Dataset::dataset->imgSets()[currentImgSetIndex]->frames[cam]->imageDimensions;
 						QRectF imgRect(QPoint(0,0), imgSize);
+						Keypoint *keypoint = Dataset::dataset->imgSets()[currentImgSetIndex]->frames[cam]->keypointMap[entity + "/" + bodypart];
 						if (!camsToUse.contains(cam) && imgRect.contains(reprojectedPoints[cam])) {
-							Keypoint *keypoint = Dataset::dataset->imgSets()[currentImgSetIndex]->frames[cam]->keypointMap[entity + "/" + bodypart];
 							if (keypoint->state() != Suppressed) {
 								keypoint->setState(Reprojected);
 								keypoint->setCoordinates(reprojectedPoints[cam]);
 							}
 						}
-						else {
+						else if (keypoint->state() == Annotated) {
 							QPointF annotatedPoint = Dataset::dataset->imgSets()[currentImgSetIndex]->frames[cam]->keypointMap[entity + "/" + bodypart]->coordinates();
 							QPointF dist = annotatedPoint-reprojectedPoints[cam];
+							if (bodypart == "Thumb_P") std::cout << cam<<":"<< dist.x() << ", "<< dist.y() << std::endl;
+							reprojectionError += sqrt(dist.x()*dist.x()+dist.y()*dist.y())/reprojectedPoints.size();
 						}
 					}
+						(*m_reprojectionErrors[entity])[Dataset::dataset->bodypartsList().indexOf(bodypart)] = reprojectionError;
 				}
 				else {
+					(*m_reprojectionErrors[entity])[Dataset::dataset->bodypartsList().indexOf(bodypart)] = 0;
 					for (int cam = 0; cam < Dataset::dataset->numCameras(); cam ++) {
 						Keypoint *keypoint = Dataset::dataset->imgSets()[currentImgSetIndex]->frames[cam]->keypointMap[entity + "/" + bodypart];
 						if (keypoint->state() == Reprojected) {
@@ -352,6 +367,7 @@ void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int c
 		}
 		emit reprojectedPoints(Dataset::dataset->imgSets()[currentImgSetIndex], currentFrameIndex);
 		emit reprojectionToolToggled(true);
+		reprojectionChartWidget->reprojectionErrorsUpdatedSlot(m_reprojectionErrors);
 	}
 }
 
@@ -368,4 +384,9 @@ void ReprojectionWidget::undoReprojection() {
 void ReprojectionWidget::minViewsChangedSlot(int value) {
 	m_minViews = value;
 	calculateReprojectionSlot(m_currentImgSetIndex, m_currentFrameIndex);
+}
+
+void ReprojectionWidget::errorThresholdChangedSlot(double value) {
+	m_errorThreshold = value;
+	emit errorThresholdChanged(value);
 }

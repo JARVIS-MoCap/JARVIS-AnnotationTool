@@ -52,6 +52,7 @@ class ImageViewer : public QWidget {
 		void keypointRemoved(Keypoint *keypoint);
 		void keypointCorrected(Keypoint *keypoint);
 		void alreadyAnnotated(bool isSuppressed);
+		void draggingPointFinished(int imgSetIndex, int frameIndex);
 
 	private:
 		QPointF scaleToImageCoordinates(QPointF rectStart);

@@ -101,7 +101,7 @@ void ImageViewer::paintEvent(QPaintEvent *) {
 						p.drawRect(QRectF(point.x()-m_keypointSize/2.0, point.y()-m_keypointSize/2.0,m_keypointSize,m_keypointSize));
 					}
 					else if(m_entityToKeypointShapeMap[pt->entity()] == Triangle) {
-						
+
 					}
 				}
 				else {
@@ -268,6 +268,7 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent *event) {
 		emit panFinished();
 	}
 	else if (event->button() == Qt::LeftButton && m_draggedPoint != nullptr) {
+		emit draggingPointFinished(Dataset::dataset->imgSets().indexOf(m_currentImgSet), m_currentFrameIndex);
 		m_draggedPoint = nullptr;
 	}
 }

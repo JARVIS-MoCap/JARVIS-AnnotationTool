@@ -186,6 +186,7 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(imageViewer, &ImageViewer::keypointRemoved, keypointWidget, &KeypointWidget::keypointRemovedSlot);
 	connect(imageViewer, &ImageViewer::keypointCorrected, keypointWidget, &KeypointWidget::keypointCorrectedSlot);
 	connect(imageViewer, &ImageViewer::alreadyAnnotated, keypointWidget, &KeypointWidget::alreadyAnnotatedSlot);
+	connect(imageViewer, &ImageViewer::draggingPointFinished, reprojectionWidget, &ReprojectionWidget::calculateReprojectionSlot);
 	connect(reprojectionWidget, &ReprojectionWidget::reprojectedPoints, keypointWidget, &KeypointWidget::setKeypointsFromDatasetSlot);
 	connect(reprojectionWidget, &ReprojectionWidget::reprojectionToolToggled, imageViewer, &ImageViewer::toggleReprojectionSlot);
 }

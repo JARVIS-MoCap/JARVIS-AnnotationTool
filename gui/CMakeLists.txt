@@ -11,6 +11,8 @@ add_library(${PROJECT_NAME}
 		imageviewer.hpp
     loaddatasetwindow.hpp
     reprojectionwidget.hpp
+		reprojectionchartwidget.hpp
+		reprojectionchartview.hpp
 		datasetcontrolwidget.hpp
     mainwindow.cpp
     mainbar.cpp
@@ -20,6 +22,8 @@ add_library(${PROJECT_NAME}
 		imageviewer.cpp
     loaddatasetwindow.cpp
     reprojectionwidget.cpp
+		reprojectionchartwidget.cpp
+		reprojectionchartview.cpp
 		datasetcontrolwidget.cpp
 )
 
@@ -31,6 +35,8 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
   Qt5::Widgets
+	Qt5::Charts
+
 	src
 )
 

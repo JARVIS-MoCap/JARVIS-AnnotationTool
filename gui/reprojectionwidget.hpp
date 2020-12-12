@@ -12,6 +12,7 @@
 #include "reprojectiontool.hpp"
 #include "switch.hpp"
 #include "colormap.hpp"
+#include "reprojectionchartwidget.hpp"
 
 
 #include <QGridLayout>
@@ -23,6 +24,7 @@
 #include <QComboBox>
 #include <QSettings>
 #include <QSpinBox>
+#include <QDoubleSpinBox>
 
 
 class ReprojectionWidget : public QWidget {
@@ -38,6 +40,9 @@ class ReprojectionWidget : public QWidget {
 	signals:
 		void reprojectedPoints(ImgSet *imgSet, int frameIndex);
 		void reprojectionToolToggled(bool toggle);
+		void datasetLoaded();
+		void errorThresholdChanged(double value);
+		void reprojectionErrorsUpdated(QMap<QString, std::vector<double> *>);
 
 
 	private:
@@ -46,6 +51,8 @@ class ReprojectionWidget : public QWidget {
 		void savePaths();
 		void loadPaths(bool onlyExtrinsics = false);
 		void undoReprojection();
+
+		ReprojectionChartWidget *reprojectionChartWidget;
 
 		QSettings *settings;
 		ColorMap *m_colorMap;
@@ -70,6 +77,7 @@ class ReprojectionWidget : public QWidget {
 		QGridLayout *reprojectioncontrollerlayout;
 		QGroupBox *reprojectionSettingsBox;
 		QSpinBox *minViewsEdit;
+		QDoubleSpinBox *errorThresholdEdit;
 
 		QList< QLineEdit* > intrinsicsPathEdits;
 		//QList< QPushButton* > intrinsicsPathButtons;
@@ -78,10 +86,12 @@ class ReprojectionWidget : public QWidget {
 		int m_numCameras = 0;
 		int m_primaryIndex = 0;
 		int m_minViews = 2;
+		double m_errorThreshold = 10.0;
 		QList<QString> m_entitiesList;
 		QList<QString> m_bodypartsList;
 		int m_currentImgSetIndex  = 0;
 		int m_currentFrameIndex = 0;
+		QMap<QString, std::vector<double> *> m_reprojectionErrors;
 
 	private slots:
 		void switchToggledSlot(bool toggle);
@@ -91,6 +101,7 @@ class ReprojectionWidget : public QWidget {
 		void initIntrinsicsClickedSlot();
 		void initReprojectionClickedSlot();
 		void minViewsChangedSlot(int value);
+		void errorThresholdChangedSlot(double value);
 
 
 

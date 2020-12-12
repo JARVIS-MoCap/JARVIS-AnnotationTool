@@ -13,10 +13,15 @@
 
 Dataset * Dataset::dataset = nullptr;
 
-Dataset::Dataset(const QString& datasetFolder) : m_datasetFolder(datasetFolder) {
+Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames) : m_datasetFolder(datasetFolder) {
 	m_colorMap = new ColorMap(ColorMap::Jet);
-	m_numCameras = QDir(datasetFolder).entryList(QDir::AllDirs | QDir::NoDotAndDotDot).count();
-	m_cameraNames = QDir(datasetFolder).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+	if (cameraNames.size() == 0) {
+		m_cameraNames = QDir(datasetFolder).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+	}
+	else {
+		m_cameraNames = cameraNames;
+	}
+	m_numCameras = m_cameraNames.size();
 	QList<QFile*> saveFiles;
 	for (int i = 0; i < m_numCameras; i++) {
 		QFile *file = new QFile(datasetFolder + "/" + m_cameraNames[i] +"/annotations.csv");
