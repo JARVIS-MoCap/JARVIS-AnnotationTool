@@ -1,0 +1,14 @@
+prefix=/Users/thueser/Documents/qtstatic
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 Concurrent
+Description: Qt Concurrent module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5Concurrent 
+Libs.private: /Users/thueser/Documents/qtstatic/lib/libQt5Core.a -framework DiskArbitration -framework IOKit -lm -framework AppKit -framework Security -framework ApplicationServices -framework CoreServices -framework CoreFoundation -framework Foundation -lz /Users/thueser/Documents/qtstatic/lib/libqtpcre2.a    
+Cflags: -DQT_CONCURRENT_LIB -I${includedir}/QtConcurrent -I${includedir}
+Requires: Qt5Core
+
