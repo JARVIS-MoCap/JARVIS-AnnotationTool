@@ -158,6 +158,7 @@ void ImageViewer::mousePressEvent(QMouseEvent *event) {
 			keypoint->setCoordinates(position);
 			keypoint->setState(Annotated);
 			emit keypointAdded(keypoint);
+			emit keypointChangedForReprojection(Dataset::dataset->imgSets().indexOf(m_currentImgSet), m_currentFrameIndex);
 		}
 		else {
 			emit alreadyAnnotated(keypoint->state() == Suppressed);
@@ -171,6 +172,7 @@ void ImageViewer::mousePressEvent(QMouseEvent *event) {
 				if (pt->state() == Annotated || pt->state() == Reprojected) {
 					pt->setState(NotAnnotated);
 					emit keypointRemoved(pt);
+					emit keypointChangedForReprojection(Dataset::dataset->imgSets().indexOf(m_currentImgSet), m_currentFrameIndex);
 					update();
 					break;
 				}
@@ -268,7 +270,7 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent *event) {
 		emit panFinished();
 	}
 	else if (event->button() == Qt::LeftButton && m_draggedPoint != nullptr) {
-		emit draggingPointFinished(Dataset::dataset->imgSets().indexOf(m_currentImgSet), m_currentFrameIndex);
+		emit keypointChangedForReprojection(Dataset::dataset->imgSets().indexOf(m_currentImgSet), m_currentFrameIndex);
 		m_draggedPoint = nullptr;
 	}
 }

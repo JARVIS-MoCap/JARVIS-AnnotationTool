@@ -207,8 +207,11 @@ void ReprojectionWidget::intrinsicsPathClickedSlot() {
 	int index = intrinsicslayout->indexOf(qobject_cast<QWidget*>(sender()));
 	int row,_;
   intrinsicslayout->getItemPosition(index, &row, &_, &_, &_);
-	QString filename = QFileDialog::getOpenFileName(this, "Open Intrinsics of Camera " + QString::number(row+1), "../", "(*.yaml)");
+	QString default_path = ".";
+	QString filename = QFileDialog::getOpenFileName(this, "Open Intrinsics of Camera " + QString::number(row+1), m_parameterDir.path(), "(*.yaml)");
 	if (filename != "") {
+		m_parameterDir.setPath(filename);
+		m_parameterDir.cdUp();
 		intrinsicsPathEdits[row]->setText(filename);
 	}
 	checkIntrinsicPathsAdded();
@@ -218,8 +221,9 @@ void ReprojectionWidget::extrinsicsPathClickedSlot() {
 	int index = extrinsicslayout->indexOf(qobject_cast<QWidget*>(sender()));
 	int row,_;
   extrinsicslayout->getItemPosition(index, &row, &_, &_, &_);
-	QString filename = QFileDialog::getOpenFileName(this, "Open Intrinsics of Camera " + QString::number(row+1), "../", "(*.yaml)");
+	QString filename = QFileDialog::getOpenFileName(this, "Open Intrinsics of Camera " + QString::number(row+1), m_parameterDir.path(), "(*.yaml)");
 	if (filename != "") {
+		m_parameterDir.setPath(filename);
 		extrinsicsPathEdits[row-1]->setText(filename);
 	}
 	checkExtrinsicPathsAdded();
@@ -297,6 +301,9 @@ void ReprojectionWidget::loadPaths(bool onlyExtrinsics) {
 	int i = 0;
 	if (!onlyExtrinsics) {
 		settings->beginGroup("Intrinsics");
+		if(settings->value(Dataset::dataset->cameraName(0)).toString() != "") {
+			m_parameterDir.setPath(settings->value(Dataset::dataset->cameraName(0)).toString());
+		}
 		for (const auto& edit : intrinsicsPathEdits) {
 			edit->setText(settings->value(Dataset::dataset->cameraName(i++)).toString());
 		}
@@ -304,6 +311,9 @@ void ReprojectionWidget::loadPaths(bool onlyExtrinsics) {
 		i = 0;
 	}
 	settings->beginGroup("Extrinsics");
+	if(settings->value(primaryCombo->currentText() + "/" + Dataset::dataset->cameraName(0)).toString() != "") {
+		m_parameterDir.setPath(settings->value(primaryCombo->currentText() + "/" + Dataset::dataset->cameraName(0)).toString());
+	}
 	for (const auto& edit : extrinsicsPathEdits) {
 		edit->setText(settings->value(primaryCombo->currentText() + "/" + Dataset::dataset->cameraName(i++)).toString());
 	}
@@ -348,7 +358,6 @@ void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int c
 						else if (keypoint->state() == Annotated) {
 							QPointF annotatedPoint = Dataset::dataset->imgSets()[currentImgSetIndex]->frames[cam]->keypointMap[entity + "/" + bodypart]->coordinates();
 							QPointF dist = annotatedPoint-reprojectedPoints[cam];
-							if (bodypart == "Thumb_P") std::cout << cam<<":"<< dist.x() << ", "<< dist.y() << std::endl;
 							reprojectionError += sqrt(dist.x()*dist.x()+dist.y()*dist.y())/reprojectedPoints.size();
 						}
 					}

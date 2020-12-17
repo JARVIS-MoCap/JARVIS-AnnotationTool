@@ -114,6 +114,7 @@ void LoadDatasetWindow::updateCameraOrderList(const QString& dir) {
 
 void LoadDatasetWindow::moveLabelUpSlot() {
 	int row = cameraOrderList->currentRow();
+	if (row == -1) return;
 	QListWidgetItem *item = cameraOrderList->takeItem(row);
 	int newRow = std::max(row-1,0);
 	cameraOrderList->insertItem(newRow,item);
@@ -123,6 +124,7 @@ void LoadDatasetWindow::moveLabelUpSlot() {
 
 void LoadDatasetWindow::moveLabelDownSlot() {
 	int row = cameraOrderList->currentRow();
+	if (row == -1) return;
 	QListWidgetItem *item = cameraOrderList->takeItem(row);
 	int newRow = std::min(row+1,cameraOrderList->count());
 	cameraOrderList->insertItem(newRow,item);

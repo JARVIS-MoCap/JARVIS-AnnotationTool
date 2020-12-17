@@ -93,6 +93,8 @@ class ReprojectionWidget : public QWidget {
 		int m_currentFrameIndex = 0;
 		QMap<QString, std::vector<double> *> m_reprojectionErrors;
 
+		QDir m_parameterDir;
+
 	private slots:
 		void switchToggledSlot(bool toggle);
 		void primaryChangedSlot(QString);

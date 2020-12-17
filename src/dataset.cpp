@@ -87,6 +87,9 @@ Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames) : m_d
 		lineCount += 1;
 		m_imgSets.append(imgSet);
   }
+	for (int i = 0; i < m_numCameras; i++) {
+		saveFiles[i]->close();
+	}
 	//save(datasetFolder);
 }
 
@@ -148,6 +151,9 @@ void Dataset::save(const QString& datasetFolder) {
 			}
 			stream << "\n";
 		}
+	}
+	for (int i = 0; i < m_numCameras; i++) {
+		saveFiles[i]->close();
 	}
 }
 

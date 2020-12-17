@@ -186,7 +186,7 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(imageViewer, &ImageViewer::keypointRemoved, keypointWidget, &KeypointWidget::keypointRemovedSlot);
 	connect(imageViewer, &ImageViewer::keypointCorrected, keypointWidget, &KeypointWidget::keypointCorrectedSlot);
 	connect(imageViewer, &ImageViewer::alreadyAnnotated, keypointWidget, &KeypointWidget::alreadyAnnotatedSlot);
-	connect(imageViewer, &ImageViewer::draggingPointFinished, reprojectionWidget, &ReprojectionWidget::calculateReprojectionSlot);
+	connect(imageViewer, &ImageViewer::keypointChangedForReprojection, reprojectionWidget, &ReprojectionWidget::calculateReprojectionSlot);
 	connect(reprojectionWidget, &ReprojectionWidget::reprojectedPoints, keypointWidget, &KeypointWidget::setKeypointsFromDatasetSlot);
 	connect(reprojectionWidget, &ReprojectionWidget::reprojectionToolToggled, imageViewer, &ImageViewer::toggleReprojectionSlot);
 }
@@ -243,11 +243,15 @@ void EditorWidget::frameChangedSlot(int index) {
 	imageViewer->setFrame(m_currentImgSet, m_currentFrameIndex);
 	if (m_currentFrameIndex == m_currentImgSet->numCameras-1) {
 		nextButton->setEnabled(false);
-		previousButton->setEnabled(true);
+		if (m_currentImgSet->numCameras > 1) {
+			previousButton->setEnabled(true);
+		}
 	}
 	else if (m_currentFrameIndex == 0) {
 		previousButton->setEnabled(false);
-		nextButton->setEnabled(true);
+		if (m_currentImgSet->numCameras > 1) {
+			nextButton->setEnabled(true);
+		}
 	}
 	else {
 		previousButton->setEnabled(true);
@@ -261,14 +265,22 @@ void EditorWidget::previousSetClickedSlot() {
 		m_currentImgSetIndex--;
 		m_currentFrameIndex = 0;
 		previousButton->setEnabled(false);
-		nextButton->setEnabled(true);
+		if (m_currentImgSet->numCameras > 1) {
+			nextButton->setEnabled(true);
+		}
 		m_currentImgSet = Dataset::dataset->imgSets()[m_currentImgSetIndex];
 		imageViewer->setFrame(m_currentImgSet, m_currentFrameIndex);
 		if (m_currentImgSetIndex == 0) {
 			previousSetButton->setEnabled(false);
+			if (Dataset::dataset->imgSets().size() > 1) {
+				nextSetButton->setEnabled(true);
+			}
 		}
 		else if (m_currentImgSetIndex == Dataset::dataset->imgSets().size()-2) {
 			nextSetButton->setEnabled(true);
+			if (Dataset::dataset->imgSets().size() > 1) {
+				previousSetButton->setEnabled(true);
+			}
 		}
 	}
 	emit frameChanged(m_currentImgSetIndex, m_currentFrameIndex);
@@ -279,14 +291,22 @@ void EditorWidget::nextSetClickedSlot() {
 		m_currentImgSetIndex++;
 		m_currentFrameIndex = 0;
 		previousButton->setEnabled(false);
-		nextButton->setEnabled(true);
+		if (m_currentImgSet->numCameras > 1) {
+			nextButton->setEnabled(true);
+		}
 		m_currentImgSet = Dataset::dataset->imgSets()[m_currentImgSetIndex];
 		imageViewer->setFrame(m_currentImgSet, m_currentFrameIndex);
 		if (m_currentImgSetIndex == Dataset::dataset->imgSets().size()-1) {
 			nextSetButton->setEnabled(false);
+			if (Dataset::dataset->imgSets().size() > 1) {
+				previousSetButton->setEnabled(true);
+			}
 		}
 		else if (m_currentImgSetIndex == 1) {
 			previousSetButton->setEnabled(true);
+			if (Dataset::dataset->imgSets().size() > 1) {
+				nextSetButton->setEnabled(true);
+			}
 		}
 	}
 	emit frameChanged(m_currentImgSetIndex, m_currentFrameIndex);
@@ -301,8 +321,8 @@ void EditorWidget::imgSetChangedSlot(int index) {
 		previousSetButton->setEnabled(true);
 	}
 	else if (m_currentImgSetIndex == 0) {
-		previousButton->setEnabled(false);
-		previousSetButton->setEnabled(true);
+		previousSetButton->setEnabled(false);
+		nextSetButton->setEnabled(true);
 	}
 	else {
 		previousSetButton->setEnabled(true);
