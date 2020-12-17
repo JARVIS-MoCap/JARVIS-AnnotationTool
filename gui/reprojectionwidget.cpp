@@ -256,11 +256,27 @@ void ReprojectionWidget::checkExtrinsicPathsAdded() {
 }
 
 void ReprojectionWidget::initIntrinsicsClickedSlot() {
+	for (const auto& edit : intrinsicsPathEdits) {
+		if (!QFile::exists(edit->text())) {
+			QErrorMessage *msg = new QErrorMessage();
+			msg->showMessage("Intrinsics File '" + edit->text() + "' does not exist.");
+			return;
+		}
+	}
 	stackedWidget->setCurrentWidget(extrinsicsSetup);
 	checkExtrinsicPathsAdded();
 }
 
 void ReprojectionWidget::initReprojectionClickedSlot() {
+	for (const auto& edit : extrinsicsPathEdits) {
+		if (edit->isVisible()) {
+			if (!QFile::exists(edit->text())) {
+				QErrorMessage *msg = new QErrorMessage();
+				msg->showMessage("Extrinsics File '" + edit->text() + "' does not exist.");
+				return;
+			}
+		}
+	}
 	savePaths();
 	toggleSwitch->setEnabled(true);
 	toggleSwitch->setToggled(true);

@@ -2,7 +2,6 @@
  *  dataset.cpp
  *  Created:  10. July 2018
  *  Author:   Timo Hüser
- *
  *------------------------------------------------------------*/
 
 #include "dataset.hpp"
@@ -10,6 +9,7 @@
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
+#include <QErrorMessage>
 
 Dataset * Dataset::dataset = nullptr;
 
@@ -22,12 +22,18 @@ Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames) : m_d
 		m_cameraNames = cameraNames;
 	}
 	m_numCameras = m_cameraNames.size();
+	if (m_numCameras == 0) {
+		QErrorMessage *msg = new QErrorMessage();
+		msg->showMessage("This directory does not contain any subdirectories! Make sure the savefiles for each camera are stored in a seperate subdirectory (even if just one camera is used).");
+		return;
+	}
 	QList<QFile*> saveFiles;
 	for (int i = 0; i < m_numCameras; i++) {
 		QFile *file = new QFile(datasetFolder + "/" + m_cameraNames[i] +"/annotations.csv");
 		saveFiles.append(file);
 		if (!file->open(QIODevice::ReadOnly)) {
-			std::cout << "Can't open File" << std::endl;
+			QErrorMessage *msg = new QErrorMessage();
+			msg->showMessage("Error reading savefile for Camera " + m_cameraNames[i] + "! Make sure a savefile called 'annotations.csv' exists in the cameras directory.");
 			return;
 		}
 	}
@@ -90,7 +96,7 @@ Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames) : m_d
 	for (int i = 0; i < m_numCameras; i++) {
 		saveFiles[i]->close();
 	}
-	//save(datasetFolder);
+	m_loadSuccessfull = true;
 }
 
 void Dataset::save(const QString& datasetFolder) {
@@ -102,6 +108,8 @@ void Dataset::save(const QString& datasetFolder) {
 		saveFiles.append(file);
 		if (!file->open(QIODevice::WriteOnly)) {
 			std::cout << "Can't open File" << std::endl;
+			QErrorMessage *msg = new QErrorMessage();
+			msg->showMessage("Error writing savefile. Make sure you have the right permissions...");
 			return;
 		}
 		 QTextStream stream(file);

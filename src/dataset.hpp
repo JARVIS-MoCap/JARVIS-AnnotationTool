@@ -24,6 +24,7 @@ class Dataset : public QObject {
 		int numCameras() const {return m_numCameras;}
 		QList<QString> entitiesList() const {return m_entitiesList;}
 		QList<QString> bodypartsList() const {return m_bodypartsList;}
+		bool loadSuccessfull() const {return m_loadSuccessfull;}
 
 		signals:
 			void keypointStateChanged(KeypointState state, KeypointState previousState, int frameIndex);
@@ -32,6 +33,7 @@ class Dataset : public QObject {
 		bool GetImageSizeEx(QString fn, int *x,int *y);
 
 		const QString m_datasetFolder;
+		bool m_loadSuccessfull = false;
 		int m_numCameras;
 		int m_numEntities;
 		QList <QString> m_cameraNames;
