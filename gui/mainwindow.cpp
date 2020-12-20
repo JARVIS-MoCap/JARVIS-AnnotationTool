@@ -12,7 +12,6 @@
 #include <QStackedWidget>
 #include <QStatusBar>
 #include <QMenuBar>
-#include <QMessageBox>
 
 /*const QMap<QString, QFont> fonts = {{"default", QFont("Sans Serif", 11)},
 																		{"bold", QFont("Sans Serif", 11, QFont::Bold)},

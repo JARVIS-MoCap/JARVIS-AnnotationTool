@@ -7,7 +7,7 @@
 
 #include "keypointwidget.hpp"
 
-#include <QMessageBox>
+#include <QErrorMessage>
 
 KeypointWidget::KeypointWidget(QWidget *parent) : QWidget(parent) {
 	colorMap = new ColorMap(ColorMap::Jet);
@@ -154,14 +154,14 @@ void KeypointWidget::unsuppressKeypointSlot(int row) {
 }
 
 void KeypointWidget::alreadyAnnotatedSlot(bool isSuppressed) {
-	QMessageBox msgBox;
+    QErrorMessage *msg = new QErrorMessage();
 	if (isSuppressed) {
-		msgBox.setText("Keypoint is suppressed!");
+        msg->showMessage("Keypoint is suppressed!");
+
 	}
 	else {
-		msgBox.setText("Keypoint already annotated!");
+        msg->showMessage("Keypoint already annotated!");
 	}
-	msgBox.exec();
 }
 
 
