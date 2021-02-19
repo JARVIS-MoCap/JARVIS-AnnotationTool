@@ -1,0 +1,14 @@
+prefix=C:/Users/timoh/Documents/qt/Qt5static_v5.15.2_minimal
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 Widgets
+Description: Qt Widgets module
+Version: 5.15.1
+Libs: -L${libdir} -lQt5Widgets 
+Libs.private: C:/Users/timoh/Documents/qt/Qt5static_v5.15.2_minimal/lib/libQt5Gui.a -ld3d11 -ldxgi -ldxguid -lpng16 C:/Users/timoh/Documents/qt/Qt5static_v5.15.2_minimal/lib/libqtharfbuzz.a -lgdi32 -lcomdlg32 -loleaut32 -limm32 C:/Users/timoh/Documents/qt/Qt5static_v5.15.2_minimal/lib/libQt5Core.a -lmpr -luserenv -lversion -lz C:/Users/timoh/Documents/qt/Qt5static_v5.15.2_minimal/lib/libqtpcre2.a -lnetapi32 -lws2_32 -ladvapi32 -lkernel32 -lole32 -lshell32 -luuid -luser32 -lwinmm -luxtheme -ldwmapi -lshell32 -lgdi32 -lcomdlg32 -loleaut32 -limm32 -lwinmm -lws2_32 -lole32 -luuid -luser32 -ladvapi32  
+Cflags: -DQT_WIDGETS_LIB -I${includedir}/QtWidgets -I${includedir}
+Requires: Qt5Core Qt5Gui
+

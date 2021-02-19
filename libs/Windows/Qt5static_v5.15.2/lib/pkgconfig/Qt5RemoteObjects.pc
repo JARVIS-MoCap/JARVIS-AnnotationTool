@@ -1,0 +1,14 @@
+prefix=C:/Users/timoh/Documents/qt/Qt5static_v5.15.2_minimal
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 RemoteObjects
+Description: Qt RemoteObjects module
+Version: 5.15.1
+Libs: -L${libdir} -lQt5RemoteObjects 
+Libs.private: C:/Users/timoh/Documents/qt/Qt5static_v5.15.2_minimal/lib/libQt5Network.a -ldnsapi -liphlpapi -lcrypt32 C:/Users/timoh/Documents/qt/Qt5static_v5.15.2_minimal/lib/libQt5Core.a -lmpr -luserenv -lversion -lz C:/Users/timoh/Documents/qt/Qt5static_v5.15.2_minimal/lib/libqtpcre2.a -lnetapi32 -lws2_32 -ladvapi32 -lkernel32 -lole32 -lshell32 -luuid -luser32 -lwinmm    
+Cflags: -DQT_REMOTEOBJECTS_LIB -I${includedir}/QtRemoteObjects -I${includedir}
+Requires: Qt5Core Qt5Network
+
