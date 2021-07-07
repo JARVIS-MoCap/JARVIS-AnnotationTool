@@ -11,6 +11,7 @@
 #include "keypointwidget.hpp"
 #include "imageviewer.hpp"
 #include "loaddatasetwindow.hpp"
+#include "newdatasetwindow.hpp"
 #include "reprojectionwidget.hpp"
 #include "datasetcontrolwidget.hpp"
 
@@ -65,6 +66,7 @@ class EditorWidget : public QWidget {
 		QPushButton *loadDatasetButton;
 		QPushButton *newDatasetButton;
 		LoadDatasetWindow *loadDatasetWindow;
+		NewDatasetWindow *newDatasetWindow;
 
 		QWidget *imageViewerContainer;
 		ImageViewer *imageViewer;
@@ -96,6 +98,7 @@ class EditorWidget : public QWidget {
 		void zoomFinishedSlot();
 		void panFinishedSlot();
 		void loadDatasetClickedSlot();
+		void newDatasetClickedSlot();
 		void quitClickedSlot();
 };
 

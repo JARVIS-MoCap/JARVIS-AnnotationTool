@@ -49,6 +49,7 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 													 "QPushButton:hover { background-color: rgb(68,74,89); }"
 													 "QPushButton { color: rgb(100,164,32);}");
 	connect(loadDatasetButton, &QPushButton::clicked, this, &EditorWidget::loadDatasetClickedSlot);
+	connect (newDatasetButton, &QPushButton::clicked, this, &EditorWidget::newDatasetClickedSlot);
 	datasetlayout->addItem(datasetTopSpacer,0,0,1,2);
 	datasetlayout->addWidget(datasetLabel,1,0,1,2,Qt::AlignCenter);
 	datasetlayout->addWidget(loadDatasetButton,2,0,Qt::AlignRight);
@@ -56,6 +57,7 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	datasetlayout->addItem(datasetBottomSpacer,3,0,1,2);
 
 	loadDatasetWindow = new LoadDatasetWindow(this);
+	newDatasetWindow = new NewDatasetWindow(this);
 
 	imageViewerContainer = new QWidget(this);
 	imageViewerContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -369,6 +371,10 @@ void EditorWidget::datasetLoadedSlot() {
 
 void EditorWidget::loadDatasetClickedSlot() {
 	loadDatasetWindow->show();
+}
+
+void EditorWidget::newDatasetClickedSlot() {
+	newDatasetWindow->show();
 }
 
 void EditorWidget::quitClickedSlot() {

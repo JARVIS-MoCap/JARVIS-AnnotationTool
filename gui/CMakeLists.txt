@@ -10,10 +10,12 @@ add_library(${PROJECT_NAME}
 		keypointwidget.hpp
 		imageviewer.hpp
     loaddatasetwindow.hpp
+    newdatasetwindow.hpp
     reprojectionwidget.hpp
 		reprojectionchartwidget.hpp
 		reprojectionchartview.hpp
 		datasetcontrolwidget.hpp
+    presetswindow.hpp
     mainwindow.cpp
     mainbar.cpp
     settingswindow.cpp
@@ -21,10 +23,12 @@ add_library(${PROJECT_NAME}
 		keypointwidget.cpp
 		imageviewer.cpp
     loaddatasetwindow.cpp
+    newdatasetwindow.cpp
     reprojectionwidget.cpp
 		reprojectionchartwidget.cpp
 		reprojectionchartview.cpp
 		datasetcontrolwidget.cpp
+    presetswindow.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
