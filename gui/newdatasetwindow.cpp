@@ -23,6 +23,7 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	QGridLayout *layout = new QGridLayout(this);
 
 	m_datasetConfig = new DatasetConfig;
+	datasetCreator = new DatasetCreator(m_datasetConfig);
 
 	loadPresetsWindow = new PresetsWindow(&presets, "load", "New Dataset Window/");
 	savePresetsWindow = new PresetsWindow(&presets, "save", "New Dataset Window/");
@@ -34,24 +35,30 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	QGridLayout *configlayout = new QGridLayout(configBox);
 	LabelWithToolTip *datasetNameLabel = new LabelWithToolTip("New Dataset Name", "");
 	datasetNameEdit = new QLineEdit(m_datasetConfig->datasetName, configBox);
+	connect (datasetNameEdit, &QLineEdit::textEdited, this, &NewDatasetWindow::datasetNameChangedSlot);
 	LabelWithToolTip *datatypeLabel = new LabelWithToolTip("Datatype to Load", "kdsff");
 	videosButton = new QRadioButton("Videos", configBox);
 	videosButton->setChecked(m_datasetConfig->dataType == "Videos");
+	connect(videosButton, &QRadioButton::toggled, this, &NewDatasetWindow::dataTypeChangedSlot);
 	imagesButton = new QRadioButton("Images", configBox);
 	imagesButton->setChecked(m_datasetConfig->dataType == "Images");
 	LabelWithToolTip *numCamerasLabel = new LabelWithToolTip("Number of Cameras", "kdsff");
 	numCamerasBox = new QSpinBox(configBox);
 	numCamerasBox->setMinimum(0);
 	numCamerasBox->setValue(m_datasetConfig->numCameras);
+	connect(numCamerasBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &NewDatasetWindow::numCamerasChangedSlot);
 	LabelWithToolTip *frameSetsRecordingLabel = new LabelWithToolTip("Frames per Recording", "kdsff");
 	frameSetsRecordingBox = new QSpinBox(configBox);
 	frameSetsRecordingBox->setMinimum(0);
+	frameSetsRecordingBox->setMaximum(99999);
 	frameSetsRecordingBox->setValue(m_datasetConfig->frameSetsRecording);
+	connect(frameSetsRecordingBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &NewDatasetWindow::frameSetsRecordingChandedSlot);
 	LabelWithToolTip *samplingMethodLabel = new LabelWithToolTip("Sampling Method", "kdsff");
 	samplingMethodCombo = new QComboBox(configBox);
 	samplingMethodCombo->addItem("uniform");
 	samplingMethodCombo->addItem("kmeans");
 	samplingMethodCombo->setCurrentText(m_datasetConfig->samplingMethod);
+	connect(samplingMethodCombo, &QComboBox::currentTextChanged, this, &NewDatasetWindow::samplingMethodChangedSlot);
 
 	QGroupBox *recordingsBox = new QGroupBox("Recordings");
 	QGridLayout *recordingslayout = new QGridLayout(recordingsBox);
@@ -86,6 +93,7 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	middleSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	createButton = new QPushButton("Create");
 	createButton->setMinimumSize(40,40);
+	connect(createButton, &QPushButton::clicked, this, &NewDatasetWindow::createDatasetClickedSlot);
 	buttonbarlayout->addWidget(saveButton, 0,0);
 	buttonbarlayout->addWidget(loadButton,0,1);
 	buttonbarlayout->addWidget(middleSpacer,0,2);
@@ -108,6 +116,37 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	layout->addWidget(entitiesBox,1,1);
 	layout->addWidget(keypointsBox,2,1);
 	layout->addWidget(buttonBarWidget,3,0,1,2);
+
+	connect(this, &NewDatasetWindow::createDataset, datasetCreator, &DatasetCreator::createDatasetSlot);
+}
+
+void NewDatasetWindow::datasetNameChangedSlot(const QString &name) {
+	m_datasetConfig->datasetName = name;
+}
+
+void NewDatasetWindow::dataTypeChangedSlot() {
+	if (videosButton->isChecked()) {
+		m_datasetConfig->dataType = "Videos";
+	}
+	else {
+		m_datasetConfig->dataType = "Images";
+	}
+}
+
+void NewDatasetWindow::numCamerasChangedSlot(int num) {
+	m_datasetConfig->numCameras = num;
+}
+
+void NewDatasetWindow::frameSetsRecordingChandedSlot(int num) {
+	m_datasetConfig->frameSetsRecording = num;
+}
+
+void NewDatasetWindow::samplingMethodChangedSlot(const QString &method) {
+	m_datasetConfig->samplingMethod = method;
+}
+
+void NewDatasetWindow::createDatasetClickedSlot() {
+	emit createDataset(recordingsItemList->getItems(), entitiesItemList->getItems(), keypointsItemList->getItems());
 }
 
 void NewDatasetWindow::savePresetsClickedSlot() {
@@ -128,7 +167,6 @@ void NewDatasetWindow::savePresetSlot(const QString& preset) {
 	QList<QString> entItemsList;
 	for (const auto& item : entitiesItemList->itemSelectorList->findItems("",Qt::MatchContains)) {
 		entItemsList.append(item->text());
-		std::cout << item->text().toStdString() << std::endl;
 	}
 	settings->setValue("itemsList", QVariant::fromValue(entItemsList));
 	settings->endGroup();
@@ -136,7 +174,6 @@ void NewDatasetWindow::savePresetSlot(const QString& preset) {
 	QList<QString> keyItemsList;
 	for (const auto& item : keypointsItemList->itemSelectorList->findItems("",Qt::MatchContains)) {
 		keyItemsList.append(item->text());
-		std::cout << item->text().toStdString() << std::endl;
 	}
 	settings->setValue("itemsList", QVariant::fromValue(keyItemsList));
 	settings->endGroup();
@@ -162,116 +199,6 @@ void NewDatasetWindow::loadPresetSlot(const QString& preset) {
 	settings->endGroup();
 	settings->endGroup();
 }
-
-
-
-ConfigurableItemList::ConfigurableItemList(QString name, DatasetConfig *datasetConfig, bool pathMode, QWidget *parent) :
-			m_pathMode(pathMode), m_name(name), m_datasetConfig(datasetConfig), QWidget(parent) {
-	QGridLayout *labelselectorlayout = new QGridLayout(this);
-	itemSelectorList = new QListWidget(this);
-	itemSelectorList->setFont(QFont("Sans Serif", 12));
-	itemSelectorList->setAlternatingRowColors(true);
-	connect(itemSelectorList, &QListWidget::itemDoubleClicked, this, &ConfigurableItemList::itemSelectedSlot);
-	moveItemUpButton = new QPushButton();
-	moveItemUpButton->setIcon(QIcon::fromTheme("up"));
-	moveItemUpButton->setMinimumSize(35,35);
-	connect(moveItemUpButton, &QPushButton::clicked, this, &ConfigurableItemList::moveItemUpSlot);
-	moveItemDownButton = new QPushButton();
-	moveItemDownButton->setIcon(QIcon::fromTheme("down"));
-	moveItemDownButton->setMinimumSize(35,35);
-	connect(moveItemDownButton, &QPushButton::clicked, this, &ConfigurableItemList::moveItemDownSlot);
-	addItemButton = new QPushButton();
-	addItemButton->setIcon(QIcon::fromTheme("plus"));
-	addItemButton->setMinimumSize(35,35);
-	connect(addItemButton, &QPushButton::clicked, this, &ConfigurableItemList::addItemSlot);
-	deleteItemButton = new QPushButton();
-	deleteItemButton->setIcon(QIcon::fromTheme("discard"));
-	deleteItemButton->setMinimumSize(35,35);
-	connect(deleteItemButton, &QPushButton::clicked, this, &ConfigurableItemList::removeItemSlot);
-	labelselectorlayout->addWidget(itemSelectorList,0,0,1,4);
-	labelselectorlayout->addWidget(moveItemUpButton,1,0);
-	labelselectorlayout->addWidget(moveItemDownButton,1,1);
-	labelselectorlayout->addWidget(addItemButton,1,2);
-	labelselectorlayout->addWidget(deleteItemButton,1,3);
-	this->setLayout(labelselectorlayout);
-}
-
-void ConfigurableItemList::itemSelectedSlot(QListWidgetItem *item) {
-}
-
-void ConfigurableItemList::moveItemUpSlot() {
-	int row = itemSelectorList->currentRow();
-	QListWidgetItem *item = itemSelectorList->takeItem(row);
-	int newRow = std::max(row-1,0);
-	itemSelectorList->insertItem(newRow,item);
-	itemSelectorList->setCurrentRow(newRow);
-}
-
-void ConfigurableItemList::moveItemDownSlot() {
-	int row = itemSelectorList->currentRow();
-	QListWidgetItem *item = itemSelectorList->takeItem(row);
-	int newRow = std::min(row+1,itemSelectorList->count());
-	itemSelectorList->insertItem(newRow,item);
-	itemSelectorList->setCurrentRow(newRow);
-}
-
-int ConfigurableItemList::getNumberSubfolders(QString path) {
-	int count = -2;
-	for (QDirIterator it(path); it.hasNext();) {
-		if (QDir(it.next()).exists()) count++;
-	}
-	return count;
-}
-
-bool ConfigurableItemList::isValidRecordingFolder(QString path) {
-	bool isValid = true;
-	if (getNumberSubfolders(path) == m_datasetConfig->numCameras) {
-		for (QDirIterator it(path); it.hasNext();) {
-			QString path = it.next();
-			QString suffix = path.split('/').takeLast();
-			if (suffix != "." && suffix != "..") {
-				if (getNumberSubfolders(path) != 0) isValid = false;
-			}
-		}
-	}
-	else {
-		isValid = false;
-	}
-	return isValid;
-}
-
-void ConfigurableItemList::addItemSlot() {
-	QStringList items;
-	if (m_pathMode) {
-		QString dir = QFileDialog::getExistingDirectory(this,m_name, "/home/trackingsetup/Documents/Sabine_17062021/TrainingSets",
-					QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-		if (isValidRecordingFolder(dir)) {
-			items.append(dir);
-		}
-		for (QDirIterator it(dir,  QDirIterator::Subdirectories); it.hasNext();) {
-			QString path = it.next();
-			QString suffix = path.split('/').takeLast();
-			if (suffix != "." && suffix != "..") {
-				if (isValidRecordingFolder(path)) {
-					items.append(path);
-				}
-			}
-		}
-	}
-	else {
-		items.append(QInputDialog::getText(this,m_name,"Enter Label:", QLineEdit::Normal));
-	}
-	if (!items.isEmpty()) {
-		for (const auto & item : items) {
-			itemSelectorList->addItem(item);
-		}
-	}
-}
-
-void ConfigurableItemList::removeItemSlot() {
-	delete itemSelectorList->takeItem(itemSelectorList->currentRow());
-}
-
 
 LabelWithToolTip::LabelWithToolTip(QString name, QString toolTip, QWidget *parent) : QWidget(parent) {
 	QGridLayout *layout = new QGridLayout(this);

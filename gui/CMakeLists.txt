@@ -11,6 +11,7 @@ add_library(${PROJECT_NAME}
 		imageviewer.hpp
     loaddatasetwindow.hpp
     newdatasetwindow.hpp
+    configurableitemlist.hpp
     reprojectionwidget.hpp
 		reprojectionchartwidget.hpp
 		reprojectionchartview.hpp
@@ -24,6 +25,7 @@ add_library(${PROJECT_NAME}
 		imageviewer.cpp
     loaddatasetwindow.cpp
     newdatasetwindow.cpp
+    configurableitemlist.cpp
     reprojectionwidget.cpp
 		reprojectionchartwidget.cpp
 		reprojectionchartview.cpp

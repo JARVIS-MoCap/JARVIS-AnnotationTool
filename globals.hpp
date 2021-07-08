@@ -38,6 +38,14 @@ typedef struct ImgSet {
 	QList<Frame*> frames;
 } ImgSet;
 
+typedef struct DatasetConfig {
+	QString datasetName = "New Dataset";
+	QString dataType = "Images";
+	int numCameras= 12;
+	int frameSetsRecording = 6;
+	QString samplingMethod = "uniform";
+
+} DatasetConfig;
 
 
 void createToolBarButton(QToolButton * button, QAction* action, QIcon icon, bool enabled = true,
