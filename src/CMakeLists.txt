@@ -41,6 +41,7 @@ target_link_libraries(${PROJECT_NAME}
 	yaml-cpp
 	opencv_core
 	opencv_calib3d
+	opencv_videoio
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused)

@@ -24,14 +24,24 @@ void DatasetCreator::createDatasetSlot(QList<QString> recordings, QList<QString>
 	for (const auto & recording : m_recordingsList) {
 		QString path = recording.split('/').takeLast();
 		QList<QString> cameras = getCameraNames(recording);
-		std::cout << cameras.size() << std::endl;
-
-		createSavefile(m_datasetConfig->datasetName + '/' + path, cameras);
+		if (m_datasetConfig->dataType == "Videos") {
+			m_datasetConfig->videoFormat = getVideoFormat(recording);
+			if (m_datasetConfig->videoFormat == "") {
+				std::cout << "All videos must have the same format!" << std::endl;
+				return;
+			}
+			if (!checkFrameCounts(recording, cameras)) {
+				std::cout << "Frame count mismatch!!" << std::endl;
+				return;
+			}
+		}
+		QList<int> frameNumbers = extractFrames(recording, cameras);
+		createSavefile(recording, cameras, m_datasetConfig->datasetName + '/' + path, frameNumbers);
 	}
 
 }
 
-QList<QString> DatasetCreator::getCameraNames(QString path) {
+QList<QString> DatasetCreator::getCameraNames(const QString& path) {
 	QList<QString> cameraNames;
 	if (m_datasetConfig->dataType == "Images") {
 		for (QDirIterator it(path); it.hasNext();) {
@@ -48,7 +58,6 @@ QList<QString> DatasetCreator::getCameraNames(QString path) {
 			QString suffix = subpath.split('/').takeLast();
 			if (suffix != "." && suffix != "..") {
 				suffix = suffix.split(".").takeFirst();
-				std::cout << suffix.toStdString() << std::endl;
 				cameraNames.append(suffix);
 			}
 		}
@@ -56,12 +65,92 @@ QList<QString> DatasetCreator::getCameraNames(QString path) {
 	return cameraNames;
 }
 
-void DatasetCreator::createSavefile(const QString& dataFolder, QList<QString> cameraNames) {
+QString DatasetCreator::getVideoFormat(const QString& recording) {
+	QList <QString> formats;
+	for (QDirIterator it(recording); it.hasNext();) {
+		QString subpath = it.next();
+		QString suffix = subpath.split('/').takeLast();
+		if (suffix != "." && suffix != "..") {
+			suffix = suffix.split(".").takeLast();
+			formats.append(suffix);
+		}
+	}
+	if (formats.count(formats[0]) != formats.length()) {
+		return "";
+	}
+	else {
+		return formats[0];
+	}
+}
+
+
+bool DatasetCreator::checkFrameCounts(const QString& recording, QList<QString> cameras) {
+	int numFrames = -1;
+	for (const auto & camera : cameras) {
+		cv::VideoCapture cap((recording + "/" + camera + "." + m_datasetConfig->videoFormat).toStdString());
+		if(!cap.isOpened()){
+    	std::cout << "Error opening video stream or file" << std::endl;
+    	return false;
+  	}
+
+		int newNumFrames = cap.get(cv::CAP_PROP_FRAME_COUNT);
+		cap.release();
+		if (numFrames != -1 && newNumFrames != numFrames)  {
+			return false;
+		}
+		else {
+			numFrames = newNumFrames;
+		}
+	}
+	return true;
+}
+
+QList<int> DatasetCreator::extractFrames(const QString& recording, QList<QString> cameras) {
+	QList<int> frameNumbers;
+	if (m_datasetConfig->dataType == "Videos") {
+		if (m_datasetConfig->samplingMethod == "uniform") {
+			cv::VideoCapture cap((recording + "/" + cameras[0] + "." + m_datasetConfig->videoFormat).toStdString());
+			float numFrames = cap.get(cv::CAP_PROP_FRAME_COUNT);
+			cap.release();
+			float spacing = numFrames / m_datasetConfig->frameSetsRecording;
+			for (float num = 0.; num < numFrames; num += spacing) {
+				frameNumbers.append(static_cast<int>(num+spacing/2.));
+			}
+		}
+	}
+	return frameNumbers;
+}
+
+QList<QString> DatasetCreator::getAndCopyFrames(const QString& recording, QList<QString> cameras, const QString& dataFolder, QList<int> frameNumbers) {
+	QList<QString> frameNames;
+	if (m_datasetConfig->dataType == "Videos") {
+		for (const auto & camera : cameras) {
+			cv::VideoCapture cap((recording + "/" + camera + "." + m_datasetConfig->videoFormat).toStdString());
+			if(!cap.isOpened()) {
+				std::cout << "Error opening video stream or file" << std::endl;
+				return frameNames;
+			}
+			for (const auto & frameNumber : frameNumbers) {
+				cv::Mat frame;
+				cap.set(cv::CAP_PROP_POS_FRAMES, frameNumber);
+    		cap >> frame;
+				cv::imwrite((dataFolder + "/" + camera + "/" +  "Frame_" + QString::number(frameNumber) + ".jpg").toStdString(), frame);
+			}
+			cap.release();
+		}
+		for (const auto &frameNumber : frameNumbers) {
+			frameNames.append("Frame_" + QString::number(frameNumber) + ".jpg");
+		}
+	}
+	return frameNames;
+}
+
+void DatasetCreator::createSavefile(const QString& recording, QList<QString> cameras, const QString& dataFolder, QList<int> frameNumbers) {
 	QList<QFile*> saveFiles;
-	for (int i = 0; i < m_datasetConfig->numCameras; i++) {
+	for (const auto & camera : cameras) {
 		QDir dir;
-		dir.mkpath(dataFolder + "/" + cameraNames[i]);
-		QFile *file = new QFile(dataFolder + "/" + cameraNames[i] +"/annotations.csv");
+		dir.mkpath(dataFolder + "/" + camera);
+		QFile *file = new QFile(dataFolder + "/" + camera +"/annotations.csv");
 		saveFiles.append(file);
 		if (!file->open(QIODevice::WriteOnly)) {
 			std::cout << "Can't open File" << std::endl;
@@ -77,7 +166,7 @@ void DatasetCreator::createSavefile(const QString& dataFolder, QList<QString> ca
 		 }
 		 stream << "\n";
 		 stream << "entities";
-		 for (int i = 0; i <num_columns; i++) {
+		 for (int i = 0; i < num_columns; i++) {
 			 stream << "," << m_entitiesList[i/(m_keypointsList.size()*3)];
 		 }
 		 stream << "\n";
@@ -94,31 +183,17 @@ void DatasetCreator::createSavefile(const QString& dataFolder, QList<QString> ca
 		 }
 		 stream << "\n";
 	}
-	/*for (auto& imgSet : m_imgSets) {
-		for (int cam = 0; cam < m_numCameras; cam++) {
+	QList<QString> frameNames = getAndCopyFrames(recording, cameras, dataFolder, frameNumbers);
+
+	for (int cam = 0; cam < m_datasetConfig->numCameras; cam++) {
+		for (const auto &frameName : frameNames) {
 			QTextStream stream(saveFiles[cam]);
-			stream << imgSet->frames[cam]->imagePath.split("/").last() << ",";	//decide on what should be in this path (look at DLC2.2)
-			for (int i = 0; i < m_keypointNameList.size(); i++) {
-				Keypoint *keypoint =  imgSet->frames[cam]->keypointMap[m_entityNameList[i] + "/" + m_keypointNameList[i]];
-				if (keypoint->state() == NotAnnotated) {
+			stream << frameName;
+			for (int i = 0; i < m_keypointsList.size()*3*m_entitiesList.size(); i++) {
 					stream << ",," << 0 << ",";
-				}
-				else if (keypoint->state() == Annotated) {
-					stream << keypoint->rx() << "," << keypoint->ry() << ",";
-					stream << 1 << ",";
-				}
-				else if (keypoint->state() == Reprojected) {
-					stream << keypoint->rx() << "," << keypoint->ry() << ",";
-					stream << 2 << ",";
-				}
-				else {
-					stream << ",," << 3 << ",";
-				}
 			}
-			stream << "\n";
+		 stream << "\n";
 		}
+		saveFiles[cam]->close();
 	}
-	for (int i = 0; i < m_numCameras; i++) {
-		saveFiles[i]->close();
-	}*/
 }

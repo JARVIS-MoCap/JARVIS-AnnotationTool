@@ -80,7 +80,7 @@ int ConfigurableItemList::getNumberSubfolders(QString path) {
 		QString subpath = it.next();
 		QString suffix = subpath.split('/').takeLast();
 		if (m_datasetConfig->dataType == "Images" && QDir(subpath).exists() && suffix != "." && suffix != "..") count++;
-		if (m_datasetConfig->dataType == "Videos" &&  subpath.split('.').takeLast() == "avi") count++;
+		if (m_datasetConfig->dataType == "Videos" &&  subpath.split('.').takeLast() == "avi") count++;		//TODO: make this work for more formats than just avi
 	}
 	return count;
 }
@@ -107,7 +107,7 @@ bool ConfigurableItemList::isValidRecordingFolder(QString path) {
 void ConfigurableItemList::addItemSlot() {
 	QStringList items;
 	if (m_pathMode) {
-		QString dir = QFileDialog::getExistingDirectory(this,m_name, "/home/trackingsetup/Documents/Sabine_17062021",
+		QString dir = QFileDialog::getExistingDirectory(this,m_name, "/media/timo/Elements/Recordings",
 					QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 		if (isValidRecordingFolder(dir)) {
 			items.append(dir);

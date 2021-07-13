@@ -16,10 +16,10 @@ endif()
 
 set(CMAKE_PREFIX_PATH "libs/${STATIC_LIB_LOCATION}")
 
-set(Qt5_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5")
-set(Qt5Core_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5Core")
-set(Qt5Widgets_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5Widgets")
-set(Qt5Charts_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5Charts")
+set(Qt5_DIR "libs/${STATIC_LIB_LOCATION}/qt-5.15.2-static/lib/cmake/Qt5")
+set(Qt5Core_DIR "libs/${STATIC_LIB_LOCATION}/qt-5.15.2-static/lib/cmake/Qt5Core")
+set(Qt5Widgets_DIR "libs/${STATIC_LIB_LOCATION}/qt-5.15.2-static/lib/cmake/Qt5Widgets")
+set(Qt5Charts_DIR "libs/${STATIC_LIB_LOCATION}/qt-5.15.2-static/lib/cmake/Qt5Charts")
 
 #find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
 
