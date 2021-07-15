@@ -44,8 +44,8 @@ typedef struct DatasetConfig {
 	QString videoFormat = "";
 	QString imageFormat = "";
 	int numCameras= 12;
-	int frameSetsRecording = 6;
-	QString samplingMethod = "uniform";
+	int frameSetsRecording = 1;
+	QString samplingMethod = "kmeans";
 
 } DatasetConfig;
 

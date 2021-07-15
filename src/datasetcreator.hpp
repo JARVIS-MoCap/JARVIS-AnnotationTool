@@ -1,6 +1,6 @@
 /*------------------------------------------------------------
  *  datasetcreator.hpp
- *  Created: 23. October 2020
+ *  Created: 23. October 2021
  *  Author:   Timo Hüser
  *------------------------------------------------------------*/
 
@@ -8,10 +8,14 @@
 #define DATASETCREATOR_H
 
 #include "globals.hpp"
-//#include "opencv2/opencv.hpp"
-//#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/highgui/highgui.hpp"
 #include "opencv2/videoio/videoio.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
+
+#include <QRunnable>
+
+Q_DECLARE_METATYPE(QList<cv::Mat>)
 
 
 class DatasetCreator : public QObject {
@@ -20,6 +24,7 @@ class DatasetCreator : public QObject {
 		explicit DatasetCreator(DatasetConfig *datasetConfig);
 
 		signals:
+			void gotAllDCTs();
 
 		public slots:
 			void createDatasetSlot(QList<QString> recordings, QList<QString> entities, QList<QString> keypoints);
@@ -29,6 +34,7 @@ class DatasetCreator : public QObject {
 		QList<QString> m_recordingsList;
 		QList<QString> m_entitiesList;
 		QList<QString> m_keypointsList;
+		QMap<int,QList<cv::Mat>> m_dctMap;
 
 		QList<QString> getCameraNames(const QString & path);
 		QString getVideoFormat(const QString& recording);
@@ -39,10 +45,24 @@ class DatasetCreator : public QObject {
 
 
 	private slots:
+		void computedDCTsSlot(QList<cv::Mat> dctImages, int threadNumber);
 
+};
 
+class VideoStreamer : public QObject, public QRunnable {
+	Q_OBJECT
+	public:
+		explicit VideoStreamer(QString videoPath, int threadNumber);
+		void run();
 
+	signals:
+		void computedDCTs(QList<cv::Mat> dctImages, int threadNumber);
 
+	private:
+		QList<cv::Mat> dctImages;
+		std::vector<cv::Mat> *m_buffer;
+		int m_threadNumber;
+		cv::VideoCapture *m_cap;
 };
 
 #endif

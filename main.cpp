@@ -20,6 +20,7 @@
 
 Q_DECLARE_METATYPE(QList<int>)
 
+
 int main(int argc, char **argv)
 {
 	// This makes relative paths work in C++ in Xcode by changing directory to the Resources folder inside the .app bundle

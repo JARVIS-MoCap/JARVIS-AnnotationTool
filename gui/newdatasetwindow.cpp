@@ -13,6 +13,7 @@
 #include <QGroupBox>
 #include <QInputDialog>
 #include <QDirIterator>
+#include <QThread>
 
 
 NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
@@ -24,6 +25,9 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 
 	m_datasetConfig = new DatasetConfig;
 	datasetCreator = new DatasetCreator(m_datasetConfig);
+	QThread *thread = new QThread;
+	datasetCreator->moveToThread(thread);
+	thread->start();
 
 	loadPresetsWindow = new PresetsWindow(&presets, "load", "New Dataset Window/");
 	savePresetsWindow = new PresetsWindow(&presets, "save", "New Dataset Window/");
@@ -50,7 +54,7 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	LabelWithToolTip *frameSetsRecordingLabel = new LabelWithToolTip("Frames per Recording", "kdsff");
 	frameSetsRecordingBox = new QSpinBox(configBox);
 	frameSetsRecordingBox->setMinimum(0);
-	frameSetsRecordingBox->setMaximum(99999);
+	frameSetsRecordingBox->setMaximum(9999999);
 	frameSetsRecordingBox->setValue(m_datasetConfig->frameSetsRecording);
 	connect(frameSetsRecordingBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &NewDatasetWindow::frameSetsRecordingChandedSlot);
 	LabelWithToolTip *samplingMethodLabel = new LabelWithToolTip("Sampling Method", "kdsff");

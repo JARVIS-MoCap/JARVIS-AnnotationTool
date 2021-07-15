@@ -107,7 +107,7 @@ bool ConfigurableItemList::isValidRecordingFolder(QString path) {
 void ConfigurableItemList::addItemSlot() {
 	QStringList items;
 	if (m_pathMode) {
-		QString dir = QFileDialog::getExistingDirectory(this,m_name, "/media/timo/Elements/Recordings",
+		QString dir = QFileDialog::getExistingDirectory(this,m_name, "/home/trackingsetup/Videos/Ralph_Test_13072021/Videos",
 					QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 		if (isValidRecordingFolder(dir)) {
 			items.append(dir);

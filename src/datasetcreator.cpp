@@ -1,6 +1,6 @@
 /*------------------------------------------------------------
  *  datasetcreator.cpp
- *  Created:  10. July 2018
+ *  Created:  10. July 2021
  *  Author:   Timo Hüser
  *------------------------------------------------------------*/
 
@@ -11,9 +11,35 @@
 #include <QTextStream>
 #include <QErrorMessage>
 #include <QDirIterator>
+#include <QThreadPool>
 
+#include <chrono>
+using namespace std::chrono;
+
+
+VideoStreamer::VideoStreamer(QString videoPath, int threadNumber) {
+	m_cap = new cv::VideoCapture(videoPath.toStdString());
+	m_threadNumber = threadNumber;
+}
+
+void VideoStreamer::run() {
+	for (int i = 0; i < 100; i++) {
+		cv::Mat img,dctImage;
+		m_cap->set(cv::CAP_PROP_POS_FRAMES, i*10);
+		m_cap->read(img);
+		cv::resize(img, img, cv::Size(160, 128));
+		cv::cvtColor(img,img, cv::COLOR_BGR2GRAY);
+		img.convertTo(img, CV_32FC1);
+		cv::dct(img/255.0, dctImage);
+		dctImage = dctImage(cv::Rect(0,0,20,16));
+		dctImages.append(dctImage);
+	}
+	emit computedDCTs(dctImages, m_threadNumber);
+}
 
 DatasetCreator::DatasetCreator(DatasetConfig *datasetConfig) : m_datasetConfig(datasetConfig) {
+	qRegisterMetaType<QList<cv::Mat>>();
+
 }
 
 void DatasetCreator::createDatasetSlot(QList<QString> recordings, QList<QString> entities, QList<QString> keypoints) {
@@ -117,6 +143,61 @@ QList<int> DatasetCreator::extractFrames(const QString& recording, QList<QString
 				frameNumbers.append(static_cast<int>(num+spacing/2.));
 			}
 		}
+		else if (m_datasetConfig->samplingMethod == "kmeans") {
+			int subsamplingRate = 10;
+
+			QList <VideoStreamer*> streamers;
+			QThreadPool *threadPool = QThreadPool::globalInstance();
+			for (int i = 0; i < m_datasetConfig->numCameras; i++) {
+				VideoStreamer *streamer = new VideoStreamer(recording + "/" + cameras[i] + "." + m_datasetConfig->videoFormat, i);
+				connect(streamer, &VideoStreamer::computedDCTs, this, &DatasetCreator::computedDCTsSlot);
+				streamers.append(streamer);
+	 			threadPool->start(streamer);
+			}
+			threadPool->waitForDone();
+
+			QEventLoop loop;
+			connect(this, &DatasetCreator::gotAllDCTs, &loop, &QEventLoop::quit);
+			loop.exec();
+
+			std::cout << m_dctMap[0].size() << std::endl;
+
+			cv::Mat dctImagesList;
+			for (int i = 0; i < m_dctMap[0].size(); i++) {
+				cv::Mat dctImages;
+				for (const auto dctImage : m_dctMap) {
+					if (dctImages.empty()) {
+						dctImages = dctImage[i];
+					}
+					else {
+						cv::vconcat(dctImages, dctImage[i], dctImages);
+					}
+				}
+				if (dctImagesList.empty()) {
+					dctImagesList = dctImages.reshape(1,1);
+				}
+				else {
+					cv::vconcat(dctImagesList,dctImages.reshape(1,1),dctImagesList);
+				}
+			}
+
+			cv::Mat labels, centers;
+			std::cout << dctImagesList.size() << std::endl;
+			double compactness = cv::kmeans(dctImagesList, m_datasetConfig->frameSetsRecording, labels,
+					cv::TermCriteria(cv::TermCriteria::EPS+cv::TermCriteria::COUNT, 1000, 1e-4),
+						 25, cv::KMEANS_PP_CENTERS, centers);
+
+			for (int i = 0; i < m_datasetConfig->frameSetsRecording; i++) {
+				std::vector< float > sums;
+				cv::Mat clusterDists;
+				for (int j = 0; j < dctImagesList.size().height; j++) {
+					clusterDists = dctImagesList.row(j)-centers.row(i);
+					sums.push_back(cv::sum(clusterDists.mul(clusterDists))[0]);
+				}
+				int minElementIndex = std::min_element(sums.begin(),sums.end()) - sums.begin();
+				frameNumbers.append(minElementIndex*subsamplingRate);
+			}
+		}
 	}
 	return frameNumbers;
 }
@@ -172,14 +253,15 @@ void DatasetCreator::createSavefile(const QString& recording, QList<QString> cam
 		 stream << "\n";
 		 stream << "bodyparts";
 		 for (int i = 0; i < num_columns; i++) {
-			 stream << "," << m_keypointsList[i%m_entitiesList.size()];
+			 stream << "," << m_keypointsList[i/(m_entitiesList.size()*3)];
 		 }
 		 stream << "\n";
 		 stream << "coords";
 		 for (int i = 0; i < num_columns; i++) {
 			 if (i%3 == 1) stream << "," << "x";
-			 else if (i%3 == 2) stream << "," << "state";
-			 else stream << "," << "y";
+			 else if (i%3 == 0) stream << "," << "y";
+			 else stream << "," << "state";
+
 		 }
 		 stream << "\n";
 	}
@@ -188,12 +270,19 @@ void DatasetCreator::createSavefile(const QString& recording, QList<QString> cam
 	for (int cam = 0; cam < m_datasetConfig->numCameras; cam++) {
 		for (const auto &frameName : frameNames) {
 			QTextStream stream(saveFiles[cam]);
-			stream << frameName;
-			for (int i = 0; i < m_keypointsList.size()*3*m_entitiesList.size(); i++) {
+			stream << frameName << ",";
+			for (int i = 0; i < m_keypointsList.size()*m_entitiesList.size(); i++) {
 					stream << ",," << 0 << ",";
 			}
 		 stream << "\n";
 		}
 		saveFiles[cam]->close();
+	}
+}
+
+void DatasetCreator::computedDCTsSlot(QList<cv::Mat> dctImages, int threadNumber) {
+	m_dctMap[threadNumber] = dctImages;
+	if (m_dctMap.size() == 12) {
+		emit gotAllDCTs();
 	}
 }
