@@ -17,33 +17,12 @@
 using namespace std::chrono;
 
 
-VideoStreamer::VideoStreamer(QString videoPath, int threadNumber) {
-	m_cap = new cv::VideoCapture(videoPath.toStdString());
-	m_threadNumber = threadNumber;
-}
-
-void VideoStreamer::run() {
-	for (int i = 0; i < 100; i++) {
-		cv::Mat img,dctImage;
-		m_cap->set(cv::CAP_PROP_POS_FRAMES, i*10);
-		m_cap->read(img);
-		cv::resize(img, img, cv::Size(160, 128));
-		cv::cvtColor(img,img, cv::COLOR_BGR2GRAY);
-		img.convertTo(img, CV_32FC1);
-		cv::dct(img/255.0, dctImage);
-		dctImage = dctImage(cv::Rect(0,0,20,16));
-		dctImages.append(dctImage);
-	}
-	emit computedDCTs(dctImages, m_threadNumber);
-}
-
 DatasetCreator::DatasetCreator(DatasetConfig *datasetConfig) : m_datasetConfig(datasetConfig) {
 	qRegisterMetaType<QList<cv::Mat>>();
 
 }
 
 void DatasetCreator::createDatasetSlot(QList<QString> recordings, QList<QString> entities, QList<QString> keypoints) {
-	std::cout << "Creating Dataset!" << std::endl;
 	m_recordingsList = recordings;
 	m_entitiesList = entities;
 	m_keypointsList = keypoints;
@@ -53,18 +32,18 @@ void DatasetCreator::createDatasetSlot(QList<QString> recordings, QList<QString>
 		if (m_datasetConfig->dataType == "Videos") {
 			m_datasetConfig->videoFormat = getVideoFormat(recording);
 			if (m_datasetConfig->videoFormat == "") {
-				std::cout << "All videos must have the same format!" << std::endl;
+				emit datasetCreationFailed("All videos must have the same format!");
 				return;
 			}
 			if (!checkFrameCounts(recording, cameras)) {
-				std::cout << "Frame count mismatch!!" << std::endl;
+				emit datasetCreationFailed("Frame count mismatch!");
 				return;
 			}
 		}
 		QList<int> frameNumbers = extractFrames(recording, cameras);
-		createSavefile(recording, cameras, m_datasetConfig->datasetName + '/' + path, frameNumbers);
+		createSavefile(recording, cameras, m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName + '/' + path, frameNumbers);
 	}
-
+	emit datasetCreated();
 }
 
 QList<QString> DatasetCreator::getCameraNames(const QString& path) {
@@ -133,12 +112,13 @@ bool DatasetCreator::checkFrameCounts(const QString& recording, QList<QString> c
 
 QList<int> DatasetCreator::extractFrames(const QString& recording, QList<QString> cameras) {
 	QList<int> frameNumbers;
+	cv::VideoCapture cap((recording + "/" + cameras[0] + "." + m_datasetConfig->videoFormat).toStdString());
+	float numFrames = cap.get(cv::CAP_PROP_FRAME_COUNT);
+	std::cout << "Total Num Frames: " << static_cast<int>(numFrames) << std::endl;
+	cap.release();
 	if (m_datasetConfig->dataType == "Videos") {
 		if (m_datasetConfig->samplingMethod == "uniform") {
-			cv::VideoCapture cap((recording + "/" + cameras[0] + "." + m_datasetConfig->videoFormat).toStdString());
-			float numFrames = cap.get(cv::CAP_PROP_FRAME_COUNT);
-			cap.release();
-			float spacing = numFrames / m_datasetConfig->frameSetsRecording;
+			float spacing = numFrames / (m_datasetConfig->frameSetsRecording+0.5);
 			for (float num = 0.; num < numFrames; num += spacing) {
 				frameNumbers.append(static_cast<int>(num+spacing/2.));
 			}
@@ -159,8 +139,6 @@ QList<int> DatasetCreator::extractFrames(const QString& recording, QList<QString
 			QEventLoop loop;
 			connect(this, &DatasetCreator::gotAllDCTs, &loop, &QEventLoop::quit);
 			loop.exec();
-
-			std::cout << m_dctMap[0].size() << std::endl;
 
 			cv::Mat dctImagesList;
 			for (int i = 0; i < m_dctMap[0].size(); i++) {
@@ -202,26 +180,24 @@ QList<int> DatasetCreator::extractFrames(const QString& recording, QList<QString
 	return frameNumbers;
 }
 
+
+
 QList<QString> DatasetCreator::getAndCopyFrames(const QString& recording, QList<QString> cameras, const QString& dataFolder, QList<int> frameNumbers) {
 	QList<QString> frameNames;
 	if (m_datasetConfig->dataType == "Videos") {
+		QList <ImageWriter*> writers;
+		QThreadPool *threadPool = QThreadPool::globalInstance();
 		for (const auto & camera : cameras) {
-			cv::VideoCapture cap((recording + "/" + camera + "." + m_datasetConfig->videoFormat).toStdString());
-			if(!cap.isOpened()) {
-				std::cout << "Error opening video stream or file" << std::endl;
-				return frameNames;
-			}
-			for (const auto & frameNumber : frameNumbers) {
-				cv::Mat frame;
-				cap.set(cv::CAP_PROP_POS_FRAMES, frameNumber);
-    		cap >> frame;
-				cv::imwrite((dataFolder + "/" + camera + "/" +  "Frame_" + QString::number(frameNumber) + ".jpg").toStdString(), frame);
-			}
-			cap.release();
+			QString videoPath = recording + "/" + camera + "." + m_datasetConfig->videoFormat;
+			QString destinationPath = dataFolder + "/" + camera;
+			ImageWriter *writer = new ImageWriter(videoPath, destinationPath, frameNumbers);
+			writers.append(writer);
+			threadPool->start(writer);
 		}
 		for (const auto &frameNumber : frameNumbers) {
 			frameNames.append("Frame_" + QString::number(frameNumber) + ".jpg");
 		}
+		threadPool->waitForDone();
 	}
 	return frameNames;
 }
@@ -284,5 +260,54 @@ void DatasetCreator::computedDCTsSlot(QList<cv::Mat> dctImages, int threadNumber
 	m_dctMap[threadNumber] = dctImages;
 	if (m_dctMap.size() == 12) {
 		emit gotAllDCTs();
+	}
+}
+
+
+VideoStreamer::VideoStreamer(const QString &videoPath, int threadNumber) {
+	m_cap = new cv::VideoCapture(videoPath.toStdString());
+	m_threadNumber = threadNumber;
+}
+
+void VideoStreamer::run() {
+	bool readFrame = true;
+	int frameCount = 0;
+	while (readFrame == true) {
+		if (m_threadNumber == 0 && frameCount % 100 == 0) {
+			std::cout << frameCount << std::endl;
+		}
+		cv::Mat img,dctImage;
+		m_cap->set(cv::CAP_PROP_POS_FRAMES, frameCount*10);
+		readFrame = m_cap->read(img);
+		if (readFrame) {
+			frameCount++;
+			cv::resize(img, img, cv::Size(160, 128));
+			cv::cvtColor(img,img, cv::COLOR_BGR2GRAY);
+			img.convertTo(img, CV_32FC1);
+			cv::dct(img/255.0, dctImage);
+			dctImage = dctImage(cv::Rect(0,0,20,16));
+			dctImages.append(dctImage);
+		}
+	}
+	emit computedDCTs(dctImages, m_threadNumber);
+}
+
+
+ImageWriter::ImageWriter(const QString &videoPath, const QString &destinationPath, QList<int> frameNumbers) :
+	m_destinationPath(destinationPath), m_frameNumbers(frameNumbers) {
+		m_cap = new cv::VideoCapture(videoPath.toStdString());
+}
+
+void ImageWriter::run() {
+	for (const auto & frameNumber : m_frameNumbers) {
+		cv::Mat frame;
+		m_cap->set(cv::CAP_PROP_POS_FRAMES, frameNumber-1);
+		if (m_cap->read(frame)) {
+			cv::imwrite((m_destinationPath + "/" +  "Frame_" + QString::number(frameNumber) + ".jpg").toStdString(), frame);
+		}
+		else {
+			std::cout << "Error reading Frame"<< std::endl;
+			return;
+		}
 	}
 }

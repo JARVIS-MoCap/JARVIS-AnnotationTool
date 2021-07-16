@@ -23,11 +23,15 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	setWindowTitle("New Dataset");
 	QGridLayout *layout = new QGridLayout(this);
 
+	videoCutterWindow = new VideoCutterWindow();
+	videoCutterWindow->show();
+
 	m_datasetConfig = new DatasetConfig;
 	datasetCreator = new DatasetCreator(m_datasetConfig);
 	QThread *thread = new QThread;
 	datasetCreator->moveToThread(thread);
 	thread->start();
+	m_errorMsg = new QErrorMessage();
 
 	loadPresetsWindow = new PresetsWindow(&presets, "load", "New Dataset Window/");
 	savePresetsWindow = new PresetsWindow(&presets, "save", "New Dataset Window/");
@@ -35,11 +39,26 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	connect(savePresetsWindow, SIGNAL(savePreset(QString)), this, SLOT(savePresetSlot(QString)));
 
 	QGroupBox *configBox = new QGroupBox("Configuration");
-	configBox->setMinimumSize(0,180);
+	configBox->setMinimumSize(0,220);
 	QGridLayout *configlayout = new QGridLayout(configBox);
 	LabelWithToolTip *datasetNameLabel = new LabelWithToolTip("New Dataset Name", "");
 	datasetNameEdit = new QLineEdit(m_datasetConfig->datasetName, configBox);
 	connect (datasetNameEdit, &QLineEdit::textEdited, this, &NewDatasetWindow::datasetNameChangedSlot);
+
+	LabelWithToolTip *datasetPathLabel = new LabelWithToolTip("New Dataset Path", "");
+	QWidget *datasetPathWidget = new QWidget(configBox);
+	QGridLayout *pathwidgetlayout = new QGridLayout(datasetPathWidget);
+	pathwidgetlayout->setMargin(0);
+	datasetPathEdit = new QLineEdit(m_datasetConfig->datasetPath, configBox);
+	connect (datasetPathEdit, &QLineEdit::textEdited, this, &NewDatasetWindow::datasetPathChangedSlot);
+	datasetPathButton = new QPushButton();
+	datasetPathButton->setMinimumSize(25,25);
+	datasetPathButton->setMaximumSize(25,25);
+	datasetPathButton->setIcon(QIcon::fromTheme("folder"));
+	connect(datasetPathButton, &QPushButton::clicked, this, &NewDatasetWindow::datasetPathClickedSlot);
+	pathwidgetlayout->addWidget(datasetPathEdit,0,0);
+	pathwidgetlayout->addWidget(datasetPathButton,0,1);
+
 	LabelWithToolTip *datatypeLabel = new LabelWithToolTip("Datatype to Load", "kdsff");
 	videosButton = new QRadioButton("Videos", configBox);
 	videosButton->setChecked(m_datasetConfig->dataType == "Videos");
@@ -105,15 +124,17 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 
 	configlayout->addWidget(datasetNameLabel,0,0);
 	configlayout->addWidget(datasetNameEdit,0,1,1,2);
-	configlayout->addWidget(datatypeLabel,1,0);
-	configlayout->addWidget(videosButton,1,1);
-	configlayout->addWidget(imagesButton,1,2);
-	configlayout->addWidget(numCamerasLabel,2,0);
-	configlayout->addWidget(numCamerasBox,2,1,1,2);
-	configlayout->addWidget(frameSetsRecordingLabel,3,0);
-	configlayout->addWidget(frameSetsRecordingBox,3,1,1,2);
-	configlayout->addWidget(samplingMethodLabel,4,0);
-	configlayout->addWidget(samplingMethodCombo,4,1,1,2);
+	configlayout->addWidget(datasetPathLabel,1,0);
+	configlayout->addWidget(datasetPathWidget,1,1,1,2);
+	configlayout->addWidget(datatypeLabel,2,0);
+	configlayout->addWidget(videosButton,2,1);
+	configlayout->addWidget(imagesButton,2,2);
+	configlayout->addWidget(numCamerasLabel,3,0);
+	configlayout->addWidget(numCamerasBox,3,1,1,2);
+	configlayout->addWidget(frameSetsRecordingLabel,4,0);
+	configlayout->addWidget(frameSetsRecordingBox,4,1,1,2);
+	configlayout->addWidget(samplingMethodLabel,5,0);
+	configlayout->addWidget(samplingMethodCombo,5,1,1,2);
 
 	layout->addWidget(configBox,0,0,1,2);
 	layout->addWidget(recordingsBox,1,0,2,1);
@@ -122,11 +143,28 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	layout->addWidget(buttonBarWidget,3,0,1,2);
 
 	connect(this, &NewDatasetWindow::createDataset, datasetCreator, &DatasetCreator::createDatasetSlot);
+	connect(datasetCreator, &DatasetCreator::datasetCreated, this, &NewDatasetWindow::datasetCreatedSot);
+	connect(datasetCreator, &DatasetCreator::datasetCreationFailed, this, &NewDatasetWindow::datasetCreationFailedSlot);
+
 }
 
 void NewDatasetWindow::datasetNameChangedSlot(const QString &name) {
 	m_datasetConfig->datasetName = name;
 }
+
+void NewDatasetWindow::datasetPathChangedSlot(const QString &path) {
+	m_datasetConfig->datasetPath = path;
+}
+
+void NewDatasetWindow::datasetPathClickedSlot() {
+	QString dir = QFileDialog::getExistingDirectory(this,"Dataset Path", "./",
+				QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	if (dir != "") {
+		datasetPathEdit->setText(dir);
+		m_datasetConfig->datasetPath = dir;
+	}
+}
+
 
 void NewDatasetWindow::dataTypeChangedSlot() {
 	if (videosButton->isChecked()) {
@@ -150,8 +188,19 @@ void NewDatasetWindow::samplingMethodChangedSlot(const QString &method) {
 }
 
 void NewDatasetWindow::createDatasetClickedSlot() {
+	createButton->setEnabled(false);
 	emit createDataset(recordingsItemList->getItems(), entitiesItemList->getItems(), keypointsItemList->getItems());
 }
+
+void NewDatasetWindow::datasetCreatedSot() {
+	createButton->setEnabled(true);
+}
+
+void NewDatasetWindow::datasetCreationFailedSlot(QString errorMsg) {
+	m_errorMsg->showMessage(errorMsg + "\nDataset Creation aborted...");
+	createButton->setEnabled(true);
+}
+
 
 void NewDatasetWindow::savePresetsClickedSlot() {
 	savePresetsWindow->updateListSlot();

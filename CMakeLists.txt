@@ -20,12 +20,17 @@ set(Qt5_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5")
 set(Qt5Core_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5Core")
 set(Qt5Widgets_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5Widgets")
 set(Qt5Charts_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5Charts")
+set(Qt5Multimedia_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5Multimedia")
+set(Qt5MultimediaWidgets_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5MultimediaWidgets")
 
 #find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
 
-find_package(Qt5Core)
-find_package(Qt5Widgets)
-find_package(Qt5Charts)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Charts REQUIRED)
+find_package(Qt5Multimedia REQUIRED)
+find_package(Qt5MultimediaWidgets REQUIRED)
+
 
 message (STATUS "QT DIRECTORY ${Qt5Core_DIR}")
 
@@ -86,6 +91,8 @@ target_include_directories( ${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   Qt5::Widgets
 	Qt5::Charts
+  Qt5::Multimedia
+  Qt5::MultimediaWidgets
   gui
   src
   darkstyle

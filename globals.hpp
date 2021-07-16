@@ -40,6 +40,7 @@ typedef struct ImgSet {
 
 typedef struct DatasetConfig {
 	QString datasetName = "New Dataset";
+	QString datasetPath = ".";
 	QString dataType = "Videos";
 	QString videoFormat = "";
 	QString imageFormat = "";

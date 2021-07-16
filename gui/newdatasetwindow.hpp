@@ -13,6 +13,7 @@
 #include "presetswindow.hpp"
 #include "configurableitemlist.hpp"
 #include "datasetcreator.hpp"
+#include "videocutterwindow.hpp"
 
 
 
@@ -25,6 +26,7 @@
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QComboBox>
+#include <QErrorMessage>
 
 
 class NewDatasetWindow : public QWidget {
@@ -38,6 +40,8 @@ class NewDatasetWindow : public QWidget {
 		void createDataset(QList<QString> recordings, QList<QString> entities, QList<QString> keypoints);
 
 	private:
+		VideoCutterWindow *videoCutterWindow;
+
 		DatasetConfig	*m_datasetConfig;
 		DatasetCreator *datasetCreator;
 		QSettings *settings;
@@ -46,6 +50,8 @@ class NewDatasetWindow : public QWidget {
 		QList<QString> presets;
 
 		QLineEdit *datasetNameEdit;
+		QLineEdit *datasetPathEdit;
+		QPushButton *datasetPathButton;
 		QRadioButton *videosButton;
 		QRadioButton *imagesButton;
 		QSpinBox *numCamerasBox;
@@ -60,14 +66,24 @@ class NewDatasetWindow : public QWidget {
 		QPushButton *saveButton;
 		QPushButton *createButton;
 
+		QErrorMessage *m_errorMsg;
+
+
 
 		private slots:
 			void datasetNameChangedSlot(const QString &name);
+			void datasetPathChangedSlot(const QString &path);
+			void datasetPathClickedSlot();
 			void dataTypeChangedSlot();
 			void numCamerasChangedSlot(int num);
 			void frameSetsRecordingChandedSlot(int num);
 			void samplingMethodChangedSlot(const QString &method);
+
 			void createDatasetClickedSlot();
+			void datasetCreatedSot();
+			void datasetCreationFailedSlot(QString errorMsg);
+
+
 			void savePresetsClickedSlot();
 			void loadPresetsClickedSlot();
 			void savePresetSlot(const QString& preset);
