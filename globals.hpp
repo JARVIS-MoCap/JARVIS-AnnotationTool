@@ -50,6 +50,18 @@ typedef struct DatasetConfig {
 
 } DatasetConfig;
 
+typedef struct TimeLineWindow {
+	QString name;
+	int start;
+	int end;
+} TimeLineWindow;
+
+
+typedef struct RecordingItem {
+	QString name;
+	QString path;
+	QList<TimeLineWindow> timeLineList;
+} RecordingItem;
 
 void createToolBarButton(QToolButton * button, QAction* action, QIcon icon, bool enabled = true,
 												 bool checkable = false, QSize minSize = QSize(20,20));

@@ -23,9 +23,6 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	setWindowTitle("New Dataset");
 	QGridLayout *layout = new QGridLayout(this);
 
-	videoCutterWindow = new VideoCutterWindow();
-	videoCutterWindow->show();
-
 	m_datasetConfig = new DatasetConfig;
 	datasetCreator = new DatasetCreator(m_datasetConfig);
 	QThread *thread = new QThread;
@@ -85,8 +82,8 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 
 	QGroupBox *recordingsBox = new QGroupBox("Recordings");
 	QGridLayout *recordingslayout = new QGridLayout(recordingsBox);
-	recordingsItemList = new ConfigurableItemList("Recordings", m_datasetConfig, true);
-	recordingslayout->addWidget(recordingsItemList,0,0);
+	recordingsTable = new RecordingsTable("Recordings", m_datasetConfig);
+	recordingslayout->addWidget(recordingsTable,0,0);
 	recordingslayout->setMargin(0);
 
 	QGroupBox *entitiesBox = new QGroupBox("Entities");
@@ -137,8 +134,8 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	configlayout->addWidget(samplingMethodCombo,5,1,1,2);
 
 	layout->addWidget(configBox,0,0,1,2);
-	layout->addWidget(recordingsBox,1,0,2,1);
-	layout->addWidget(entitiesBox,1,1);
+	layout->addWidget(recordingsBox,1,0,1,2);
+	layout->addWidget(entitiesBox,2,0);
 	layout->addWidget(keypointsBox,2,1);
 	layout->addWidget(buttonBarWidget,3,0,1,2);
 
@@ -189,7 +186,7 @@ void NewDatasetWindow::samplingMethodChangedSlot(const QString &method) {
 
 void NewDatasetWindow::createDatasetClickedSlot() {
 	createButton->setEnabled(false);
-	emit createDataset(recordingsItemList->getItems(), entitiesItemList->getItems(), keypointsItemList->getItems());
+	emit createDataset(recordingsTable->getItems(), entitiesItemList->getItems(), keypointsItemList->getItems());
 }
 
 void NewDatasetWindow::datasetCreatedSot() {
@@ -252,6 +249,8 @@ void NewDatasetWindow::loadPresetSlot(const QString& preset) {
 	settings->endGroup();
 	settings->endGroup();
 }
+
+
 
 LabelWithToolTip::LabelWithToolTip(QString name, QString toolTip, QWidget *parent) : QWidget(parent) {
 	QGridLayout *layout = new QGridLayout(this);

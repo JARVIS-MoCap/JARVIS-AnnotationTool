@@ -15,6 +15,8 @@
 #ifndef __ctkRangeSlider_h
 #define __ctkRangeSlider_h
 
+#include "globals.hpp"
+
 // Qt includes
 #include <QSlider>
 
@@ -44,8 +46,10 @@ class ctkRangeSlider : public QSlider
   Q_OBJECT
   Q_PROPERTY(int minimumValue READ minimumValue WRITE setMinimumValue)
   Q_PROPERTY(int maximumValue READ maximumValue WRITE setMaximumValue)
+  Q_PROPERTY(int mainValue READ mainValue WRITE setMainValue)
   Q_PROPERTY(int minimumPosition READ minimumPosition WRITE setMinimumPosition)
   Q_PROPERTY(int maximumPosition READ maximumPosition WRITE setMaximumPosition)
+  Q_PROPERTY(int mainPosition READ mainPosition WRITE setMainPosition)
   Q_PROPERTY(bool symmetricMoves READ symmetricMoves WRITE setSymmetricMoves)
   Q_PROPERTY(QString handleToolTip READ handleToolTip WRITE setHandleToolTip)
 
@@ -58,6 +62,18 @@ public:
   explicit ctkRangeSlider( Qt::Orientation o, QWidget* par= 0 );
   explicit ctkRangeSlider( QWidget* par = 0 );
   virtual ~ctkRangeSlider();
+
+  void setRangeVisible(bool visible);
+  void setMainVisible(bool visible);
+  void setMainOverRange(bool overRange);
+  void setMinInRange(bool inRange);
+  void setMaxInRange(bool inRange);
+
+  bool rangeVisible();
+  bool mainOverRange();
+  bool mainVisible();
+  bool minInRange();
+  bool maxInRange();
 
   ///
   /// This property holds the slider's current minimum value.
@@ -74,6 +90,14 @@ public:
   int maximumValue() const;
 
   ///
+  /// This property holds the slider's current maximum value.
+  /// The slider forces the maximum value to be within the legal range:
+  /// The slider silently forces maximumValue to be within the legal range:
+  /// Changing the maximumValue also changes the maximumPosition.
+  int mainValue() const;
+
+
+  ///
   /// This property holds the current slider minimum position.
   /// If tracking is enabled (the default), this is identical to minimumValue.
   int minimumPosition() const;
@@ -86,9 +110,15 @@ public:
   void setMaximumPosition(int max);
 
   ///
+  /// This property holds the current slider main position.
+  /// If tracking is enabled (the default), this is identical to maximumValue.
+  int mainPosition() const;
+  void setMainPosition(int main);
+
+  ///
   /// Utility function that set the minimum position and
   /// maximum position at once.
-  void setPositions(int min, int max);
+  void setPositions(int min, int max, int main);
 
   ///
   /// When symmetricMoves is true, moving a handle will move the other handle
@@ -111,6 +141,9 @@ public:
   /// \sa isMinimumSliderDown()
   bool isMaximumSliderDown()const;
 
+  /// Returns true if the main value handle is down, false if it is up.
+  bool isMainSliderDown()const;
+
 Q_SIGNALS:
   ///
   /// This signal is emitted when the slider minimum value has changed,
@@ -120,9 +153,12 @@ Q_SIGNALS:
   /// This signal is emitted when the slider maximum value has changed,
   /// with the new slider value as argument.
   void maximumValueChanged(int max);
+  /// This signal is emitted when the slider main value has changed,
+  /// with the new slider value as argument.
+  void mainValueChanged(int max);
   ///
   /// Utility signal that is fired when minimum or maximum values have changed.
-  void valuesChanged(int min, int max);
+  void valuesChanged(int min, int max, int main);
 
   ///
   /// This signal is emitted when sliderDown is true and the slider moves.
@@ -139,9 +175,16 @@ Q_SIGNALS:
   void maximumPositionChanged(int max);
 
   ///
+  /// This signal is emitted when sliderDown is true and the slider moves.
+  /// This usually happens when the user is dragging the maximum slider.
+  /// The value is the new slider maximum position.
+  /// This signal is emitted even when tracking is turned off.
+  void mainPositionChanged(int main);
+
+  ///
   /// Utility signal that is fired when minimum or maximum positions
   /// have changed.
-  void positionsChanged(int min, int max);
+  void positionsChanged(int min, int max, int main);
 
 public Q_SLOTS:
   ///
@@ -161,13 +204,21 @@ public Q_SLOTS:
   void setMaximumValue(int max);
 
   ///
+  /// This property holds the slider's current maximum value.
+  /// The slider silently forces max to be within the legal range:
+  /// minimum() <= minimumValue() <= max <= maximum().
+  /// Note: Changing the maximumValue also changes the maximumPosition.
+  /// \sa stMinimumValue, setValues, setMinimum, setMaximum, setRange
+  void setMainValue(int main);
+
+  ///
   /// Utility function that set the minimum value and maximum value at once.
   /// The slider silently forces min and max to be within the legal range:
   /// minimum() <= min <= max <= maximum().
   /// Note: Changing the minimumValue and maximumValue also changes the
   /// minimumPosition and maximumPosition.
   /// \sa setMinimumValue, setMaximumValue, setMinimum, setMaximum, setRange
-  void setValues(int min, int max);
+  void setValues(int min, int max, int main);
 
 protected Q_SLOTS:
   void onRangeChanged(int minimum, int maximum);
@@ -187,6 +238,7 @@ protected:
   virtual void paintEvent(QPaintEvent* ev);
   virtual void initMinimumSliderStyleOption(QStyleOptionSlider* option) const;
   virtual void initMaximumSliderStyleOption(QStyleOptionSlider* option) const;
+  virtual void initMainSliderStyleOption(QStyleOptionSlider* option) const;
 
   // Description:
   // Reimplemented for the tooltips

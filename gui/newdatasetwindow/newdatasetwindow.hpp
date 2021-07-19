@@ -12,8 +12,8 @@
 #include "dataset.hpp"
 #include "presetswindow.hpp"
 #include "configurableitemlist.hpp"
+#include "recordingstable.hpp"
 #include "datasetcreator.hpp"
-#include "videocutterwindow.hpp"
 
 
 
@@ -40,8 +40,6 @@ class NewDatasetWindow : public QWidget {
 		void createDataset(QList<QString> recordings, QList<QString> entities, QList<QString> keypoints);
 
 	private:
-		VideoCutterWindow *videoCutterWindow;
-
 		DatasetConfig	*m_datasetConfig;
 		DatasetCreator *datasetCreator;
 		QSettings *settings;
@@ -58,7 +56,7 @@ class NewDatasetWindow : public QWidget {
 		QSpinBox *frameSetsRecordingBox;
 		QComboBox *samplingMethodCombo;
 
-		ConfigurableItemList *recordingsItemList;
+		RecordingsTable *recordingsTable;
 		ConfigurableItemList *entitiesItemList;
 		ConfigurableItemList *keypointsItemList;
 
@@ -88,6 +86,7 @@ class NewDatasetWindow : public QWidget {
 			void loadPresetsClickedSlot();
 			void savePresetSlot(const QString& preset);
 			void loadPresetSlot(const QString& preset);
+
 };
 
 

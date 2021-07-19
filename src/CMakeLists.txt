@@ -15,14 +15,12 @@ message("OPENCV_DIR ${OpenCV_DIR}")
 
 add_library(${PROJECT_NAME}
 	keypoint.hpp
-	configreader.hpp
 	colormap.hpp
 	dataset.hpp
 	datasetcreator.hpp
 	reprojectiontool.hpp
 	switch.hpp
 	keypoint.cpp
-	configreader.cpp
 	colormap.cpp
 	dataset.cpp
 	datasetcreator.cpp
@@ -42,7 +40,6 @@ target_link_libraries(${PROJECT_NAME}
 	opencv_core
 	opencv_calib3d
 	opencv_videoio
-	opencv_highgui
 	opencv_imgproc
 )
 

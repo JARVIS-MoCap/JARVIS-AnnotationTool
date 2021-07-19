@@ -15,8 +15,8 @@
 #include <QDirIterator>
 
 
-ConfigurableItemList::ConfigurableItemList(QString name, DatasetConfig *datasetConfig, bool pathMode, QWidget *parent) :
-			m_pathMode(pathMode), m_name(name), m_datasetConfig(datasetConfig), QWidget(parent) {
+ConfigurableItemList::ConfigurableItemList(QString name, DatasetConfig *datasetConfig, QWidget *parent) :
+			m_name(name), m_datasetConfig(datasetConfig), QWidget(parent) {
 	QGridLayout *labelselectorlayout = new QGridLayout(this);
 	itemSelectorList = new QListWidget(this);
 	itemSelectorList->setFont(QFont("Sans Serif", 12));
@@ -74,57 +74,10 @@ void ConfigurableItemList::moveItemDownSlot() {
 	itemSelectorList->setCurrentRow(newRow);
 }
 
-int ConfigurableItemList::getNumberSubfolders(QString path) {
-	int count = 0;
-	for (QDirIterator it(path); it.hasNext();) {
-		QString subpath = it.next();
-		QString suffix = subpath.split('/').takeLast();
-		if (m_datasetConfig->dataType == "Images" && QDir(subpath).exists() && suffix != "." && suffix != "..") count++;
-		if (m_datasetConfig->dataType == "Videos" &&  subpath.split('.').takeLast() == "avi") count++;		//TODO: make this work for more formats than just avi
-	}
-	return count;
-}
-
-bool ConfigurableItemList::isValidRecordingFolder(QString path) {
-	bool isValid = true;
-	if (getNumberSubfolders(path) == m_datasetConfig->numCameras) {
-		if (m_datasetConfig->dataType == "Images") {
-			for (QDirIterator it(path); it.hasNext();) {
-				QString path = it.next();
-				QString suffix = path.split('/').takeLast();
-				if (suffix != "." && suffix != "..") {
-					if (getNumberSubfolders(path) != 0) isValid = false;
-				}
-			}
-		}
-	}
-	else {
-		isValid = false;
-	}
-	return isValid;
-}
 
 void ConfigurableItemList::addItemSlot() {
 	QStringList items;
-	if (m_pathMode) {
-		QString dir = QFileDialog::getExistingDirectory(this,m_name, "/home/trackingsetup/Videos/Ralph_Test_13072021/Videos",
-					QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-		if (isValidRecordingFolder(dir)) {
-			items.append(dir);
-		}
-		for (QDirIterator it(dir,  QDirIterator::Subdirectories); it.hasNext();) {
-			QString path = it.next();
-			QString suffix = path.split('/').takeLast();
-			if (suffix != "." && suffix != "..") {
-				if (isValidRecordingFolder(path)) {
-					items.append(path);
-				}
-			}
-		}
-	}
-	else {
-		items.append(QInputDialog::getText(this,m_name,"Enter Label:", QLineEdit::Normal));
-	}
+	items.append(QInputDialog::getText(this,m_name,"Enter Label:", QLineEdit::Normal));
 	if (!items.isEmpty()) {
 		for (const auto & item : items) {
 			itemSelectorList->addItem(item);

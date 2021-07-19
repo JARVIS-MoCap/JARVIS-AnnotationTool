@@ -1,6 +1,9 @@
 project (gui)
 
 add_subdirectory(Qt-DarkStyle)
+add_subdirectory(videocutter)
+add_subdirectory(newdatasetwindow)
+
 
 add_library(${PROJECT_NAME}
     mainwindow.hpp
@@ -10,15 +13,10 @@ add_library(${PROJECT_NAME}
 		keypointwidget.hpp
 		imageviewer.hpp
     loaddatasetwindow.hpp
-    newdatasetwindow.hpp
-    videocutterwindow.hpp
-    configurableitemlist.hpp
     reprojectionwidget.hpp
 		reprojectionchartwidget.hpp
 		reprojectionchartview.hpp
 		datasetcontrolwidget.hpp
-    presetswindow.hpp
-    rangeslider.hpp
     mainwindow.cpp
     mainbar.cpp
     settingswindow.cpp
@@ -26,15 +24,10 @@ add_library(${PROJECT_NAME}
 		keypointwidget.cpp
 		imageviewer.cpp
     loaddatasetwindow.cpp
-    newdatasetwindow.cpp
-    videocutterwindow.cpp
-    configurableitemlist.cpp
     reprojectionwidget.cpp
 		reprojectionchartwidget.cpp
 		reprojectionchartview.cpp
 		datasetcontrolwidget.cpp
-    presetswindow.cpp
-    rangeslider.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -46,8 +39,7 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   Qt5::Widgets
 	Qt5::Charts
-  Qt5::Multimedia
-  Qt5::MultimediaWidgets
+  newdatasetwindow
 	src
 )
 
