@@ -15,15 +15,20 @@
 #include <QDirIterator>
 #include <QHeaderView>
 #include <QTimer>
+#include <QMessageBox>
+#include <QFileDialog>
 
 #include "opencv2/videoio/videoio.hpp"
 
-VideoCutterWindow::VideoCutterWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
+VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWidget *parent)
+	: m_timeLineWindows(timeLineWindows), QWidget(parent, Qt::Window) {
 	this->resize(800,800);
 	this->setMinimumSize(600,600);
 	settings = new QSettings();
 	setWindowTitle("Video Cutter");
 	QGridLayout *layout = new QGridLayout(this);
+	m_savedTimeLineWindows = timeLineWindows;
+	m_initialTimeLineWindows = timeLineWindows;
 
 
 	player = new QMediaPlayer(this);
@@ -49,7 +54,7 @@ VideoCutterWindow::VideoCutterWindow(QWidget *parent) : QWidget(parent, Qt::Wind
 	connect(rangeSlider, &ctkRangeSlider::minimumValueChanged, this, &VideoCutterWindow::minValueChangedSlot);
   connect(rangeSlider, &ctkRangeSlider::mainValueChanged, this, &VideoCutterWindow::mainValueChangedSlot);
 
-  timeLine = new TimeLine(timeLineWindows);
+  timeLine = new TimeLine(m_timeLineWindows);
   timeLine->setMinimumSize(500,25);
   connect(timeLine, &TimeLine::offsetAndZoomChanged, this, &VideoCutterWindow::offsetAndZoomChangedSlot);
   startTimeLabel = new QLabel("00:00");
@@ -169,7 +174,6 @@ VideoCutterWindow::VideoCutterWindow(QWidget *parent) : QWidget(parent, Qt::Wind
   layout->addWidget(buttonWidget,2,0);
   layout->addWidget(timeWindowBox,3,0);
   layout->addWidget(bottomButtonWidget,4,0);
-
 }
 
 void VideoCutterWindow::openVideo(const QString &path) {
@@ -190,6 +194,7 @@ void VideoCutterWindow::openVideo(const QString &path) {
 		player->play();
 		player->pause();
     updateTimeLabels();
+    updateTimeWindowTable();
 
 		QTimer::singleShot(10, [this]{
 			timeLine->createTimeLineImage(rangeSlider->width());
@@ -342,29 +347,29 @@ void VideoCutterWindow::offsetAndZoomChangedSlot(double offset, float zoom) {
 void VideoCutterWindow::updateTimeWindowTable() {
   QList<QColor> colors = {QColor(100,164,32),QColor(100,32,164), QColor(164,100,32), QColor(164,32,100), QColor(32,164,100), QColor(32,100,164)};
   timeLine->createTimeLineImage(rangeSlider->width());
-  timeWindowTable->setRowCount(timeLineWindows.size());
-  for (int i = 0; i < timeLineWindows.size(); i++) {
+  timeWindowTable->setRowCount(m_timeLineWindows.size());
+  for (int i = 0; i < m_timeLineWindows.size(); i++) {
     QTableWidgetItem* iconItem = new QTableWidgetItem();
     QImage img(20, 20, QImage::Format_RGB888);
     img.fill(colors[i%colors.size()]);
     iconItem->setIcon(QIcon(QPixmap::fromImage(img)));
     iconItem->setFlags(iconItem->flags() ^ Qt::ItemIsEditable);
     QTableWidgetItem* nameItem = new QTableWidgetItem();
-    if (timeLineWindows[i].name == "") {
+    if (m_timeLineWindows[i].name == "") {
       nameItem->setText("Window " + QString::number(m_WindowCounter));
-      timeLineWindows[i].name = "Window " + QString::number(m_WindowCounter++);
+      m_timeLineWindows[i].name = "Window " + QString::number(m_WindowCounter++);
     }
     else {
-      nameItem->setText(timeLineWindows[i].name);
+      nameItem->setText(m_timeLineWindows[i].name);
     }
     //nameItem->setFlags(nameItem->flags() ^ Qt::ItemIsEditable);
     //nameItem->setFlags(frameItem->flags() ^ Qt::ItemIsSelectable);
     QTableWidgetItem* startItem = new QTableWidgetItem();
-    int startMinute = timeLineWindows[i].start/m_frameRate/60;
-    int startSecond = timeLineWindows[i].start/m_frameRate%60;
+    int startMinute = m_timeLineWindows[i].start/m_frameRate/60;
+    int startSecond = m_timeLineWindows[i].start/m_frameRate%60;
     QTime startTime(1, startMinute, startSecond, 0);
-    int endMinute = timeLineWindows[i].end/m_frameRate/60;
-    int endSecond = timeLineWindows[i].end/m_frameRate%60;
+    int endMinute = m_timeLineWindows[i].end/m_frameRate/60;
+    int endSecond = m_timeLineWindows[i].end/m_frameRate%60;
     QTime endTime(1, endMinute, endSecond, 0);
     startItem->setText(startTime.toString("mm:ss"));
     startItem->setFlags(startItem->flags() ^ Qt::ItemIsEditable);
@@ -386,7 +391,7 @@ void VideoCutterWindow::updateTimeWindowTable() {
 void VideoCutterWindow::deleteWindowClickedSlot() {
   for(int row=0; row < timeWindowTable->rowCount(); row++){
     if(sender() == timeWindowTable->cellWidget(row,4)) {
-      timeLineWindows.removeAt(row);
+      m_timeLineWindows.removeAt(row);
     }
   }
   updateTimeWindowTable();
@@ -394,7 +399,7 @@ void VideoCutterWindow::deleteWindowClickedSlot() {
 
 void VideoCutterWindow::timeWindowEditedSlot(QTableWidgetItem *item) {
   if (item->column() == 1) {
-    timeLineWindows[item->row()].name = item->text();
+    m_timeLineWindows[item->row()].name = item->text();
   }
 }
 
@@ -406,7 +411,7 @@ void VideoCutterWindow::cancelElementClickedSlot() {
 }
 
 bool VideoCutterWindow::addTimeLineWindow(const QString &name, int start, int end) {
-  for (const auto & window : timeLineWindows) {
+  for (const auto & window : m_timeLineWindows) {
     int r_start = window.start;
     int r_end = window.end;
     if ((start >= r_start && start <= r_end) || (end >= r_start && end <= r_end)) {
@@ -417,7 +422,8 @@ bool VideoCutterWindow::addTimeLineWindow(const QString &name, int start, int en
   window.name = name;
   window.start = start;
   window.end = end;
-  timeLineWindows.append(window);
+  m_timeLineWindows.append(window);
+	std::sort(m_timeLineWindows.begin(), m_timeLineWindows.end());
   return true;
 }
 
@@ -430,24 +436,108 @@ void VideoCutterWindow::resizeEvent(QResizeEvent* event)
 }
 
 void VideoCutterWindow::saveClickedSlot() {
-
+	saveSegmentation();
 }
 
 void VideoCutterWindow::loadClickedSlot() {
-
+	loadSegmentation();
 }
 
 void VideoCutterWindow::cancelClickedSlot() {
+	if (m_savedTimeLineWindows == m_timeLineWindows) {
+		close();
+		return;
+	}
+	QMessageBox::StandardButton reply;
+	reply = QMessageBox::question(this, "", "Discard new Segmentation?\n",
+                                QMessageBox::Yes|QMessageBox::No);
 
+	if (reply == QMessageBox::Yes) {
+		m_timeLineWindows = m_initialTimeLineWindows;
+		m_savedTimeLineWindows = m_timeLineWindows;
+		close();
+	}
 }
 
 void VideoCutterWindow::continueClickedSlot() {
-
+	if (!(m_savedTimeLineWindows == m_timeLineWindows)) {
+		QMessageBox::StandardButton reply;
+		reply = QMessageBox::question(this, "", "Save Segmentation to File?\n",
+	                                QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Cancel);
+																	std::cout << reply << std::endl;
+		if (reply == QMessageBox::Cancel) {
+			return;
+		}
+		else if (reply == QMessageBox::Yes) {
+			saveSegmentation();
+		}
+		else {
+			m_savedTimeLineWindows = m_timeLineWindows;
+		}
+	}
+	close();
 }
+
+bool VideoCutterWindow::saveSegmentation() {
+	QFileDialog fd(this);
+	QString fileName = fd.getSaveFileName(this, "Save Segmentation", "./segmentation.csv",
+  									 			tr("CSV Files (*.csv)"));
+	fd.setAcceptMode(QFileDialog::AcceptSave);
+	QFile saveFile(fileName);
+	//TODO: maybe warn if file exists?
+	if (saveFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+		QTextStream out(&saveFile);
+		out << "Name:" << "," << "Start Frame" << "," << "End Frame" << "," << "Total Number of Frames:" << "\n";
+		for (const auto &window : m_timeLineWindows) {
+			out << window.name << "," << window.start << "," << window.end << "," << m_frameCount << "\n";
+		}
+	}
+	else {
+		return false;
+	}
+	saveFile.close();
+	m_savedTimeLineWindows = m_timeLineWindows;
+	return true;
+}
+
+bool VideoCutterWindow::loadSegmentation() {
+	QList<TimeLineWindow> timeLineWindows;
+	QFileDialog fd(this);
+	QString fileName = fd.getOpenFileName(this, "Save Segmentation", "./segmentation.csv",
+  									 			tr("CSV Files (*.csv)"));
+	fd.setFileMode(	QFileDialog::ExistingFile);
+	QFile saveFile(fileName);
+	QList<QStringList> fileText;
+	if (saveFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		QTextStream s1(&saveFile);
+		while (!s1.atEnd()){
+		  QString s=s1.readLine(); // reads line from file
+		  fileText.append(s.split(",")); // appends first column to list, ',' is separator
+		}
+		saveFile.close();
+		for (int row = 1; row < fileText.size(); row++) {
+			TimeLineWindow window;
+			window.name = fileText[row][0];
+			window.start = fileText[row][1].toInt();
+			window.end = fileText[row][2].toInt();
+			timeLineWindows.append(window);
+		}
+		m_timeLineWindows = timeLineWindows;
+		m_savedTimeLineWindows = m_timeLineWindows;
+		updateTimeLabels();
+		updateTimeWindowTable();
+	}
+}
+
 
 void VideoCutterWindow::closeEvent (QCloseEvent * event ) {
 	event->ignore();
-	emit editingFinished(timeLineWindows, m_frameCount);
-	emit closingWindow();
-	event->accept();
+	if (m_savedTimeLineWindows == m_timeLineWindows) {
+		emit editingFinished(m_timeLineWindows, m_frameCount);
+		emit closingWindow();
+		event->accept();
+	}
+	else {
+		std::cout << "Not saved!" << std::endl;
+	}
 }

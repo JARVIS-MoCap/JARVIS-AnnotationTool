@@ -26,7 +26,7 @@
 class VideoCutterWindow : public QWidget {
 	Q_OBJECT
 	public:
-		explicit VideoCutterWindow(QWidget *parent = nullptr);
+		explicit VideoCutterWindow(QList<TimeLineWindow> timeLineWindows = QList<TimeLineWindow>(), QWidget *parent = nullptr);
 		void openVideo(const QString &path);
 		virtual void closeEvent ( QCloseEvent * event );
 
@@ -71,13 +71,19 @@ class VideoCutterWindow : public QWidget {
 		QPushButton *cancelButton;
 		QPushButton *continueButton;
 
-		QList<TimeLineWindow> timeLineWindows;
+		QList<TimeLineWindow> m_timeLineWindows;
+		QList<TimeLineWindow> m_initialTimeLineWindows;
+		QList<TimeLineWindow> m_savedTimeLineWindows;
+
+
 		int m_mainValue = 0, m_maximumValue = 0, m_minimumValue = 0;
 
 		int m_WindowCounter = 0;
 
 		bool addTimeLineWindow(const QString &name, int start, int end);
 		void updateTimeLabels();
+		bool saveSegmentation();
+		bool loadSegmentation();
 
 		private slots:
 			void playerPositionChangedSlot(qint64 duration);

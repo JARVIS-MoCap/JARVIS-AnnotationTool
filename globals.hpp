@@ -50,18 +50,31 @@ typedef struct DatasetConfig {
 
 } DatasetConfig;
 
-typedef struct TimeLineWindow {
+struct TimeLineWindow {
 	QString name;
 	int start;
 	int end;
-} TimeLineWindow;
+
+	friend bool operator< (const TimeLineWindow &lhs, const TimeLineWindow &rhs){
+	    if(lhs.start < rhs.start )return true;
+	    else return false;
+	}
+
+	friend bool operator== (const TimeLineWindow &lhs, const TimeLineWindow &rhs){
+		if (lhs.name == rhs.name && lhs.start == rhs.start && lhs.end == rhs.end) return true;
+		else return false;
+	}
+
+};
 
 
-typedef struct RecordingItem {
+struct RecordingItem {
 	QString name;
 	QString path;
 	QList<TimeLineWindow> timeLineList;
-} RecordingItem;
+};
+
+
 
 void createToolBarButton(QToolButton * button, QAction* action, QIcon icon, bool enabled = true,
 												 bool checkable = false, QSize minSize = QSize(20,20));

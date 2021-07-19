@@ -34,6 +34,7 @@ class RecordingsTable : public QWidget {
 	private:
 		DatasetConfig	*m_datasetConfig;
 		QString m_name;
+		int m_frameCount = 0;
 		QPushButton *moveItemUpButton;
 		QPushButton *moveItemDownButton;
 		QPushButton *addItemButton;
@@ -42,6 +43,8 @@ class RecordingsTable : public QWidget {
 		QList<RecordingItem> m_recordingItems;
 		int m_editingIndex;
 		bool m_editingActive = false;
+		QMap<int, QList<TimeLineWindow>> m_windowsMap;
+
 		int getNumberSubfolders(QString path);
 		bool isValidRecordingFolder(QString path);
 		void updateTable();
@@ -55,6 +58,7 @@ class RecordingsTable : public QWidget {
 		void deleteRecordingClickedSlot();
 		void editRecordingClickedSlot();
 		void editingFinishedSlot(QList<TimeLineWindow> timeLineWindows, int frameCount);
+		QImage createTimeLineImage(QList<TimeLineWindow> timeLineWindows);
 };
 
 

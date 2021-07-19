@@ -335,7 +335,7 @@ void ctkRangeSliderPrivate::drawMinimumSlider( QStylePainter* painter ) const
   painter->setClipRect(clip);
 #endif
   painter->drawComplexControl(QStyle::CC_Slider, option);
-  painter->drawPixmap(pixelPosFromRangeValue(m_MinimumPosition), 2, 15, 26, QPixmap("/home/timo/Documents/AnnotationTool/bracket.png"));
+  painter->drawPixmap(pixelPosFromRangeValue(m_MinimumPosition), 2, 15, 26, QIcon::fromTheme("bracket_open").pixmap(128,128).copy(40,0,48,128));
   //painter->drawRect(m_MinimumPosition, 0, 48, 48);
 }
 
@@ -362,7 +362,7 @@ void ctkRangeSliderPrivate::drawMaximumSlider( QStylePainter* painter ) const
   painter->setClipRect(clip);
 #endif
   painter->drawComplexControl(QStyle::CC_Slider, option);
-  painter->drawPixmap(pixelPosFromRangeValue(m_MaximumPosition), 2, 15, 26, QPixmap("/home/timo/Documents/AnnotationTool/bracket_max.png"));
+  painter->drawPixmap(pixelPosFromRangeValue(m_MaximumPosition), 2, 15, 26, QIcon::fromTheme("bracket_close").pixmap(128,128).copy(40,0,48,128));
 }
 
 //---------------------------------------------------------------------------
@@ -388,7 +388,7 @@ void ctkRangeSliderPrivate::drawMainSlider( QStylePainter* painter ) const
   painter->setClipRect(clip);
 #endif
   painter->drawComplexControl(QStyle::CC_Slider, option);
-  painter->drawPixmap(pixelPosFromRangeValue(m_MainPosition), 0, 15, 30, QPixmap("/home/timo/Documents/AnnotationTool/mainSlider.png"));
+  painter->drawPixmap(pixelPosFromRangeValue(m_MainPosition), 0, 15, 30, QIcon::fromTheme("slider").pixmap(128, 128).copy(30,0,68,128));
 }
 
 // --------------------------------------------------------------------------

@@ -22,11 +22,11 @@ RecordingsTable::RecordingsTable(QString name, DatasetConfig *datasetConfig, QWi
 	recordingsTable = new QTableWidget(0, 5);
 	recordingsTable->setAlternatingRowColors(true);
 	QStringList labels;
-	labels << "Name" << "Path"  << "" << "Timeline" << "";
+	labels << "Name" << "Path"  << "Segments" << "" << "";
 	recordingsTable->setHorizontalHeaderLabels(labels);
 	recordingsTable->horizontalHeader()-> setSectionResizeMode(1, QHeaderView::Stretch);
-	recordingsTable->setColumnWidth(2, 30);
-	recordingsTable->setColumnWidth(3, 155);
+	recordingsTable->setColumnWidth(2, 155);
+	recordingsTable->setColumnWidth(3, 30);
 	recordingsTable->setColumnWidth(4, 30);
 	recordingsTable->verticalHeader()->hide();
 	recordingsTable->setShowGrid(false);
@@ -80,7 +80,7 @@ bool RecordingsTable::isValidRecordingFolder(QString path) {
 }
 
 void RecordingsTable::addItemSlot() {
-	QString dir = QFileDialog::getExistingDirectory(this,m_name, "/media/timo/2,0 TB Volume/Recording_Sabine_17062021",
+	QString dir = QFileDialog::getExistingDirectory(this,m_name, "/media/trackingsetup/Elements/Recordings/Recording_Colleen_03032021",
 				QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 	if (isValidRecordingFolder(dir)) {
 		RecordingItem recordingItem;
@@ -114,10 +114,17 @@ void RecordingsTable::updateTable() {
 		pathIcon->setFlags(pathIcon->flags() ^ Qt::ItemIsEditable);
 		pathIcon->setText(m_recordingItems[i].path);
 		QPushButton *editButton = new QPushButton(recordingsTable);
-    editButton->setIcon(QIcon::fromTheme("update"));
+    editButton->setIcon(QIcon::fromTheme("scissors"));
     connect(editButton, &QPushButton::clicked, this, &RecordingsTable::editRecordingClickedSlot);
-		QImage timeLineImage(100, 1, QImage::Format_RGB888);
-		timeLineImage.fill(QColor(80,80,80));
+		auto it = m_windowsMap.find(i);
+		QImage timeLineImage;
+		if (it != m_windowsMap.end()) {
+			timeLineImage = createTimeLineImage(it.value());
+		}
+		else {
+			timeLineImage = QImage(100, 1, QImage::Format_RGB888);
+			timeLineImage.fill(QColor(80,80,80));
+		}
 		QTableWidgetItem* iconItem = new QTableWidgetItem();
     iconItem->setIcon(QIcon(QPixmap::fromImage(timeLineImage).scaled(150,20)));
     iconItem->setFlags(iconItem->flags() ^ Qt::ItemIsEditable);
@@ -126,24 +133,32 @@ void RecordingsTable::updateTable() {
     connect(deleteButton, &QPushButton::clicked, this, &RecordingsTable::deleteRecordingClickedSlot);
 		recordingsTable->setItem(i,0,nameItem);
 		recordingsTable->setItem(i,1,pathIcon);
-		recordingsTable->setCellWidget(i,2,editButton);
-		recordingsTable->setItem(i,3,iconItem);
+		recordingsTable->setItem(i,2,iconItem);
+		recordingsTable->setCellWidget(i,3,editButton);
 		recordingsTable->setCellWidget(i,4,deleteButton);
 	}
 }
 
 void RecordingsTable::deleteRecordingClickedSlot() {
+	bool deletedItem = false;
+	std::cout << "Rows: " << recordingsTable->rowCount() << std::endl;
 	for(int row=0; row < recordingsTable->rowCount(); row++){
     if(sender() == recordingsTable->cellWidget(row,4)) {
       m_recordingItems.removeAt(row);
+			m_windowsMap.remove(row);
+			deletedItem = true;
     }
+		else if (deletedItem == true) {
+			m_windowsMap[row-1] = m_windowsMap[row];
+			m_windowsMap.remove(row);
+		}
   }
   updateTable();
 }
 
 void RecordingsTable::editRecordingClickedSlot() {
 	for(int row=0; row < recordingsTable->rowCount(); row++){
-		if(sender() == recordingsTable->cellWidget(row,2)) {
+		if(sender() == recordingsTable->cellWidget(row,3)) {
 			std::cout << "Editing Video at " << row << std::endl;
 			if (!m_editingActive) {
 				m_editingActive = true;
@@ -155,17 +170,29 @@ void RecordingsTable::editRecordingClickedSlot() {
 }
 
 void RecordingsTable::editVideo(QString path) {
-	VideoCutterWindow * videoCutterWindow = new VideoCutterWindow();
-	videoCutterWindow->openVideo("/media/timo/2,0 TB Volume/Camera_TT.avi");
+	VideoCutterWindow * videoCutterWindow = new VideoCutterWindow(m_windowsMap[m_editingIndex]);
+	videoCutterWindow->openVideo("/media/trackingsetup/Elements/Recordings/Recording_Colleen_03032021/Camera_T.avi");
 	connect(videoCutterWindow, &VideoCutterWindow::editingFinished, this, &RecordingsTable::editingFinishedSlot);
 	videoCutterWindow->show();
 }
 
 void RecordingsTable::editingFinishedSlot(QList<TimeLineWindow> timeLineWindows, int frameCount) {
+	m_frameCount = frameCount;
+	m_windowsMap[m_editingIndex] = timeLineWindows;
 	std::cout << "Size: " << timeLineWindows.size() <<  ", " << frameCount <<std::endl;
-	QImage timeLineImage(frameCount, 1, QImage::Format_RGB888);
+	QImage timeLineImage = createTimeLineImage(timeLineWindows);
+	QTableWidgetItem* iconItem = new QTableWidgetItem();
+	iconItem->setIcon(QIcon(QPixmap::fromImage(timeLineImage).scaled(150,20)));
+	iconItem->setFlags(iconItem->flags() ^ Qt::ItemIsEditable);
+	recordingsTable->setItem(m_editingIndex,2,iconItem);
+	m_editingActive = false;
+
+}
+
+QImage RecordingsTable::createTimeLineImage(QList<TimeLineWindow> timeLineWindows) {
+	QImage timeLineImage(m_frameCount, 1, QImage::Format_RGB888);
 	QList<QColor> colors = {QColor(100,164,32),QColor(100,32,164), QColor(164,100,32), QColor(164,32,100), QColor(32,164,100), QColor(32,100,164)};
-	for (int i = 0; i < frameCount; i++) {
+	for (int i = 0; i < m_frameCount; i++) {
     int counter = 0;
 		timeLineImage.setPixelColor(i,0,QColor(80,80,80));
     for (const auto & window : timeLineWindows) {
@@ -175,10 +202,5 @@ void RecordingsTable::editingFinishedSlot(QList<TimeLineWindow> timeLineWindows,
       counter++;
     }
 	}
-	QTableWidgetItem* iconItem = new QTableWidgetItem();
-	iconItem->setIcon(QIcon(QPixmap::fromImage(timeLineImage).scaled(150,20)));
-	iconItem->setFlags(iconItem->flags() ^ Qt::ItemIsEditable);
-	recordingsTable->setItem(m_editingIndex,3,iconItem);
-	m_editingActive = false;
-
+	return timeLineImage;
 }
