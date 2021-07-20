@@ -17,6 +17,7 @@
 #include <QTimer>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QErrorMessage>
 
 #include "opencv2/videoio/videoio.hpp"
 
@@ -30,12 +31,14 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
 	m_savedTimeLineWindows = timeLineWindows;
 	m_initialTimeLineWindows = timeLineWindows;
 
+	mainSplitter = new QSplitter(this);
+	mainSplitter->setOrientation(Qt::Vertical);
 
+	QWidget *videoPlayerWidget = new QWidget();
+	QGridLayout *videoplayerlayout = new QGridLayout(videoPlayerWidget);
 	player = new QMediaPlayer(this);
   player->setNotifyInterval(10);
   connect(player, &QMediaPlayer::positionChanged, this, &VideoCutterWindow::playerPositionChangedSlot);
-	QWidget *videoPlayerWidget = new QWidget();
-	QGridLayout *videoplayerlayout = new QGridLayout(videoPlayerWidget);
 	videoplayerlayout->setMargin(0);
 	videoplayerlayout->setSpacing(0);
 	videoWidget = new QVideoWidget(this);
@@ -46,6 +49,8 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
 	player->setVideoOutput(videoWidget);
 
 
+	QWidget *controlWidget = new QWidget(mainSplitter);
+	QGridLayout *controllayout = new QGridLayout(controlWidget);
   QWidget *videoControlWidget = new QWidget();
   QGridLayout *videocontrollayout = new QGridLayout(videoControlWidget);
   rangeSlider = new ctkRangeSlider(Qt::Horizontal);
@@ -131,7 +136,7 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
   QGridLayout *timewindowboxlayout = new QGridLayout(timeWindowBox);
   timewindowboxlayout->setMargin(0);
   timeWindowTable = new QTableWidget(0, 5);
-  timeWindowTable->setMinimumSize(200,200);
+  timeWindowTable->setMinimumSize(200,100);
 	timeWindowTable->setAlternatingRowColors(true);
 	QStringList labels;
 	labels << "" << "Name" << "Start" << "End" << "";
@@ -144,9 +149,27 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
   connect(timeWindowTable, &QTableWidget::itemChanged, this, &VideoCutterWindow::timeWindowEditedSlot);
   timewindowboxlayout->addWidget(timeWindowTable,0,0);
 
+	QGroupBox *cameraSelectorBox = new QGroupBox("Camera Views");
+	cameraSelectorBox->setMaximumSize(200,10000);
+	QGridLayout *cameraselectorboxlayout = new QGridLayout(cameraSelectorBox);
+	cameraselectorboxlayout->setMargin(0);
+	camsTable = new QTableWidget(0, 1);
+	camsTable->setAlternatingRowColors(true);
+	QStringList camLabels;
+	camLabels << "Name";
+	camsTable->setHorizontalHeaderLabels(camLabels);
+	camsTable->horizontalHeader()-> setSectionResizeMode(0, QHeaderView::Stretch);
+	camsTable->verticalHeader()->hide();
+	camsTable->setShowGrid(false);
+	camsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	connect(camsTable, &QTableWidget::cellDoubleClicked, this, &VideoCutterWindow::changeCameraViewSlot);
+	//connect(camsTable, &QTableWidget::itemPressed, this, &CamSelectorWindow::tableItemPressed);
+	//connect(camsTable, &QTableWidget::itemClicked, this, &CamSelectorWindow::tableItemClicked);
+	cameraselectorboxlayout->addWidget(camsTable,0,0);
 
   QWidget *bottomButtonWidget = new QWidget();
   QGridLayout *bottombuttonlayout = new QGridLayout(bottomButtonWidget);
+	bottomButtonWidget->setMaximumSize(10000,60);
   saveButton = new QPushButton("Save");
   saveButton->setIcon(QIcon::fromTheme("upload"));
   saveButton->setMinimumSize(40,40);
@@ -169,11 +192,18 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
   bottombuttonlayout->addWidget(cancelButton, 0,3);
   bottombuttonlayout->addWidget(continueButton, 0,4);
 
-	layout->addWidget(videoPlayerWidget,0,0);
-	layout->addWidget(videoControlWidget,1,0);
-  layout->addWidget(buttonWidget,2,0);
-  layout->addWidget(timeWindowBox,3,0);
-  layout->addWidget(bottomButtonWidget,4,0);
+	controllayout->addWidget(videoControlWidget,0,0,1,2);
+  controllayout->addWidget(buttonWidget,1,0,1,2);
+  controllayout->addWidget(timeWindowBox,2,0);
+	controllayout->addWidget(cameraSelectorBox,2,1);
+
+	mainSplitter->addWidget(videoPlayerWidget);
+	mainSplitter->addWidget(controlWidget);
+
+	layout->addWidget(mainSplitter,0,0);
+	layout->addWidget(bottomButtonWidget,1,0);
+
+	mainSplitter->setStretchFactor(0,2);
 }
 
 void VideoCutterWindow::openVideo(const QString &path) {
@@ -191,8 +221,6 @@ void VideoCutterWindow::openVideo(const QString &path) {
 
 
 		player->setMedia(QUrl::fromLocalFile(QFileInfo(path).absoluteFilePath()));
-		player->play();
-		player->pause();
     updateTimeLabels();
     updateTimeWindowTable();
 
@@ -201,6 +229,57 @@ void VideoCutterWindow::openVideo(const QString &path) {
 			rangeOverview->setFrameCount(m_frameCount);
 			rangeOverview->updateRange(rangeSlider->minimum(), rangeSlider->maximum(), videoWidget->width());
 			});
+}
+
+bool VideoCutterWindow::openVideos(QList<QString> videoPaths) {
+		int frameCount = 0;
+		int frameRate = 0;
+		for (const auto& path : videoPaths) {
+			cv::VideoCapture cap(path.toStdString());
+			int fc = cap.get(cv::CAP_PROP_FRAME_COUNT);
+			int fr = cap.get(cv::CAP_PROP_FPS);
+			if (frameCount == 0) frameCount = fc;
+			else if (frameCount != fc) {
+				return false;
+			}
+			if (frameRate == 0) frameRate = fr;
+			else if (frameRate != fr) {
+				return false;
+			}
+			cap.release();
+		}
+		m_frameCount = frameCount;
+		m_frameRate = frameRate;
+		m_duration = m_frameCount*1000/m_frameRate;
+    timeLine->setFrameCount(m_frameCount);
+		rangeOverview->setFrameCount(m_frameCount);
+    rangeSlider->setRange(0, m_frameCount);
+    rangeSlider->setMainPosition(0);
+    rangeSlider->setMinimumPosition(m_frameCount*0.25);
+    rangeSlider->setMaximumPosition(m_frameCount*0.75);
+
+
+		m_playlist = new QMediaPlaylist;
+		for (const auto& path : videoPaths) {
+			m_playlist->addMedia(QUrl::fromLocalFile(QFileInfo(path).absoluteFilePath()));
+			m_cameraList.append(path.split('/').takeLast().split(".").takeFirst());
+		}
+		player->setPlaylist(m_playlist);
+		m_playlist->setCurrentIndex(1);
+		//player->setMedia(QUrl::fromLocalFile(QFileInfo(path).absoluteFilePath()));
+		player->play();
+		player->pause();
+    updateTimeLabels();
+    updateTimeWindowTable();
+		updateCameraListSlot();
+
+		QTimer::singleShot(10, [this]{
+			timeLine->createTimeLineImage(rangeSlider->width());
+			rangeOverview->setFrameCount(m_frameCount);
+			rangeOverview->updateRange(rangeSlider->minimum(), rangeSlider->maximum(), videoWidget->width());
+		});
+
+		return true;
 }
 
 void VideoCutterWindow::updateTimeLabels() {
@@ -293,11 +372,6 @@ void VideoCutterWindow::saveElementClickedSlot() {
     addTimeLineElementButton->show();
     updateTimeWindowTable();
     m_editingWindow = false;
-
-
-  }
-  else {
-    std::cout << "Error" << std::endl;
   }
 }
 
@@ -415,9 +489,16 @@ bool VideoCutterWindow::addTimeLineWindow(const QString &name, int start, int en
     int r_start = window.start;
     int r_end = window.end;
     if ((start >= r_start && start <= r_end) || (end >= r_start && end <= r_end)) {
+			QErrorMessage *msg = new QErrorMessage();
+			msg->showMessage("Timeline Segments are not allowed to overlap!");
       return false;
     }
   }
+	if (start == end) {
+		QErrorMessage *msg = new QErrorMessage();
+		msg->showMessage("You are trying to save a segment that contains 0 Frames!");
+		return false;
+	}
   TimeLineWindow window;
   window.name = name;
   window.start = start;
@@ -444,7 +525,7 @@ void VideoCutterWindow::loadClickedSlot() {
 }
 
 void VideoCutterWindow::cancelClickedSlot() {
-	if (m_savedTimeLineWindows == m_timeLineWindows) {
+	if (m_initialTimeLineWindows == m_timeLineWindows) {
 		close();
 		return;
 	}
@@ -464,7 +545,6 @@ void VideoCutterWindow::continueClickedSlot() {
 		QMessageBox::StandardButton reply;
 		reply = QMessageBox::question(this, "", "Save Segmentation to File?\n",
 	                                QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Cancel);
-																	std::cout << reply << std::endl;
 		if (reply == QMessageBox::Cancel) {
 			return;
 		}
@@ -508,27 +588,70 @@ bool VideoCutterWindow::loadSegmentation() {
 	fd.setFileMode(	QFileDialog::ExistingFile);
 	QFile saveFile(fileName);
 	QList<QStringList> fileText;
+	QErrorMessage *msg = new QErrorMessage();
+	msg->resize(400,200);
 	if (saveFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		int frameCount;
 		QTextStream s1(&saveFile);
-		while (!s1.atEnd()){
-		  QString s=s1.readLine(); // reads line from file
-		  fileText.append(s.split(",")); // appends first column to list, ',' is separator
+		while (!s1.atEnd()) {
+		  QString s=s1.readLine();
+		  fileText.append(s.split(","));
 		}
 		saveFile.close();
 		for (int row = 1; row < fileText.size(); row++) {
+			if (fileText[row].size() != 4) {
+				msg->showMessage("Could not load read savefile. Wrong number of columns...");
+				return false;
+			}
 			TimeLineWindow window;
 			window.name = fileText[row][0];
 			window.start = fileText[row][1].toInt();
 			window.end = fileText[row][2].toInt();
+			frameCount = fileText[row][3].toInt();
 			timeLineWindows.append(window);
+		}
+		if (m_frameCount != frameCount) {
+			msg->showMessage("Could not load segmentation savefile. Number of frames in this recording doesn't match the savefile...");
+			return false;
 		}
 		m_timeLineWindows = timeLineWindows;
 		m_savedTimeLineWindows = m_timeLineWindows;
 		updateTimeLabels();
 		updateTimeWindowTable();
 	}
+	else {
+			msg->showMessage("Could not open segmentation savefile...");
+			return false;
+	}
 }
 
+void VideoCutterWindow::updateCameraListSlot() {
+	camsTable->setRowCount(m_cameraList.size());
+	int row = 0;
+	for (const auto& cam : m_cameraList) {
+    QTableWidgetItem* nameItem = new QTableWidgetItem();
+    nameItem->setText(cam);
+		nameItem->setFlags(nameItem->flags() ^ Qt::ItemIsEditable);
+    camsTable->setItem(row,0,nameItem);
+		row++;
+	}
+}
+
+void VideoCutterWindow::changeCameraViewSlot(int row, int) {
+	player->blockSignals(true);
+	player = new QMediaPlayer(this);
+	player->setPlaylist(m_playlist);
+	m_playlist->setCurrentIndex(row);
+	player->setVideoOutput(videoWidget);
+	connect(player, &QMediaPlayer::positionChanged, this, &VideoCutterWindow::playerPositionChangedSlot);
+	mainValueChangedSlot(rangeSlider->mainValue());
+	player->blockSignals(false);
+	player->play();
+	if (!playButton->isChecked()) {
+		player->pause();
+	}
+
+}
 
 void VideoCutterWindow::closeEvent (QCloseEvent * event ) {
 	event->ignore();

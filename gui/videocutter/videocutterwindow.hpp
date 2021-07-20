@@ -18,9 +18,11 @@
 #include <QLabel>
 #include <QSettings>
 #include <QMediaPlayer>
+#include <QMediaPlaylist>
 #include <QVideoWidget>
 #include <QTableWidget>
 #include <QDoubleSpinBox>
+#include <QSplitter>
 
 
 class VideoCutterWindow : public QWidget {
@@ -28,6 +30,7 @@ class VideoCutterWindow : public QWidget {
 	public:
 		explicit VideoCutterWindow(QList<TimeLineWindow> timeLineWindows = QList<TimeLineWindow>(), QWidget *parent = nullptr);
 		void openVideo(const QString &path);
+		bool openVideos(QList<QString> videoPaths);
 		virtual void closeEvent ( QCloseEvent * event );
 
 	public slots:
@@ -40,7 +43,10 @@ class VideoCutterWindow : public QWidget {
 		void resizeEvent(QResizeEvent*);
 		QSettings *settings;
 
+		QSplitter *mainSplitter;
+
 		QMediaPlayer *player;
+		QMediaPlaylist *m_playlist;
 		QVideoWidget *videoWidget;
 		int m_duration;
 		int m_frameCount;
@@ -65,6 +71,8 @@ class VideoCutterWindow : public QWidget {
 		bool m_editingWindow = false;
 
 		QTableWidget *timeWindowTable;
+		QTableWidget *camsTable;
+		QList<QString> m_cameraList;
 
 		QPushButton *saveButton;
 		QPushButton *loadButton;
@@ -110,6 +118,9 @@ class VideoCutterWindow : public QWidget {
 			void loadClickedSlot();
 			void cancelClickedSlot();
 			void continueClickedSlot();
+
+			void changeCameraViewSlot(int row, int);
+			void updateCameraListSlot();
 };
 
 

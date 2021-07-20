@@ -37,7 +37,7 @@ class NewDatasetWindow : public QWidget {
 	public slots:
 
 	signals:
-		void createDataset(QList<QString> recordings, QList<QString> entities, QList<QString> keypoints);
+		void createDataset(QList<RecordingItem> recordings, QList<QString> entities, QList<QString> keypoints);
 
 	private:
 		DatasetConfig	*m_datasetConfig;
@@ -72,7 +72,6 @@ class NewDatasetWindow : public QWidget {
 			void datasetNameChangedSlot(const QString &name);
 			void datasetPathChangedSlot(const QString &path);
 			void datasetPathClickedSlot();
-			void dataTypeChangedSlot();
 			void numCamerasChangedSlot(int num);
 			void frameSetsRecordingChandedSlot(int num);
 			void samplingMethodChangedSlot(const QString &method);

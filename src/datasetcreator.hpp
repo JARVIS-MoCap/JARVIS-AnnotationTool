@@ -28,11 +28,11 @@ class DatasetCreator : public QObject {
 			void datasetCreationFailed(QString errorMsg);
 
 		public slots:
-			void createDatasetSlot(QList<QString> recordings, QList<QString> entities, QList<QString> keypoints);
+			void createDatasetSlot(QList<RecordingItem> recordings, QList<QString> entities, QList<QString> keypoints);
 
 	private:
 		DatasetConfig *m_datasetConfig;
-		QList<QString> m_recordingsList;
+		QList<RecordingItem> m_recordingItems;
 		QList<QString> m_entitiesList;
 		QList<QString> m_keypointsList;
 		QMap<int,QList<cv::Mat>> m_dctMap;
@@ -40,9 +40,10 @@ class DatasetCreator : public QObject {
 		QList<QString> getCameraNames(const QString & path);
 		QString getVideoFormat(const QString& recording);
 		bool checkFrameCounts(const QString& recording, QList<QString> cameras);
-		QList<int> extractFrames(const QString& recording, QList<QString> cameras);
+		QList<int> extractFrames(const QString &path, QList<TimeLineWindow> timeLineWindows, QList<QString> cameras);
 		QList<QString> getAndCopyFrames(const QString& recording, QList<QString> cameras, const QString& dataFolder, QList<int> frameNumbers);
 		void createSavefile(const QString& recording, QList<QString> cameraNames, const QString& dataFolder, QList<int> frameNumbers);
+		QMap<QString, QList<TimeLineWindow>> getRecordingSubsets(QList<TimeLineWindow> timeLineWindows);
 
 
 	private slots:
@@ -53,7 +54,7 @@ class DatasetCreator : public QObject {
 class VideoStreamer : public QObject, public QRunnable {
 	Q_OBJECT
 	public:
-		explicit VideoStreamer(const QString &videoPath, int threadNumber);
+		explicit VideoStreamer(const QString &videoPath, QList<TimeLineWindow> timeLineWindows, int threadNumber);
 		void run();
 
 	signals:
@@ -63,6 +64,7 @@ class VideoStreamer : public QObject, public QRunnable {
 		QList<cv::Mat> dctImages;
 		std::vector<cv::Mat> *m_buffer;
 		int m_threadNumber;
+  	QList<TimeLineWindow>	m_timeLineWindows;
 		cv::VideoCapture *m_cap;
 };
 

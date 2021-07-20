@@ -27,7 +27,7 @@ class RecordingsTable : public QWidget {
 		explicit RecordingsTable(QString name, DatasetConfig *datasetConfig, QWidget *parent = nullptr);
 		QTableWidget *recordingsTable;
 
-		QList<QString> getItems();
+		QList<RecordingItem> getItems();
 
 	signals:
 
@@ -49,6 +49,7 @@ class RecordingsTable : public QWidget {
 		bool isValidRecordingFolder(QString path);
 		void updateTable();
 		void editVideo(QString path);
+		QList<QString> getVideoPaths(const QString& path);
 
 	public slots:
 		//void setNumberOfCamerasSlot(int num);

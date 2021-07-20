@@ -36,7 +36,7 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	connect(savePresetsWindow, SIGNAL(savePreset(QString)), this, SLOT(savePresetSlot(QString)));
 
 	QGroupBox *configBox = new QGroupBox("Configuration");
-	configBox->setMinimumSize(0,220);
+	configBox->setMinimumSize(0,200);
 	QGridLayout *configlayout = new QGridLayout(configBox);
 	LabelWithToolTip *datasetNameLabel = new LabelWithToolTip("New Dataset Name", "");
 	datasetNameEdit = new QLineEdit(m_datasetConfig->datasetName, configBox);
@@ -56,12 +56,6 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	pathwidgetlayout->addWidget(datasetPathEdit,0,0);
 	pathwidgetlayout->addWidget(datasetPathButton,0,1);
 
-	LabelWithToolTip *datatypeLabel = new LabelWithToolTip("Datatype to Load", "kdsff");
-	videosButton = new QRadioButton("Videos", configBox);
-	videosButton->setChecked(m_datasetConfig->dataType == "Videos");
-	connect(videosButton, &QRadioButton::toggled, this, &NewDatasetWindow::dataTypeChangedSlot);
-	imagesButton = new QRadioButton("Images", configBox);
-	imagesButton->setChecked(m_datasetConfig->dataType == "Images");
 	LabelWithToolTip *numCamerasLabel = new LabelWithToolTip("Number of Cameras", "kdsff");
 	numCamerasBox = new QSpinBox(configBox);
 	numCamerasBox->setMinimum(0);
@@ -123,15 +117,12 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	configlayout->addWidget(datasetNameEdit,0,1,1,2);
 	configlayout->addWidget(datasetPathLabel,1,0);
 	configlayout->addWidget(datasetPathWidget,1,1,1,2);
-	configlayout->addWidget(datatypeLabel,2,0);
-	configlayout->addWidget(videosButton,2,1);
-	configlayout->addWidget(imagesButton,2,2);
-	configlayout->addWidget(numCamerasLabel,3,0);
-	configlayout->addWidget(numCamerasBox,3,1,1,2);
-	configlayout->addWidget(frameSetsRecordingLabel,4,0);
-	configlayout->addWidget(frameSetsRecordingBox,4,1,1,2);
-	configlayout->addWidget(samplingMethodLabel,5,0);
-	configlayout->addWidget(samplingMethodCombo,5,1,1,2);
+	configlayout->addWidget(numCamerasLabel,2,0);
+	configlayout->addWidget(numCamerasBox,2,1,1,2);
+	configlayout->addWidget(frameSetsRecordingLabel,3,0);
+	configlayout->addWidget(frameSetsRecordingBox,3,1,1,2);
+	configlayout->addWidget(samplingMethodLabel,4,0);
+	configlayout->addWidget(samplingMethodCombo,4,1,1,2);
 
 	layout->addWidget(configBox,0,0,1,2);
 	layout->addWidget(recordingsBox,1,0,1,2);
@@ -162,15 +153,6 @@ void NewDatasetWindow::datasetPathClickedSlot() {
 	}
 }
 
-
-void NewDatasetWindow::dataTypeChangedSlot() {
-	if (videosButton->isChecked()) {
-		m_datasetConfig->dataType = "Videos";
-	}
-	else {
-		m_datasetConfig->dataType = "Images";
-	}
-}
 
 void NewDatasetWindow::numCamerasChangedSlot(int num) {
 	m_datasetConfig->numCameras = num;

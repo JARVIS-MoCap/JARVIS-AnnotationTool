@@ -40,12 +40,8 @@ RecordingsTable::RecordingsTable(QString name, DatasetConfig *datasetConfig, QWi
 	this->setLayout(labelselectorlayout);
 }
 
-QList<QString> RecordingsTable::getItems() {
-	QList <QString> items;
-	//for (const auto& item : itemSelectorList->findItems("",Qt::MatchContains)) {
-	//	items.append(item->text());
-	//}
-	return items;
+QList<RecordingItem> RecordingsTable::getItems() {
+	return m_recordingItems;
 }
 
 
@@ -54,37 +50,26 @@ int RecordingsTable::getNumberSubfolders(QString path) {
 	for (QDirIterator it(path); it.hasNext();) {
 		QString subpath = it.next();
 		QString suffix = subpath.split('/').takeLast();
-		if (m_datasetConfig->dataType == "Images" && QDir(subpath).exists() && suffix != "." && suffix != "..") count++;
-		if (m_datasetConfig->dataType == "Videos" &&  subpath.split('.').takeLast() == "avi") count++;		//TODO: make this work for more formats than just avi
+		if (subpath.split('.').takeLast() == "avi") count++;		//TODO: make this work for more formats than just avi
 	}
 	return count;
 }
 
 bool RecordingsTable::isValidRecordingFolder(QString path) {
-	bool isValid = true;
 	if (getNumberSubfolders(path) == m_datasetConfig->numCameras) {
-		if (m_datasetConfig->dataType == "Images") {
-			for (QDirIterator it(path); it.hasNext();) {
-				QString path = it.next();
-				QString suffix = path.split('/').takeLast();
-				if (suffix != "." && suffix != "..") {
-					if (getNumberSubfolders(path) != 0) isValid = false;
-				}
-			}
-		}
+		return true;
 	}
 	else {
-		isValid = false;
+		return false;
 	}
-	return isValid;
 }
 
 void RecordingsTable::addItemSlot() {
-	QString dir = QFileDialog::getExistingDirectory(this,m_name, "/media/trackingsetup/Elements/Recordings/Recording_Colleen_03032021",
+	QString dir = QFileDialog::getExistingDirectory(this,m_name, "/home/trackingsetup/Videos/Ralph_Test_15072021",
 				QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 	if (isValidRecordingFolder(dir)) {
 		RecordingItem recordingItem;
-		recordingItem.name = "Test";
+		recordingItem.name = dir.split("/").takeLast();
 		recordingItem.path = dir;
 		m_recordingItems.append(recordingItem);
 	}
@@ -108,7 +93,6 @@ void RecordingsTable::updateTable() {
 	recordingsTable->setRowCount(m_recordingItems.size());
 	for (int i = 0; i < m_recordingItems.size(); i++) {
 		QTableWidgetItem* nameItem = new QTableWidgetItem();
-		nameItem->setFlags(nameItem->flags() ^ Qt::ItemIsEditable);
 		nameItem->setText(m_recordingItems[i].name);
 		QTableWidgetItem* pathIcon = new QTableWidgetItem();
 		pathIcon->setFlags(pathIcon->flags() ^ Qt::ItemIsEditable);
@@ -141,7 +125,6 @@ void RecordingsTable::updateTable() {
 
 void RecordingsTable::deleteRecordingClickedSlot() {
 	bool deletedItem = false;
-	std::cout << "Rows: " << recordingsTable->rowCount() << std::endl;
 	for(int row=0; row < recordingsTable->rowCount(); row++){
     if(sender() == recordingsTable->cellWidget(row,4)) {
       m_recordingItems.removeAt(row);
@@ -171,7 +154,8 @@ void RecordingsTable::editRecordingClickedSlot() {
 
 void RecordingsTable::editVideo(QString path) {
 	VideoCutterWindow * videoCutterWindow = new VideoCutterWindow(m_windowsMap[m_editingIndex]);
-	videoCutterWindow->openVideo("/media/trackingsetup/Elements/Recordings/Recording_Colleen_03032021/Camera_T.avi");
+	QList<QString> videoPaths = getVideoPaths(path);
+	videoCutterWindow->openVideos(videoPaths);
 	connect(videoCutterWindow, &VideoCutterWindow::editingFinished, this, &RecordingsTable::editingFinishedSlot);
 	videoCutterWindow->show();
 }
@@ -179,7 +163,7 @@ void RecordingsTable::editVideo(QString path) {
 void RecordingsTable::editingFinishedSlot(QList<TimeLineWindow> timeLineWindows, int frameCount) {
 	m_frameCount = frameCount;
 	m_windowsMap[m_editingIndex] = timeLineWindows;
-	std::cout << "Size: " << timeLineWindows.size() <<  ", " << frameCount <<std::endl;
+	m_recordingItems[m_editingIndex].timeLineList = timeLineWindows;
 	QImage timeLineImage = createTimeLineImage(timeLineWindows);
 	QTableWidgetItem* iconItem = new QTableWidgetItem();
 	iconItem->setIcon(QIcon(QPixmap::fromImage(timeLineImage).scaled(150,20)));
@@ -203,4 +187,17 @@ QImage RecordingsTable::createTimeLineImage(QList<TimeLineWindow> timeLineWindow
     }
 	}
 	return timeLineImage;
+}
+
+QList<QString> RecordingsTable::getVideoPaths(const QString& path) {
+	QList<QString> videoPaths;
+	for (QDirIterator it(path); it.hasNext();) {
+		QString subpath = it.next();
+		QString suffix = subpath.split('/').takeLast();
+		if (suffix != "." && suffix != "..") {
+			suffix = suffix.split(".").takeLast();
+			if (suffix == "avi") videoPaths.append(subpath); //TODO: make this work for all valid video formats
+		}
+	}
+	return videoPaths;
 }
