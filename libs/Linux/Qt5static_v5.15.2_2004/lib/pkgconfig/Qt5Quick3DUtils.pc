@@ -1,0 +1,14 @@
+prefix=/home/timo/Qt_build/qt-5.15.2-static
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 Quick3DUtils
+Description: Qt Quick3DUtils module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5Quick3DUtils 
+Libs.private: /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Gui.a -lGL /home/timo/Qt_build/qt-5.15.2-static/lib/libqtlibpng.a /home/timo/Qt_build/qt-5.15.2-static/lib/libqtharfbuzz.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Core.a -lm -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/timo/Qt_build/qt-5.15.2-static/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -lpthread -lGL   
+Cflags: -DQT_QUICK3DUTILS_LIB -I${includedir}/QtQuick3DUtils -I${includedir}
+Requires: Qt5Core Qt5Gui
+

@@ -1,0 +1,14 @@
+prefix=/home/timo/Qt_build/qt-5.15.2-static
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 Network
+Description: Qt Network module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5Network 
+Libs.private: /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Core.a -lm -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/timo/Qt_build/qt-5.15.2-static/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -lpthread /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Core.a -lpthread -lm -ldouble-conversion -licui18n -licuuc -licudata /home/timo/Qt_build/qt-5.15.2-static/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -ldl   
+Cflags: -DQT_NETWORK_LIB -I${includedir}/QtNetwork -I${includedir}
+Requires: Qt5Core
+

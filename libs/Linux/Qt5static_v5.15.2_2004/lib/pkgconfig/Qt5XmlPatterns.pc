@@ -1,0 +1,14 @@
+prefix=/home/timo/Qt_build/qt-5.15.2-static
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 XmlPatterns
+Description: Qt XmlPatterns module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5XmlPatterns 
+Libs.private: /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Network.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Core.a -lm -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/timo/Qt_build/qt-5.15.2-static/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -lpthread    
+Cflags: -DQT_XMLPATTERNS_LIB -I${includedir}/QtXmlPatterns -I${includedir}
+Requires: Qt5Core Qt5Network
+

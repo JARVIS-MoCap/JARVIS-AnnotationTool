@@ -1,0 +1,14 @@
+prefix=/home/timo/Qt_build/qt-5.15.2-static
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 QuickTemplates2
+Description: Qt QuickTemplates2 module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5QuickTemplates2 
+Libs.private: /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Quick.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Gui.a -lGL /home/timo/Qt_build/qt-5.15.2-static/lib/libqtlibpng.a /home/timo/Qt_build/qt-5.15.2-static/lib/libqtharfbuzz.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5QmlModels.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Qml.a -lrt /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Network.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Core.a -lm -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/timo/Qt_build/qt-5.15.2-static/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -lpthread /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Quick.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Gui.a /home/timo/Qt_build/qt-5.15.2-static/lib/libqtlibpng.a /home/timo/Qt_build/qt-5.15.2-static/lib/libqtharfbuzz.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5QmlModels.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Qml.a -lrt /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Network.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Core.a -lpthread -lm -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/timo/Qt_build/qt-5.15.2-static/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -lGL   
+Cflags: -DQT_QUICKTEMPLATES2_LIB -I${includedir}/QtQuickTemplates2 -I${includedir}
+Requires: Qt5Core Qt5Gui Qt5Quick Qt5QmlModels
+

@@ -3,7 +3,7 @@ project (src)
 
 set(CMAKE_PREFIX_PATH "../libs/${STATIC_LIB_LOCATION}")
 
-set(OpenCV_DIR "../libs/${STATIC_LIB_LOCATION}/opencv_static")
+set(OpenCV_DIR "../libs/${STATIC_LIB_LOCATION}/${OPENCV_LIBRARY_NAME}")
 set(OpenCV_STATIC ON)
 
 if(NOT WIN32)

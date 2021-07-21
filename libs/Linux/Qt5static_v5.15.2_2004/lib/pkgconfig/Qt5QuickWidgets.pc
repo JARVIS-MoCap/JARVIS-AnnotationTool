@@ -1,0 +1,14 @@
+prefix=/home/timo/Qt_build/qt-5.15.2-static
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 QuickWidgets
+Description: Qt QuickWidgets module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5QuickWidgets 
+Libs.private: /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Quick.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Widgets.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Gui.a -lGL /home/timo/Qt_build/qt-5.15.2-static/lib/libqtlibpng.a /home/timo/Qt_build/qt-5.15.2-static/lib/libqtharfbuzz.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5QmlModels.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Qml.a -lrt /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Network.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Core.a -lm -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/timo/Qt_build/qt-5.15.2-static/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -lpthread -lGL   
+Cflags: -DQT_QUICKWIDGETS_LIB -I${includedir}/QtQuickWidgets -I${includedir}
+Requires: Qt5Core Qt5Gui Qt5Qml Qt5Quick Qt5Widgets
+

@@ -1,0 +1,14 @@
+prefix=/home/timo/Qt_build/qt-5.15.2-static
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 Positioning
+Description: Qt Positioning module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5Positioning 
+Libs.private: /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Core.a -lm -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/timo/Qt_build/qt-5.15.2-static/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -lpthread -L/home/timo/Qt_build/qt-5.15.2-static/lib -lqt_clip2tri -lqt_poly2tri -lqt_clipper   
+Cflags: -DQT_POSITIONING_LIB -I${includedir}/QtPositioning -I${includedir}
+Requires: Qt5Core
+
