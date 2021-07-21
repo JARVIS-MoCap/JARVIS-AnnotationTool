@@ -8,7 +8,6 @@
 #define REPROJECTIONTOOL_H
 
 #include "globals.hpp"
-#include "yaml-cpp/yaml.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/calib3d.hpp>

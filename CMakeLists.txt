@@ -21,7 +21,7 @@ set(Qt5Core_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5Core
 set(Qt5Widgets_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5Widgets")
 set(Qt5Charts_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5Charts")
 set(Qt5Multimedia_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5Multimedia")
-set(Qt5MultimediaWidgets_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2c/lib/cmake/Qt5MultimediaWidgets")
+set(Qt5MultimediaWidgets_DIR "libs/${STATIC_LIB_LOCATION}/Qt5static_v5.15.2/lib/cmake/Qt5MultimediaWidgets")
 
 #find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
 
@@ -30,14 +30,6 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Charts REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
 find_package(Qt5MultimediaWidgets REQUIRED)
-
-find_package(PkgConfig)
-
-pkg_check_modules(GST REQUIRED gstreamer-1.0>=1.4
-                               gstreamer-sdp-1.0>=1.4
-                               gstreamer-video-1.0>=1.4
-                               gstreamer-app-1.0>=1.4)
-
 
 
 message (STATUS "QT DIRECTORY ${Qt5Core_DIR}")
