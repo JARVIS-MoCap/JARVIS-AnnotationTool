@@ -24,6 +24,7 @@ inline void delayl(int ms) {
 
 enum KeypointState {NotAnnotated, Annotated, Reprojected, Suppressed};
 enum KeypointShape {Circle, Rectangle, Triangle};
+
 //----- Structs Definitions ----//
 typedef struct Frame {
 	QString imagePath;
@@ -41,12 +42,12 @@ typedef struct ImgSet {
 typedef struct DatasetConfig {
 	QString datasetName = "New Dataset";
 	QString datasetPath = ".";
-	QString dataType = "Videos";
 	QString videoFormat = "";
 	QString imageFormat = "";
 	int numCameras= 12;
-	int frameSetsRecording = 1;
+	int frameSetsRecording = 10;
 	QString samplingMethod = "kmeans";
+	QList<QString> validRecordingFormats = {"avi", "mp4"};
 
 } DatasetConfig;
 

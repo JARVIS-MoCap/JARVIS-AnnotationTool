@@ -19,7 +19,7 @@
 #include <QSettings>
 #include <QToolBar>
 #include <QTableWidget>
-
+#include <QErrorMessage>
 
 class RecordingsTable : public QWidget {
 	Q_OBJECT
@@ -33,6 +33,7 @@ class RecordingsTable : public QWidget {
 
 	private:
 		DatasetConfig	*m_datasetConfig;
+		QErrorMessage *m_errorMsg;
 		QString m_name;
 		int m_frameCount = 0;
 		QPushButton *moveItemUpButton;
@@ -60,6 +61,7 @@ class RecordingsTable : public QWidget {
 		void editRecordingClickedSlot();
 		void editingFinishedSlot(QList<TimeLineWindow> timeLineWindows, int frameCount);
 		QImage createTimeLineImage(QList<TimeLineWindow> timeLineWindows);
+		void nameEditedSlot(QTableWidgetItem *item);
 };
 
 

@@ -28,7 +28,10 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	QThread *thread = new QThread;
 	datasetCreator->moveToThread(thread);
 	thread->start();
+	progressInfoWindow = new ProgressInfoWindow(this);
 	m_errorMsg = new QErrorMessage();
+
+
 
 	loadPresetsWindow = new PresetsWindow(&presets, "load", "New Dataset Window/");
 	savePresetsWindow = new PresetsWindow(&presets, "save", "New Dataset Window/");
@@ -134,6 +137,15 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	connect(datasetCreator, &DatasetCreator::datasetCreated, this, &NewDatasetWindow::datasetCreatedSot);
 	connect(datasetCreator, &DatasetCreator::datasetCreationFailed, this, &NewDatasetWindow::datasetCreationFailedSlot);
 
+	//Signal relay
+	connect(datasetCreator, &DatasetCreator::dctProgress, progressInfoWindow, &ProgressInfoWindow::dctProgressSlot);
+	connect(datasetCreator, &DatasetCreator::recordingBeingProcessedChanged, progressInfoWindow, &ProgressInfoWindow::recordingBeingProcessedChangedSlot);
+	connect(datasetCreator, &DatasetCreator::currentSegmentChanged, progressInfoWindow, &ProgressInfoWindow::segmentNameChangedSlot);
+	connect(datasetCreator, &DatasetCreator::startedClustering, progressInfoWindow, &ProgressInfoWindow::startedClusteringSlot);
+	connect(datasetCreator, &DatasetCreator::finishedClustering, progressInfoWindow, &ProgressInfoWindow::finishedClusteringSlot);
+	connect(datasetCreator, &DatasetCreator::copyImagesStatus, progressInfoWindow, &ProgressInfoWindow::copyImagesStatusSlot);
+
+
 }
 
 void NewDatasetWindow::datasetNameChangedSlot(const QString &name) {
@@ -169,10 +181,12 @@ void NewDatasetWindow::samplingMethodChangedSlot(const QString &method) {
 void NewDatasetWindow::createDatasetClickedSlot() {
 	createButton->setEnabled(false);
 	emit createDataset(recordingsTable->getItems(), entitiesItemList->getItems(), keypointsItemList->getItems());
+	progressInfoWindow->show();
 }
 
 void NewDatasetWindow::datasetCreatedSot() {
 	createButton->setEnabled(true);
+	progressInfoWindow->hide();
 }
 
 void NewDatasetWindow::datasetCreationFailedSlot(QString errorMsg) {

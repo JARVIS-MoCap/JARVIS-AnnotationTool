@@ -73,6 +73,7 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
 
 
   QWidget *buttonWidget = new QWidget();
+	buttonWidget->setMaximumSize(999999,60);
   QGridLayout *buttonlayout = new QGridLayout(buttonWidget);
   playButton = new QPushButton();
   playButton->setMinimumSize(40,40);

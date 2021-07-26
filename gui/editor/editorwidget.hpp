@@ -40,6 +40,7 @@ class EditorWidget : public QWidget {
 		void datasetLoadedSlot();
 		void frameChangedSlot(int index);
 		void imgSetChangedSlot(int index);
+		void exitToMainPageSlot();
 
 	signals:
 		void zoomToggled(bool toggle);

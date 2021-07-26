@@ -17,6 +17,7 @@
 using namespace std::chrono;
 
 
+
 DatasetCreator::DatasetCreator(DatasetConfig *datasetConfig) : m_datasetConfig(datasetConfig) {
 	qRegisterMetaType<QList<cv::Mat>>();
 
@@ -27,6 +28,7 @@ void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings, QList<QS
 	m_entitiesList = entities;
 	m_keypointsList = keypoints;
 	for (const auto & recording : m_recordingItems) {
+		emit recordingBeingProcessedChanged(recording.name);
 		QString path = recording.path.split('/').takeLast();
 		QList<QString> cameras = getCameraNames(recording.path);
 		m_datasetConfig->videoFormat = getVideoFormat(recording.path);
@@ -42,15 +44,18 @@ void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings, QList<QS
 			QList<TimeLineWindow> timeLineWindows;
 			TimeLineWindow fullWindow;
 			cv::VideoCapture cap((recording.path + "/" + cameras[0] + "." + m_datasetConfig->videoFormat).toStdString());
+			fullWindow.name = recording.name;
 			fullWindow.start = 0;
 	    fullWindow.end = cap.get(cv::CAP_PROP_FRAME_COUNT);
 			cap.release();
 			timeLineWindows.append(fullWindow);
+			emit currentSegmentChanged("");
 			QList<int> frameNumbers = extractFrames(recording.path, timeLineWindows, cameras);
-			createSavefile(recording.path, cameras, m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName + "/" + path, frameNumbers);
+			createSavefile(recording.path, cameras, m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName + "/" + recording.name, frameNumbers);
 		}
 		QMap<QString, QList<TimeLineWindow>> recordingSubsets = getRecordingSubsets(recording.timeLineList);
 		for (const auto &subsetName : recordingSubsets.keys()) {
+			emit currentSegmentChanged(subsetName);
 			QList<int> frameNumbers = extractFrames(recording.path, recordingSubsets[subsetName], cameras);
 			createSavefile(recording.path, cameras, m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName + "/" + path + "/" + subsetName, frameNumbers);
 		}
@@ -64,8 +69,10 @@ QList<QString> DatasetCreator::getCameraNames(const QString& path) {
 		QString subpath = it.next();
 		QString suffix = subpath.split('/').takeLast();
 		if (suffix != "." && suffix != "..") {
-			suffix = suffix.split(".").takeFirst();
-			cameraNames.append(suffix);
+			if (m_datasetConfig->validRecordingFormats.contains(suffix.split(".").takeLast())) {
+				suffix = suffix.split(".").takeFirst();
+				cameraNames.append(suffix);
+			}
 		}
 	}
 	return cameraNames;
@@ -78,7 +85,9 @@ QString DatasetCreator::getVideoFormat(const QString& recording) {
 		QString suffix = subpath.split('/').takeLast();
 		if (suffix != "." && suffix != "..") {
 			suffix = suffix.split(".").takeLast();
-			formats.append(suffix);
+			if (m_datasetConfig->validRecordingFormats.contains(suffix)) {
+				formats.append(suffix);
+			}
 		}
 	}
 	if (formats.count(formats[0]) != formats.length()) {
@@ -137,20 +146,26 @@ QList<int> DatasetCreator::extractFrames(const QString &path, QList<TimeLineWind
 		}
 	}
 	else if (m_datasetConfig->samplingMethod == "kmeans") {
-		int subsamplingRate = 10;
 		QList <VideoStreamer*> streamers;
 		QThreadPool *threadPool = QThreadPool::globalInstance();
 		for (int i = 0; i < m_datasetConfig->numCameras; i++) {
-			VideoStreamer *streamer = new VideoStreamer(path + "/" + cameras[i] + "." + m_datasetConfig->videoFormat, timeLineWindows,i);
+			VideoStreamer *streamer = new VideoStreamer(path + "/" + cameras[i] + "." + m_datasetConfig->videoFormat, timeLineWindows, m_datasetConfig->frameSetsRecording, i);
 			connect(streamer, &VideoStreamer::computedDCTs, this, &DatasetCreator::computedDCTsSlot);
+			if (i == 0) {
+				connect(streamer, &VideoStreamer::dctProgress, this, &DatasetCreator::dctProgress);
+			}
 			streamers.append(streamer);
  			threadPool->start(streamer);
 		}
-		threadPool->waitForDone();
+		while (!threadPool->waitForDone(100)) {
+			QCoreApplication::instance()->processEvents();
+		}
 
 		QEventLoop loop;
 		connect(this, &DatasetCreator::gotAllDCTs, &loop, &QEventLoop::quit);
 		loop.exec();
+
+		emit startedClustering();
 
 		cv::Mat dctImagesList;
 		for (int i = 0; i < m_dctMap[0].size(); i++) {
@@ -184,9 +199,11 @@ QList<int> DatasetCreator::extractFrames(const QString &path, QList<TimeLineWind
 				sums.push_back(cv::sum(clusterDists.mul(clusterDists))[0]);
 			}
 			int minElementIndex = std::min_element(sums.begin(),sums.end()) - sums.begin();
-			frameNumbers.append(minElementIndex*subsamplingRate);
+			frameNumbers.append(m_frameNumberMap[minElementIndex]);
 		}
+		emit finishedClustering();
 	}
+
 	return frameNumbers;
 }
 
@@ -196,17 +213,24 @@ QList<QString> DatasetCreator::getAndCopyFrames(const QString& recording, QList<
 	QList<QString> frameNames;
 	QList <ImageWriter*> writers;
 	QThreadPool *threadPool = QThreadPool::globalInstance();
+	int threadNumber = 0;
 	for (const auto & camera : cameras) {
 		QString videoPath = recording + "/" + camera + "." + m_datasetConfig->videoFormat;
 		QString destinationPath = dataFolder + "/" + camera;
-		ImageWriter *writer = new ImageWriter(videoPath, destinationPath, frameNumbers);
+		ImageWriter *writer = new ImageWriter(videoPath, destinationPath, frameNumbers, threadNumber);
+		if (threadNumber == 0) {
+			connect(writer, &ImageWriter::copyImagesStatus, this, &DatasetCreator::copyImagesStatus);
+		}
+		threadNumber++;
 		writers.append(writer);
 		threadPool->start(writer);
 	}
 	for (const auto &frameNumber : frameNumbers) {
 		frameNames.append("Frame_" + QString::number(frameNumber) + ".jpg");
 	}
-	threadPool->waitForDone();
+	while (!threadPool->waitForDone(100)) {
+		QCoreApplication::instance()->processEvents();
+	}
 	return frameNames;
 }
 
@@ -264,67 +288,87 @@ void DatasetCreator::createSavefile(const QString& recording, QList<QString> cam
 	}
 }
 
-void DatasetCreator::computedDCTsSlot(QList<cv::Mat> dctImages, int threadNumber) {
+void DatasetCreator::computedDCTsSlot(QList<cv::Mat> dctImages, QMap<int,int> frameNumberMap, int threadNumber) {
 	m_dctMap[threadNumber] = dctImages;
+	m_frameNumberMap = frameNumberMap;
 	if (m_dctMap.size() == 12) {
 		emit gotAllDCTs();
 	}
 }
 
 
-VideoStreamer::VideoStreamer(const QString &videoPath, QList<TimeLineWindow> timeLineWindows,int threadNumber) {
+VideoStreamer::VideoStreamer(const QString &videoPath, QList<TimeLineWindow> timeLineWindows, int numFramesToExtract, int threadNumber) {
 	m_cap = new cv::VideoCapture(videoPath.toStdString());
 	m_threadNumber = threadNumber;
 	m_timeLineWindows = timeLineWindows;
+	m_numFramesToExtract = numFramesToExtract;
 }
 
 void VideoStreamer::run() {
 	bool readFrame = true;
 	int frameCount = 0;
-	while (readFrame == true) {
-		if (m_threadNumber == 0 && frameCount % 100 == 0) {
-			std::cout << frameCount << std::endl;
-		}
-		cv::Mat img,dctImage;
-		m_cap->set(cv::CAP_PROP_POS_FRAMES, frameCount*10);
-		readFrame = m_cap->read(img);
-		if (readFrame) {
-			frameCount++;
-			bool inWindow = false;
-			for (const auto & window : m_timeLineWindows) {
-				if (frameCount*10+1 >= window.start && frameCount*10+1 <= window.end) {
-					inWindow = true;
-				}
+	int indexCount = 0;
+	int totalFrames = 0;
+	int minFrameCount = 0;
+	int subSamplingRate = 10;
+	cv::Mat img,dctImage;
+	for (const auto & window : m_timeLineWindows) {
+		int windowSize = window.end-window.start;
+		totalFrames += windowSize;
+		if (minFrameCount == 0 || windowSize < minFrameCount) minFrameCount = windowSize;
+	}
+	std::cout << minFrameCount << std::endl;
+	while (m_numFramesToExtract > minFrameCount/subSamplingRate) {
+		subSamplingRate = subSamplingRate/2;
+		std ::cout << subSamplingRate << std::endl;
+	}
+
+	for (const auto & window : m_timeLineWindows) {
+		frameCount = window.start;
+		while (frameCount < window.end) {
+			if (m_threadNumber == 0 && indexCount % 1 == 0) {
+				emit dctProgress(indexCount, totalFrames/subSamplingRate);
 			}
-			if (inWindow) {
+			m_cap->set(cv::CAP_PROP_POS_FRAMES, frameCount);
+			readFrame = m_cap->read(img);
+			if (readFrame) {
 				cv::resize(img, img, cv::Size(160, 128));
 				cv::cvtColor(img,img, cv::COLOR_BGR2GRAY);
 				img.convertTo(img, CV_32FC1);
 				cv::dct(img/255.0, dctImage);
 				dctImage = dctImage(cv::Rect(0,0,20,16));
-				dctImages.append(dctImage);
+				m_dctImages.append(dctImage);
+				m_frameNumberMap[indexCount++] = frameCount;
+				frameCount += subSamplingRate;
 			}
 		}
 	}
-	emit computedDCTs(dctImages, m_threadNumber);
+	emit computedDCTs(m_dctImages, m_frameNumberMap, m_threadNumber);
 }
 
 
-ImageWriter::ImageWriter(const QString &videoPath, const QString &destinationPath, QList<int> frameNumbers) :
-	m_destinationPath(destinationPath), m_frameNumbers(frameNumbers) {
+ImageWriter::ImageWriter(const QString &videoPath, const QString &destinationPath, QList<int> frameNumbers, int threadNumber) :
+	m_destinationPath(destinationPath), m_frameNumbers(frameNumbers), m_threadNumber(threadNumber) {
 		m_cap = new cv::VideoCapture(videoPath.toStdString());
 }
 
 void ImageWriter::run() {
+	int totalNumFrames = m_frameNumbers.size();
+	int frameCount = 0;
+
 	for (const auto & frameNumber : m_frameNumbers) {
 		cv::Mat frame;
 		m_cap->set(cv::CAP_PROP_POS_FRAMES, frameNumber-1);
 		if (m_cap->read(frame)) {
 			cv::imwrite((m_destinationPath + "/" +  "Frame_" + QString::number(frameNumber) + ".jpg").toStdString(), frame);
+			frameCount++;
 		}
 		else {
 			std::cout << "Error reading Frame"<< std::endl;
 			return;
+		}
+		if (m_threadNumber == 0 && frameCount % 1 == 0) {
+			emit copyImagesStatus(frameCount, totalNumFrames);
 		}
 	}
 }

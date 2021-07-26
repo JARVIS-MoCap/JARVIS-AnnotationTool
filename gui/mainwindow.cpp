@@ -60,6 +60,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	//<- Outgoing Signals
 
 	//<-> Relayed Signals
+	connect(mainBar, &MainBar::exitToMainPage, editorWidget, &EditorWidget::exitToMainPageSlot);
 
 }
 

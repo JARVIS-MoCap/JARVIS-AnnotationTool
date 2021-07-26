@@ -20,10 +20,13 @@ class MainBar : public QToolBar {
 
 	signals:
 		void openSettingsWindow();
+		void exitToMainPage();
 
 	private:
 		QToolButton *settingsButton;
 		QAction *settingsAction;
+		QToolButton *exitButton;
+		QAction *exitAction;
 };
 
 #endif

@@ -5,10 +5,12 @@ add_library(${PROJECT_NAME}
   recordingstable.hpp
   configurableitemlist.hpp
   presetswindow.hpp
+  progressinfowindow.hpp
   newdatasetwindow.cpp
   configurableitemlist.cpp
   recordingstable.cpp
   presetswindow.cpp
+  progressinfowindow.cpp
 )
 
 target_include_directories(${PROJECT_NAME}

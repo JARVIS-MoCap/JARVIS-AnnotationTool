@@ -140,10 +140,11 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	buttonlayout->addWidget(quitButton,0,10);
 
 	stackedWidget->addWidget(datasetWidget);
-	stackedWidget->addWidget(imageViewerContainer);
+	stackedWidget->addWidget(newDatasetWindow);
+	stackedWidget->addWidget(mainSplitter);
 
 	horizontalSplitter->addWidget(leftSplitter);
-	horizontalSplitter->addWidget(stackedWidget);
+	horizontalSplitter->addWidget(imageViewerContainer);
 	horizontalSplitter->addWidget(keypointWidget);
 	horizontalSplitter->setSizes({200,1000,200});
 
@@ -153,7 +154,7 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	mainSplitter->setCollapsible(1,false);
 	mainSplitter->setSizes({1000,50});
 
-	layout->addWidget(mainSplitter,0,0),
+	layout->addWidget(stackedWidget,0,0),
 	//--- SIGNAL-SLOT Connections ---//
 	//-> Incoming Signals
 	connect(imageViewer, &ImageViewer::zoomFinished, this, &EditorWidget::zoomFinishedSlot);
@@ -362,7 +363,7 @@ void EditorWidget::datasetLoadedSlot() {
 	m_currentImgSetIndex = 0;
 	m_currentFrameIndex = 0;
 	imageViewer->setFrame(m_currentImgSet, m_currentFrameIndex);
-	stackedWidget->setCurrentWidget(imageViewerContainer);
+	stackedWidget->setCurrentWidget(mainSplitter);
 	nextButton->setEnabled(true);
 	nextSetButton->setEnabled(true);
 	splitterMovedSlot(0,0);
@@ -374,7 +375,12 @@ void EditorWidget::loadDatasetClickedSlot() {
 }
 
 void EditorWidget::newDatasetClickedSlot() {
-	newDatasetWindow->show();
+	//newDatasetWindow->show();
+	stackedWidget->setCurrentWidget(newDatasetWindow);
+}
+
+void EditorWidget::exitToMainPageSlot() {
+	stackedWidget->setCurrentWidget(datasetWidget);
 }
 
 void EditorWidget::quitClickedSlot() {

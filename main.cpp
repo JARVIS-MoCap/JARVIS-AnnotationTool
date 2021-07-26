@@ -70,6 +70,7 @@ int main(int argc, char **argv)
 	QCoreApplication::setOrganizationDomain("test");
 	QCoreApplication::setApplicationName("Annotation Tool");
 	qRegisterMetaTypeStreamOperators<QList<QString> >("QList<QString>");
+  qRegisterMetaTypeStreamOperators<QMap<int,int> >("QMap<int,int>");
 	qRegisterMetaTypeStreamOperators<QList<RecordingItem> >("QList<RecordingItem>");
 	//qRegisterMetaTypeStreamOperators<QVector<QPoint> >("QVector<QPoint>");
 	//LOGUTILS::initLogging(1,0);

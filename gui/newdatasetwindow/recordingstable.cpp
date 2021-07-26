@@ -18,7 +18,9 @@
 
 RecordingsTable::RecordingsTable(QString name, DatasetConfig *datasetConfig, QWidget *parent) :
 			m_name(name), m_datasetConfig(datasetConfig), QWidget(parent) {
-	QGridLayout *labelselectorlayout = new QGridLayout(this);
+	QGridLayout *layout = new QGridLayout(this);
+	m_errorMsg = new QErrorMessage();
+
 	recordingsTable = new QTableWidget(0, 5);
 	recordingsTable->setAlternatingRowColors(true);
 	QStringList labels;
@@ -31,13 +33,14 @@ RecordingsTable::RecordingsTable(QString name, DatasetConfig *datasetConfig, QWi
 	recordingsTable->verticalHeader()->hide();
 	recordingsTable->setShowGrid(false);
 	recordingsTable->setSelectionMode(QAbstractItemView::NoSelection);
+	connect(recordingsTable, &QTableWidget::itemChanged, this, &RecordingsTable::nameEditedSlot);
+
 	addItemButton = new QPushButton();
 	addItemButton->setIcon(QIcon::fromTheme("plus"));
 	addItemButton->setMinimumSize(35,35);
 	connect(addItemButton, &QPushButton::clicked, this, &RecordingsTable::addItemSlot);
-	labelselectorlayout->addWidget(recordingsTable,0,0);
-	labelselectorlayout->addWidget(addItemButton,1,0, Qt::AlignRight);
-	this->setLayout(labelselectorlayout);
+	layout->addWidget(recordingsTable,0,0);
+	layout->addWidget(addItemButton,1,0, Qt::AlignRight);
 }
 
 QList<RecordingItem> RecordingsTable::getItems() {
@@ -50,7 +53,7 @@ int RecordingsTable::getNumberSubfolders(QString path) {
 	for (QDirIterator it(path); it.hasNext();) {
 		QString subpath = it.next();
 		QString suffix = subpath.split('/').takeLast();
-		if (subpath.split('.').takeLast() == "avi") count++;		//TODO: make this work for more formats than just avi
+		if (m_datasetConfig->validRecordingFormats.contains(subpath.split('.').takeLast())) count++;
 	}
 	return count;
 }
@@ -65,25 +68,20 @@ bool RecordingsTable::isValidRecordingFolder(QString path) {
 }
 
 void RecordingsTable::addItemSlot() {
-	QString dir = QFileDialog::getExistingDirectory(this,m_name, "/home/trackingsetup/Videos/Ralph_Test_15072021",
+	QString dir = QFileDialog::getExistingDirectory(this,m_name, "/media/timo/2,0 TB Volume/Recording_Sabine_17062021",
 				QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	if (dir == "") {
+		return;
+	}
 	if (isValidRecordingFolder(dir)) {
 		RecordingItem recordingItem;
 		recordingItem.name = dir.split("/").takeLast();
 		recordingItem.path = dir;
 		m_recordingItems.append(recordingItem);
 	}
-	for (QDirIterator it(dir,  QDirIterator::Subdirectories); it.hasNext();) {
-		QString path = it.next();
-		QString suffix = path.split('/').takeLast();
-		if (suffix != "." && suffix != "..") {
-			if (isValidRecordingFolder(path)) {
-				RecordingItem recordingItem;
-				recordingItem.name = "TestSub";
-				recordingItem.path = path;
-				m_recordingItems.append(recordingItem);
-			}
-		}
+	else {
+		m_errorMsg->showMessage("Selected folder is not a valid recording folder. Make sure there are exactly " +
+											      QString::number(m_datasetConfig->numCameras) + " recording files in this folder.");
 	}
 	updateTable();
 }
@@ -196,8 +194,19 @@ QList<QString> RecordingsTable::getVideoPaths(const QString& path) {
 		QString suffix = subpath.split('/').takeLast();
 		if (suffix != "." && suffix != "..") {
 			suffix = suffix.split(".").takeLast();
-			if (suffix == "avi") videoPaths.append(subpath); //TODO: make this work for all valid video formats
+			if (m_datasetConfig->validRecordingFormats.contains(suffix)) videoPaths.append(subpath);
 		}
 	}
 	return videoPaths;
+}
+
+void RecordingsTable::nameEditedSlot(QTableWidgetItem *item) {
+	if (item->text() != "") {
+		if (item->column() == 0) {
+			m_recordingItems[item->row()].name = item->text();
+		}
+	}
+	else {
+		item->setText(m_recordingItems[item->row()].name);
+	}
 }
