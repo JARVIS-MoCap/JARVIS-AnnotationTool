@@ -28,55 +28,52 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 	loadDatasetFirstLabel->setAlignment(Qt::AlignCenter);
 	stackedWidget->addWidget(loadDatasetFirstLabel);
 
-	intrinsicsSetup = new QWidget(stackedWidget);
-	intrinsicssetuplayout = new QGridLayout(intrinsicsSetup);
-	QGroupBox *intrinsicsInfoBox = new QGroupBox(intrinsicsSetup);
-	QGridLayout *intrinsicsinfolayout = new QGridLayout(intrinsicsInfoBox);
-	intrinsicsinfolayout->setMargin(4);
-	intrinsicsinfolayout->setSpacing(10);
-	QLabel *intrinsicsInfoIcon = new QLabel();
-	intrinsicsInfoIcon->setPixmap(QIcon::fromTheme("info2").pixmap(QSize(60, 60)));
-	QLabel *intrinsicsInfoLabel = new QLabel("Select Savefiles containing the intrinsic parameters for all the cameras obtained by calibration.");
-	intrinsicsInfoLabel->setWordWrap(true);
-	intrinsicsinfolayout->addWidget(intrinsicsInfoIcon,0,0);
-	intrinsicsinfolayout->addWidget(intrinsicsInfoLabel,0,1);
-	intrinsicsBox = new QGroupBox("Intrinsic Camera Parameters");
-	intrinsicslayout = new QGridLayout(intrinsicsBox);
-	initIntrinsicsButton = new QPushButton("Set Intrinsic Parameters");
-	initIntrinsicsButton->setEnabled(false);
-	connect(initIntrinsicsButton, &QPushButton::clicked, this, &ReprojectionWidget::initIntrinsicsClickedSlot);
-	intrinsicssetuplayout->addWidget(intrinsicsInfoBox,0,0);
-	intrinsicssetuplayout->addWidget(intrinsicsBox,1,0);
-	intrinsicssetuplayout->addWidget(initIntrinsicsButton,2,0,Qt::AlignRight);
+	calibrationSetup = new QWidget(stackedWidget);
+	QGridLayout *calibrationsetuplayout = new QGridLayout(calibrationSetup);
+	QGroupBox *infoBox = new QGroupBox(calibrationSetup);
+	QGridLayout *infolayout = new QGridLayout(infoBox);
+	infolayout->setMargin(4);
+	infolayout->setSpacing(10);
+	QLabel *infoIcon = new QLabel();
+	infoIcon->setPixmap(QIcon::fromTheme("info2").pixmap(QSize(60, 60)));
+	QLabel *infoLabel = new QLabel("Select Savefiles containing the intrinsic parameters for all the cameras obtained by calibration.");
+	infoLabel->setWordWrap(true);
+	infolayout->addWidget(infoIcon,0,0);
+	infolayout->addWidget(infoLabel,0,1);
 
-	extrinsicsSetup = new QWidget(stackedWidget);
-	extrinsicssetuplayout = new QGridLayout(extrinsicsSetup);
-	QGroupBox *extrinsicsInfoBox = new QGroupBox(intrinsicsSetup);
-	QGridLayout *extrinsicsinfolayout = new QGridLayout(extrinsicsInfoBox);
-	extrinsicsinfolayout->setMargin(4);
-	extrinsicsinfolayout->setSpacing(10);
-	QLabel *extrinsicsInfoIcon = new QLabel();
-	extrinsicsInfoIcon->setPixmap(QIcon::fromTheme("info2").pixmap(QSize(60, 60)));
-	QLabel *extrinsicsInfoLabel = new QLabel("Select Savefiles containing the extrinsic parameters for all camera pairs obtained by stereo calibration.");
-	extrinsicsInfoLabel->setWordWrap(true);
-	extrinsicsinfolayout->addWidget(extrinsicsInfoIcon,0,0);
-	extrinsicsinfolayout->addWidget(extrinsicsInfoLabel,0,1);
+	intrinsicsBox = new QGroupBox("Intrinsic Camera Parameters");
+	QGridLayout *intrinsicslayout = new QGridLayout(intrinsicsBox);
+	QLabel *intrinsicsPathLabel = new QLabel("Intrinsics Path",intrinsicsBox);
+	intrinsicsPathEdit = new QLineEdit(intrinsicsBox);
+	intrinsicsPathButton = new QPushButton();
+	intrinsicsPathButton->setMinimumSize(30,30);
+	intrinsicsPathButton->setIcon(QIcon::fromTheme("folder"));
+	connect(intrinsicsPathButton, &QPushButton::clicked, this, &ReprojectionWidget::intrinsicsPathClickedSlot);
+	intrinsicslayout->addWidget(intrinsicsPathLabel,0,0);
+	intrinsicslayout->addWidget(intrinsicsPathEdit,0,1);
+	intrinsicslayout->addWidget(intrinsicsPathButton,0,2);
+
 	extrinsicsBox = new QGroupBox("Extrinsic Camera Parameters");
-	extrinsicslayout = new QGridLayout(extrinsicsBox);
-	QWidget *primarySelectorWidget = new QWidget(this);
-	QGridLayout *primaryselectorlayout = new QGridLayout(primarySelectorWidget);
-	primaryselectorlayout->setMargin(0);
-	QLabel *primaryLabel = new QLabel("Primary Camera");
+	QGridLayout *extrinsicslayout = new QGridLayout(extrinsicsBox);
 	primaryCombo = new QComboBox(extrinsicsBox);
-	primaryselectorlayout->addWidget(primaryLabel,0,0);
-	primaryselectorlayout->addWidget(primaryCombo,0,1);
-	extrinsicslayout->addWidget(primarySelectorWidget,0,0,1,3);
-	initReprojectionButton = new QPushButton("Initialise Reprojection Tool");
-	initReprojectionButton->setEnabled(false);
+	extrinsicslayout->addWidget(primaryCombo,0,0);
+	QLabel *extrinsicsPathLabel = new QLabel("Extrinsics Path" ,extrinsicsBox);
+	extrinsicsPathEdit = new QLineEdit(extrinsicsBox);
+	extrinsicsPathButton = new QPushButton();
+	extrinsicsPathButton->setMinimumSize(30,30);
+	extrinsicsPathButton->setIcon(QIcon::fromTheme("folder"));
+	connect(extrinsicsPathButton, &QPushButton::clicked, this, &ReprojectionWidget::extrinsicsPathClickedSlot);
+	extrinsicslayout->addWidget(primaryCombo,0,0,1,3);
+	extrinsicslayout->addWidget(extrinsicsPathLabel,1,0);
+	extrinsicslayout->addWidget(extrinsicsPathEdit,1,1);
+	extrinsicslayout->addWidget(extrinsicsPathButton,1,2);
+	initReprojectionButton = new QPushButton("Set Calibration Parameters");
 	connect(initReprojectionButton, &QPushButton::clicked, this, &ReprojectionWidget::initReprojectionClickedSlot);
-	extrinsicssetuplayout->addWidget(extrinsicsInfoBox,0,0);
-	extrinsicssetuplayout->addWidget(extrinsicsBox,1,0);
-	extrinsicssetuplayout->addWidget(initReprojectionButton,2,0, Qt::AlignRight);
+
+	calibrationsetuplayout->addWidget(infoBox,0,0);
+	calibrationsetuplayout->addWidget(intrinsicsBox,1,0);
+	calibrationsetuplayout->addWidget(extrinsicsBox,2,0);
+	calibrationsetuplayout->addWidget(initReprojectionButton,3,0,Qt::AlignRight);
 
 	reprojectionController = new QWidget(stackedWidget);
 	reprojectioncontrollerlayout = new QGridLayout(reprojectionController);
@@ -101,8 +98,8 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 	reprojectioncontrollerlayout->addWidget(reprojectionSettingsBox,0,0);
 	reprojectioncontrollerlayout->addWidget(reprojectionChartWidget,1,0);
 
-	stackedWidget->addWidget(intrinsicsSetup);
-	stackedWidget->addWidget(extrinsicsSetup);
+	stackedWidget->addWidget(loadDatasetFirstLabel);
+	stackedWidget->addWidget(calibrationSetup);
 	stackedWidget->addWidget(reprojectionController);
 
 	reprojectionlayout->addWidget(reprojectionLabel,0,0);
@@ -120,53 +117,20 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 
 
 void ReprojectionWidget::datasetLoadedSlot() {
-	//intrinsicsPathEdits.clear();
-	//extrinsicsPathEdits.clear();
 	primaryCombo->clear();
 	m_numCameras = Dataset::dataset->numCameras();
 	m_entitiesList = Dataset::dataset->entitiesList();
 	m_bodypartsList = Dataset::dataset->bodypartsList();
-	for (int i = 0; i < m_numCameras; i++) {
-		if (intrinsicslayout->itemAtPosition(i, 0) == nullptr) {
-			QLabel *camLabel = new QLabel(Dataset::dataset->cameraName(i) ,intrinsicsBox);
-			QLineEdit *pathEdit = new QLineEdit(intrinsicsBox);
-			intrinsicsPathEdits.append(pathEdit);
-			QPushButton *pathButton = new QPushButton();
-			pathButton->setMinimumSize(30,30);
-			pathButton->setIcon(QIcon::fromTheme("folder"));
-			connect(pathButton, &QPushButton::clicked, this, &ReprojectionWidget::intrinsicsPathClickedSlot);
-			intrinsicslayout->addWidget(camLabel,i,0);
-			intrinsicslayout->addWidget(pathEdit,i,1);
-			intrinsicslayout->addWidget(pathButton,i,2);
-		}
-	}
+
 	for (int cam = 0; cam < m_numCameras; cam++) {
 		primaryCombo->addItem(Dataset::dataset->cameraName(cam));
 	}
-	connect(primaryCombo, &QComboBox::currentTextChanged, this, &ReprojectionWidget::primaryChangedSlot);
-	for (int cam = 0; cam < m_numCameras; cam++) {
-		if (extrinsicslayout->itemAtPosition(cam+1, 0) == nullptr) {
-			QLabel *camLabel = new QLabel(Dataset::dataset->cameraName(cam) ,intrinsicsBox);
-			QLineEdit *pathEdit = new QLineEdit(intrinsicsBox);
-			extrinsicsPathEdits.append(pathEdit);
-			QPushButton *pathButton = new QPushButton();
-			pathButton->setMinimumSize(30,30);
-			pathButton->setIcon(QIcon::fromTheme("folder"));
-			connect(pathButton, &QPushButton::clicked, this, &ReprojectionWidget::extrinsicsPathClickedSlot);
-			extrinsicslayout->addWidget(camLabel,cam+1,0);
-			extrinsicslayout->addWidget(pathEdit,cam+1,1);
-			extrinsicslayout->addWidget(pathButton,cam+1,2);
-			if (cam == primaryCombo->currentIndex()) {
-				camLabel->hide();
-				pathEdit->hide();
-				pathButton->hide();
-			}
-		}
-	}
+
 	minViewsEdit->setRange(2, m_numCameras);
-	loadPaths();
-	stackedWidget->setCurrentWidget(intrinsicsSetup);
-	checkIntrinsicPathsAdded();
+	//loadPaths();
+	stackedWidget->setCurrentWidget(calibrationSetup);
+	//checkIntrinsicsPath();
+	//checkExtrinsicsPath();
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		m_reprojectionErrors[entity] = new std::vector<double>(Dataset::dataset->bodypartsList().size());
 	}
@@ -195,88 +159,52 @@ void ReprojectionWidget::switchToggledSlot(bool toggle) {
 	emit reprojectionToolToggled(toggle);
 }
 
-
-void ReprojectionWidget::primaryChangedSlot(QString) {
-	m_primaryIndex = primaryCombo->currentIndex();
-	for (int cam = 0; cam < m_numCameras; cam++) {
-		if (cam == primaryCombo->currentIndex()) {
-			extrinsicslayout->itemAtPosition(cam+1,0)->widget()->hide();
-			extrinsicslayout->itemAtPosition(cam+1,1)->widget()->hide();
-			extrinsicslayout->itemAtPosition(cam+1,2)->widget()->hide();
-		}
-		else {
-			extrinsicslayout->itemAtPosition(cam+1,0)->widget()->show();
-			extrinsicslayout->itemAtPosition(cam+1,1)->widget()->show();
-			extrinsicslayout->itemAtPosition(cam+1,2)->widget()->show();
-		}
-	}
-	loadPaths(true);
-	checkExtrinsicPathsAdded();
-}
-
 void ReprojectionWidget::intrinsicsPathClickedSlot() {
-	int index = intrinsicslayout->indexOf(qobject_cast<QWidget*>(sender()));
-	int row,_;
-  intrinsicslayout->getItemPosition(index, &row, &_, &_, &_);
-	QString default_path = ".";
-	QString filename = QFileDialog::getOpenFileName(this, "Open Intrinsics of Camera " + QString::number(row+1), m_parameterDir.path(), "(*.yaml)");
-	if (filename != "") {
-		m_parameterDir.setPath(filename);
-		m_parameterDir.cdUp();
-		intrinsicsPathEdits[row]->setText(filename);
+	QString path = QFileDialog::getExistingDirectory(this, "Select Intrinsics Parameter Path", m_parameterDir.path());
+	if (path != "") {
+		if (checkIntrinsicsPath(path)) {
+			m_parameterDir.setPath(path);
+			intrinsicsPathEdit->setText(path);
+			m_intrinsicsPathValid = true;
+		}
 	}
-	checkIntrinsicPathsAdded();
 }
 
 void ReprojectionWidget::extrinsicsPathClickedSlot() {
-	int index = extrinsicslayout->indexOf(qobject_cast<QWidget*>(sender()));
-	int row,_;
-  extrinsicslayout->getItemPosition(index, &row, &_, &_, &_);
-	QString filename = QFileDialog::getOpenFileName(this, "Open Intrinsics of Camera " + QString::number(row+1), m_parameterDir.path(), "(*.yaml)");
-	if (filename != "") {
-		m_parameterDir.setPath(filename);
-		extrinsicsPathEdits[row-1]->setText(filename);
-	}
-	checkExtrinsicPathsAdded();
-}
-
-void ReprojectionWidget::checkIntrinsicPathsAdded() {
-	bool allAdded = true;
-	for (const auto& edit : intrinsicsPathEdits) {
-		if (edit->text() == "" && edit->isVisible()) {
-			allAdded = false;
-			break;
+	QString path = QFileDialog::getExistingDirectory(this, "Select Extrnsics Parameter Path", m_parameterDir.path());
+	if (path != "") {
+		if (checkExtrinsicsPath(path)) {
+			m_parameterDir.setPath(path);
+			extrinsicsPathEdit->setText(path);
+			m_extrinsicsPathValid = true;
 		}
 	}
-	if (allAdded == true) {
-		initIntrinsicsButton->setEnabled(true);
-	}
 }
 
-void ReprojectionWidget::checkExtrinsicPathsAdded() {
-	bool allAdded = true;
-	for (const auto& edit : extrinsicsPathEdits) {
-		if (edit->text() == "" && edit->isVisible()) {
-			allAdded = false;
-			break;
-		}
-	}
-	if (allAdded == true) {
-		initReprojectionButton->setEnabled(true);
-	}
-}
-
-void ReprojectionWidget::initIntrinsicsClickedSlot() {
-	for (const auto& edit : intrinsicsPathEdits) {
-		if (!QFile::exists(edit->text())) {
+bool ReprojectionWidget::checkIntrinsicsPath(QString path) {
+	for (int cam = 0; cam < m_numCameras; cam++) {
+		std::cout << (path + "/" + "Intrinsics_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml").toStdString() << std::endl;
+		if (!QFile::exists(path + "/" + "Intrinsics_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml")) {
 			QErrorMessage *msg = new QErrorMessage();
-			msg->showMessage("Intrinsics File '" + edit->text() + "' does not exist.");
-			return;
+			std::cout << "JSBFKF" << std::endl;
+			//msg->showMessage("Intrinsics File " + "Intrinsics_" + Dataset::dataset->cameraName(cam) + ".yaml" + " does not exist.");
+			return false;
 		}
 	}
-	stackedWidget->setCurrentWidget(extrinsicsSetup);
-	checkExtrinsicPathsAdded();
+	return true;
 }
+
+bool ReprojectionWidget::checkExtrinsicsPath(QString path) {
+	for (int cam = 0; cam < m_numCameras; cam++) {
+		if (cam != primaryCombo->currentIndex() && !QFile::exists(path + "/" + "Camera_Pair_" + primaryCombo->currentText().split("_").takeLast() + "_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml")) {
+			QErrorMessage *msg = new QErrorMessage();
+		//	msg->showMessage("Extrinsics File " + "Camera_Pair_" + primaryCombo->currentText().split("_").takeLast() + "_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml" + " does not exist.");
+			return false;
+		}
+	}
+	return true;
+}
+
 
 void ReprojectionWidget::initReprojectionClickedSlot() {
 	for (const auto& edit : extrinsicsPathEdits) {
@@ -324,6 +252,7 @@ void ReprojectionWidget::savePaths() {
 	settings->endGroup();
 }
 
+/*
 void ReprojectionWidget::loadPaths(bool onlyExtrinsics) {
 	settings->beginGroup("ReprojectionParameters");
 	int i = 0;
@@ -347,7 +276,7 @@ void ReprojectionWidget::loadPaths(bool onlyExtrinsics) {
 	}
 	settings->endGroup();
 	settings->endGroup();
-}
+}*/
 
 
 void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int currentFrameIndex) {

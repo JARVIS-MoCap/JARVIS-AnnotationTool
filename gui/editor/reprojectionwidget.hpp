@@ -46,8 +46,8 @@ class ReprojectionWidget : public QWidget {
 
 
 	private:
-		void checkIntrinsicPathsAdded();
-		void checkExtrinsicPathsAdded();
+		bool checkIntrinsicsPath(QString path);
+		bool checkExtrinsicsPath(QString path);
 		void savePaths();
 		void loadPaths(bool onlyExtrinsics = false);
 		void undoReprojection();
@@ -61,16 +61,16 @@ class ReprojectionWidget : public QWidget {
 		Switch *toggleSwitch;
 		QStackedWidget *stackedWidget;
 
-		QWidget *intrinsicsSetup;
-		QGridLayout *intrinsicssetuplayout;
+		QWidget *calibrationSetup;
 		QGroupBox *intrinsicsBox;
-		QGridLayout *intrinsicslayout;
-		QPushButton *initIntrinsicsButton;
-		QWidget *extrinsicsSetup;
-		QGridLayout *extrinsicssetuplayout;
+		QLineEdit *intrinsicsPathEdit;
+		QPushButton *intrinsicsPathButton;
+		bool m_intrinsicsPathValid = false;
 		QGroupBox *extrinsicsBox;
-		QGridLayout*extrinsicslayout;
 		QComboBox *primaryCombo;
+		QLineEdit *extrinsicsPathEdit;
+		QPushButton *extrinsicsPathButton;
+		bool m_extrinsicsPathValid = false;
 		QPushButton *initReprojectionButton;
 
 		QWidget *reprojectionController;
@@ -97,10 +97,8 @@ class ReprojectionWidget : public QWidget {
 
 	private slots:
 		void switchToggledSlot(bool toggle);
-		void primaryChangedSlot(QString);
 		void intrinsicsPathClickedSlot();
 		void extrinsicsPathClickedSlot();
-		void initIntrinsicsClickedSlot();
 		void initReprojectionClickedSlot();
 		void minViewsChangedSlot(int value);
 		void errorThresholdChangedSlot(double value);
