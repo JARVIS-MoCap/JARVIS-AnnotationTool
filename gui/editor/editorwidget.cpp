@@ -192,6 +192,7 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(imageViewer, &ImageViewer::keypointChangedForReprojection, reprojectionWidget, &ReprojectionWidget::calculateReprojectionSlot);
 	connect(reprojectionWidget, &ReprojectionWidget::reprojectedPoints, keypointWidget, &KeypointWidget::setKeypointsFromDatasetSlot);
 	connect(reprojectionWidget, &ReprojectionWidget::reprojectionToolToggled, imageViewer, &ImageViewer::toggleReprojectionSlot);
+	connect(newDatasetWindow, &NewDatasetWindow::toggleExitButton, this, &EditorWidget::toggleExitButton);
 }
 
 void EditorWidget::splitterMovedSlot(int, int) {
@@ -380,6 +381,10 @@ void EditorWidget::newDatasetClickedSlot() {
 }
 
 void EditorWidget::exitToMainPageSlot() {
+	if (stackedWidget->currentWidget() == mainSplitter) {
+		std::cout << "Saving Dataset" << std::endl;
+		Dataset::dataset->save();
+	}
 	stackedWidget->setCurrentWidget(datasetWidget);
 }
 

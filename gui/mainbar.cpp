@@ -35,3 +35,7 @@ MainBar::MainBar(QWidget *parent) : QToolBar(parent) {
 	this->addWidget(settingsButton);
 	this->addWidget(exitButton);
 }
+
+void MainBar::toggleExitButtonSlot(bool toggle) {
+	exitAction->setEnabled(toggle);
+}

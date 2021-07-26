@@ -120,40 +120,47 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 
 
 void ReprojectionWidget::datasetLoadedSlot() {
+	//intrinsicsPathEdits.clear();
+	//extrinsicsPathEdits.clear();
+	primaryCombo->clear();
 	m_numCameras = Dataset::dataset->numCameras();
 	m_entitiesList = Dataset::dataset->entitiesList();
 	m_bodypartsList = Dataset::dataset->bodypartsList();
 	for (int i = 0; i < m_numCameras; i++) {
-		QLabel *camLabel = new QLabel(Dataset::dataset->cameraName(i) ,intrinsicsBox);
-		QLineEdit *pathEdit = new QLineEdit(intrinsicsBox);
-		intrinsicsPathEdits.append(pathEdit);
-		QPushButton *pathButton = new QPushButton();
-		pathButton->setMinimumSize(30,30);
-		pathButton->setIcon(QIcon::fromTheme("folder"));
-		connect(pathButton, &QPushButton::clicked, this, &ReprojectionWidget::intrinsicsPathClickedSlot);
-		intrinsicslayout->addWidget(camLabel,i,0);
-		intrinsicslayout->addWidget(pathEdit,i,1);
-		intrinsicslayout->addWidget(pathButton,i,2);
+		if (intrinsicslayout->itemAtPosition(i, 0) == nullptr) {
+			QLabel *camLabel = new QLabel(Dataset::dataset->cameraName(i) ,intrinsicsBox);
+			QLineEdit *pathEdit = new QLineEdit(intrinsicsBox);
+			intrinsicsPathEdits.append(pathEdit);
+			QPushButton *pathButton = new QPushButton();
+			pathButton->setMinimumSize(30,30);
+			pathButton->setIcon(QIcon::fromTheme("folder"));
+			connect(pathButton, &QPushButton::clicked, this, &ReprojectionWidget::intrinsicsPathClickedSlot);
+			intrinsicslayout->addWidget(camLabel,i,0);
+			intrinsicslayout->addWidget(pathEdit,i,1);
+			intrinsicslayout->addWidget(pathButton,i,2);
+		}
 	}
 	for (int cam = 0; cam < m_numCameras; cam++) {
 		primaryCombo->addItem(Dataset::dataset->cameraName(cam));
 	}
 	connect(primaryCombo, &QComboBox::currentTextChanged, this, &ReprojectionWidget::primaryChangedSlot);
 	for (int cam = 0; cam < m_numCameras; cam++) {
-		QLabel *camLabel = new QLabel(Dataset::dataset->cameraName(cam) ,intrinsicsBox);
-		QLineEdit *pathEdit = new QLineEdit(intrinsicsBox);
-		extrinsicsPathEdits.append(pathEdit);
-		QPushButton *pathButton = new QPushButton();
-		pathButton->setMinimumSize(30,30);
-		pathButton->setIcon(QIcon::fromTheme("folder"));
-		connect(pathButton, &QPushButton::clicked, this, &ReprojectionWidget::extrinsicsPathClickedSlot);
-		extrinsicslayout->addWidget(camLabel,cam+1,0);
-		extrinsicslayout->addWidget(pathEdit,cam+1,1);
-		extrinsicslayout->addWidget(pathButton,cam+1,2);
-		if (cam == primaryCombo->currentIndex()) {
-			camLabel->hide();
-			pathEdit->hide();
-			pathButton->hide();
+		if (extrinsicslayout->itemAtPosition(cam+1, 0) == nullptr) {
+			QLabel *camLabel = new QLabel(Dataset::dataset->cameraName(cam) ,intrinsicsBox);
+			QLineEdit *pathEdit = new QLineEdit(intrinsicsBox);
+			extrinsicsPathEdits.append(pathEdit);
+			QPushButton *pathButton = new QPushButton();
+			pathButton->setMinimumSize(30,30);
+			pathButton->setIcon(QIcon::fromTheme("folder"));
+			connect(pathButton, &QPushButton::clicked, this, &ReprojectionWidget::extrinsicsPathClickedSlot);
+			extrinsicslayout->addWidget(camLabel,cam+1,0);
+			extrinsicslayout->addWidget(pathEdit,cam+1,1);
+			extrinsicslayout->addWidget(pathButton,cam+1,2);
+			if (cam == primaryCombo->currentIndex()) {
+				camLabel->hide();
+				pathEdit->hide();
+				pathButton->hide();
+			}
 		}
 	}
 	minViewsEdit->setRange(2, m_numCameras);
@@ -163,6 +170,9 @@ void ReprojectionWidget::datasetLoadedSlot() {
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		m_reprojectionErrors[entity] = new std::vector<double>(Dataset::dataset->bodypartsList().size());
 	}
+
+	switchToggledSlot(false);
+
 	emit datasetLoaded();
 }
 
@@ -174,6 +184,7 @@ void ReprojectionWidget::switchToggledSlot(bool toggle) {
 			return;
 		}
 		m_reprojectionActive = true;
+		calculateAllReprojections();
 		calculateReprojectionSlot(m_currentImgSetIndex, m_currentFrameIndex);
 	}
 	else {
@@ -292,6 +303,7 @@ void ReprojectionWidget::initReprojectionClickedSlot() {
 	}
 	reprojectionTool = new ReprojectionTool(intrinsicsList, extrinsicsList,primaryCombo->currentIndex());
 	stackedWidget->setCurrentWidget(reprojectionController);
+	calculateAllReprojections();
 	calculateReprojectionSlot(m_currentImgSetIndex, m_currentFrameIndex);
 }
 
@@ -336,6 +348,7 @@ void ReprojectionWidget::loadPaths(bool onlyExtrinsics) {
 	settings->endGroup();
 	settings->endGroup();
 }
+
 
 void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int currentFrameIndex) {
 	m_currentImgSetIndex = currentImgSetIndex;
@@ -396,6 +409,62 @@ void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int c
 	}
 }
 
+void ReprojectionWidget::calculateAllReprojections() {
+	if (m_reprojectionActive) {
+		for (const auto& imgSet : Dataset::dataset->imgSets()) {
+			for (const auto& entity : m_entitiesList) {
+				for (const auto& bodypart : m_bodypartsList) {
+					QList<int> camsToUse;
+					QList<int> alreadyReprojected;
+					QList<QPointF> points;
+					int camCounter = 0;
+					for (const auto& frame : imgSet->frames) {
+						if (frame->keypointMap[entity + "/" + bodypart]->state() == Annotated) {
+							camsToUse.append(camCounter);
+							points.append(frame->keypointMap[entity + "/" + bodypart]->coordinates());
+						}
+						else if (frame->keypointMap[entity + "/" + bodypart]->state() == Reprojected) {
+							alreadyReprojected.append(camCounter);
+						}
+						camCounter++;
+					}
+					if (camsToUse.size() >= m_minViews) {
+						cv::Mat X =  reprojectionTool->reconstructPoint3D(points, camsToUse);
+						QList<QPointF> reprojectedPoints = reprojectionTool->reprojectPoint(X);
+						double reprojectionError = 0;
+						for (int cam = 0; cam < reprojectedPoints.size(); cam ++) {
+							QSize imgSize =imgSet->frames[cam]->imageDimensions;
+							QRectF imgRect(QPoint(0,0), imgSize);
+							Keypoint *keypoint = imgSet->frames[cam]->keypointMap[entity + "/" + bodypart];
+							if (!camsToUse.contains(cam) && imgRect.contains(reprojectedPoints[cam])) {
+								if (keypoint->state() != Suppressed) {
+									keypoint->setState(Reprojected);
+									keypoint->setCoordinates(reprojectedPoints[cam]);
+								}
+							}
+							else if (keypoint->state() == Annotated) {
+								QPointF annotatedPoint = imgSet->frames[cam]->keypointMap[entity + "/" + bodypart]->coordinates();
+								QPointF dist = annotatedPoint-reprojectedPoints[cam];
+								reprojectionError += sqrt(dist.x()*dist.x()+dist.y()*dist.y())/reprojectedPoints.size();
+							}
+						}
+							(*m_reprojectionErrors[entity])[Dataset::dataset->bodypartsList().indexOf(bodypart)] = reprojectionError;
+					}
+					else {
+						(*m_reprojectionErrors[entity])[Dataset::dataset->bodypartsList().indexOf(bodypart)] = 0;
+						for (int cam = 0; cam < Dataset::dataset->numCameras(); cam ++) {
+							Keypoint *keypoint = imgSet->frames[cam]->keypointMap[entity + "/" + bodypart];
+							if (keypoint->state() == Reprojected) {
+								keypoint->setState(NotAnnotated);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 void ReprojectionWidget::undoReprojection() {
 	for (auto& imgSet : Dataset::dataset->imgSets()) {
 		for (auto& frame : imgSet->frames) {
@@ -408,6 +477,7 @@ void ReprojectionWidget::undoReprojection() {
 
 void ReprojectionWidget::minViewsChangedSlot(int value) {
 	m_minViews = value;
+	calculateAllReprojections();
 	calculateReprojectionSlot(m_currentImgSetIndex, m_currentFrameIndex);
 }
 

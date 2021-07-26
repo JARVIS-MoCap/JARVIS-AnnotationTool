@@ -51,7 +51,7 @@ class ReprojectionWidget : public QWidget {
 		void savePaths();
 		void loadPaths(bool onlyExtrinsics = false);
 		void undoReprojection();
-
+		void calculateAllReprojections();
 		ReprojectionChartWidget *reprojectionChartWidget;
 
 		QSettings *settings;

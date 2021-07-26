@@ -53,14 +53,13 @@ class RecordingsTable : public QWidget {
 		QList<QString> getVideoPaths(const QString& path);
 
 	public slots:
-		//void setNumberOfCamerasSlot(int num);
 
 	private slots:
 		void addItemSlot();
 		void deleteRecordingClickedSlot();
 		void editRecordingClickedSlot();
 		void editingFinishedSlot(QList<TimeLineWindow> timeLineWindows, int frameCount);
-		QImage createTimeLineImage(QList<TimeLineWindow> timeLineWindows);
+		QImage createTimeLineImage(QList<TimeLineWindow> timeLineWindows, int frameCount);
 		void nameEditedSlot(QTableWidgetItem *item);
 };
 

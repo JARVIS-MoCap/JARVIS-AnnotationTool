@@ -42,6 +42,12 @@ KeypointWidget::KeypointWidget(QWidget *parent) : QWidget(parent) {
 }
 
 void KeypointWidget::init() {
+	entitiesList.clear();
+	hideEntitiesBoxesList.clear();
+	keypointTabWidget->blockSignals(true);
+	keypointTabWidget->clear();
+	keypointTabWidget->blockSignals(false);
+
 	int i = 1;
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		QCheckBox *hideBox = new QCheckBox(entity,hideEntityWidget);

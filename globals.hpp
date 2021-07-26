@@ -73,6 +73,7 @@ struct RecordingItem {
 	QString name;
 	QString path;
 	QList<TimeLineWindow> timeLineList;
+	int frameCount = 0;
 };
 
 

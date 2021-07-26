@@ -18,6 +18,9 @@ class MainBar : public QToolBar {
 	public:
 		explicit MainBar(QWidget *parent = nullptr);
 
+	public slots:
+		void toggleExitButtonSlot(bool toggle);
+
 	signals:
 		void openSettingsWindow();
 		void exitToMainPage();

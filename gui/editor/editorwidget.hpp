@@ -53,6 +53,7 @@ class EditorWidget : public QWidget {
 		void keypointSizeChanged(int value);
 		void keypointShapeChanged(const QString& entity, KeypointShape shape);
 		void colorMapChanged(const QString& entity, ColorMap::ColorMapType type, QColor color);
+		void toggleExitButton(bool toggle);
 
 	private:
 		QSplitter *mainSplitter;

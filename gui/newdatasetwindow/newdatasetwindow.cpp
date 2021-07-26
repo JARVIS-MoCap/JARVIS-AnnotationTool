@@ -180,12 +180,14 @@ void NewDatasetWindow::samplingMethodChangedSlot(const QString &method) {
 
 void NewDatasetWindow::createDatasetClickedSlot() {
 	createButton->setEnabled(false);
+	emit toggleExitButton(false);
 	emit createDataset(recordingsTable->getItems(), entitiesItemList->getItems(), keypointsItemList->getItems());
 	progressInfoWindow->show();
 }
 
 void NewDatasetWindow::datasetCreatedSot() {
 	createButton->setEnabled(true);
+	emit toggleExitButton(true);
 	progressInfoWindow->hide();
 }
 

@@ -35,6 +35,7 @@ ReprojectionChartWidget::ReprojectionChartWidget(QWidget *parent) : QWidget(pare
 }
 
 void ReprojectionChartWidget::datasetLoadedSlot() {
+	chartsTabWidget->clear();
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		ReprojectionChartView * chart = new ReprojectionChartView();
 		connect(this, &ReprojectionChartWidget::errorThresholdChanged, chart, &ReprojectionChartView::errorThresholdChangedSlot);
