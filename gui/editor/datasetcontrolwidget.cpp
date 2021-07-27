@@ -11,9 +11,7 @@
 
 
 DatasetControlWidget::DatasetControlWidget(QWidget *parent) : QWidget(parent) {
-	//this->setMaximumSize(10000,600);
 	QGridLayout *layout = new QGridLayout(this);
-	//layout->setMargin(0);
 	QLabel *datasetControlLabel = new QLabel("Dataset Control");
 	datasetControlLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
 
@@ -28,6 +26,7 @@ DatasetControlWidget::DatasetControlWidget(QWidget *parent) : QWidget(parent) {
 
 	framesTable = new QTableWidget(0, 2);
 	framesTable->setAlternatingRowColors(true);
+	framesTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QStringList labels;
 	labels << "Frame" << "Annotations";
 	framesTable->setHorizontalHeaderLabels(labels);
@@ -39,7 +38,6 @@ DatasetControlWidget::DatasetControlWidget(QWidget *parent) : QWidget(parent) {
 	connect(framesTable, &QTableWidget::cellDoubleClicked, this, &DatasetControlWidget::selectionChangedSlot);
 
 	QWidget *spacer = new QWidget(this);
-	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	layout->addWidget(datasetControlLabel,0,0,1,4);
 	layout->addWidget(imgSetSelectorLabel,1,0);

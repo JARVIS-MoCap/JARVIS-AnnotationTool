@@ -67,7 +67,7 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 	extrinsicslayout->addWidget(extrinsicsPathLabel,1,0);
 	extrinsicslayout->addWidget(extrinsicsPathEdit,1,1);
 	extrinsicslayout->addWidget(extrinsicsPathButton,1,2);
-	initReprojectionButton = new QPushButton("Set Calibration Parameters");
+	initReprojectionButton = new QPushButton("Initialise Reprojection Tool");
 	connect(initReprojectionButton, &QPushButton::clicked, this, &ReprojectionWidget::initReprojectionClickedSlot);
 
 	calibrationsetuplayout->addWidget(infoBox,0,0);
@@ -183,11 +183,9 @@ void ReprojectionWidget::extrinsicsPathClickedSlot() {
 
 bool ReprojectionWidget::checkIntrinsicsPath(QString path) {
 	for (int cam = 0; cam < m_numCameras; cam++) {
-		std::cout << (path + "/" + "Intrinsics_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml").toStdString() << std::endl;
 		if (!QFile::exists(path + "/" + "Intrinsics_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml")) {
 			QErrorMessage *msg = new QErrorMessage();
-			std::cout << "JSBFKF" << std::endl;
-			//msg->showMessage("Intrinsics File " + "Intrinsics_" + Dataset::dataset->cameraName(cam) + ".yaml" + " does not exist.");
+			msg->showMessage("Intrinsics File \"Intrinsics_" + Dataset::dataset->cameraName(cam) + ".yaml\" does not exist.");
 			return false;
 		}
 	}
@@ -198,7 +196,7 @@ bool ReprojectionWidget::checkExtrinsicsPath(QString path) {
 	for (int cam = 0; cam < m_numCameras; cam++) {
 		if (cam != primaryCombo->currentIndex() && !QFile::exists(path + "/" + "Camera_Pair_" + primaryCombo->currentText().split("_").takeLast() + "_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml")) {
 			QErrorMessage *msg = new QErrorMessage();
-		//	msg->showMessage("Extrinsics File " + "Camera_Pair_" + primaryCombo->currentText().split("_").takeLast() + "_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml" + " does not exist.");
+			msg->showMessage("Extrinsics File \"Camera_Pair_" + primaryCombo->currentText().split("_").takeLast() + "_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml\" does not exist.");
 			return false;
 		}
 	}
@@ -207,27 +205,21 @@ bool ReprojectionWidget::checkExtrinsicsPath(QString path) {
 
 
 void ReprojectionWidget::initReprojectionClickedSlot() {
-	for (const auto& edit : extrinsicsPathEdits) {
-		if (edit->isVisible()) {
-			if (!QFile::exists(edit->text())) {
-				QErrorMessage *msg = new QErrorMessage();
-				msg->showMessage("Extrinsics File '" + edit->text() + "' does not exist.");
-				return;
-			}
-		}
+	if (!checkIntrinsicsPath(intrinsicsPathEdit->text()) || !checkExtrinsicsPath(extrinsicsPathEdit->text())) {
+		return;
 	}
-	savePaths();
+	//savePaths();
 	toggleSwitch->setEnabled(true);
 	toggleSwitch->setToggled(true);
 	emit reprojectionToolToggled(true);
 	m_reprojectionActive = true;
 	QList<QString> intrinsicsList;
-	for (const auto& edit : intrinsicsPathEdits) {
-		intrinsicsList.append(edit->text());
+	for (int cam = 0; cam < m_numCameras; cam++) {
+		intrinsicsList.append(intrinsicsPathEdit->text() + "/" + "Intrinsics_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml");
 	}
 	QList<QString> extrinsicsList;
-	for (const auto& edit : extrinsicsPathEdits) {
-		extrinsicsList.append(edit->text());
+	for (int cam = 0; cam < m_numCameras; cam++) {
+			extrinsicsList.append(extrinsicsPathEdit->text() + "/" + "Camera_Pair_" + primaryCombo->currentText().split("_").takeLast() + "_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml");
 	}
 	reprojectionTool = new ReprojectionTool(intrinsicsList, extrinsicsList,primaryCombo->currentIndex());
 	stackedWidget->setCurrentWidget(reprojectionController);
@@ -236,7 +228,8 @@ void ReprojectionWidget::initReprojectionClickedSlot() {
 }
 
 void ReprojectionWidget::savePaths() {
-	settings->beginGroup("ReprojectionParameters");
+	settings->beginGroup("CalibrationPaths");
+	settings->setValue("IntrinsicsPath", intrinsicsPathEdit->text());
 	int i = 0;
 	settings->beginGroup("Intrinsics");
 	for (const auto& edit : intrinsicsPathEdits) {
@@ -252,9 +245,9 @@ void ReprojectionWidget::savePaths() {
 	settings->endGroup();
 }
 
-/*
-void ReprojectionWidget::loadPaths(bool onlyExtrinsics) {
-	settings->beginGroup("ReprojectionParameters");
+
+void ReprojectionWidget::loadPaths() {
+	settings->beginGroup("CalibrationPaths");
 	int i = 0;
 	if (!onlyExtrinsics) {
 		settings->beginGroup("Intrinsics");
@@ -276,7 +269,7 @@ void ReprojectionWidget::loadPaths(bool onlyExtrinsics) {
 	}
 	settings->endGroup();
 	settings->endGroup();
-}*/
+}
 
 
 void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int currentFrameIndex) {

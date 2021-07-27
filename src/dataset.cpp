@@ -130,7 +130,7 @@ void Dataset::save(const QString& datasetFolder) {
 		 stream << "\n";
 		 stream << "coords";
 		 for (int i = 0; i < m_keypointNameList.size()*3; i++) {
-			 if (i%3 == 1) stream << "," << "x";
+			 if (i%3 == 0) stream << "," << "x";
 			 else if (i%3 == 2) stream << "," << "state";
 			 else stream << "," << "y";
 		 }
