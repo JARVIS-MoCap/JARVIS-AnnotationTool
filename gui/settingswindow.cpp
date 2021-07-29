@@ -12,7 +12,7 @@
 
 SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	this->resize(600,600);
-	this->setMinimumSize(600,200);
+	this->setMinimumSize(500,550);
 	settings = new QSettings();
 	setWindowTitle("Settings");
 	QGridLayout *settingslayout = new QGridLayout(this);
@@ -35,8 +35,8 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	hueResetButton->setMinimumSize(30,30);
 	hueResetButton->setIcon(QIcon::fromTheme("reset"));
 	connect(hueSlider, &QSlider::valueChanged, hueBox, &QSpinBox::setValue);
-	connect(hueBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), hueSlider, &QSlider::setValue);
-	connect(hueBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &SettingsWindow::imageTranformationChangedSlot);
+	connect(hueBox, QOverload<int>::of(&QSpinBox::valueChanged), hueSlider, &QSlider::setValue);
+	connect(hueBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsWindow::imageTranformationChangedSlot);
 	connect(hueResetButton, &QPushButton::clicked, this, &SettingsWindow::hueResetClickedSlot);
 	QLabel *saturationLabel = new QLabel("Saturation");
 	saturationSlider = new QSlider(Qt::Horizontal,this);
@@ -50,8 +50,8 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	saturationResetButton->setMinimumSize(30,30);
 	saturationResetButton->setIcon(QIcon::fromTheme("reset"));
 	connect(saturationSlider, &QSlider::valueChanged, saturationBox, &QSpinBox::setValue);
-	connect(saturationBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), saturationSlider, &QSlider::setValue);
-	connect(saturationBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &SettingsWindow::imageTranformationChangedSlot);
+	connect(saturationBox, QOverload<int>::of(&QSpinBox::valueChanged), saturationSlider, &QSlider::setValue);
+	connect(saturationBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsWindow::imageTranformationChangedSlot);
 	connect(saturationResetButton, &QPushButton::clicked, this, &SettingsWindow::saturationResetClickedSlot);
 	QLabel *brightnessLabel = new QLabel("Brightness");
 	brightnessSlider = new QSlider(Qt::Horizontal,this);
@@ -65,8 +65,8 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	brightnessResetButton->setMinimumSize(30,30);
 	brightnessResetButton->setIcon(QIcon::fromTheme("reset"));
 	connect(brightnessSlider, &QSlider::valueChanged, brightnessBox, &QSpinBox::setValue);
-	connect(brightnessBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), brightnessSlider, &QSlider::setValue);
-	connect(brightnessBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &SettingsWindow::imageTranformationChangedSlot);
+	connect(brightnessBox, QOverload<int>::of(&QSpinBox::valueChanged), brightnessSlider, &QSlider::setValue);
+	connect(brightnessBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsWindow::imageTranformationChangedSlot);
 	connect(brightnessResetButton, &QPushButton::clicked, this, &SettingsWindow::brightnessResetClickedSlot);
 
 	imagesettingslayout->addWidget(grayScaleLabel, 0,0);
@@ -91,16 +91,35 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	keypointSizeEdit = new QSpinBox(annotationSettingsBox);
 	keypointSizeEdit->setRange(0,100);
 	keypointSizeEdit->setValue(8);
-	connect(keypointSizeEdit, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &SettingsWindow::keypointSizeChanged);
+	connect(keypointSizeEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsWindow::keypointSizeChanged);
 	entitySettingsWidget = new QWidget(annotationSettingsBox);
 	entitysettingslayout = new QGridLayout(entitySettingsWidget);
 	annotationsettingslayout->addWidget(keypointSizeLabel,0,0);
 	annotationsettingslayout->addWidget(keypointSizeEdit,0,1);
 	annotationsettingslayout->addWidget(entitySettingsWidget,1,0,1,2);
 
+	reprojectionSettingsBox = new QGroupBox("Reprojection Settings");
+	QGridLayout *reprojectionsettingslayout = new QGridLayout(reprojectionSettingsBox);
+	QLabel *minViewsLabel = new QLabel("Min Annotated Views");
+	minViewsEdit = new QSpinBox(reprojectionSettingsBox);
+	minViewsEdit->setRange(2,12);
+	minViewsEdit->setValue(2);
+	connect(minViewsEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsWindow::minViewsChangedSlot);
+	QLabel *errorThresholdLabel = new QLabel("Repro Error Threshold");
+	errorThresholdEdit = new QDoubleSpinBox();
+	errorThresholdEdit->setValue(10.0);
+	connect(errorThresholdEdit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SettingsWindow::errorThresholdChangedSlot);
+	reprojectionsettingslayout->addWidget(minViewsLabel,0,0);
+	reprojectionsettingslayout->addWidget(minViewsEdit,0,1);
+	reprojectionsettingslayout->addWidget(errorThresholdLabel,1,0);
+	reprojectionsettingslayout->addWidget(errorThresholdEdit,1,1);
+
 
 	settingslayout->addWidget(imageSettingsBox,0,0);
 	settingslayout->addWidget(annotationSettingsBox,1,0);
+	settingslayout->addWidget(reprojectionSettingsBox,2,0);
+
+	loadSettings();
 }
 
 void SettingsWindow::datasetLoadedSlot() {
@@ -110,6 +129,7 @@ void SettingsWindow::datasetLoadedSlot() {
 		QLabel *entityLabel = new QLabel(entity);
 		entityLabel->setFont(QFont("Sans Serif", 11, QFont::Bold));
 		QGridLayout *singleentitylayout = new QGridLayout(singleEntityWidget);
+		singleentitylayout->setMargin(0);
 		QLabel *keypointShapeLabel = new QLabel(" Keypoint Shape");
 		QComboBox * keypointShapeCombo = new QComboBox();
 		keypointShapeCombo->addItem("Circle");
@@ -147,6 +167,25 @@ void SettingsWindow::datasetLoadedSlot() {
 
 		entitysettingslayout->addWidget(singleEntityWidget,i++,0);
 	}
+}
+
+void SettingsWindow::loadSettings() {
+	settings->beginGroup("Settings");
+	settings->beginGroup("ReprojectionSettings");
+	int minViews = 2;
+	if (settings->contains("MinViews")) {
+		minViews = settings->value("MinViews").toInt();
+	}
+	minViewsEdit->setValue(minViews);
+	minViewsChangedSlot(minViews);
+	double errorThreshold = 10.0;
+	if (settings->contains("errorThreshold")) {
+		errorThreshold = settings->value("errorThreshold").toDouble();
+	}
+	errorThresholdEdit->setValue(errorThreshold);
+	errorThresholdChangedSlot(errorThreshold);
+	settings->endGroup();
+	settings->endGroup();
 }
 
 void SettingsWindow::imageTranformationChangedSlot() {
@@ -216,4 +255,22 @@ void SettingsWindow::colorChooserClickedSlot() {
 	QImage colormapPreview = createColorMapPreview(colorMapTypeList[entityIndex], colorsList[entityIndex]);
 	colormapPreviewsList[entityIndex]->setPixmap(QPixmap::fromImage(colormapPreview).scaled(200,20));
 	emit colorMapChanged(Dataset::dataset->entitiesList()[entityIndex], colorMapTypeList[entityIndex], colorsList[entityIndex]);
+}
+
+void SettingsWindow::minViewsChangedSlot(int val) {
+	settings->beginGroup("Settings");
+	settings->beginGroup("ReprojectionSettings");
+	settings->setValue("MinViews", val);
+	settings->endGroup();
+	settings->endGroup();
+	emit minViewsChanged(val);
+}
+
+void SettingsWindow::errorThresholdChangedSlot(double val) {
+	settings->beginGroup("Settings");
+	settings->beginGroup("ReprojectionSettings");
+	settings->setValue("errorThreshold", val);
+	settings->endGroup();
+	settings->endGroup();
+	emit errorThresholdChanged(val);
 }

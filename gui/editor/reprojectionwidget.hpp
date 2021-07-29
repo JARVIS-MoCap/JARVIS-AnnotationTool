@@ -36,6 +36,8 @@ class ReprojectionWidget : public QWidget {
 	public slots:
 		void datasetLoadedSlot();
 		void calculateReprojectionSlot(int currentImgSetIndex, int currentFrameIndex);
+		void minViewsChangedSlot(int value);
+		void errorThresholdChangedSlot(double value);
 
 	signals:
 		void reprojectedPoints(ImgSet *imgSet, int frameIndex);
@@ -49,9 +51,11 @@ class ReprojectionWidget : public QWidget {
 		bool checkIntrinsicsPath(QString path);
 		bool checkExtrinsicsPath(QString path);
 		void savePaths();
-		void loadPaths(bool onlyExtrinsics = false);
+		void loadPaths();
 		void undoReprojection();
 		void calculateAllReprojections();
+		void getSettings();
+
 		ReprojectionChartWidget *reprojectionChartWidget;
 
 		QSettings *settings;
@@ -75,9 +79,6 @@ class ReprojectionWidget : public QWidget {
 
 		QWidget *reprojectionController;
 		QGridLayout *reprojectioncontrollerlayout;
-		QGroupBox *reprojectionSettingsBox;
-		QSpinBox *minViewsEdit;
-		QDoubleSpinBox *errorThresholdEdit;
 
 		QList< QLineEdit* > intrinsicsPathEdits;
 		//QList< QPushButton* > intrinsicsPathButtons;
@@ -100,8 +101,6 @@ class ReprojectionWidget : public QWidget {
 		void intrinsicsPathClickedSlot();
 		void extrinsicsPathClickedSlot();
 		void initReprojectionClickedSlot();
-		void minViewsChangedSlot(int value);
-		void errorThresholdChangedSlot(double value);
 
 
 

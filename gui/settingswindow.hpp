@@ -21,6 +21,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 
+
 class SettingsWindow : public QWidget {
 	Q_OBJECT
 	public:
@@ -34,8 +35,11 @@ class SettingsWindow : public QWidget {
 		void keypointSizeChanged(int value);
 		void keypointShapeChanged(const QString& entity, KeypointShape shape);
 		void colorMapChanged(const QString& entity, ColorMap::ColorMapType type, QColor color);
+		void minViewsChanged(int val);
+		void errorThresholdChanged(float val);
 
 	private:
+		void loadSettings();
 		QImage createColorMapPreview(ColorMap::ColorMapType type, QColor color = QColor(0,0,255));
 
 		QSettings *settings;
@@ -62,6 +66,10 @@ class SettingsWindow : public QWidget {
 		QList<QPushButton*> colorChooserButtonsList;
 		QList<QColor> colorsList;
 
+		QGroupBox *reprojectionSettingsBox;
+		QSpinBox *minViewsEdit;
+		QDoubleSpinBox *errorThresholdEdit;
+
 		private slots:
 			void imageTranformationChangedSlot();
 			void grayScaleToggledSlot(int state);
@@ -71,6 +79,8 @@ class SettingsWindow : public QWidget {
 			void keypointShapeChangedSlot(int index);
 			void colorMapChangedSlot(int index);
 			void colorChooserClickedSlot();
+			void minViewsChangedSlot(int val);
+			void errorThresholdChangedSlot(double val);
 
 };
 

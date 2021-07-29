@@ -54,6 +54,8 @@ class EditorWidget : public QWidget {
 		void keypointShapeChanged(const QString& entity, KeypointShape shape);
 		void colorMapChanged(const QString& entity, ColorMap::ColorMapType type, QColor color);
 		void toggleExitButton(bool toggle);
+		void minViewsChanged(int val);
+		void errorThresholdChanged(float val);
 
 	private:
 		QSplitter *mainSplitter;

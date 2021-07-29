@@ -192,6 +192,8 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(imageViewer, &ImageViewer::keypointChangedForReprojection, reprojectionWidget, &ReprojectionWidget::calculateReprojectionSlot);
 	connect(reprojectionWidget, &ReprojectionWidget::reprojectedPoints, keypointWidget, &KeypointWidget::setKeypointsFromDatasetSlot);
 	connect(reprojectionWidget, &ReprojectionWidget::reprojectionToolToggled, imageViewer, &ImageViewer::toggleReprojectionSlot);
+	connect(this, &EditorWidget::minViewsChanged, reprojectionWidget, &ReprojectionWidget::minViewsChangedSlot);
+	connect(this, &EditorWidget::errorThresholdChanged, reprojectionWidget, &ReprojectionWidget::errorThresholdChangedSlot);
 	connect(newDatasetWindow, &NewDatasetWindow::toggleExitButton, this, &EditorWidget::toggleExitButton);
 }
 
@@ -359,6 +361,7 @@ void EditorWidget::panFinishedSlot() {
 void EditorWidget::datasetLoadedSlot() {
 	keypointWidget->init();
 	leftSplitter->show();
+	leftSplitter->setSizes({500,500});
 	keypointWidget->show();
 	m_currentImgSet = Dataset::dataset->imgSets()[0];
 	m_currentImgSetIndex = 0;
@@ -376,7 +379,6 @@ void EditorWidget::loadDatasetClickedSlot() {
 }
 
 void EditorWidget::newDatasetClickedSlot() {
-	//newDatasetWindow->show();
 	stackedWidget->setCurrentWidget(newDatasetWindow);
 }
 

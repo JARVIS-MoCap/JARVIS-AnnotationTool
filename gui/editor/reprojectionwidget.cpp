@@ -36,7 +36,7 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 	infolayout->setSpacing(10);
 	QLabel *infoIcon = new QLabel();
 	infoIcon->setPixmap(QIcon::fromTheme("info2").pixmap(QSize(60, 60)));
-	QLabel *infoLabel = new QLabel("Select Savefiles containing the intrinsic parameters for all the cameras obtained by calibration.");
+	QLabel *infoLabel = new QLabel("Select the folders containing the intrinsic and extrinsic parameters for all the cameras respectively.");
 	infoLabel->setWordWrap(true);
 	infolayout->addWidget(infoIcon,0,0);
 	infolayout->addWidget(infoLabel,0,1);
@@ -77,26 +77,8 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 
 	reprojectionController = new QWidget(stackedWidget);
 	reprojectioncontrollerlayout = new QGridLayout(reprojectionController);
-	reprojectionSettingsBox = new QGroupBox("Settings");
-	reprojectionSettingsBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	QGridLayout* reprojectionsettingslayout = new QGridLayout(reprojectionSettingsBox);
-	QLabel *minViewsLabel = new QLabel("Min Annotated Views");
-	minViewsEdit = new QSpinBox();
-	minViewsEdit->setValue(2);
-	connect(minViewsEdit, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &ReprojectionWidget::minViewsChangedSlot);
-	QLabel *errorThresholdLabel = new QLabel("Repro Error Threshold");
-	errorThresholdEdit = new QDoubleSpinBox();
-	errorThresholdEdit->setValue(10.0);
-	connect(errorThresholdEdit, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ReprojectionWidget::errorThresholdChangedSlot);
 	reprojectionChartWidget = new ReprojectionChartWidget(this);
-
-	reprojectionsettingslayout->addWidget(minViewsLabel,0,0);
-	reprojectionsettingslayout->addWidget(minViewsEdit,0,1);
-	reprojectionsettingslayout->addWidget(errorThresholdLabel,1,0);
-	reprojectionsettingslayout->addWidget(errorThresholdEdit,1,1);
-
-	reprojectioncontrollerlayout->addWidget(reprojectionSettingsBox,0,0);
-	reprojectioncontrollerlayout->addWidget(reprojectionChartWidget,1,0);
+	reprojectioncontrollerlayout->addWidget(reprojectionChartWidget,0,0);
 
 	stackedWidget->addWidget(loadDatasetFirstLabel);
 	stackedWidget->addWidget(calibrationSetup);
@@ -126,11 +108,8 @@ void ReprojectionWidget::datasetLoadedSlot() {
 		primaryCombo->addItem(Dataset::dataset->cameraName(cam));
 	}
 
-	minViewsEdit->setRange(2, m_numCameras);
-	//loadPaths();
+	loadPaths();
 	stackedWidget->setCurrentWidget(calibrationSetup);
-	//checkIntrinsicsPath();
-	//checkExtrinsicsPath();
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		m_reprojectionErrors[entity] = new std::vector<double>(Dataset::dataset->bodypartsList().size());
 	}
@@ -164,6 +143,7 @@ void ReprojectionWidget::intrinsicsPathClickedSlot() {
 	if (path != "") {
 		if (checkIntrinsicsPath(path)) {
 			m_parameterDir.setPath(path);
+			m_parameterDir.cdUp();
 			intrinsicsPathEdit->setText(path);
 			m_intrinsicsPathValid = true;
 		}
@@ -175,6 +155,7 @@ void ReprojectionWidget::extrinsicsPathClickedSlot() {
 	if (path != "") {
 		if (checkExtrinsicsPath(path)) {
 			m_parameterDir.setPath(path);
+			m_parameterDir.cdUp();
 			extrinsicsPathEdit->setText(path);
 			m_extrinsicsPathValid = true;
 		}
@@ -208,7 +189,8 @@ void ReprojectionWidget::initReprojectionClickedSlot() {
 	if (!checkIntrinsicsPath(intrinsicsPathEdit->text()) || !checkExtrinsicsPath(extrinsicsPathEdit->text())) {
 		return;
 	}
-	//savePaths();
+	getSettings();
+	savePaths();
 	toggleSwitch->setEnabled(true);
 	toggleSwitch->setToggled(true);
 	emit reprojectionToolToggled(true);
@@ -229,45 +211,24 @@ void ReprojectionWidget::initReprojectionClickedSlot() {
 
 void ReprojectionWidget::savePaths() {
 	settings->beginGroup("CalibrationPaths");
+	settings->setValue("NumberCameras", Dataset::dataset->numCameras());
 	settings->setValue("IntrinsicsPath", intrinsicsPathEdit->text());
-	int i = 0;
-	settings->beginGroup("Intrinsics");
-	for (const auto& edit : intrinsicsPathEdits) {
-		settings->setValue(Dataset::dataset->cameraName(i++), edit->text());
-	}
-	settings->endGroup();
-	settings->beginGroup("Extrinsics");
-	i = 0;
-	for (const auto& edit : extrinsicsPathEdits) {
-		settings->setValue(primaryCombo->currentText() + "/" + Dataset::dataset->cameraName(i++), edit->text());
-	}
-	settings->endGroup();
+	settings->setValue("ExtrinsicsPath", extrinsicsPathEdit->text());
+	settings->setValue("PrimaryIndex", primaryCombo->currentIndex());
 	settings->endGroup();
 }
 
 
 void ReprojectionWidget::loadPaths() {
 	settings->beginGroup("CalibrationPaths");
-	int i = 0;
-	if (!onlyExtrinsics) {
-		settings->beginGroup("Intrinsics");
-		if(settings->value(Dataset::dataset->cameraName(0)).toString() != "") {
-			m_parameterDir.setPath(settings->value(Dataset::dataset->cameraName(0)).toString());
+	if(settings->value("NumberCameras").toInt() == Dataset::dataset->numCameras()) {
+			intrinsicsPathEdit->setText(settings->value("IntrinsicsPath").toString());
+			extrinsicsPathEdit->setText(settings->value("ExtrinsicsPath").toString());
+			primaryCombo->setCurrentIndex(settings->value("PrimaryIndex").toInt());
+			m_parameterDir.setPath(settings->value("ExtrinsicsPath").toString());
+			m_parameterDir.cdUp();
+
 		}
-		for (const auto& edit : intrinsicsPathEdits) {
-			edit->setText(settings->value(Dataset::dataset->cameraName(i++)).toString());
-		}
-		settings->endGroup();
-		i = 0;
-	}
-	settings->beginGroup("Extrinsics");
-	if(settings->value(primaryCombo->currentText() + "/" + Dataset::dataset->cameraName(0)).toString() != "") {
-		m_parameterDir.setPath(settings->value(primaryCombo->currentText() + "/" + Dataset::dataset->cameraName(0)).toString());
-	}
-	for (const auto& edit : extrinsicsPathEdits) {
-		edit->setText(settings->value(primaryCombo->currentText() + "/" + Dataset::dataset->cameraName(i++)).toString());
-	}
-	settings->endGroup();
 	settings->endGroup();
 }
 
@@ -395,6 +356,21 @@ void ReprojectionWidget::undoReprojection() {
 			}
 		}
 	}
+}
+
+void ReprojectionWidget::getSettings() {
+	settings->beginGroup("Settings");
+	settings->beginGroup("ReprojectionSettings");
+	if (settings->contains("MinViews")) {
+		m_minViews = settings->value("MinViews").toInt();
+	}
+	minViewsChangedSlot(m_minViews);
+	if (settings->contains("errorThreshold")) {
+		m_errorThreshold = settings->value("errorThreshold").toDouble();
+	}
+	errorThresholdChangedSlot(m_errorThreshold);
+	settings->endGroup();
+	settings->endGroup();
 }
 
 void ReprojectionWidget::minViewsChangedSlot(int value) {
