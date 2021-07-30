@@ -25,40 +25,6 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	leftSplitter->setCollapsible(0,true);
 	leftSplitter->setCollapsible(1,true);
 
-
-	stackedWidget = new QStackedWidget(this);
-
-	datasetWidget = new QWidget(this);
-	QSpacerItem *datasetTopSpacer = new QSpacerItem(100,300,QSizePolicy::Maximum,QSizePolicy::Maximum);
-	QSpacerItem *datasetBottomSpacer = new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Expanding);
-	QGridLayout *datasetlayout = new QGridLayout(datasetWidget);
-	datasetlayout->setSpacing(16);
-	QLabel *datasetLabel = new QLabel("Load existing Dataset or create new one?");
-	datasetLabel->setFont(QFont("Sans Serif", 22, QFont::Bold));
-	datasetLabel->setStyleSheet("QLabel {color: rgb(32,100,164)}");
-	loadDatasetButton = new QPushButton("Load Dataset");
-	loadDatasetButton->setMinimumSize(450,80);
-	loadDatasetButton->setFont(QFont("Sans Serif", 18, QFont::Bold));
-	loadDatasetButton->setStyleSheet(" QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
-													 "QPushButton:hover { background-color: rgb(68,74,89); }"
-													 "QPushButton { color: rgb(100,164,32);}");
-	newDatasetButton = new QPushButton("New Dataset");
-	newDatasetButton->setMinimumSize(450,80);
-	newDatasetButton->setFont(QFont("Sans Serif", 18, QFont::Bold));
-	newDatasetButton->setStyleSheet(" QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
-													 "QPushButton:hover { background-color: rgb(68,74,89); }"
-													 "QPushButton { color: rgb(100,164,32);}");
-	connect(loadDatasetButton, &QPushButton::clicked, this, &EditorWidget::loadDatasetClickedSlot);
-	connect (newDatasetButton, &QPushButton::clicked, this, &EditorWidget::newDatasetClickedSlot);
-	datasetlayout->addItem(datasetTopSpacer,0,0,1,2);
-	datasetlayout->addWidget(datasetLabel,1,0,1,2,Qt::AlignCenter);
-	datasetlayout->addWidget(loadDatasetButton,2,0,Qt::AlignRight);
-	datasetlayout->addWidget(newDatasetButton,2,1,Qt::AlignLeft);
-	datasetlayout->addItem(datasetBottomSpacer,3,0,1,2);
-
-	loadDatasetWindow = new LoadDatasetWindow(this);
-	newDatasetWindow = new NewDatasetWindow(this);
-
 	imageViewerContainer = new QWidget(this);
 	imageViewerContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QGridLayout *containerlayout = new QGridLayout(imageViewerContainer);
@@ -139,9 +105,7 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	buttonlayout->addWidget(buttonSpacer3,0,9);
 	buttonlayout->addWidget(quitButton,0,10);
 
-	stackedWidget->addWidget(datasetWidget);
-	stackedWidget->addWidget(newDatasetWindow);
-	stackedWidget->addWidget(mainSplitter);
+
 
 	horizontalSplitter->addWidget(leftSplitter);
 	horizontalSplitter->addWidget(imageViewerContainer);
@@ -154,18 +118,20 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	mainSplitter->setCollapsible(1,false);
 	mainSplitter->setSizes({1000,50});
 
-	layout->addWidget(stackedWidget,0,0),
+	layout->addWidget(mainSplitter,0,0);
+
 	//--- SIGNAL-SLOT Connections ---//
 	//-> Incoming Signals
 	connect(imageViewer, &ImageViewer::zoomFinished, this, &EditorWidget::zoomFinishedSlot);
 	connect(imageViewer, &ImageViewer::panFinished, this, &EditorWidget::panFinishedSlot);
-	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded, this, &EditorWidget::datasetLoadedSlot);
-	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded, this, &EditorWidget::datasetLoaded);
 	connect(datasetControlWidget, &DatasetControlWidget::frameSelectionChanged, this, &EditorWidget::frameChangedSlot);
 	connect(datasetControlWidget, &DatasetControlWidget::imgSetChanged, this, &EditorWidget::imgSetChangedSlot);
 
 
 	//<- Outgoing Signals
+	connect(this, &EditorWidget::datasetLoaded, keypointWidget, &KeypointWidget::datasetLoadedSlot);
+	connect(this, &EditorWidget::datasetLoaded, reprojectionWidget, &ReprojectionWidget::datasetLoadedSlot);
+	connect(this, &EditorWidget::datasetLoaded, datasetControlWidget, &DatasetControlWidget::datasetLoadedSlot);
 	connect(this, &EditorWidget::zoomToggled, imageViewer, &ImageViewer::zoomToggledSlot);
 	connect(this, &EditorWidget::panToggled, imageViewer, &ImageViewer::panToggledSlot);
 	connect(this, &EditorWidget::homeClicked, imageViewer, &ImageViewer::homeClickedSlot);
@@ -182,9 +148,6 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(keypointWidget, &KeypointWidget::currentBodypartChanged, imageViewer, &ImageViewer::currentBodypartChangedSlot);
 	connect(keypointWidget, &KeypointWidget::toggleEntityVisible, imageViewer, &ImageViewer::toggleEntityVisibleSlot);
 	connect(keypointWidget, &KeypointWidget::updateViewer, imageViewer, &ImageViewer::updateViewer);
-	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded, keypointWidget, &KeypointWidget::datasetLoadedSlot);
-	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded, reprojectionWidget, &ReprojectionWidget::datasetLoadedSlot);
-	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded, datasetControlWidget, &DatasetControlWidget::datasetLoadedSlot);
 	connect(imageViewer, &ImageViewer::keypointAdded, keypointWidget, &KeypointWidget::keypointAddedSlot);
 	connect(imageViewer, &ImageViewer::keypointRemoved, keypointWidget, &KeypointWidget::keypointRemovedSlot);
 	connect(imageViewer, &ImageViewer::keypointCorrected, keypointWidget, &KeypointWidget::keypointCorrectedSlot);
@@ -194,12 +157,11 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(reprojectionWidget, &ReprojectionWidget::reprojectionToolToggled, imageViewer, &ImageViewer::toggleReprojectionSlot);
 	connect(this, &EditorWidget::minViewsChanged, reprojectionWidget, &ReprojectionWidget::minViewsChangedSlot);
 	connect(this, &EditorWidget::errorThresholdChanged, reprojectionWidget, &ReprojectionWidget::errorThresholdChangedSlot);
-	connect(newDatasetWindow, &NewDatasetWindow::toggleExitButton, this, &EditorWidget::toggleExitButton);
 }
 
 void EditorWidget::splitterMovedSlot(int, int) {
-	int maxWidth = stackedWidget->size().width();
-	int maxHeight = stackedWidget->size().height();
+	int maxWidth = mainSplitter->size().width();
+	int maxHeight = mainSplitter->size().height();
 	int width, height;
 	float aspectRatio = 1280.0/1024.0;
 	if ((maxHeight)*aspectRatio > maxWidth) {
@@ -367,27 +329,10 @@ void EditorWidget::datasetLoadedSlot() {
 	m_currentImgSetIndex = 0;
 	m_currentFrameIndex = 0;
 	imageViewer->setFrame(m_currentImgSet, m_currentFrameIndex);
-	stackedWidget->setCurrentWidget(mainSplitter);
 	nextButton->setEnabled(true);
 	nextSetButton->setEnabled(true);
 	splitterMovedSlot(0,0);
 	connect(Dataset::dataset, &Dataset::keypointStateChanged, datasetControlWidget, &DatasetControlWidget::keypointStateChangedSlot);
-}
-
-void EditorWidget::loadDatasetClickedSlot() {
-	loadDatasetWindow->show();
-}
-
-void EditorWidget::newDatasetClickedSlot() {
-	stackedWidget->setCurrentWidget(newDatasetWindow);
-}
-
-void EditorWidget::exitToMainPageSlot() {
-	if (stackedWidget->currentWidget() == mainSplitter) {
-		std::cout << "Saving Dataset" << std::endl;
-		Dataset::dataset->save();
-	}
-	stackedWidget->setCurrentWidget(datasetWidget);
 }
 
 void EditorWidget::quitClickedSlot() {

@@ -10,8 +10,6 @@
 #include "globals.hpp"
 #include "keypointwidget.hpp"
 #include "imageviewer.hpp"
-#include "loaddatasetwindow.hpp"
-#include "newdatasetwindow.hpp"
 #include "reprojectionwidget.hpp"
 #include "datasetcontrolwidget.hpp"
 
@@ -26,8 +24,6 @@
 #include <QCheckBox>
 #include <QTabWidget>
 #include <QListWidget>
-#include <QStackedWidget>
-
 
 
 class EditorWidget : public QWidget {
@@ -40,7 +36,6 @@ class EditorWidget : public QWidget {
 		void datasetLoadedSlot();
 		void frameChangedSlot(int index);
 		void imgSetChangedSlot(int index);
-		void exitToMainPageSlot();
 
 	signals:
 		void zoomToggled(bool toggle);
@@ -53,24 +48,16 @@ class EditorWidget : public QWidget {
 		void keypointSizeChanged(int value);
 		void keypointShapeChanged(const QString& entity, KeypointShape shape);
 		void colorMapChanged(const QString& entity, ColorMap::ColorMapType type, QColor color);
-		void toggleExitButton(bool toggle);
 		void minViewsChanged(int val);
 		void errorThresholdChanged(float val);
 
 	private:
 		QSplitter *mainSplitter;
 		QSplitter *horizontalSplitter;
-		QStackedWidget *stackedWidget;
 
 		QSplitter *leftSplitter;
 		ReprojectionWidget *reprojectionWidget;
 		DatasetControlWidget *datasetControlWidget;
-
-		QWidget *datasetWidget;
-		QPushButton *loadDatasetButton;
-		QPushButton *newDatasetButton;
-		LoadDatasetWindow *loadDatasetWindow;
-		NewDatasetWindow *newDatasetWindow;
 
 		QWidget *imageViewerContainer;
 		ImageViewer *imageViewer;
@@ -101,8 +88,6 @@ class EditorWidget : public QWidget {
 		void nextSetClickedSlot();
 		void zoomFinishedSlot();
 		void panFinishedSlot();
-		void loadDatasetClickedSlot();
-		void newDatasetClickedSlot();
 		void quitClickedSlot();
 };
 

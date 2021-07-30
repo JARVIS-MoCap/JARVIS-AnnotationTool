@@ -9,10 +9,16 @@
 
 #include "globals.hpp"
 #include "mainbar.hpp"
-#include "editorwidget.hpp"
 #include "settingswindow.hpp"
+#include "loaddatasetwindow.hpp"
+#include "newdatasetwindow.hpp"
+#include "newcalibrationwidget.hpp"
+#include "exportdatasetwidget.hpp"
+#include "editorwidget.hpp"
 
 #include <QMainWindow>
+#include <QStackedWidget>
+
 
 class MainWindow : public QMainWindow {
 	Q_OBJECT
@@ -29,9 +35,27 @@ class MainWindow : public QMainWindow {
 		SettingsWindow *settingsWindow;
 
 		MainBar *mainBar;
+		QStackedWidget *stackedWidget;
+
+		QWidget *datasetWidget;
+		QPushButton *loadDatasetButton;
+		QPushButton *newDatasetButton;
+		QPushButton *newCalibrationButton;
+		QPushButton *exportDatasetButton;
+
+		LoadDatasetWindow *loadDatasetWindow;
+		NewDatasetWindow *newDatasetWindow;
+		NewCalibrationWidget *newCalibrationWidget;
+		ExportDatasetWidget *exportDatasetWidget;
 		EditorWidget *editorWidget;
 
 	private slots:
+		void loadDatasetClickedSlot();
+		void newDatasetClickedSlot();
+		void newCalibrationClickedSlot();
+		void exportDatasetClickedSlot();
+		void datasetLoadedSlot();
+		void exitToMainPageSlot();
 };
 
 #endif
