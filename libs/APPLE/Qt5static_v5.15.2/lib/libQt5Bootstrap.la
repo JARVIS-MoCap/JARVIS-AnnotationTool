@@ -25,4 +25,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/Users/thueser/Documents/qtstatic/lib'
+libdir='/Users/timo/Documents/QT/lib'

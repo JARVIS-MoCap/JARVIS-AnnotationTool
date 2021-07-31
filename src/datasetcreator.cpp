@@ -291,7 +291,7 @@ void DatasetCreator::createSavefile(const QString& recording, QList<QString> cam
 void DatasetCreator::computedDCTsSlot(QList<cv::Mat> dctImages, QMap<int,int> frameNumberMap, int threadNumber) {
 	m_dctMap[threadNumber] = dctImages;
 	m_frameNumberMap = frameNumberMap;
-	if (m_dctMap.size() == 12) {
+	if (m_dctMap.size() == m_datasetConfig->numCameras) {
 		emit gotAllDCTs();
 	}
 }
@@ -317,10 +317,8 @@ void VideoStreamer::run() {
 		totalFrames += windowSize;
 		if (minFrameCount == 0 || windowSize < minFrameCount) minFrameCount = windowSize;
 	}
-	std::cout << minFrameCount << std::endl;
 	while (m_numFramesToExtract > minFrameCount/subSamplingRate) {
 		subSamplingRate = subSamplingRate/2;
-		std ::cout << subSamplingRate << std::endl;
 	}
 
 	for (const auto & window : m_timeLineWindows) {

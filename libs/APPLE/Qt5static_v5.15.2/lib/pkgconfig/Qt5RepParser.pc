@@ -1,4 +1,4 @@
-prefix=/Users/thueser/Documents/qtstatic
+prefix=/Users/timo/Documents/QT
 exec_prefix=${prefix}
 libdir=${prefix}/lib
 includedir=${prefix}/include

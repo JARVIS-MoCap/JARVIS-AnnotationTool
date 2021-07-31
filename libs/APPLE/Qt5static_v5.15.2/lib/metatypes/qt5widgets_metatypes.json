@@ -2929,45 +2929,6 @@
     {
         "classes": [
             {
-                "className": "QOpenGLWidget",
-                "object": true,
-                "qualifiedClassName": "QOpenGLWidget",
-                "signals": [
-                    {
-                        "access": "public",
-                        "name": "aboutToCompose",
-                        "returnType": "void"
-                    },
-                    {
-                        "access": "public",
-                        "name": "frameSwapped",
-                        "returnType": "void"
-                    },
-                    {
-                        "access": "public",
-                        "name": "aboutToResize",
-                        "returnType": "void"
-                    },
-                    {
-                        "access": "public",
-                        "name": "resized",
-                        "returnType": "void"
-                    }
-                ],
-                "superClasses": [
-                    {
-                        "access": "public",
-                        "name": "QWidget"
-                    }
-                ]
-            }
-        ],
-        "inputFile": "qopenglwidget.h",
-        "outputRevision": 67
-    },
-    {
-        "classes": [
-            {
                 "className": "QFormLayout",
                 "enums": [
                     {
@@ -24046,36 +24007,6 @@
             }
         ],
         "inputFile": "qpixmapfilter_p.h",
-        "outputRevision": 67
-    },
-    {
-        "classes": [
-            {
-                "className": "QPlatformTextureListWatcher",
-                "object": true,
-                "qualifiedClassName": "QPlatformTextureListWatcher",
-                "slots": [
-                    {
-                        "access": "private",
-                        "arguments": [
-                            {
-                                "name": "locked",
-                                "type": "bool"
-                            }
-                        ],
-                        "name": "onLockStatusChanged",
-                        "returnType": "void"
-                    }
-                ],
-                "superClasses": [
-                    {
-                        "access": "public",
-                        "name": "QObject"
-                    }
-                ]
-            }
-        ],
-        "inputFile": "qwidgetrepaintmanager.cpp",
         "outputRevision": 67
     },
     {

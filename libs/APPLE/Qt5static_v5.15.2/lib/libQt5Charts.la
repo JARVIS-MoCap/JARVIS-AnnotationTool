@@ -10,7 +10,7 @@ library_names='  '
 old_library='libQt5Charts.a'
 
 # Libraries that this one depends upon.
-dependency_libs='-L=/Users/thueser/Documents/qtstatic/lib -lQt5Widgets -lQt5Gui -framework Metal -framework CoreGraphics -framework OpenGL -framework AGL -lqtlibpng -lqtharfbuzz -lQt5Core -framework DiskArbitration -framework IOKit -lm -framework AppKit -framework Security -framework ApplicationServices -framework CoreServices -framework CoreFoundation -framework Foundation -lz -lqtpcre2'
+dependency_libs='-L=/Users/timo/Documents/QT/lib -lQt5Widgets -lQt5Gui -framework Metal -framework CoreGraphics -lqtlibpng -lqtharfbuzz -lQt5Core -framework DiskArbitration -framework IOKit -lm -framework AppKit -framework Security -framework ApplicationServices -framework CoreServices -framework CoreFoundation -framework Foundation -lz -lqtpcre2'
 
 # Version information for libQt5Charts.la
 current=65
@@ -25,4 +25,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='=/Users/thueser/Documents/qtstatic/lib'
+libdir='=/Users/timo/Documents/QT/lib'

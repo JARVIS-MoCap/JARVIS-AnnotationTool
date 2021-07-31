@@ -12,7 +12,9 @@
 #define QT_FEATURE_desktopservices 1
 #define QT_FEATURE_imageformat_xpm 1
 #define QT_FEATURE_draganddrop 1
-#define QT_FEATURE_opengl 1
+#define QT_FEATURE_opengl -1
+#define QT_NO_OPENGL 
+#define QT_FEATURE_openvg -1
 #define QT_NO_EGL 
 #define QT_NO_FONTCONFIG 
 #define QT_FEATURE_imageformatplugin 1
@@ -29,7 +31,6 @@
 #define QT_FEATURE_opengles3 -1
 #define QT_FEATURE_opengles31 -1
 #define QT_FEATURE_opengles32 -1
-#define QT_FEATURE_openvg -1
 #define QT_FEATURE_pdf 1
 #define QT_FEATURE_picture 1
 #define QT_QPA_DEFAULT_PLATFORM_NAME "cocoa"
