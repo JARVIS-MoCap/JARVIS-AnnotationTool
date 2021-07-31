@@ -5,7 +5,7 @@ endif()
 get_filename_component(_qt5AccessibilitySupport_install_prefix "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
 
 # For backwards compatibility only. Use Qt5AccessibilitySupport_VERSION instead.
-set(Qt5AccessibilitySupport_VERSION_STRING 5.15.1)
+set(Qt5AccessibilitySupport_VERSION_STRING 5.15.2)
 
 set(Qt5AccessibilitySupport_LIBRARIES Qt5::AccessibilitySupport)
 
@@ -179,8 +179,8 @@ if (NOT TARGET Qt5::AccessibilitySupport)
 
     set(_Qt5AccessibilitySupport_OWN_INCLUDE_DIRS "${_qt5AccessibilitySupport_install_prefix}/include/" "${_qt5AccessibilitySupport_install_prefix}/include/QtAccessibilitySupport")
     set(Qt5AccessibilitySupport_PRIVATE_INCLUDE_DIRS
-        "${_qt5AccessibilitySupport_install_prefix}/include/QtAccessibilitySupport/5.15.1"
-        "${_qt5AccessibilitySupport_install_prefix}/include/QtAccessibilitySupport/5.15.1/QtAccessibilitySupport"
+        "${_qt5AccessibilitySupport_install_prefix}/include/QtAccessibilitySupport/5.15.2"
+        "${_qt5AccessibilitySupport_install_prefix}/include/QtAccessibilitySupport/5.15.2/QtAccessibilitySupport"
     )
 
     foreach(_dir ${_Qt5AccessibilitySupport_OWN_INCLUDE_DIRS})
@@ -223,7 +223,7 @@ if (NOT TARGET Qt5::AccessibilitySupport)
     foreach(_module_dep ${_Qt5AccessibilitySupport_MODULE_DEPENDENCIES})
         if (NOT Qt5${_module_dep}_FOUND)
             find_package(Qt5${_module_dep}
-                5.15.1 ${_Qt5AccessibilitySupport_FIND_VERSION_EXACT}
+                5.15.2 ${_Qt5AccessibilitySupport_FIND_VERSION_EXACT}
                 ${_Qt5AccessibilitySupport_DEPENDENCIES_FIND_QUIET}
                 ${_Qt5AccessibilitySupport_FIND_DEPENDENCIES_REQUIRED}
                 PATHS "${CMAKE_CURRENT_LIST_DIR}/.." NO_DEFAULT_PATH

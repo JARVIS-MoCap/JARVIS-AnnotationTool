@@ -6,4 +6,4 @@ QMAKE_LIBS_ZLIB = -lz
 CONFIG -= precompile_header
 CONFIG += sse2 aesni sse3 ssse3 sse4_1 sse4_2 avx avx2 avx512f avx512bw avx512cd avx512dq avx512er avx512ifma avx512pf avx512vbmi avx512vl compile_examples f16c largefile optimize_size rdrnd shani x86SimdAlways
 QT_BUILD_PARTS += libs
-QT_HOST_CFLAGS_DBUS += 
+QT_HOST_CFLAGS_DBUS += -IC:/MinGW/include/dbus-1.0 -IC:/MinGW/lib/dbus-1.0/include

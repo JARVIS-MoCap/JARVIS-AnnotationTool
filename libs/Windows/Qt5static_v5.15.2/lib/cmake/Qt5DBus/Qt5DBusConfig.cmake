@@ -5,7 +5,7 @@ endif()
 get_filename_component(_qt5DBus_install_prefix "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
 
 # For backwards compatibility only. Use Qt5DBus_VERSION instead.
-set(Qt5DBus_VERSION_STRING 5.15.1)
+set(Qt5DBus_VERSION_STRING 5.15.2)
 
 set(Qt5DBus_LIBRARIES Qt5::DBus)
 
@@ -179,8 +179,8 @@ if (NOT TARGET Qt5::DBus)
 
     set(_Qt5DBus_OWN_INCLUDE_DIRS "${_qt5DBus_install_prefix}/include/" "${_qt5DBus_install_prefix}/include/QtDBus")
     set(Qt5DBus_PRIVATE_INCLUDE_DIRS
-        "${_qt5DBus_install_prefix}/include/QtDBus/5.15.1"
-        "${_qt5DBus_install_prefix}/include/QtDBus/5.15.1/QtDBus"
+        "${_qt5DBus_install_prefix}/include/QtDBus/5.15.2"
+        "${_qt5DBus_install_prefix}/include/QtDBus/5.15.2/QtDBus"
     )
 
     foreach(_dir ${_Qt5DBus_OWN_INCLUDE_DIRS})
@@ -223,7 +223,7 @@ if (NOT TARGET Qt5::DBus)
     foreach(_module_dep ${_Qt5DBus_MODULE_DEPENDENCIES})
         if (NOT Qt5${_module_dep}_FOUND)
             find_package(Qt5${_module_dep}
-                5.15.1 ${_Qt5DBus_FIND_VERSION_EXACT}
+                5.15.2 ${_Qt5DBus_FIND_VERSION_EXACT}
                 ${_Qt5DBus_DEPENDENCIES_FIND_QUIET}
                 ${_Qt5DBus_FIND_DEPENDENCIES_REQUIRED}
                 PATHS "${CMAKE_CURRENT_LIST_DIR}/.." NO_DEFAULT_PATH

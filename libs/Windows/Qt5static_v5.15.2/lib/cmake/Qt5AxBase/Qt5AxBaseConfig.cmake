@@ -5,7 +5,7 @@ endif()
 get_filename_component(_qt5AxBase_install_prefix "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
 
 # For backwards compatibility only. Use Qt5AxBase_VERSION instead.
-set(Qt5AxBase_VERSION_STRING 5.15.1)
+set(Qt5AxBase_VERSION_STRING 5.15.2)
 
 set(Qt5AxBase_LIBRARIES Qt5::AxBase)
 
@@ -179,8 +179,8 @@ if (NOT TARGET Qt5::AxBase)
 
     set(_Qt5AxBase_OWN_INCLUDE_DIRS "${_qt5AxBase_install_prefix}/include/" "${_qt5AxBase_install_prefix}/include/ActiveQt")
     set(Qt5AxBase_PRIVATE_INCLUDE_DIRS
-        "${_qt5AxBase_install_prefix}/include/ActiveQt/5.15.1"
-        "${_qt5AxBase_install_prefix}/include/ActiveQt/5.15.1/ActiveQt"
+        "${_qt5AxBase_install_prefix}/include/ActiveQt/5.15.2"
+        "${_qt5AxBase_install_prefix}/include/ActiveQt/5.15.2/ActiveQt"
     )
 
     foreach(_dir ${_Qt5AxBase_OWN_INCLUDE_DIRS})
@@ -223,7 +223,7 @@ if (NOT TARGET Qt5::AxBase)
     foreach(_module_dep ${_Qt5AxBase_MODULE_DEPENDENCIES})
         if (NOT Qt5${_module_dep}_FOUND)
             find_package(Qt5${_module_dep}
-                5.15.1 ${_Qt5AxBase_FIND_VERSION_EXACT}
+                5.15.2 ${_Qt5AxBase_FIND_VERSION_EXACT}
                 ${_Qt5AxBase_DEPENDENCIES_FIND_QUIET}
                 ${_Qt5AxBase_FIND_DEPENDENCIES_REQUIRED}
                 PATHS "${CMAKE_CURRENT_LIST_DIR}/.." NO_DEFAULT_PATH

@@ -5,7 +5,7 @@ endif()
 get_filename_component(_qt5RemoteObjects_install_prefix "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
 
 # For backwards compatibility only. Use Qt5RemoteObjects_VERSION instead.
-set(Qt5RemoteObjects_VERSION_STRING 5.15.1)
+set(Qt5RemoteObjects_VERSION_STRING 5.15.2)
 
 set(Qt5RemoteObjects_LIBRARIES Qt5::RemoteObjects)
 
@@ -179,8 +179,8 @@ if (NOT TARGET Qt5::RemoteObjects)
 
     set(_Qt5RemoteObjects_OWN_INCLUDE_DIRS "${_qt5RemoteObjects_install_prefix}/include/" "${_qt5RemoteObjects_install_prefix}/include/QtRemoteObjects")
     set(Qt5RemoteObjects_PRIVATE_INCLUDE_DIRS
-        "${_qt5RemoteObjects_install_prefix}/include/QtRemoteObjects/5.15.1"
-        "${_qt5RemoteObjects_install_prefix}/include/QtRemoteObjects/5.15.1/QtRemoteObjects"
+        "${_qt5RemoteObjects_install_prefix}/include/QtRemoteObjects/5.15.2"
+        "${_qt5RemoteObjects_install_prefix}/include/QtRemoteObjects/5.15.2/QtRemoteObjects"
     )
 
     foreach(_dir ${_Qt5RemoteObjects_OWN_INCLUDE_DIRS})
@@ -223,7 +223,7 @@ if (NOT TARGET Qt5::RemoteObjects)
     foreach(_module_dep ${_Qt5RemoteObjects_MODULE_DEPENDENCIES})
         if (NOT Qt5${_module_dep}_FOUND)
             find_package(Qt5${_module_dep}
-                5.15.1 ${_Qt5RemoteObjects_FIND_VERSION_EXACT}
+                5.15.2 ${_Qt5RemoteObjects_FIND_VERSION_EXACT}
                 ${_Qt5RemoteObjects_DEPENDENCIES_FIND_QUIET}
                 ${_Qt5RemoteObjects_FIND_DEPENDENCIES_REQUIRED}
                 PATHS "${CMAKE_CURRENT_LIST_DIR}/.." NO_DEFAULT_PATH

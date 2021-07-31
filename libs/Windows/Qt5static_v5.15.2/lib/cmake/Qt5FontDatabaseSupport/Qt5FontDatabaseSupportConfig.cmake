@@ -5,7 +5,7 @@ endif()
 get_filename_component(_qt5FontDatabaseSupport_install_prefix "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
 
 # For backwards compatibility only. Use Qt5FontDatabaseSupport_VERSION instead.
-set(Qt5FontDatabaseSupport_VERSION_STRING 5.15.1)
+set(Qt5FontDatabaseSupport_VERSION_STRING 5.15.2)
 
 set(Qt5FontDatabaseSupport_LIBRARIES Qt5::FontDatabaseSupport)
 
@@ -179,8 +179,8 @@ if (NOT TARGET Qt5::FontDatabaseSupport)
 
     set(_Qt5FontDatabaseSupport_OWN_INCLUDE_DIRS "${_qt5FontDatabaseSupport_install_prefix}/include/" "${_qt5FontDatabaseSupport_install_prefix}/include/QtFontDatabaseSupport")
     set(Qt5FontDatabaseSupport_PRIVATE_INCLUDE_DIRS
-        "${_qt5FontDatabaseSupport_install_prefix}/include/QtFontDatabaseSupport/5.15.1"
-        "${_qt5FontDatabaseSupport_install_prefix}/include/QtFontDatabaseSupport/5.15.1/QtFontDatabaseSupport"
+        "${_qt5FontDatabaseSupport_install_prefix}/include/QtFontDatabaseSupport/5.15.2"
+        "${_qt5FontDatabaseSupport_install_prefix}/include/QtFontDatabaseSupport/5.15.2/QtFontDatabaseSupport"
     )
 
     foreach(_dir ${_Qt5FontDatabaseSupport_OWN_INCLUDE_DIRS})
@@ -223,7 +223,7 @@ if (NOT TARGET Qt5::FontDatabaseSupport)
     foreach(_module_dep ${_Qt5FontDatabaseSupport_MODULE_DEPENDENCIES})
         if (NOT Qt5${_module_dep}_FOUND)
             find_package(Qt5${_module_dep}
-                5.15.1 ${_Qt5FontDatabaseSupport_FIND_VERSION_EXACT}
+                5.15.2 ${_Qt5FontDatabaseSupport_FIND_VERSION_EXACT}
                 ${_Qt5FontDatabaseSupport_DEPENDENCIES_FIND_QUIET}
                 ${_Qt5FontDatabaseSupport_FIND_DEPENDENCIES_REQUIRED}
                 PATHS "${CMAKE_CURRENT_LIST_DIR}/.." NO_DEFAULT_PATH

@@ -1,4 +1,4 @@
-QT.gui.VERSION = 5.15.1
+QT.gui.VERSION = 5.15.2
 QT.gui.name = QtGui
 QT.gui.module = Qt5Gui
 QT.gui.libs = $$QT_MODULE_LIB_BASE

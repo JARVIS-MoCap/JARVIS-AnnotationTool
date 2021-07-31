@@ -147,7 +147,7 @@ if (NOT TARGET Qt5::RepParser)
     foreach(_module_dep ${_Qt5RepParser_MODULE_DEPENDENCIES})
         if (NOT Qt5${_module_dep}_FOUND)
             find_package(Qt5${_module_dep}
-                5.15.1 ${_Qt5RepParser_FIND_VERSION_EXACT}
+                5.15.2 ${_Qt5RepParser_FIND_VERSION_EXACT}
                 ${_Qt5RepParser_DEPENDENCIES_FIND_QUIET}
                 ${_Qt5RepParser_FIND_DEPENDENCIES_REQUIRED}
                 PATHS "${CMAKE_CURRENT_LIST_DIR}/.." NO_DEFAULT_PATH

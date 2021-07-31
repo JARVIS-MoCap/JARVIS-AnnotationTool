@@ -1,4 +1,4 @@
-QT.charts.VERSION = 5.15.1
+QT.charts.VERSION = 5.15.2
 QT.charts.name = QtCharts
 QT.charts.module = Qt5Charts
 QT.charts.libs = $$QT_MODULE_LIB_BASE

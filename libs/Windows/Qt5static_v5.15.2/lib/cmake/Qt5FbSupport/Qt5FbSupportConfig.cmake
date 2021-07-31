@@ -5,7 +5,7 @@ endif()
 get_filename_component(_qt5FbSupport_install_prefix "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
 
 # For backwards compatibility only. Use Qt5FbSupport_VERSION instead.
-set(Qt5FbSupport_VERSION_STRING 5.15.1)
+set(Qt5FbSupport_VERSION_STRING 5.15.2)
 
 set(Qt5FbSupport_LIBRARIES Qt5::FbSupport)
 
@@ -179,8 +179,8 @@ if (NOT TARGET Qt5::FbSupport)
 
     set(_Qt5FbSupport_OWN_INCLUDE_DIRS "${_qt5FbSupport_install_prefix}/include/" "${_qt5FbSupport_install_prefix}/include/QtFbSupport")
     set(Qt5FbSupport_PRIVATE_INCLUDE_DIRS
-        "${_qt5FbSupport_install_prefix}/include/QtFbSupport/5.15.1"
-        "${_qt5FbSupport_install_prefix}/include/QtFbSupport/5.15.1/QtFbSupport"
+        "${_qt5FbSupport_install_prefix}/include/QtFbSupport/5.15.2"
+        "${_qt5FbSupport_install_prefix}/include/QtFbSupport/5.15.2/QtFbSupport"
     )
 
     foreach(_dir ${_Qt5FbSupport_OWN_INCLUDE_DIRS})
@@ -223,7 +223,7 @@ if (NOT TARGET Qt5::FbSupport)
     foreach(_module_dep ${_Qt5FbSupport_MODULE_DEPENDENCIES})
         if (NOT Qt5${_module_dep}_FOUND)
             find_package(Qt5${_module_dep}
-                5.15.1 ${_Qt5FbSupport_FIND_VERSION_EXACT}
+                5.15.2 ${_Qt5FbSupport_FIND_VERSION_EXACT}
                 ${_Qt5FbSupport_DEPENDENCIES_FIND_QUIET}
                 ${_Qt5FbSupport_FIND_DEPENDENCIES_REQUIRED}
                 PATHS "${CMAKE_CURRENT_LIST_DIR}/.." NO_DEFAULT_PATH

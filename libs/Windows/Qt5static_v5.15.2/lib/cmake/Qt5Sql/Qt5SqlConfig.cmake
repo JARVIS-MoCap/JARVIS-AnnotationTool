@@ -5,7 +5,7 @@ endif()
 get_filename_component(_qt5Sql_install_prefix "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
 
 # For backwards compatibility only. Use Qt5Sql_VERSION instead.
-set(Qt5Sql_VERSION_STRING 5.15.1)
+set(Qt5Sql_VERSION_STRING 5.15.2)
 
 set(Qt5Sql_LIBRARIES Qt5::Sql)
 
@@ -179,8 +179,8 @@ if (NOT TARGET Qt5::Sql)
 
     set(_Qt5Sql_OWN_INCLUDE_DIRS "${_qt5Sql_install_prefix}/include/" "${_qt5Sql_install_prefix}/include/QtSql")
     set(Qt5Sql_PRIVATE_INCLUDE_DIRS
-        "${_qt5Sql_install_prefix}/include/QtSql/5.15.1"
-        "${_qt5Sql_install_prefix}/include/QtSql/5.15.1/QtSql"
+        "${_qt5Sql_install_prefix}/include/QtSql/5.15.2"
+        "${_qt5Sql_install_prefix}/include/QtSql/5.15.2/QtSql"
     )
 
     foreach(_dir ${_Qt5Sql_OWN_INCLUDE_DIRS})
@@ -223,7 +223,7 @@ if (NOT TARGET Qt5::Sql)
     foreach(_module_dep ${_Qt5Sql_MODULE_DEPENDENCIES})
         if (NOT Qt5${_module_dep}_FOUND)
             find_package(Qt5${_module_dep}
-                5.15.1 ${_Qt5Sql_FIND_VERSION_EXACT}
+                5.15.2 ${_Qt5Sql_FIND_VERSION_EXACT}
                 ${_Qt5Sql_DEPENDENCIES_FIND_QUIET}
                 ${_Qt5Sql_FIND_DEPENDENCIES_REQUIRED}
                 PATHS "${CMAKE_CURRENT_LIST_DIR}/.." NO_DEFAULT_PATH

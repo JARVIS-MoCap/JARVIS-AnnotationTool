@@ -29,7 +29,7 @@
 #      - OpenCV_VERSION_MAJOR            : Major version part of OpenCV_VERSION: "4"
 #      - OpenCV_VERSION_MINOR            : Minor version part of OpenCV_VERSION: "5"
 #      - OpenCV_VERSION_PATCH            : Patch version part of OpenCV_VERSION: "1"
-#      - OpenCV_VERSION_STATUS           : Development status of this build: "-pre"
+#      - OpenCV_VERSION_STATUS           : Development status of this build: ""
 #
 #    Advanced variables:
 #      - OpenCV_SHARED                   : Use OpenCV as shared library
@@ -50,7 +50,7 @@ SET(OpenCV_VERSION_MAJOR  4)
 SET(OpenCV_VERSION_MINOR  5)
 SET(OpenCV_VERSION_PATCH  1)
 SET(OpenCV_VERSION_TWEAK  0)
-SET(OpenCV_VERSION_STATUS "-pre")
+SET(OpenCV_VERSION_STATUS "")
 
 include(FindPackageHandleStandardArgs)
 
@@ -105,7 +105,7 @@ set(OpenCV_SHARED OFF)
 # Enables mangled install paths, that help with side by side installs
 set(OpenCV_USE_MANGLED_PATHS FALSE)
 
-set(OpenCV_LIB_COMPONENTS opencv_calib3d;opencv_core;opencv_features2d;opencv_flann;opencv_imgproc)
+set(OpenCV_LIB_COMPONENTS opencv_calib3d;opencv_core;opencv_features2d;opencv_flann;opencv_imgcodecs;opencv_imgproc;opencv_videoio)
 set(__OpenCV_INCLUDE_DIRS "${OpenCV_INSTALL_PATH}/include")
 
 set(OpenCV_INCLUDE_DIRS "")

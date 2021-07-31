@@ -1,4 +1,4 @@
-QT.widgets.VERSION = 5.15.1
+QT.widgets.VERSION = 5.15.2
 QT.widgets.name = QtWidgets
 QT.widgets.module = Qt5Widgets
 QT.widgets.libs = $$QT_MODULE_LIB_BASE

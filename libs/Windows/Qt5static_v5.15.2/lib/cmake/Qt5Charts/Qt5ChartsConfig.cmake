@@ -5,7 +5,7 @@ endif()
 get_filename_component(_qt5Charts_install_prefix "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
 
 # For backwards compatibility only. Use Qt5Charts_VERSION instead.
-set(Qt5Charts_VERSION_STRING 5.15.1)
+set(Qt5Charts_VERSION_STRING 5.15.2)
 
 set(Qt5Charts_LIBRARIES Qt5::Charts)
 
@@ -179,8 +179,8 @@ if (NOT TARGET Qt5::Charts)
 
     set(_Qt5Charts_OWN_INCLUDE_DIRS "${_qt5Charts_install_prefix}/include/" "${_qt5Charts_install_prefix}/include/QtCharts")
     set(Qt5Charts_PRIVATE_INCLUDE_DIRS
-        "${_qt5Charts_install_prefix}/include/QtCharts/5.15.1"
-        "${_qt5Charts_install_prefix}/include/QtCharts/5.15.1/QtCharts"
+        "${_qt5Charts_install_prefix}/include/QtCharts/5.15.2"
+        "${_qt5Charts_install_prefix}/include/QtCharts/5.15.2/QtCharts"
     )
 
     foreach(_dir ${_Qt5Charts_OWN_INCLUDE_DIRS})
@@ -223,7 +223,7 @@ if (NOT TARGET Qt5::Charts)
     foreach(_module_dep ${_Qt5Charts_MODULE_DEPENDENCIES})
         if (NOT Qt5${_module_dep}_FOUND)
             find_package(Qt5${_module_dep}
-                5.15.1 ${_Qt5Charts_FIND_VERSION_EXACT}
+                5.15.2 ${_Qt5Charts_FIND_VERSION_EXACT}
                 ${_Qt5Charts_DEPENDENCIES_FIND_QUIET}
                 ${_Qt5Charts_FIND_DEPENDENCIES_REQUIRED}
                 PATHS "${CMAKE_CURRENT_LIST_DIR}/.." NO_DEFAULT_PATH

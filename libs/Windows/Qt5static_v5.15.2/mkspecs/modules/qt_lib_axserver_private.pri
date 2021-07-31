@@ -1,4 +1,4 @@
-QT.axserver_private.VERSION = 5.15.1
+QT.axserver_private.VERSION = 5.15.2
 QT.axserver_private.name = QtAxServer
 QT.axserver_private.module =
 QT.axserver_private.libs = $$QT_MODULE_LIB_BASE

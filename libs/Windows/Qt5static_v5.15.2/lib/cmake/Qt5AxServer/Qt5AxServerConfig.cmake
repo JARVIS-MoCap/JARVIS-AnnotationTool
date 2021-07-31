@@ -5,7 +5,7 @@ endif()
 get_filename_component(_qt5AxServer_install_prefix "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
 
 # For backwards compatibility only. Use Qt5AxServer_VERSION instead.
-set(Qt5AxServer_VERSION_STRING 5.15.1)
+set(Qt5AxServer_VERSION_STRING 5.15.2)
 
 set(Qt5AxServer_LIBRARIES Qt5::AxServer)
 
@@ -220,7 +220,7 @@ if (NOT TARGET Qt5::AxServer)
     foreach(_module_dep ${_Qt5AxServer_MODULE_DEPENDENCIES})
         if (NOT Qt5${_module_dep}_FOUND)
             find_package(Qt5${_module_dep}
-                5.15.1 ${_Qt5AxServer_FIND_VERSION_EXACT}
+                5.15.2 ${_Qt5AxServer_FIND_VERSION_EXACT}
                 ${_Qt5AxServer_DEPENDENCIES_FIND_QUIET}
                 ${_Qt5AxServer_FIND_DEPENDENCIES_REQUIRED}
                 PATHS "${CMAKE_CURRENT_LIST_DIR}/.." NO_DEFAULT_PATH

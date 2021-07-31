@@ -5,6 +5,16 @@
 # Commands may need to know the format version.
 set(CMAKE_IMPORT_FILE_VERSION 1)
 
+# Import target "libwebp" for configuration "RELEASE"
+set_property(TARGET libwebp APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(libwebp PROPERTIES
+  IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "C"
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/x64/mingw/staticlib/liblibwebp.a"
+  )
+
+list(APPEND _IMPORT_CHECK_TARGETS libwebp )
+list(APPEND _IMPORT_CHECK_FILES_FOR_libwebp "${_IMPORT_PREFIX}/x64/mingw/staticlib/liblibwebp.a" )
+
 # Import target "ade" for configuration "RELEASE"
 set_property(TARGET ade APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
 set_target_properties(ade PROPERTIES
@@ -54,6 +64,26 @@ set_target_properties(opencv_features2d PROPERTIES
 
 list(APPEND _IMPORT_CHECK_TARGETS opencv_features2d )
 list(APPEND _IMPORT_CHECK_FILES_FOR_opencv_features2d "${_IMPORT_PREFIX}/x64/mingw/staticlib/libopencv_features2d451.a" )
+
+# Import target "opencv_imgcodecs" for configuration "RELEASE"
+set_property(TARGET opencv_imgcodecs APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(opencv_imgcodecs PROPERTIES
+  IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/x64/mingw/staticlib/libopencv_imgcodecs451.a"
+  )
+
+list(APPEND _IMPORT_CHECK_TARGETS opencv_imgcodecs )
+list(APPEND _IMPORT_CHECK_FILES_FOR_opencv_imgcodecs "${_IMPORT_PREFIX}/x64/mingw/staticlib/libopencv_imgcodecs451.a" )
+
+# Import target "opencv_videoio" for configuration "RELEASE"
+set_property(TARGET opencv_videoio APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(opencv_videoio PROPERTIES
+  IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/x64/mingw/staticlib/libopencv_videoio451.a"
+  )
+
+list(APPEND _IMPORT_CHECK_TARGETS opencv_videoio )
+list(APPEND _IMPORT_CHECK_FILES_FOR_opencv_videoio "${_IMPORT_PREFIX}/x64/mingw/staticlib/libopencv_videoio451.a" )
 
 # Import target "opencv_calib3d" for configuration "RELEASE"
 set_property(TARGET opencv_calib3d APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)

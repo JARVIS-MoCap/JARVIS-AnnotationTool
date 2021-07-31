@@ -1,8 +1,8 @@
-QT.accessibility_support_private.VERSION = 5.15.1
+QT.accessibility_support_private.VERSION = 5.15.2
 QT.accessibility_support_private.name = QtAccessibilitySupport
 QT.accessibility_support_private.module = Qt5AccessibilitySupport
 QT.accessibility_support_private.libs = $$QT_MODULE_LIB_BASE
-QT.accessibility_support_private.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtAccessibilitySupport $$QT_MODULE_INCLUDE_BASE/QtAccessibilitySupport/5.15.1 $$QT_MODULE_INCLUDE_BASE/QtAccessibilitySupport/5.15.1/QtAccessibilitySupport
+QT.accessibility_support_private.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtAccessibilitySupport $$QT_MODULE_INCLUDE_BASE/QtAccessibilitySupport/5.15.2 $$QT_MODULE_INCLUDE_BASE/QtAccessibilitySupport/5.15.2/QtAccessibilitySupport
 QT.accessibility_support_private.frameworks =
 QT.accessibility_support_private.bins = $$QT_MODULE_BIN_BASE
 QT.accessibility_support_private.depends = core_private gui_private

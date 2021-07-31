@@ -5,7 +5,7 @@ endif()
 get_filename_component(_qt5WindowsUIAutomationSupport_install_prefix "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
 
 # For backwards compatibility only. Use Qt5WindowsUIAutomationSupport_VERSION instead.
-set(Qt5WindowsUIAutomationSupport_VERSION_STRING 5.15.1)
+set(Qt5WindowsUIAutomationSupport_VERSION_STRING 5.15.2)
 
 set(Qt5WindowsUIAutomationSupport_LIBRARIES Qt5::WindowsUIAutomationSupport)
 
@@ -179,8 +179,8 @@ if (NOT TARGET Qt5::WindowsUIAutomationSupport)
 
     set(_Qt5WindowsUIAutomationSupport_OWN_INCLUDE_DIRS "${_qt5WindowsUIAutomationSupport_install_prefix}/include/" "${_qt5WindowsUIAutomationSupport_install_prefix}/include/QtWindowsUIAutomationSupport")
     set(Qt5WindowsUIAutomationSupport_PRIVATE_INCLUDE_DIRS
-        "${_qt5WindowsUIAutomationSupport_install_prefix}/include/QtWindowsUIAutomationSupport/5.15.1"
-        "${_qt5WindowsUIAutomationSupport_install_prefix}/include/QtWindowsUIAutomationSupport/5.15.1/QtWindowsUIAutomationSupport"
+        "${_qt5WindowsUIAutomationSupport_install_prefix}/include/QtWindowsUIAutomationSupport/5.15.2"
+        "${_qt5WindowsUIAutomationSupport_install_prefix}/include/QtWindowsUIAutomationSupport/5.15.2/QtWindowsUIAutomationSupport"
     )
 
     foreach(_dir ${_Qt5WindowsUIAutomationSupport_OWN_INCLUDE_DIRS})
@@ -223,7 +223,7 @@ if (NOT TARGET Qt5::WindowsUIAutomationSupport)
     foreach(_module_dep ${_Qt5WindowsUIAutomationSupport_MODULE_DEPENDENCIES})
         if (NOT Qt5${_module_dep}_FOUND)
             find_package(Qt5${_module_dep}
-                5.15.1 ${_Qt5WindowsUIAutomationSupport_FIND_VERSION_EXACT}
+                5.15.2 ${_Qt5WindowsUIAutomationSupport_FIND_VERSION_EXACT}
                 ${_Qt5WindowsUIAutomationSupport_DEPENDENCIES_FIND_QUIET}
                 ${_Qt5WindowsUIAutomationSupport_FIND_DEPENDENCIES_REQUIRED}
                 PATHS "${CMAKE_CURRENT_LIST_DIR}/.." NO_DEFAULT_PATH

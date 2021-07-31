@@ -1,8 +1,8 @@
-QT.eventdispatcher_support_private.VERSION = 5.15.1
+QT.eventdispatcher_support_private.VERSION = 5.15.2
 QT.eventdispatcher_support_private.name = QtEventDispatcherSupport
 QT.eventdispatcher_support_private.module = Qt5EventDispatcherSupport
 QT.eventdispatcher_support_private.libs = $$QT_MODULE_LIB_BASE
-QT.eventdispatcher_support_private.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtEventDispatcherSupport $$QT_MODULE_INCLUDE_BASE/QtEventDispatcherSupport/5.15.1 $$QT_MODULE_INCLUDE_BASE/QtEventDispatcherSupport/5.15.1/QtEventDispatcherSupport
+QT.eventdispatcher_support_private.includes = $$QT_MODULE_INCLUDE_BASE $$QT_MODULE_INCLUDE_BASE/QtEventDispatcherSupport $$QT_MODULE_INCLUDE_BASE/QtEventDispatcherSupport/5.15.2 $$QT_MODULE_INCLUDE_BASE/QtEventDispatcherSupport/5.15.2/QtEventDispatcherSupport
 QT.eventdispatcher_support_private.frameworks =
 QT.eventdispatcher_support_private.bins = $$QT_MODULE_BIN_BASE
 QT.eventdispatcher_support_private.depends = core_private gui_private

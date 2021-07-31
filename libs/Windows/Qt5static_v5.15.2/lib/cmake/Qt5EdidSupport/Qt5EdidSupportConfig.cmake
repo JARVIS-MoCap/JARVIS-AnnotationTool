@@ -5,7 +5,7 @@ endif()
 get_filename_component(_qt5EdidSupport_install_prefix "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
 
 # For backwards compatibility only. Use Qt5EdidSupport_VERSION instead.
-set(Qt5EdidSupport_VERSION_STRING 5.15.1)
+set(Qt5EdidSupport_VERSION_STRING 5.15.2)
 
 set(Qt5EdidSupport_LIBRARIES Qt5::EdidSupport)
 
@@ -179,8 +179,8 @@ if (NOT TARGET Qt5::EdidSupport)
 
     set(_Qt5EdidSupport_OWN_INCLUDE_DIRS "${_qt5EdidSupport_install_prefix}/include/" "${_qt5EdidSupport_install_prefix}/include/QtEdidSupport")
     set(Qt5EdidSupport_PRIVATE_INCLUDE_DIRS
-        "${_qt5EdidSupport_install_prefix}/include/QtEdidSupport/5.15.1"
-        "${_qt5EdidSupport_install_prefix}/include/QtEdidSupport/5.15.1/QtEdidSupport"
+        "${_qt5EdidSupport_install_prefix}/include/QtEdidSupport/5.15.2"
+        "${_qt5EdidSupport_install_prefix}/include/QtEdidSupport/5.15.2/QtEdidSupport"
     )
 
     foreach(_dir ${_Qt5EdidSupport_OWN_INCLUDE_DIRS})
@@ -223,7 +223,7 @@ if (NOT TARGET Qt5::EdidSupport)
     foreach(_module_dep ${_Qt5EdidSupport_MODULE_DEPENDENCIES})
         if (NOT Qt5${_module_dep}_FOUND)
             find_package(Qt5${_module_dep}
-                5.15.1 ${_Qt5EdidSupport_FIND_VERSION_EXACT}
+                5.15.2 ${_Qt5EdidSupport_FIND_VERSION_EXACT}
                 ${_Qt5EdidSupport_DEPENDENCIES_FIND_QUIET}
                 ${_Qt5EdidSupport_FIND_DEPENDENCIES_REQUIRED}
                 PATHS "${CMAKE_CURRENT_LIST_DIR}/.." NO_DEFAULT_PATH

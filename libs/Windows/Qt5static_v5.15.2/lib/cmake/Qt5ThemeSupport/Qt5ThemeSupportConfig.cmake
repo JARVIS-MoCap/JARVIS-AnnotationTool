@@ -5,7 +5,7 @@ endif()
 get_filename_component(_qt5ThemeSupport_install_prefix "${CMAKE_CURRENT_LIST_DIR}/../../../" ABSOLUTE)
 
 # For backwards compatibility only. Use Qt5ThemeSupport_VERSION instead.
-set(Qt5ThemeSupport_VERSION_STRING 5.15.1)
+set(Qt5ThemeSupport_VERSION_STRING 5.15.2)
 
 set(Qt5ThemeSupport_LIBRARIES Qt5::ThemeSupport)
 
@@ -179,8 +179,8 @@ if (NOT TARGET Qt5::ThemeSupport)
 
     set(_Qt5ThemeSupport_OWN_INCLUDE_DIRS "${_qt5ThemeSupport_install_prefix}/include/" "${_qt5ThemeSupport_install_prefix}/include/QtThemeSupport")
     set(Qt5ThemeSupport_PRIVATE_INCLUDE_DIRS
-        "${_qt5ThemeSupport_install_prefix}/include/QtThemeSupport/5.15.1"
-        "${_qt5ThemeSupport_install_prefix}/include/QtThemeSupport/5.15.1/QtThemeSupport"
+        "${_qt5ThemeSupport_install_prefix}/include/QtThemeSupport/5.15.2"
+        "${_qt5ThemeSupport_install_prefix}/include/QtThemeSupport/5.15.2/QtThemeSupport"
     )
 
     foreach(_dir ${_Qt5ThemeSupport_OWN_INCLUDE_DIRS})
@@ -223,7 +223,7 @@ if (NOT TARGET Qt5::ThemeSupport)
     foreach(_module_dep ${_Qt5ThemeSupport_MODULE_DEPENDENCIES})
         if (NOT Qt5${_module_dep}_FOUND)
             find_package(Qt5${_module_dep}
-                5.15.1 ${_Qt5ThemeSupport_FIND_VERSION_EXACT}
+                5.15.2 ${_Qt5ThemeSupport_FIND_VERSION_EXACT}
                 ${_Qt5ThemeSupport_DEPENDENCIES_FIND_QUIET}
                 ${_Qt5ThemeSupport_FIND_DEPENDENCIES_REQUIRED}
                 PATHS "${CMAKE_CURRENT_LIST_DIR}/.." NO_DEFAULT_PATH

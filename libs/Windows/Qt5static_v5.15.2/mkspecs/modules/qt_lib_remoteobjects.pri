@@ -1,4 +1,4 @@
-QT.remoteobjects.VERSION = 5.15.1
+QT.remoteobjects.VERSION = 5.15.2
 QT.remoteobjects.name = QtRemoteObjects
 QT.remoteobjects.module = Qt5RemoteObjects
 QT.remoteobjects.libs = $$QT_MODULE_LIB_BASE

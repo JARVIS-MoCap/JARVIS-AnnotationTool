@@ -43,10 +43,10 @@
 #define QT_FEATURE_signaling_nan 1
 #define QT_FEATURE_static 1
 #define QT_COMPILER_SUPPORTS_SIMD_ALWAYS 1
-#define QT_VERSION_STR "5.15.1"
+#define QT_VERSION_STR "5.15.2"
 #define QT_VERSION_MAJOR 5
 #define QT_VERSION_MINOR 15
-#define QT_VERSION_PATCH 1
+#define QT_VERSION_PATCH 2
 /* Qt was configured for a static build */
 #if !defined(QT_SHARED) && !defined(QT_STATIC)
 # define QT_STATIC

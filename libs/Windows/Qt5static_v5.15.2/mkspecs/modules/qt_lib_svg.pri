@@ -1,4 +1,4 @@
-QT.svg.VERSION = 5.15.1
+QT.svg.VERSION = 5.15.2
 QT.svg.name = QtSvg
 QT.svg.module = Qt5Svg
 QT.svg.libs = $$QT_MODULE_LIB_BASE

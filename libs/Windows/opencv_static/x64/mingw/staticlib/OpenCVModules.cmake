@@ -4,7 +4,7 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" LESS 2.5)
    message(FATAL_ERROR "CMake >= 2.6.0 required")
 endif()
 cmake_policy(PUSH)
-cmake_policy(VERSION 2.6...3.17)
+cmake_policy(VERSION 2.6...3.19)
 #----------------------------------------------------------------
 # Generated CMake target import file.
 #----------------------------------------------------------------
@@ -16,7 +16,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_targetsDefined)
 set(_targetsNotDefined)
 set(_expectedTargets)
-foreach(_expectedTarget ade ocv.3rdparty.ffmpeg ocv.3rdparty.dshow opencv_core opencv_flann opencv_imgproc opencv_features2d opencv_calib3d)
+foreach(_expectedTarget libwebp ade ocv.3rdparty.ffmpeg ocv.3rdparty.dshow opencv_core opencv_flann opencv_imgproc opencv_features2d opencv_imgcodecs opencv_videoio opencv_calib3d)
   list(APPEND _expectedTargets ${_expectedTarget})
   if(NOT TARGET ${_expectedTarget})
     list(APPEND _targetsNotDefined ${_expectedTarget})
@@ -50,6 +50,9 @@ if(_IMPORT_PREFIX STREQUAL "/")
   set(_IMPORT_PREFIX "")
 endif()
 
+# Create imported target libwebp
+add_library(libwebp STATIC IMPORTED)
+
 # Create imported target ade
 add_library(ade STATIC IMPORTED)
 
@@ -75,7 +78,7 @@ set_target_properties(ocv.3rdparty.dshow PROPERTIES
 add_library(opencv_core STATIC IMPORTED)
 
 set_target_properties(opencv_core PROPERTIES
-  INTERFACE_LINK_LIBRARIES "C:/Strawberry/c/lib/libz.a"
+  INTERFACE_LINK_LIBRARIES "C:/Strawberry/c/i686-w64-mingw32/lib/libz.a"
 )
 
 # Create imported target opencv_flann
@@ -97,6 +100,20 @@ add_library(opencv_features2d STATIC IMPORTED)
 
 set_target_properties(opencv_features2d PROPERTIES
   INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:opencv_core>;\$<LINK_ONLY:opencv_flann>;\$<LINK_ONLY:opencv_imgproc>;opencv_core;opencv_flann;opencv_imgproc"
+)
+
+# Create imported target opencv_imgcodecs
+add_library(opencv_imgcodecs STATIC IMPORTED)
+
+set_target_properties(opencv_imgcodecs PROPERTIES
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:opencv_core>;\$<LINK_ONLY:opencv_imgproc>;opencv_core;opencv_imgproc;C:/Strawberry/c/i686-w64-mingw32/lib/libz.a;C:/Strawberry/c/lib/libjpeg.a;\$<LINK_ONLY:libwebp>;C:/Strawberry/c/lib/libpng.a;C:/Strawberry/c/i686-w64-mingw32/lib/libz.a;C:/Strawberry/c/lib/libtiff.a"
+)
+
+# Create imported target opencv_videoio
+add_library(opencv_videoio STATIC IMPORTED)
+
+set_target_properties(opencv_videoio PROPERTIES
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:opencv_core>;\$<LINK_ONLY:opencv_imgproc>;\$<LINK_ONLY:opencv_imgcodecs>;opencv_core;opencv_imgproc;opencv_imgcodecs;\$<LINK_ONLY:ocv.3rdparty.dshow>;\$<LINK_ONLY:ocv.3rdparty.ffmpeg>"
 )
 
 # Create imported target opencv_calib3d
