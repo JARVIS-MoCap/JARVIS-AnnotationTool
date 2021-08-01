@@ -5,7 +5,7 @@
  * Contact: 	timo.hueser@gmail.com
  *****************************************************************/
 
-#include "newdatasetwindow.hpp"
+#include "configurableitemlist.hpp"
 
 #include <QGridLayout>
 #include <QLineEdit>
@@ -15,8 +15,8 @@
 #include <QDirIterator>
 
 
-ConfigurableItemList::ConfigurableItemList(QString name, DatasetConfig *datasetConfig, QWidget *parent) :
-			m_name(name), m_datasetConfig(datasetConfig), QWidget(parent) {
+ConfigurableItemList::ConfigurableItemList(QString name, QWidget *parent) :
+			m_name(name), QWidget(parent) {
 	QGridLayout *labelselectorlayout = new QGridLayout(this);
 	itemSelectorList = new QListWidget(this);
 	itemSelectorList->setFont(QFont("Sans Serif", 12));
@@ -64,6 +64,7 @@ void ConfigurableItemList::moveItemUpSlot() {
 	int newRow = std::max(row-1,0);
 	itemSelectorList->insertItem(newRow,item);
 	itemSelectorList->setCurrentRow(newRow);
+	emit itemsChanged(getItems());
 }
 
 void ConfigurableItemList::moveItemDownSlot() {
@@ -72,19 +73,22 @@ void ConfigurableItemList::moveItemDownSlot() {
 	int newRow = std::min(row+1,itemSelectorList->count());
 	itemSelectorList->insertItem(newRow,item);
 	itemSelectorList->setCurrentRow(newRow);
+	emit itemsChanged(getItems());
 }
 
 
 void ConfigurableItemList::addItemSlot() {
-	QStringList items;
+	QList<QString> items;
 	items.append(QInputDialog::getText(this,m_name,"Enter Label:", QLineEdit::Normal));
 	if (!items.isEmpty()) {
 		for (const auto & item : items) {
 			itemSelectorList->addItem(item);
 		}
+		emit itemsChanged(getItems());
 	}
 }
 
 void ConfigurableItemList::removeItemSlot() {
 	delete itemSelectorList->takeItem(itemSelectorList->currentRow());
+	emit itemsChanged(getItems());
 }

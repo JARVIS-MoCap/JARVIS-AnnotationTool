@@ -9,7 +9,6 @@
 #define CONFIGURABLEITEMLIST_H
 
 #include "globals.hpp"
-#include "dataset.hpp"
 
 #include <QPushButton>
 #include <QTableWidget>
@@ -21,13 +20,15 @@
 class ConfigurableItemList : public QWidget {
 	Q_OBJECT
 	public:
-		explicit ConfigurableItemList(QString name, DatasetConfig *datasetConfig, QWidget *parent = nullptr);
+		explicit ConfigurableItemList(QString name, QWidget *parent = nullptr);
 		QListWidget *itemSelectorList;
 
 		QList<QString> getItems();
 
+	signals:
+		void itemsChanged(QList<QString> items);
+
 	private:
-		DatasetConfig	*m_datasetConfig;
 		QString m_name;
 		QPushButton *moveItemUpButton;
 		QPushButton *moveItemDownButton;

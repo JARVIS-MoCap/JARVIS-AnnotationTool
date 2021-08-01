@@ -1,16 +1,12 @@
-project (newdatasetwindow)
-
-add_subdirectory(videocutter)
+project (conveniencewidgets)
 
 add_library(${PROJECT_NAME}
-  newdatasetwindow.hpp
-  recordingstable.hpp
-  presetswindow.hpp
-  progressinfowindow.hpp
-  newdatasetwindow.cpp
-  recordingstable.cpp
-  presetswindow.cpp
-  progressinfowindow.cpp
+  labelwithtooltip.hpp
+  pathwidget.hpp
+  configurableitemlist.hpp
+  labelwithtooltip.cpp
+  pathwidget.cpp
+  configurableitemlist.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -22,8 +18,6 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   Qt5::Widgets
 	src
-  gui
-  videocutter
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused)

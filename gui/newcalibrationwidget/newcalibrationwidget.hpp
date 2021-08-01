@@ -9,7 +9,11 @@
 #define NEWCALIBRATIONWIDGET_H
 
 #include "globals.hpp"
-#include "dataset.hpp"
+#include "presetswindow.hpp"
+#include "labelwithtooltip.hpp"
+#include "pathwidget.hpp"
+#include "configurableitemlist.hpp"
+#include "extrinsicspairlist.hpp"
 
 #include <QPushButton>
 #include <QTableWidget>
@@ -17,9 +21,12 @@
 #include <QSettings>
 #include <QListWidget>
 #include <QSpinBox>
+#include <QDoubleSpinBox>
 #include <QComboBox>
 #include <QErrorMessage>
+#include <QRadioButton>
 
+class YesNoRadioWidget;
 
 class NewCalibrationWidget : public QWidget {
 	Q_OBJECT
@@ -33,9 +40,52 @@ class NewCalibrationWidget : public QWidget {
 	private:
 		QSettings *settings;
 		QErrorMessage *m_errorMsg;
+		PresetsWindow *loadPresetsWindow;
+		PresetsWindow *savePresetsWindow;
+		QList<QString> presets;
 
-		private slots:
+		QPushButton *loadButton;
+		QPushButton *saveButton;
+		QPushButton *calibrateButton;
 
+		YesNoRadioWidget *seperateRadioWidget;
+		YesNoRadioWidget *calibrateIntrinsicsRadioWidget;
+		YesNoRadioWidget *calibrateExtrinsicsRadioWidget;
+		DirPathWidget *intrinsicsPathWidget;
+		DirPathWidget *extrinsicsPathWidget;
+		QSpinBox *intrinsicsFramesEdit;
+		QSpinBox *extrinsicsFramesEdit;
+		QSpinBox *widthEdit;
+		QSpinBox *heightEdit;
+		QDoubleSpinBox *sideLengthEdit;
+
+		ConfigurableItemList *cameraList;
+
+		ExtrinsicsPairList *extrinsicsPairList;
+
+
+	private slots:
+		void savePresetsClickedSlot();
+		void loadPresetsClickedSlot();
+		void savePresetSlot(const QString& preset);
+		void loadPresetSlot(const QString& preset);
+
+};
+
+
+class YesNoRadioWidget : public QWidget {
+	Q_OBJECT
+	public:
+			explicit YesNoRadioWidget(QWidget *parent = nullptr);
+			void setState(bool state);
+			bool state() {return yesButton->isChecked();};
+
+	signals:
+		void stateChanged(bool state);
+
+	private:
+		QRadioButton *yesButton;
+		QRadioButton *noButton;
 };
 
 

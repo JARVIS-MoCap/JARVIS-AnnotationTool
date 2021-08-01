@@ -31,6 +31,8 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	progressInfoWindow = new ProgressInfoWindow(this);
 	m_errorMsg = new QErrorMessage();
 
+	QLabel *newDatasetLabel = new QLabel("New Dataset");
+	newDatasetLabel->setFont(QFont("Sans Serif", 18, QFont::Bold));
 
 
 	loadPresetsWindow = new PresetsWindow(&presets, "load", "New Dataset Window/");
@@ -85,13 +87,13 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 
 	QGroupBox *entitiesBox = new QGroupBox("Entities");
 	QGridLayout *entitieslayout = new QGridLayout(entitiesBox);
-	entitiesItemList = new ConfigurableItemList("Entities", m_datasetConfig);
+	entitiesItemList = new ConfigurableItemList("Entities");
 	entitieslayout->addWidget(entitiesItemList,0,0);
 	entitieslayout->setMargin(0);
 
 	QGroupBox *keypointsBox = new QGroupBox("Keypoints");
 	QGridLayout *keypointslayout = new QGridLayout(keypointsBox);
-	keypointsItemList = new ConfigurableItemList("Keypoints", m_datasetConfig);
+	keypointsItemList = new ConfigurableItemList("Keypoints");
 	keypointslayout->addWidget(keypointsItemList,0,0);
 	keypointslayout->setMargin(0);
 
@@ -127,11 +129,12 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	configlayout->addWidget(samplingMethodLabel,4,0);
 	configlayout->addWidget(samplingMethodCombo,4,1,1,2);
 
-	layout->addWidget(configBox,0,0,1,2);
-	layout->addWidget(recordingsBox,1,0,1,2);
-	layout->addWidget(entitiesBox,2,0);
-	layout->addWidget(keypointsBox,2,1);
-	layout->addWidget(buttonBarWidget,3,0,1,2);
+	layout->addWidget(newDatasetLabel,0,0,1,2);
+	layout->addWidget(configBox,1,0,1,2);
+	layout->addWidget(recordingsBox,2,0,1,2);
+	layout->addWidget(entitiesBox,3,0);
+	layout->addWidget(keypointsBox,3,1);
+	layout->addWidget(buttonBarWidget,4,0,1,2);
 
 	connect(this, &NewDatasetWindow::createDataset, datasetCreator, &DatasetCreator::createDatasetSlot);
 	connect(datasetCreator, &DatasetCreator::datasetCreated, this, &NewDatasetWindow::datasetCreatedSot);
@@ -246,20 +249,4 @@ void NewDatasetWindow::loadPresetSlot(const QString& preset) {
 	}
 	settings->endGroup();
 	settings->endGroup();
-}
-
-
-
-LabelWithToolTip::LabelWithToolTip(QString name, QString toolTip, QWidget *parent) : QWidget(parent) {
-	QGridLayout *layout = new QGridLayout(this);
-	layout->setMargin(0);
-	QLabel *label = new QLabel(name);
-	if (toolTip != "") {
-		QLabel *helpIcon = new QLabel(this);
-		helpIcon->setPixmap((QIcon::fromTheme("info2")).pixmap(15,15));
-		helpIcon->setToolTip(toolTip);
-		helpIcon->setMaximumSize(10,40);
-		layout->addWidget(helpIcon,0,1, Qt::AlignLeft);
-	}
-	layout->addWidget(label,0,0);
 }

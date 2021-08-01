@@ -15,7 +15,7 @@
 #include "recordingstable.hpp"
 #include "datasetcreator.hpp"
 #include "progressinfowindow.hpp"
-
+#include "labelwithtooltip.hpp"
 
 
 #include <QPushButton>
@@ -90,13 +90,6 @@ class NewDatasetWindow : public QWidget {
 			void savePresetSlot(const QString& preset);
 			void loadPresetSlot(const QString& preset);
 
-};
-
-
-class LabelWithToolTip : public QWidget {
-	Q_OBJECT
-	public:
-		explicit LabelWithToolTip(QString name, QString toolTip, QWidget *parent = nullptr);
 };
 
 

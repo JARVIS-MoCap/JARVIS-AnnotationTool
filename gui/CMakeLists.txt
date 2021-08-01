@@ -1,11 +1,11 @@
 project (gui)
 
 add_subdirectory(Qt-DarkStyle)
-add_subdirectory(videocutter)
 add_subdirectory(newdatasetwindow)
 add_subdirectory(newcalibrationwidget)
 add_subdirectory(exportdatasetwidget)
 add_subdirectory(editor)
+add_subdirectory(conveniencewidgets)
 
 
 add_library(${PROJECT_NAME}
@@ -27,11 +27,12 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
   Qt5::Widgets
-	Qt5::Charts
+  src
   editor
-	src
+  newdatasetwindow
   newcalibrationwidget
   exportdatasetwidget
+  conveniencewidgets
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused)
