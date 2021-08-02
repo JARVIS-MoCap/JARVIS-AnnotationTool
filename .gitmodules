@@ -1,6 +1,0 @@
-[submodule "libs/libcbdetect"]
-	path = libs/libcbdetect
-	url = https://github.com/ftdlyc/libcbdetect.git
-[submodule "libs/yaml-cpp"]
-	path = libs/yaml-cpp
-	url = https://github.com/jbeder/yaml-cpp.git
