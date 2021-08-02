@@ -1,15 +1,7 @@
 project (src)
 
+
 add_subdirectory(calibrationtool)
-
-set(CMAKE_PREFIX_PATH "../libs/${STATIC_LIB_LOCATION}")
-
-set(OpenCV_DIR "../libs/${STATIC_LIB_LOCATION}/${OPENCV_LIBRARY_NAME}/lib/cmake/opencv4")
-set(OpenCV_STATIC ON)
-
-if(NOT WIN32)
-	find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-endif()
 
 find_package(OpenCV REQUIRED)
 message("OPENCV_DIR ${OpenCV_DIR}")

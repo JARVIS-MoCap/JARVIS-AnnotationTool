@@ -45,10 +45,18 @@ find_package(Qt5MultimediaWidgets REQUIRED)
 
 message (STATUS "QT DIRECTORY ${Qt5Core_DIR}")
 
-
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+
+set(CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/libs/${STATIC_LIB_LOCATION}" CACHE STRING "OpenCV Prefix")
+set(OpenCV_DIR "${PROJECT_SOURCE_DIR}/libs/${STATIC_LIB_LOCATION}/${OPENCV_LIBRARY_NAME}/lib/cmake/opencv4" CACHE STRING "OpenCV Directory")
+set(OpenCV_STATIC ON CACHE STRING "OpenCV static")
+
+if(NOT WIN32)
+	find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+endif()
+
 
 
 # detect operating system and host processor

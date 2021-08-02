@@ -1,8 +1,5 @@
 project (calibrationtool)
 
-#include_directories(libcbdetect/include)
-add_subdirectory(libcbdetect)
-add_subdirectory(yaml-cpp)
 
 add_library(${PROJECT_NAME}
   calibrationtool.hpp
@@ -15,7 +12,7 @@ add_library(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-    libcbdetect/include
+    libcbdetect
     ${PROJECT_SOURCE_DIR}
     ../../
     ../
@@ -26,7 +23,6 @@ target_link_libraries(${PROJECT_NAME}
   Qt5::Widgets
   cbdetect
   tbb
-  yaml-cpp
   opencv_core
   opencv_calib3d
   opencv_videoio
