@@ -28,7 +28,7 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	QThread *thread = new QThread;
 	datasetCreator->moveToThread(thread);
 	thread->start();
-	progressInfoWindow = new ProgressInfoWindow(this);
+	datasetProgressInfoWindow = new DatasetProgressInfoWindow(this);
 	m_errorMsg = new QErrorMessage();
 
 	QLabel *newDatasetLabel = new QLabel("New Dataset");
@@ -141,12 +141,12 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	connect(datasetCreator, &DatasetCreator::datasetCreationFailed, this, &NewDatasetWindow::datasetCreationFailedSlot);
 
 	//Signal relay
-	connect(datasetCreator, &DatasetCreator::dctProgress, progressInfoWindow, &ProgressInfoWindow::dctProgressSlot);
-	connect(datasetCreator, &DatasetCreator::recordingBeingProcessedChanged, progressInfoWindow, &ProgressInfoWindow::recordingBeingProcessedChangedSlot);
-	connect(datasetCreator, &DatasetCreator::currentSegmentChanged, progressInfoWindow, &ProgressInfoWindow::segmentNameChangedSlot);
-	connect(datasetCreator, &DatasetCreator::startedClustering, progressInfoWindow, &ProgressInfoWindow::startedClusteringSlot);
-	connect(datasetCreator, &DatasetCreator::finishedClustering, progressInfoWindow, &ProgressInfoWindow::finishedClusteringSlot);
-	connect(datasetCreator, &DatasetCreator::copyImagesStatus, progressInfoWindow, &ProgressInfoWindow::copyImagesStatusSlot);
+	connect(datasetCreator, &DatasetCreator::dctProgress, datasetProgressInfoWindow, &DatasetProgressInfoWindow::dctProgressSlot);
+	connect(datasetCreator, &DatasetCreator::recordingBeingProcessedChanged, datasetProgressInfoWindow, &DatasetProgressInfoWindow::recordingBeingProcessedChangedSlot);
+	connect(datasetCreator, &DatasetCreator::currentSegmentChanged, datasetProgressInfoWindow, &DatasetProgressInfoWindow::segmentNameChangedSlot);
+	connect(datasetCreator, &DatasetCreator::startedClustering, datasetProgressInfoWindow, &DatasetProgressInfoWindow::startedClusteringSlot);
+	connect(datasetCreator, &DatasetCreator::finishedClustering, datasetProgressInfoWindow, &DatasetProgressInfoWindow::finishedClusteringSlot);
+	connect(datasetCreator, &DatasetCreator::copyImagesStatus, datasetProgressInfoWindow, &DatasetProgressInfoWindow::copyImagesStatusSlot);
 
 
 }
@@ -185,13 +185,13 @@ void NewDatasetWindow::createDatasetClickedSlot() {
 	createButton->setEnabled(false);
 	emit toggleExitButton(false);
 	emit createDataset(recordingsTable->getItems(), entitiesItemList->getItems(), keypointsItemList->getItems());
-	progressInfoWindow->show();
+	datasetProgressInfoWindow->show();
 }
 
 void NewDatasetWindow::datasetCreatedSot() {
 	createButton->setEnabled(true);
 	emit toggleExitButton(true);
-	progressInfoWindow->hide();
+	datasetProgressInfoWindow->hide();
 }
 
 void NewDatasetWindow::datasetCreationFailedSlot(QString errorMsg) {
@@ -215,17 +215,11 @@ void NewDatasetWindow::loadPresetsClickedSlot() {
 void NewDatasetWindow::savePresetSlot(const QString& preset) {
 	settings->beginGroup(preset);
 	settings->beginGroup("entitiesItemList");
-	QList<QString> entItemsList;
-	for (const auto& item : entitiesItemList->itemSelectorList->findItems("",Qt::MatchContains)) {
-		entItemsList.append(item->text());
-	}
+	QList<QString> entItemsList = entitiesItemList->getItems();
 	settings->setValue("itemsList", QVariant::fromValue(entItemsList));
 	settings->endGroup();
 	settings->beginGroup("keypointItemList");
-	QList<QString> keyItemsList;
-	for (const auto& item : keypointsItemList->itemSelectorList->findItems("",Qt::MatchContains)) {
-		keyItemsList.append(item->text());
-	}
+	QList<QString> keyItemsList = keypointsItemList->getItems();
 	settings->setValue("itemsList", QVariant::fromValue(keyItemsList));
 	settings->endGroup();
 	settings->endGroup();
@@ -233,19 +227,19 @@ void NewDatasetWindow::savePresetSlot(const QString& preset) {
 
 
 void NewDatasetWindow::loadPresetSlot(const QString& preset) {
-	entitiesItemList->itemSelectorList->clear();
-	keypointsItemList->itemSelectorList->clear();
+	entitiesItemList->clear();
+	keypointsItemList->clear();
 	settings->beginGroup(preset);
 	settings->beginGroup("entitiesItemList");
 	QList<QString>entIitemsList = settings->value("itemsList").value<QList<QString>>();
 	for (const auto& item : entIitemsList) {
-		entitiesItemList->itemSelectorList->addItem(item);
+		entitiesItemList->addItem(item);
 	}
 	settings->endGroup();
 	settings->beginGroup("keypointItemList");
 	QList<QString> keyItemsList = settings->value("itemsList").value<QList<QString>>();
 	for (const auto& item : keyItemsList) {
-		keypointsItemList->itemSelectorList->addItem(item);
+		keypointsItemList->addItem(item);
 	}
 	settings->endGroup();
 	settings->endGroup();

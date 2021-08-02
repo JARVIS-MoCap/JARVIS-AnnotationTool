@@ -6,11 +6,11 @@ add_library(${PROJECT_NAME}
   newdatasetwindow.hpp
   recordingstable.hpp
   presetswindow.hpp
-  progressinfowindow.hpp
+  datasetprogressinfowindow.hpp
   newdatasetwindow.cpp
   recordingstable.cpp
   presetswindow.cpp
-  progressinfowindow.cpp
+  datasetprogressinfowindow.cpp
 )
 
 target_include_directories(${PROJECT_NAME}

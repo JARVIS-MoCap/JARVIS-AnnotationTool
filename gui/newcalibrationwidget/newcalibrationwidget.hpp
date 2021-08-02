@@ -14,6 +14,8 @@
 #include "pathwidget.hpp"
 #include "configurableitemlist.hpp"
 #include "extrinsicspairlist.hpp"
+#include "calibrationtool.hpp"
+#include "calibrationprogressinfowindow.hpp"
 
 #include <QPushButton>
 #include <QTableWidget>
@@ -36,6 +38,7 @@ class NewCalibrationWidget : public QWidget {
 	public slots:
 
 	signals:
+		void makeCalibrationSet();
 
 	private:
 		QSettings *settings;
@@ -44,10 +47,13 @@ class NewCalibrationWidget : public QWidget {
 		PresetsWindow *savePresetsWindow;
 		QList<QString> presets;
 
-		QPushButton *loadButton;
-		QPushButton *saveButton;
-		QPushButton *calibrateButton;
+		CalibrationTool *calibrationTool;
+		CalibrationProgressInfoWindow *calibrationProgressInfoWindow;
+		CalibrationConfig *m_calibrationConfig;
+		QList<QString> m_validRecordingFormats = {"avi", "mp4"};
 
+		QLineEdit *calibrationSetNameEdit;
+		DirPathWidget *calibrationSetPathWidget;
 		YesNoRadioWidget *seperateRadioWidget;
 		YesNoRadioWidget *calibrateIntrinsicsRadioWidget;
 		YesNoRadioWidget *calibrateExtrinsicsRadioWidget;
@@ -63,12 +69,23 @@ class NewCalibrationWidget : public QWidget {
 
 		ExtrinsicsPairList *extrinsicsPairList;
 
+		QPushButton *loadButton;
+		QPushButton *saveButton;
+		QPushButton *calibrateButton;
+
+		bool checkIntrinsics(const QString& path);
+		bool checkExtrinsics(const QString& path);
+		bool checkIsValidRecording(const QString& path, const QString& recording);
+
 
 	private slots:
 		void savePresetsClickedSlot();
 		void loadPresetsClickedSlot();
 		void savePresetSlot(const QString& preset);
 		void loadPresetSlot(const QString& preset);
+		void calibrateClickedSlot();
+		void calibrationFinishedSlot();
+		void intrinsicsProgressSlot(int count, int frameCount, int threadNumber);
 
 };
 

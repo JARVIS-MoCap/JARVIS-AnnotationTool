@@ -1,5 +1,6 @@
 project (src)
 
+add_subdirectory(calibrationtool)
 
 set(CMAKE_PREFIX_PATH "../libs/${STATIC_LIB_LOCATION}")
 

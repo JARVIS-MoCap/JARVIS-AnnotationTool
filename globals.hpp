@@ -68,12 +68,28 @@ struct TimeLineWindow {
 
 };
 
-
 struct RecordingItem {
 	QString name;
 	QString path;
 	QList<TimeLineWindow> timeLineList;
 	int frameCount = 0;
+};
+
+struct CalibrationConfig {
+	QString calibrationSetName;
+	QString calibrationSetPath;
+	bool seperateIntrinsics;
+	bool calibrateIntrinsics;
+	bool calibrateExtrinsics;
+	QString intrinsicsPath;
+	QString extrinsicsPath;
+	int framesForIntrinsics;
+	int framesForExtrinsics;
+	int patternWidth;
+	int patternHeight;
+	double patternSideLength;
+	QList<QString> cameraNames;
+	QList<QList<QString>> cameraPairs;
 };
 
 

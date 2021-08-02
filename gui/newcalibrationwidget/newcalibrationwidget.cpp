@@ -23,6 +23,13 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	layout->setHorizontalSpacing(100);
 	m_errorMsg = new QErrorMessage();
 
+	m_calibrationConfig = new CalibrationConfig;
+	calibrationTool = new CalibrationTool(m_calibrationConfig);
+	QThread *thread = new QThread;
+	calibrationTool->moveToThread(thread);
+	thread->start();
+	connect(this, &NewCalibrationWidget::makeCalibrationSet, calibrationTool, &CalibrationTool::makeCalibrationSet);
+
 	loadPresetsWindow = new PresetsWindow(&presets, "load", "New Calibration Widget/");
 	savePresetsWindow = new PresetsWindow(&presets, "save", "New Calibration Widget/");
 	connect(loadPresetsWindow, SIGNAL(loadPreset(QString)), this, SLOT(loadPresetSlot(QString)));
@@ -39,23 +46,33 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	QGridLayout *generallayout = new QGridLayout(generalWidget);
 	generallayout->setMargin(0);
 	generalLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
+	LabelWithToolTip *calibrationSetNameLabel = new LabelWithToolTip("  Calibration Set Name");
+	calibrationSetNameEdit = new QLineEdit("New Calibration Set");
+	LabelWithToolTip *calibrationSetPathLabel = new LabelWithToolTip("  Calibration Set Savepath");
+	calibrationSetPathWidget = new DirPathWidget("Select Calibration Set Savepath");
 	LabelWithToolTip *seperateIntrinsicsLabel = new LabelWithToolTip("  Seperate Recordings for Intrinsics");
 	seperateRadioWidget = new YesNoRadioWidget(generalWidget);
 	seperateRadioWidget->setState(true);
+	//connect(seperateRadioWidget, &YesNoRadioWidget::stateChanged, this, &NewCalibrationWidget::sperateRadioStateChanged);
 	LabelWithToolTip *calibrateIntrinsicsLabel = new LabelWithToolTip("  Calibrate Intrinsics");
 	calibrateIntrinsicsRadioWidget = new YesNoRadioWidget(generalWidget);
 	calibrateIntrinsicsRadioWidget->setState(true);
+	calibrateIntrinsicsRadioWidget->setEnabled(false);
 	LabelWithToolTip *CalibrateExtrinsicsLabel = new LabelWithToolTip("  Calibrate Extrinsics");
 	calibrateExtrinsicsRadioWidget = new YesNoRadioWidget(generalWidget);
 	calibrateExtrinsicsRadioWidget->setState(true);
 	LabelWithToolTip *intrinsicsPathLabel = new LabelWithToolTip("  Intrinsics Folder Path");
-	intrinsicsPathWidget = new DirPathWidget("  Select Intrinsics Path");
+	intrinsicsPathWidget = new DirPathWidget("Select Intrinsics Path");
 	//make sure it emits edited signal when changing text
 	LabelWithToolTip *extrinsicsPathLabel = new LabelWithToolTip("  Extrinsics Folder Path");
-	extrinsicsPathWidget = new DirPathWidget("  Select Extrinsics Path");
+	extrinsicsPathWidget = new DirPathWidget("Select Extrinsics Path");
 	QLabel *checkerBoardLabel = new QLabel("Checkerboard Layout");
 	checkerBoardLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
 	int i = 0;
+	generallayout->addWidget(calibrationSetNameLabel,i,0);
+	generallayout->addWidget(calibrationSetNameEdit,i++,1);
+	generallayout->addWidget(calibrationSetPathLabel,i,0);
+	generallayout->addWidget(calibrationSetPathWidget,i++,1);
 	generallayout->addWidget(seperateIntrinsicsLabel,i,0);
 	generallayout->addWidget(seperateRadioWidget,i++,1);
 	generallayout->addWidget(calibrateIntrinsicsLabel,i,0);
@@ -157,7 +174,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	middleSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	calibrateButton = new QPushButton("Calibrate");
 	calibrateButton->setMinimumSize(40,40);
-	//connect(createButton, &QPushButton::clicked, this, &NewDatasetWindow::createDatasetClickedSlot);
+	connect(calibrateButton, &QPushButton::clicked, this, &NewCalibrationWidget::calibrateClickedSlot);
 	buttonbarlayout->addWidget(saveButton, 0,0);
 	buttonbarlayout->addWidget(loadButton,0,1);
 	buttonbarlayout->addWidget(middleSpacer,0,2);
@@ -169,11 +186,99 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	layout->addWidget(cameraPairsBox,2,1);
 	layout->addWidget(buttonBarWidget,3,0,1,2);
 
+	connect(calibrationTool, &CalibrationTool::calibrationFinished, this, &NewCalibrationWidget::calibrationFinishedSlot);
 	//Signal Relay:
 	connect(cameraList, &ConfigurableItemList::itemsChanged, extrinsicsPairList, &ExtrinsicsPairList::cameraNamesChangedSlot);
-
 }
 
+void NewCalibrationWidget::calibrateClickedSlot() {
+	QString intrinsicsPath = intrinsicsPathWidget->path();
+	QString extrinsicsPath = extrinsicsPathWidget->path();
+	QList<QString> cameraNames = cameraList->getItems();
+	QList<QList<QString>> cameraPairs = extrinsicsPairList->getItems();
+	if (seperateRadioWidget->state() && calibrateIntrinsicsRadioWidget->state()) {
+		if (!checkIntrinsics(intrinsicsPath)) {
+			m_errorMsg->showMessage("Could not find  all Intrinsics Recordings. Make sure the Path is correct and the recording names match the camera names given.");
+			return;
+		}
+	}
+	if (!seperateRadioWidget->state() || calibrateExtrinsicsRadioWidget->state()) {
+		if (!checkExtrinsics(extrinsicsPath)) {
+			m_errorMsg->showMessage("Could not find  all Extrinsics Recordings. Make sure the Path is correct and the folder structure and recording names match the camera pairs you defined.");
+			return;
+		}
+	}
+
+	m_calibrationConfig->calibrationSetName = calibrationSetNameEdit->text();
+	m_calibrationConfig->calibrationSetPath = calibrationSetPathWidget->path();
+	m_calibrationConfig->seperateIntrinsics = seperateRadioWidget->state();
+	m_calibrationConfig->calibrateIntrinsics = calibrateIntrinsicsRadioWidget->state();
+	m_calibrationConfig->calibrateExtrinsics = calibrateExtrinsicsRadioWidget->state();
+	m_calibrationConfig->intrinsicsPath = intrinsicsPathWidget->path();
+	m_calibrationConfig->extrinsicsPath = extrinsicsPathWidget->path();
+	m_calibrationConfig->framesForIntrinsics = intrinsicsFramesEdit->value();
+	m_calibrationConfig->framesForExtrinsics = extrinsicsFramesEdit->value();
+	m_calibrationConfig->patternWidth = widthEdit->value();
+	m_calibrationConfig->patternHeight = heightEdit->value();
+	m_calibrationConfig->patternSideLength = sideLengthEdit->value();
+	m_calibrationConfig->cameraNames = cameraList->getItems();
+	m_calibrationConfig->cameraPairs = extrinsicsPairList->getItems();
+	emit makeCalibrationSet();
+	calibrationProgressInfoWindow = new CalibrationProgressInfoWindow(m_calibrationConfig->cameraNames, m_calibrationConfig->cameraPairs, this);
+	connect(calibrationTool, &CalibrationTool::intrinsicsProgress, calibrationProgressInfoWindow, &CalibrationProgressInfoWindow::updateIntrinsicsProgressSlot);
+	connect(calibrationTool, &CalibrationTool::extrinsicsProgress, calibrationProgressInfoWindow, &CalibrationProgressInfoWindow::updateExtrinsicsProgressSlot);
+	calibrationProgressInfoWindow->exec();
+}
+
+void NewCalibrationWidget::calibrationFinishedSlot() {
+	calibrationProgressInfoWindow->accept();
+}
+
+
+bool NewCalibrationWidget::checkIntrinsics(const QString& path) {
+	QList<QString> cameraNames = cameraList->getItems();
+	bool allFilesValid = true;
+	for (const auto & cam : cameraNames) {
+		if (!checkIsValidRecording(path, cam)) {
+			allFilesValid = false;
+		}
+	}
+	return allFilesValid;
+}
+
+
+bool NewCalibrationWidget::checkExtrinsics(const QString& path) {
+	QList<QList<QString>> cameraPairs = extrinsicsPairList->getItems();
+	bool allFilesValid = true;
+	for (const auto & pair : cameraPairs) {
+		if (pair.size() == 2) {
+			bool primaryValid = checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[0]);
+			bool secondaryValid = checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[1]);
+			if (!primaryValid || !secondaryValid) allFilesValid = false;
+		}
+		else if (pair.size() == 3) {
+			bool primaryValid1 = checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[0]);
+			bool secondaryValid1 = checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[1]);
+			bool primaryValid2 = checkIsValidRecording(path + "/" + pair[1] + "-" + pair[2], pair[1]);
+			bool secondaryValid2 = checkIsValidRecording(path + "/" + pair[1] + "-" + pair[2], pair[2]);
+			if (!primaryValid1 || !secondaryValid1 || !primaryValid2 || !secondaryValid2) allFilesValid = false;
+		}
+	}
+	return allFilesValid;
+}
+
+
+bool NewCalibrationWidget::checkIsValidRecording(const QString& path, const QString& recording) {
+	bool validFileFound = false;
+	for (const auto& format : m_validRecordingFormats) {
+		if (QFile::exists(path + "/" + recording  + "." + format)) validFileFound = true;
+	}
+	return validFileFound;
+}
+
+void NewCalibrationWidget::intrinsicsProgressSlot(int count, int frameCount, int threadNumber){
+	std::cout << "Progress Thread " << threadNumber << ": " << count << "/" << frameCount << std::endl;
+}
 
 
 void NewCalibrationWidget::savePresetsClickedSlot() {
@@ -191,10 +296,7 @@ void NewCalibrationWidget::loadPresetsClickedSlot() {
 void NewCalibrationWidget::savePresetSlot(const QString& preset) {
 	settings->beginGroup(preset);
 	settings->beginGroup("cameraNames");
-	QList<QString> cameraNames;
-	for (const auto& item : cameraList->itemSelectorList->findItems("",Qt::MatchContains)) {
-		cameraNames.append(item->text());
-	}
+	QList<QString> cameraNames = cameraList->getItems();
 	settings->setValue("itemsList", QVariant::fromValue(cameraNames));
 	settings->endGroup();
 	settings->beginGroup("cameraPairs");
@@ -218,12 +320,12 @@ void NewCalibrationWidget::savePresetSlot(const QString& preset) {
 
 
 void NewCalibrationWidget::loadPresetSlot(const QString& preset) {
-	cameraList->itemSelectorList->clear();
+	cameraList->clear();
 	settings->beginGroup(preset);
 	settings->beginGroup("cameraNames");
 	QList<QString>cameraNames = settings->value("itemsList").value<QList<QString>>();
 	for (const auto& item : cameraNames) {
-		cameraList->itemSelectorList->addItem(item);
+		cameraList->addItem(item);
 	}
 	settings->endGroup();
 	settings->beginGroup("cameraPairs");

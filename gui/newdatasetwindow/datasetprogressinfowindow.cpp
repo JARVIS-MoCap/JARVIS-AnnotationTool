@@ -5,12 +5,12 @@
  * Contact: 	timo.hueser@gmail.com
  *****************************************************************/
 
-#include "progressinfowindow.hpp"
+#include "datasetprogressinfowindow.hpp"
 
 #include <QGridLayout>
 
 
-ProgressInfoWindow::ProgressInfoWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
+DatasetProgressInfoWindow::DatasetProgressInfoWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
 	this->resize(700,120);
 	this->setMinimumSize(500,140);
@@ -31,34 +31,34 @@ ProgressInfoWindow::ProgressInfoWindow(QWidget *parent) : QWidget(parent, Qt::Wi
 }
 
 
-void ProgressInfoWindow::recordingBeingProcessedChangedSlot(QString recording) {
+void DatasetProgressInfoWindow::recordingBeingProcessedChangedSlot(QString recording) {
 	recordingLabel->setText("Processing Recording " + recording + ":");
 }
 
-void ProgressInfoWindow::segmentNameChangedSlot(QString segmentName) {
+void DatasetProgressInfoWindow::segmentNameChangedSlot(QString segmentName) {
 	m_currentSegmentName = segmentName;
 }
 
-void ProgressInfoWindow::dctProgressSlot(int index, int windowSize) {
+void DatasetProgressInfoWindow::dctProgressSlot(int index, int windowSize) {
 	operationLabel->setText("Extracting image features for k-means Clustering for segement \"" + m_currentSegmentName + "\"...");
 	progressBar->setRange(0, windowSize);
 	progressBar->setValue(index);
 }
 
-void ProgressInfoWindow::startedClusteringSlot() {
+void DatasetProgressInfoWindow::startedClusteringSlot() {
 	operationLabel->setText("Started k-means Clustering. This might take a while...");
 	progressBar->hide();
 }
 
-void ProgressInfoWindow::finishedClusteringSlot() {
+void DatasetProgressInfoWindow::finishedClusteringSlot() {
 	operationLabel->setText("Finished k-means Clustering!");
 	progressBar->show();
 }
 
-void ProgressInfoWindow::copyingFramesSlot() {
+void DatasetProgressInfoWindow::copyingFramesSlot() {
 }
 
-void ProgressInfoWindow::copyImagesStatusSlot(int frameCount, int totalNumFrames) {
+void DatasetProgressInfoWindow::copyImagesStatusSlot(int frameCount, int totalNumFrames) {
 	if (m_currentSegmentName == "") {
 		operationLabel->setText("Copying Frames to dataset folder...");
 	}

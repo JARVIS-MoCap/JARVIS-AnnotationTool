@@ -1,12 +1,12 @@
 /*****************************************************************
- * File:			progressinfowindow.hpp
+ * File:			datasetprogressinfowindow.hpp
  * Created: 	24. July 2021
  * Author:   	Timo Hüser
  * Contact: 	timo.hueser@gmail.com
  ******************************************************************/
 
-#ifndef PROGRSSINFOWINDOW_H
-#define PROGRSSINFOWINDOW_H
+#ifndef DATASETPROGRSSINFOWINDOW_H
+#define DATASETPROGRSSINFOWINDOW_H
 
 #include "globals.hpp"
 
@@ -16,10 +16,10 @@
 #include <QProgressBar>
 
 
-class ProgressInfoWindow : public QWidget {
+class DatasetProgressInfoWindow : public QWidget {
 	Q_OBJECT
 	public:
-		explicit ProgressInfoWindow(QWidget *parent = nullptr);
+		explicit DatasetProgressInfoWindow(QWidget *parent = nullptr);
 
 	public slots:
 		void recordingBeingProcessedChangedSlot(QString recording);

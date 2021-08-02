@@ -14,7 +14,7 @@
 #include "configurableitemlist.hpp"
 #include "recordingstable.hpp"
 #include "datasetcreator.hpp"
-#include "progressinfowindow.hpp"
+#include "datasetprogressinfowindow.hpp"
 #include "labelwithtooltip.hpp"
 
 
@@ -44,7 +44,7 @@ class NewDatasetWindow : public QWidget {
 	private:
 		DatasetConfig	*m_datasetConfig;
 		DatasetCreator *datasetCreator;
-		ProgressInfoWindow *progressInfoWindow;
+		DatasetProgressInfoWindow *datasetProgressInfoWindow;
 		QSettings *settings;
 		PresetsWindow *loadPresetsWindow;
 		PresetsWindow *savePresetsWindow;

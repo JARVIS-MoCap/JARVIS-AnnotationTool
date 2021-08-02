@@ -21,14 +21,16 @@ class ConfigurableItemList : public QWidget {
 	Q_OBJECT
 	public:
 		explicit ConfigurableItemList(QString name, QWidget *parent = nullptr);
-		QListWidget *itemSelectorList;
 
 		QList<QString> getItems();
+		void clear() {itemSelectorList->clear();};
+		void addItem(QString item) {itemSelectorList->addItem(item);}; 
 
 	signals:
 		void itemsChanged(QList<QString> items);
 
 	private:
+		QListWidget *itemSelectorList;
 		QString m_name;
 		QPushButton *moveItemUpButton;
 		QPushButton *moveItemDownButton;

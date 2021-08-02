@@ -4,6 +4,8 @@ add_library(${PROJECT_NAME}
   exportdatasetwidget.hpp
   exportdatasetwidget.cpp
 )
+message ("Source ${PROJECT_SOURCE_DIR}")
+
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC

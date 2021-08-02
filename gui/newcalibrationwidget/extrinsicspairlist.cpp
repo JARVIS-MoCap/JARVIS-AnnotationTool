@@ -61,7 +61,7 @@ void ExtrinsicsPairList::setItems(QList<QList<QString>> items) {
 		}
 		else if (newPair.size() == 3) {
 			m_cameraPairs.append(newPair);
-			itemSelectorList->addItem(newPair[0] + " --> " + newPair[1] + " --> " + newPair[1]);
+			itemSelectorList->addItem(newPair[0] + " --> " + newPair[1] + " --> " + newPair[2]);
 		}
 	}
 }
