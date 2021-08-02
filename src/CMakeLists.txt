@@ -3,9 +3,6 @@ project (src)
 
 add_subdirectory(calibrationtool)
 
-find_package(OpenCV REQUIRED)
-message("OPENCV_DIR ${OpenCV_DIR}")
-
 add_library(${PROJECT_NAME}
 	keypoint.hpp
 	colormap.hpp

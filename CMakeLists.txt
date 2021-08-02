@@ -1,71 +1,60 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
 
-
-project(AnnotationTool VERSION 1.0.0  LANGUAGES CXX)
+project(AnnotationTool VERSION 0.2.0  LANGUAGES CXX)
 
 #find_package(Qt5 COMPONENTS Widgets Core Gui Charts REQUIRED)
 
 if(APPLE)
-  set(STATIC_LIB_LOCATION "Apple")
-  set(QT_LIBRARY_NAME "Qt5static_v5.15.2")
-  set(OPENCV_LIBRARY_NAME "opencv_static")
+  set(OS_LIB_DIR "MacOS")
 elseif(WIN32)
-  set(STATIC_LIB_LOCATION "Windows")
-  set(QT_LIBRARY_NAME "Qt5static_v5.15.2")
-  set(OPENCV_LIBRARY_NAME "opencv_static")
+  set(OS_LIB_DIR "Windows")
 elseif(UNIX)
-  set(STATIC_LIB_LOCATION "Linux")
   if(${CMAKE_SYSTEM} MATCHES "Linux-5.8")
-    set(QT_LIBRARY_NAME "Qt5static_v5.15.2_2004")
-    set(OPENCV_LIBRARY_NAME "opencv_static_2004")
+    set(OS_LIB_DIR "Ubuntu_2004")
   else()
-    set(QT_LIBRARY_NAME "Qt5static_v5.15.2_1804")
-    set(OPENCV_LIBRARY_NAME "opencv_static_1804")
+    set(OS_LIB_DIR "Ubuntu_1804")
   endif()
 endif()
 
-set(CMAKE_PREFIX_PATH "libs/${STATIC_LIB_LOCATION}")
+#set(CMAKE_PREFIX_PATH "libs/${STATIC_LIB_LOCATION}")
 
-set(Qt5_DIR "libs/${STATIC_LIB_LOCATION}/${QT_LIBRARY_NAME}/lib/cmake/Qt5")
-set(Qt5Core_DIR "libs/${STATIC_LIB_LOCATION}/${QT_LIBRARY_NAME}/lib/cmake/Qt5Core")
-set(Qt5Widgets_DIR "libs/${STATIC_LIB_LOCATION}/${QT_LIBRARY_NAME}/lib/cmake/Qt5Widgets")
-set(Qt5Charts_DIR "libs/${STATIC_LIB_LOCATION}/${QT_LIBRARY_NAME}/lib/cmake/Qt5Charts")
-set(Qt5Multimedia_DIR "libs/${STATIC_LIB_LOCATION}/${QT_LIBRARY_NAME}/lib/cmake/Qt5Multimedia")
-set(Qt5MultimediaWidgets_DIR "libs/${STATIC_LIB_LOCATION}/${QT_LIBRARY_NAME}/lib/cmake/Qt5MultimediaWidgets")
-
-#find_package(Qt5 COMPONENTS Widgets Core Gui REQUIRED)
+set(Qt5_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5")
+set(Qt5Core_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Core")
+set(Qt5Widgets_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Widgets")
+set(Qt5Charts_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Charts")
+set(Qt5Multimedia_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Multimedia")
+set(Qt5MultimediaWidgets_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5MultimediaWidgets")
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Charts REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
 find_package(Qt5MultimediaWidgets REQUIRED)
-
-
 message (STATUS "QT DIRECTORY ${Qt5Core_DIR}")
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-set(CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/libs/${STATIC_LIB_LOCATION}" CACHE STRING "OpenCV Prefix")
-set(OpenCV_DIR "${PROJECT_SOURCE_DIR}/libs/${STATIC_LIB_LOCATION}/${OPENCV_LIBRARY_NAME}/lib/cmake/opencv4" CACHE STRING "OpenCV Directory")
-set(OpenCV_STATIC ON CACHE STRING "OpenCV static")
+#set(CMAKE_PREFIX_PATH "libs/OpenCV/${OS_LIB_DIR}")
+set(OpenCV_DIR "libs/OpenCV_4.5.1/${OS_LIB_DIR}/lib/cmake/opencv4")
+set(OpenCV_STATIC ON)
+find_package(OpenCV REQUIRED)
+message(STATUS "OPENCV_DIR ${OpenCV_DIR}")
 
 if(NOT WIN32)
 	find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 endif()
 
 
-
 # detect operating system and host processor
 message(STATUS "We are on a ${CMAKE_SYSTEM_NAME} system")
 message(STATUS "The host processor is ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 
+add_subdirectory(libs)
 add_subdirectory(gui)
 add_subdirectory(src)
-add_subdirectory(libs)
 
 
 if(APPLE)

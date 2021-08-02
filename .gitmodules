@@ -1,0 +1,3 @@
+[submodule "libs/libcbdetect"]
+	path = libs/libcbdetect
+	url = https://github.com/mocapsetup/libcbdetect.git

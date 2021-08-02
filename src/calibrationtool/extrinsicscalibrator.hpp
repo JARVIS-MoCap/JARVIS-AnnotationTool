@@ -10,11 +10,11 @@
 
 #include "globals.hpp"
 
-#include "libcbdetect/boards_from_corners.h"
-#include "libcbdetect/config.h"
-#include "libcbdetect/find_corners.h"
-#include "libcbdetect/plot_boards.h"
-#include "libcbdetect/plot_corners.h"
+#include "boards_from_corners.h"
+#include "config.h"
+#include "find_corners.h"
+//#include "plot_boards.h"
+//#include "plot_corners.h"
 
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"

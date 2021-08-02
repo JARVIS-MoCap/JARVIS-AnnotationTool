@@ -53,10 +53,10 @@ void IntrinsicsCalibrator::run() {
       int frameIndex = cap.get(cv::CAP_PROP_POS_FRAMES);
       cap.set(cv::CAP_PROP_POS_FRAMES, frameIndex+40);
       cbdetect::find_corners(img, cbCorners, params);
-      cbdetect::boards_from_corners(img, cbCorners, boards, params);
       bool patternFound = (cbCorners.p.size() >= m_calibrationConfig->patternHeight*m_calibrationConfig->patternWidth);
 
       if (patternFound) {
+        cbdetect::boards_from_corners(img, cbCorners, boards, params);
         patternFound = boardToCorners(boards[0], cbCorners, corners);
         checkRotation(corners, img);
       }
@@ -69,6 +69,7 @@ void IntrinsicsCalibrator::run() {
     }
   }
 
+  std::cout << "SADFMLKMFLMFLMF" << std::endl;
   double keep_ratio = imagePointsAll.size() / (double)std::min(m_calibrationConfig->framesForIntrinsics, (int)imagePointsAll.size());
   for (double k = 0; k < imagePointsAll.size(); k += keep_ratio) {
     imagePoints.push_back(imagePointsAll[(int)k]);

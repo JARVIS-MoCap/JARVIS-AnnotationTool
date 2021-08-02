@@ -223,15 +223,16 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	m_calibrationConfig->patternSideLength = sideLengthEdit->value();
 	m_calibrationConfig->cameraNames = cameraList->getItems();
 	m_calibrationConfig->cameraPairs = extrinsicsPairList->getItems();
-	emit makeCalibrationSet();
 	calibrationProgressInfoWindow = new CalibrationProgressInfoWindow(m_calibrationConfig->cameraNames, m_calibrationConfig->cameraPairs, this);
 	connect(calibrationTool, &CalibrationTool::intrinsicsProgress, calibrationProgressInfoWindow, &CalibrationProgressInfoWindow::updateIntrinsicsProgressSlot);
 	connect(calibrationTool, &CalibrationTool::extrinsicsProgress, calibrationProgressInfoWindow, &CalibrationProgressInfoWindow::updateExtrinsicsProgressSlot);
+	emit makeCalibrationSet();
 	calibrationProgressInfoWindow->exec();
 }
 
 void NewCalibrationWidget::calibrationFinishedSlot() {
 	calibrationProgressInfoWindow->accept();
+	delete calibrationProgressInfoWindow;
 }
 
 

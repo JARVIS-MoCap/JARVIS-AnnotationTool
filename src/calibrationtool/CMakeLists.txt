@@ -12,8 +12,8 @@ add_library(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-    libcbdetect
     ${PROJECT_SOURCE_DIR}
+    ../../libs/libcbdetect/src
     ../../
     ../
 )
