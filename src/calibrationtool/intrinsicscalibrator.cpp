@@ -30,6 +30,8 @@ void IntrinsicsCalibrator::run() {
   std::vector<std::string> fileNames;
   cv::VideoCapture cap(m_calibrationConfig->intrinsicsPath.toStdString() + "/" + m_cameraName + ".avi");
   int frameCount = cap.get(cv::CAP_PROP_FRAME_COUNT);
+  std::cout << frameCount << std::endl;
+
 
   std::vector< std::vector< cv::Point3f > > objectPointsAll, objectPoints;
   std::vector< std::vector< cv::Point2f > > imagePointsAll, imagePoints;
@@ -51,7 +53,9 @@ void IntrinsicsCalibrator::run() {
       corners.clear();
       size = img.size();
       int frameIndex = cap.get(cv::CAP_PROP_POS_FRAMES);
+      std::cout << frameIndex << std::endl;
       cap.set(cv::CAP_PROP_POS_FRAMES, frameIndex+40);
+      if (frameIndex+40 > frameCount) read_success = false;
       cbdetect::find_corners(img, cbCorners, params);
       bool patternFound = (cbCorners.p.size() >= m_calibrationConfig->patternHeight*m_calibrationConfig->patternWidth);
 
@@ -69,7 +73,6 @@ void IntrinsicsCalibrator::run() {
     }
   }
 
-  std::cout << "SADFMLKMFLMFLMF" << std::endl;
   double keep_ratio = imagePointsAll.size() / (double)std::min(m_calibrationConfig->framesForIntrinsics, (int)imagePointsAll.size());
   for (double k = 0; k < imagePointsAll.size(); k += keep_ratio) {
     imagePoints.push_back(imagePointsAll[(int)k]);

@@ -22,7 +22,6 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   Qt5::Widgets
   cbdetect
-  tbb
   opencv_core
   opencv_calib3d
   opencv_videoio

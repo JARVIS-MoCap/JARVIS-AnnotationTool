@@ -37,13 +37,14 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-#set(CMAKE_PREFIX_PATH "libs/OpenCV/${OS_LIB_DIR}")
 set(OpenCV_DIR "libs/OpenCV_4.5.1/${OS_LIB_DIR}/lib/cmake/opencv4")
 set(OpenCV_STATIC ON)
 find_package(OpenCV REQUIRED)
 message(STATUS "OPENCV_DIR ${OpenCV_DIR}")
 
 if(NOT WIN32)
+	set(Eigen3_DIR "libs/eigen-3.3.8/MacOS/build")
+	message("${EIGEN3_DIR}")
 	find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 endif()
 
