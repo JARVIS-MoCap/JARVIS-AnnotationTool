@@ -79,7 +79,6 @@ struct CalibrationConfig {
 	QString calibrationSetName;
 	QString calibrationSetPath;
 	bool seperateIntrinsics;
-	bool calibrateIntrinsics;
 	bool calibrateExtrinsics;
 	QString intrinsicsPath;
 	QString extrinsicsPath;

@@ -53,14 +53,11 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	LabelWithToolTip *seperateIntrinsicsLabel = new LabelWithToolTip("  Seperate Recordings for Intrinsics");
 	seperateRadioWidget = new YesNoRadioWidget(generalWidget);
 	seperateRadioWidget->setState(true);
-	//connect(seperateRadioWidget, &YesNoRadioWidget::stateChanged, this, &NewCalibrationWidget::sperateRadioStateChanged);
-	LabelWithToolTip *calibrateIntrinsicsLabel = new LabelWithToolTip("  Calibrate Intrinsics");
-	calibrateIntrinsicsRadioWidget = new YesNoRadioWidget(generalWidget);
-	calibrateIntrinsicsRadioWidget->setState(true);
-	calibrateIntrinsicsRadioWidget->setEnabled(false);
+	connect(seperateRadioWidget, &YesNoRadioWidget::stateChanged, this, &NewCalibrationWidget::sperateRadioStateChangedSlot);
 	LabelWithToolTip *CalibrateExtrinsicsLabel = new LabelWithToolTip("  Calibrate Extrinsics");
 	calibrateExtrinsicsRadioWidget = new YesNoRadioWidget(generalWidget);
 	calibrateExtrinsicsRadioWidget->setState(true);
+	connect(calibrateExtrinsicsRadioWidget, &YesNoRadioWidget::stateChanged, this, &NewCalibrationWidget::calibrateExtrinsicsRadioStateChangedSlot);
 	LabelWithToolTip *intrinsicsPathLabel = new LabelWithToolTip("  Intrinsics Folder Path");
 	intrinsicsPathWidget = new DirPathWidget("Select Intrinsics Path");
 	//make sure it emits edited signal when changing text
@@ -75,8 +72,6 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	generallayout->addWidget(calibrationSetPathWidget,i++,1);
 	generallayout->addWidget(seperateIntrinsicsLabel,i,0);
 	generallayout->addWidget(seperateRadioWidget,i++,1);
-	generallayout->addWidget(calibrateIntrinsicsLabel,i,0);
-	generallayout->addWidget(calibrateIntrinsicsRadioWidget,i++,1);
 	generallayout->addWidget(CalibrateExtrinsicsLabel,i,0);
 	generallayout->addWidget(calibrateExtrinsicsRadioWidget,i++,1);
 	generallayout->addWidget(intrinsicsPathLabel,i,0);
@@ -196,7 +191,7 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	QString extrinsicsPath = extrinsicsPathWidget->path();
 	QList<QString> cameraNames = cameraList->getItems();
 	QList<QList<QString>> cameraPairs = extrinsicsPairList->getItems();
-	if (seperateRadioWidget->state() && calibrateIntrinsicsRadioWidget->state()) {
+	if (seperateRadioWidget->state()) {
 		if (!checkIntrinsics(intrinsicsPath)) {
 			m_errorMsg->showMessage("Could not find  all Intrinsics Recordings. Make sure the Path is correct and the recording names match the camera names given.");
 			return;
@@ -212,7 +207,6 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	m_calibrationConfig->calibrationSetName = calibrationSetNameEdit->text();
 	m_calibrationConfig->calibrationSetPath = calibrationSetPathWidget->path();
 	m_calibrationConfig->seperateIntrinsics = seperateRadioWidget->state();
-	m_calibrationConfig->calibrateIntrinsics = calibrateIntrinsicsRadioWidget->state();
 	m_calibrationConfig->calibrateExtrinsics = calibrateExtrinsicsRadioWidget->state();
 	m_calibrationConfig->intrinsicsPath = intrinsicsPathWidget->path();
 	m_calibrationConfig->extrinsicsPath = extrinsicsPathWidget->path();
@@ -281,6 +275,26 @@ void NewCalibrationWidget::intrinsicsProgressSlot(int count, int frameCount, int
 	std::cout << "Progress Thread " << threadNumber << ": " << count << "/" << frameCount << std::endl;
 }
 
+void NewCalibrationWidget::sperateRadioStateChangedSlot(bool state) {
+	if (state) {
+		intrinsicsPathWidget->setEnabled(true);
+		calibrateExtrinsicsRadioWidget->setEnabled(true);
+	}
+	else {
+		intrinsicsPathWidget->setEnabled(false);
+		calibrateExtrinsicsRadioWidget->setState(true);
+		calibrateExtrinsicsRadioWidget->setEnabled(false);
+	}
+}
+
+void NewCalibrationWidget::calibrateExtrinsicsRadioStateChangedSlot(bool state) {
+	if (state) {
+		extrinsicsPathWidget->setEnabled(true);
+	}
+	else {
+		extrinsicsPathWidget->setEnabled(false);
+	}
+}
 
 void NewCalibrationWidget::savePresetsClickedSlot() {
 	savePresetsWindow->updateListSlot();
@@ -306,7 +320,6 @@ void NewCalibrationWidget::savePresetSlot(const QString& preset) {
 	settings->beginGroup("Configuration");
 	std::cout << "State: " << seperateRadioWidget->state() << std::endl;
 	settings->setValue("seperateIntrinsics", seperateRadioWidget->state());
-	settings->setValue("calibrateIntrinsics", calibrateIntrinsicsRadioWidget->state());
 	settings->setValue("calibrateExtrinsics", calibrateExtrinsicsRadioWidget->state());
 	settings->setValue("intrinsicsFolder", intrinsicsPathWidget->path());
 	settings->setValue("extrinsicsFolder", extrinsicsPathWidget->path());
@@ -335,7 +348,6 @@ void NewCalibrationWidget::loadPresetSlot(const QString& preset) {
 	settings->beginGroup("Configuration");
 	std::cout << "State: " << settings->value("seperateIntrinsics").toBool() << std::endl;
 	seperateRadioWidget->setState(settings->value("seperateIntrinsics").toBool());
-	calibrateIntrinsicsRadioWidget->setState(settings->value("calibrateIntrinsics").toBool());
 	calibrateExtrinsicsRadioWidget->setState(settings->value("calibrateExtrinsics").toBool());
 	intrinsicsPathWidget->setPath(settings->value("intrinsicsFolder").toString());
 	extrinsicsPathWidget->setPath(settings->value("extrinsicsFolder").toString());

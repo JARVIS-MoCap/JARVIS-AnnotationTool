@@ -55,7 +55,6 @@ class NewCalibrationWidget : public QWidget {
 		QLineEdit *calibrationSetNameEdit;
 		DirPathWidget *calibrationSetPathWidget;
 		YesNoRadioWidget *seperateRadioWidget;
-		YesNoRadioWidget *calibrateIntrinsicsRadioWidget;
 		YesNoRadioWidget *calibrateExtrinsicsRadioWidget;
 		DirPathWidget *intrinsicsPathWidget;
 		DirPathWidget *extrinsicsPathWidget;
@@ -86,6 +85,8 @@ class NewCalibrationWidget : public QWidget {
 		void calibrateClickedSlot();
 		void calibrationFinishedSlot();
 		void intrinsicsProgressSlot(int count, int frameCount, int threadNumber);
+		void sperateRadioStateChangedSlot(bool state);
+		void calibrateExtrinsicsRadioStateChangedSlot(bool state);
 
 };
 

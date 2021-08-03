@@ -84,20 +84,21 @@ void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
     read_success = read_success1 && read_success2;
     if (read_success) {
       int frameIndex = cap1.get(cv::CAP_PROP_POS_FRAMES);
-      cap1.set(cv::CAP_PROP_POS_FRAMES, frameIndex+30);
-      cap2.set(cv::CAP_PROP_POS_FRAMES, frameIndex+30);
+      //cap1.set(cv::CAP_PROP_POS_FRAMES, frameIndex+30);
+      //cap2.set(cv::CAP_PROP_POS_FRAMES, frameIndex+30);
+      if (frameIndex > frameCount) read_success = false;
       corners1.clear();
       corners2.clear();
       size = img1.size();
 
       cbdetect::find_corners(img1, cbCorners1, params);
-      cbdetect::boards_from_corners(img1, cbCorners1, boards1, params);
       cbdetect::find_corners(img2, cbCorners2, params);
-      cbdetect::boards_from_corners(img2, cbCorners2, boards2, params);
-
       bool patternFound1 = (cbCorners1.p.size() >= m_calibrationConfig->patternHeight*m_calibrationConfig->patternWidth);
       bool patternFound2 = (cbCorners2.p.size() >= m_calibrationConfig->patternHeight*m_calibrationConfig->patternWidth);
+
       if (patternFound1 && patternFound2) {
+        cbdetect::boards_from_corners(img1, cbCorners1, boards1, params);
+        cbdetect::boards_from_corners(img2, cbCorners2, boards2, params);
         patternFound1 = boardToCorners(boards1[0], cbCorners1, corners1);
         patternFound2 = boardToCorners(boards2[0], cbCorners2, corners2);
         if (patternFound1 && patternFound2) {
@@ -108,7 +109,7 @@ void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
           objectPointsAll.push_back(checkerBoardPoints);
         }
       }
-      emit extrinsicsProgress(counter*40, frameCount, m_threadNumber);
+      emit extrinsicsProgress(counter, frameCount, m_threadNumber);
       counter++;
     }
   }

@@ -19,7 +19,7 @@ CalibrationTool::CalibrationTool(CalibrationConfig *calibrationConfig) :
 void CalibrationTool::makeCalibrationSet()  {
   std::cout << "Calibrating!!" << std::endl;
 
-  if (m_calibrationConfig->seperateIntrinsics && m_calibrationConfig->calibrateIntrinsics) {
+  if (m_calibrationConfig->seperateIntrinsics) {
 		QThreadPool *threadPool = QThreadPool::globalInstance();
     int thread = 0;
 		for (const auto& cam : m_calibrationConfig->cameraNames) {

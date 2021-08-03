@@ -164,7 +164,7 @@ void ReprojectionWidget::extrinsicsPathClickedSlot() {
 
 bool ReprojectionWidget::checkIntrinsicsPath(QString path) {
 	for (int cam = 0; cam < m_numCameras; cam++) {
-		if (!QFile::exists(path + "/" + "Intrinsics_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml")) {
+		if (!QFile::exists(path + "/" + "Intrinsics_" + Dataset::dataset->cameraName(cam) + ".yaml")) {
 			QErrorMessage *msg = new QErrorMessage();
 			msg->showMessage("Intrinsics File \"Intrinsics_" + Dataset::dataset->cameraName(cam) + ".yaml\" does not exist.");
 			return false;
@@ -175,9 +175,9 @@ bool ReprojectionWidget::checkIntrinsicsPath(QString path) {
 
 bool ReprojectionWidget::checkExtrinsicsPath(QString path) {
 	for (int cam = 0; cam < m_numCameras; cam++) {
-		if (cam != primaryCombo->currentIndex() && !QFile::exists(path + "/" + "Camera_Pair_" + primaryCombo->currentText().split("_").takeLast() + "_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml")) {
+		if (cam != primaryCombo->currentIndex() && !QFile::exists(path + "/" + "Extrinsics_" + primaryCombo->currentText() + "_" + Dataset::dataset->cameraName(cam) + ".yaml")) {
 			QErrorMessage *msg = new QErrorMessage();
-			msg->showMessage("Extrinsics File \"Camera_Pair_" + primaryCombo->currentText().split("_").takeLast() + "_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml\" does not exist.");
+			msg->showMessage("Extrinsics File \"Extrinsics_" + primaryCombo->currentText() + "_" + Dataset::dataset->cameraName(cam) + ".yaml\" does not exist.");
 			return false;
 		}
 	}
@@ -197,11 +197,11 @@ void ReprojectionWidget::initReprojectionClickedSlot() {
 	m_reprojectionActive = true;
 	QList<QString> intrinsicsList;
 	for (int cam = 0; cam < m_numCameras; cam++) {
-		intrinsicsList.append(intrinsicsPathEdit->text() + "/" + "Intrinsics_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml");
+		intrinsicsList.append(intrinsicsPathEdit->text() + "/" + "Intrinsics_" + Dataset::dataset->cameraName(cam) + ".yaml");
 	}
 	QList<QString> extrinsicsList;
 	for (int cam = 0; cam < m_numCameras; cam++) {
-			extrinsicsList.append(extrinsicsPathEdit->text() + "/" + "Camera_Pair_" + primaryCombo->currentText().split("_").takeLast() + "_" + Dataset::dataset->cameraName(cam).split("_").takeLast() + ".yaml");
+			extrinsicsList.append(extrinsicsPathEdit->text() + "/" + "Extrinsics_" + primaryCombo->currentText() +"_" + Dataset::dataset->cameraName(cam) + ".yaml");
 	}
 	reprojectionTool = new ReprojectionTool(intrinsicsList, extrinsicsList,primaryCombo->currentIndex());
 	stackedWidget->setCurrentWidget(reprojectionController);

@@ -44,14 +44,24 @@ void ReprojectionTool::readExtrinsincs(const QString& path, CameraExtrinsics& ca
 
 cv::Mat ReprojectionTool::reconstructPoint3D(QList<QPointF> points, QList<int> camerasToUse) {
 	QList<cv::Mat> camMats;
+	QList<cv::Mat> intrinsicMats;
+	QList<cv::Mat> distCoefficients;
 	for (const auto& cam : camerasToUse) {
 		cv::Mat camMat = (m_cameraExtrinsicsList[cam].locationMatrix*m_cameraIntrinsicsList[cam].intrinsicMatrix).t();
 		camMats.append(camMat);
+		distCoefficients.append(m_cameraIntrinsicsList[cam].distortionCoefficients);
+		intrinsicMats.append(m_cameraIntrinsicsList[cam].intrinsicMatrix);
 	}
 	cv::Mat A = cv::Mat::zeros(points.size()*2,4, CV_64F);
 	for (int i = 0; i < points.size(); i++) {
 		cv::Mat point = cv::Mat({points[i].x(),points[i].y()});
-		A(cv::Range(2*i, 2*i+2), cv::Range::all()) = point*camMats[i](cv::Range(2,3), cv::Range::all()) - camMats[i](cv::Range(0, 2) ,cv::Range::all());
+		cv::Mat undistPoint;
+		cv::undistortPoints(point, undistPoint, intrinsicMats[i].t(), distCoefficients[i]);
+		undistPoint.at<double>(0) = undistPoint.at<double>(0)* intrinsicMats[i].at<double>(0,0) + intrinsicMats[i].at<double>(2,0);
+		undistPoint.at<double>(1) = undistPoint.at<double>(1)* intrinsicMats[i].at<double>(1,1) + intrinsicMats[i].at<double>(2,1);
+		undistPoint = cv::Mat({undistPoint.at<double>(0),undistPoint.at<double>(1)});
+
+		A(cv::Range(2*i, 2*i+2), cv::Range::all()) = undistPoint*camMats[i](cv::Range(2,3), cv::Range::all()) - camMats[i](cv::Range(0, 2) ,cv::Range::all());
 	}
 	cv::Mat w, u, vt;
 	cv::SVD::compute(A, w, u, vt);
@@ -66,8 +76,9 @@ QList<QPointF> ReprojectionTool::reprojectPoint(cv::Mat point3D) {
 	QList<QPointF> reprojectedPoints;
 	for (int cam = 0; cam < m_cameraIntrinsicsList.size(); cam ++) {
 		cv::Rodrigues(m_cameraExtrinsicsList[cam].rotationMatrix.t(), R);
+		cv::Mat test;
 		cv::projectPoints(point3D, R, m_cameraExtrinsicsList[cam].translationVector,
-			m_cameraIntrinsicsList[cam].intrinsicMatrix.t(), m_cameraIntrinsicsList[cam].distortionCoefficients, res);
+			m_cameraIntrinsicsList[cam].intrinsicMatrix.t(), m_cameraIntrinsicsList[cam].distortionCoefficients, res);		//TODO: Took ozt distCoefficients!!
 	reprojectedPoints.append(QPointF(res.at<double>(0,0), res.at<double>(0,1)));
 	}
 	return reprojectedPoints;
