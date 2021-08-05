@@ -1,6 +1,6 @@
 /*****************************************************************
  * File:			calibrationstatisticswindow.cpp
- * Created: 	24. July 2021
+ * Created: 	05. August 2021
  * Author:		Timo Hüser
  * Contact: 	timo.hueser@gmail.com
  *****************************************************************/
@@ -47,11 +47,14 @@ CalibrationStatisticsWindow::CalibrationStatisticsWindow(QList<QString> cameraNa
 	}
 	extrinsicsChartView = new CalibrationChartView(cameraPairNames, extrinsicsReproErrorsVec);
 
+	closeButton = new QPushButton("Close");
+	closeButton->setMinimumSize(30,30);
+	connect(closeButton, &QPushButton::clicked, this, &CalibrationStatisticsWindow::accept);
+
 
 	layout->addWidget(intrinsicsChartLabel,0,0, Qt::AlignCenter);
 	layout->addWidget(extrinsicsChartLabel,0,1, Qt::AlignCenter);
 	layout->addWidget(intrinsicsChartView,1,0);
 	layout->addWidget(extrinsicsChartView,1,1);
-
-
+	layout->addWidget(closeButton,2,0,1,2, Qt::AlignRight);
 }

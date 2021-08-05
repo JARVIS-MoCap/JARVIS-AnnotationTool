@@ -16,6 +16,7 @@
 #include <QProgressBar>
 #include <QDialog>
 #include <QStackedWidget>
+#include <QKeyEvent>
 
 class CalibrationProgressInfoWindow : public QDialog {
 	Q_OBJECT
@@ -33,6 +34,9 @@ class CalibrationProgressInfoWindow : public QDialog {
 		QStackedWidget *progressStackWidget;
 		QList<QProgressBar*> intrinsicsProgressBars;
 		QList<QProgressBar*> extrinsicsProgressBars;
+		QPushButton *cancelButton;
+
+		void keyPressEvent(QKeyEvent *e);
 
 
 	private slots:

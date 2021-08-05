@@ -1,6 +1,6 @@
 /*****************************************************************
  * File:			calibrationstatisticswindow.hpp
- * Created: 	24. July 2021
+ * Created: 	05. August 2021
  * Author:   	Timo Hüser
  * Contact: 	timo.hueser@gmail.com
  ******************************************************************/
@@ -31,6 +31,8 @@ class CalibrationStatisticsWindow : public QDialog {
 	private:
 		CalibrationChartView *intrinsicsChartView;
 		CalibrationChartView *extrinsicsChartView;
+
+		QPushButton *closeButton;
 
 		QList<QString> m_cameraNames;
 		QList<QList<QString>> m_cameraPairs;

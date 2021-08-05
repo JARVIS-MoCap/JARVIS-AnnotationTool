@@ -30,20 +30,23 @@ class CalibrationTool : public QObject {
 
   public slots:
     void makeCalibrationSet();
+		void cancelCalibrationSlot();
 
   signals:
     void intrinsicsProgress(int counter, int frameCount, int threadNumber);
     void extrinsicsProgress(int counter, int frameCount, int threadNumber);
     void calibrationFinished();
+		void calibrationCanceled();
 
   private:
     CalibrationConfig *m_calibrationConfig;
 		QMap<int, double> m_intrinsicsReproErrors;
 		QMap<int, double> m_extrinsicsReproErrors;
+		bool m_calibrationCanceled = false;
 
 	private slots:
-	void finishedIntrinsicsSlot(double reproError, int threadNumber);
-	void finishedExtrinsicsSlot(double reproError, int threadNumber);
+		void finishedIntrinsicsSlot(double reproError, int threadNumber);
+		void finishedExtrinsicsSlot(double reproError, int threadNumber);
 
 
 };

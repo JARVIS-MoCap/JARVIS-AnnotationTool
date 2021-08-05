@@ -180,6 +180,8 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	layout->addWidget(buttonBarWidget,3,0,1,2);
 
 	connect(calibrationTool, &CalibrationTool::calibrationFinished, this, &NewCalibrationWidget::calibrationFinishedSlot);
+	connect(calibrationTool, &CalibrationTool::calibrationCanceled, this, &NewCalibrationWidget::calibrationCanceledSlot);
+
 	//Signal Relay:
 	connect(cameraList, &ConfigurableItemList::itemsChanged, extrinsicsPairList, &ExtrinsicsPairList::cameraNamesChangedSlot);
 }
@@ -218,6 +220,7 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	calibrationProgressInfoWindow = new CalibrationProgressInfoWindow(m_calibrationConfig->cameraNames, m_calibrationConfig->cameraPairs, this);
 	connect(calibrationTool, &CalibrationTool::intrinsicsProgress, calibrationProgressInfoWindow, &CalibrationProgressInfoWindow::updateIntrinsicsProgressSlot);
 	connect(calibrationTool, &CalibrationTool::extrinsicsProgress, calibrationProgressInfoWindow, &CalibrationProgressInfoWindow::updateExtrinsicsProgressSlot);
+	connect(calibrationProgressInfoWindow, &CalibrationProgressInfoWindow::rejected, calibrationTool, &CalibrationTool::cancelCalibrationSlot);
 	emit makeCalibrationSet();
 	calibrationProgressInfoWindow->exec();
 }
@@ -235,7 +238,11 @@ void NewCalibrationWidget::calibrationFinishedSlot() {
 	}
 	CalibrationStatisticsWindow *calibrationStatisticsWindow = new CalibrationStatisticsWindow(m_calibrationConfig->cameraNames, m_calibrationConfig->cameraPairs, intrinsicsReproErrors,  extrinsicsReproErrors,this);
 	calibrationStatisticsWindow->exec();
+}
 
+void NewCalibrationWidget::calibrationCanceledSlot() {
+	calibrationProgressInfoWindow->accept();
+	delete calibrationProgressInfoWindow;
 }
 
 
@@ -278,10 +285,6 @@ bool NewCalibrationWidget::checkIsValidRecording(const QString& path, const QStr
 		if (QFile::exists(path + "/" + recording  + "." + format)) validFileFound = true;
 	}
 	return validFileFound;
-}
-
-void NewCalibrationWidget::intrinsicsProgressSlot(int count, int frameCount, int threadNumber){
-	std::cout << "Progress Thread " << threadNumber << ": " << count << "/" << frameCount << std::endl;
 }
 
 void NewCalibrationWidget::sperateRadioStateChangedSlot(bool state) {

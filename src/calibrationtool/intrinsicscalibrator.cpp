@@ -27,7 +27,8 @@ void IntrinsicsCalibrator::run() {
     for (int j = 0; j < m_calibrationConfig->patternWidth; j++)
       checkerBoardPoints.push_back(cv::Point3f((float)j * m_calibrationConfig->patternSideLength, (float)i * m_calibrationConfig->patternSideLength, 0));
   std::vector<std::string> fileNames;
-  cv::VideoCapture cap(m_calibrationConfig->intrinsicsPath.toStdString() + "/" + m_cameraName + ".avi");
+  QString format = getFormat(m_calibrationConfig->intrinsicsPath, QString::fromStdString(m_cameraName));
+  cv::VideoCapture cap(m_calibrationConfig->intrinsicsPath.toStdString() + "/" + m_cameraName + "." + format.toStdString());
   int frameCount = cap.get(cv::CAP_PROP_FRAME_COUNT);
 
   std::vector< std::vector< cv::Point3f > > objectPointsAll, objectPoints;
@@ -43,7 +44,7 @@ void IntrinsicsCalibrator::run() {
 
   bool read_success = true;
   int counter = 0;
-  while (read_success) {
+  while (read_success && !m_interrupt) {
     cv::Mat img;
     read_success = cap.read(img);
     if (read_success) {
@@ -68,6 +69,7 @@ void IntrinsicsCalibrator::run() {
       counter++;
     }
   }
+  if (m_interrupt) return;
 
   double keep_ratio = imagePointsAll.size() / (double)std::min(m_calibrationConfig->framesForIntrinsics, (int)imagePointsAll.size());
   for (double k = 0; k < imagePointsAll.size(); k += keep_ratio) {
@@ -86,6 +88,14 @@ void IntrinsicsCalibrator::run() {
   emit finishedIntrinsics(repro_error, m_threadNumber);
 }
 
+
+QString IntrinsicsCalibrator::getFormat(const QString& path, const QString& cameraName) {
+  QString usedFormat;
+	for (const auto& format : m_validRecordingFormats) {
+		if (QFile::exists(path + "/" + cameraName  + "." + format)) usedFormat = format;
+	}
+	return usedFormat;
+}
 
 void IntrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1) {
   int width = m_calibrationConfig->patternWidth;
@@ -139,4 +149,8 @@ bool IntrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corn
     }
   }
   return true;
+}
+
+void IntrinsicsCalibrator::calibrationCanceledSlot() {
+  m_interrupt = true;
 }

@@ -13,8 +13,6 @@
 #include "boards_from_corners.h"
 #include "config.h"
 #include "find_corners.h"
-//#include "plot_boards.h"
-//#include "plot_corners.h"
 
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"
@@ -32,6 +30,9 @@ class IntrinsicsCalibrator : public QObject, public QRunnable {
 		explicit IntrinsicsCalibrator(CalibrationConfig *calibrationConfig, const QString& cameraName, int threadNumber);
 		void run();
 
+	public slots:
+		void calibrationCanceledSlot();
+
 	signals:
 		void intrinsicsProgress(int counter, int frameCount, int threadNumber);
 		void finishedIntrinsics(double reproError, int threadNumber);
@@ -47,9 +48,12 @@ class IntrinsicsCalibrator : public QObject, public QRunnable {
 		std::string m_parametersSavePath;
 		std::string m_cameraName;
 		int m_threadNumber;
+		bool m_interrupt = false;
+		QList<QString> m_validRecordingFormats = {"avi", "mp4", "mov", "wmv"};
 
 		void checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1);
 		bool boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners, std::vector<cv::Point2f> &corners);
+		QString getFormat(const QString& path, const QString& cameraName);
 };
 
 

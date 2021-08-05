@@ -51,7 +51,7 @@ class NewCalibrationWidget : public QWidget {
 		CalibrationTool *calibrationTool;
 		CalibrationProgressInfoWindow *calibrationProgressInfoWindow;
 		CalibrationConfig *m_calibrationConfig;
-		QList<QString> m_validRecordingFormats = {"avi", "mp4"};
+		QList<QString> m_validRecordingFormats = {"avi", "mp4", "mov", "wmv"};
 
 		QLineEdit *calibrationSetNameEdit;
 		DirPathWidget *calibrationSetPathWidget;
@@ -85,7 +85,7 @@ class NewCalibrationWidget : public QWidget {
 		void loadPresetSlot(const QString& preset);
 		void calibrateClickedSlot();
 		void calibrationFinishedSlot();
-		void intrinsicsProgressSlot(int count, int frameCount, int threadNumber);
+		void calibrationCanceledSlot();
 		void sperateRadioStateChangedSlot(bool state);
 		void calibrateExtrinsicsRadioStateChangedSlot(bool state);
 

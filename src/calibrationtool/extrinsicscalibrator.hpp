@@ -13,8 +13,6 @@
 #include "boards_from_corners.h"
 #include "config.h"
 #include "find_corners.h"
-//#include "plot_boards.h"
-//#include "plot_corners.h"
 
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"
@@ -36,6 +34,8 @@ class ExtrinsicsCalibrator : public QObject, public QRunnable {
 		void extrinsicsProgress(int counter, int frameCount, int threadNumber);
 		void finishedExtrinsics(double reproError, int threadNumber);
 
+	public slots:
+		void calibrationCanceledSlot();
 
 	private:
 		struct Intrinsics {
@@ -55,6 +55,8 @@ class ExtrinsicsCalibrator : public QObject, public QRunnable {
 		std::string m_parametersSavePath;
 		QList<QString> m_cameraPair;
 		int m_threadNumber;
+		bool m_interrupt = false;
+		QList<QString> m_validRecordingFormats = {"avi", "mp4", "mov", "wmv"};
 
 		void calibrateExtrinsicsPair(QList<QString> cameraPair, Extrinsics &e);
 		double stereoCalibrationStep(std::vector<std::vector<cv::Point3f>> &objectPoints, std::vector<std::vector<cv::Point2f>> &imagePoints1,
@@ -64,6 +66,8 @@ class ExtrinsicsCalibrator : public QObject, public QRunnable {
 		void checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1);
 		bool boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners, std::vector<cv::Point2f> &corners);
 		bool tryLoadIntrinsics(QList<QString> cameraPair, Intrinsics &i1, Intrinsics &i2);
+		QString getFormat(const QString& path, const QString& cameraName);
+
 };
 
 

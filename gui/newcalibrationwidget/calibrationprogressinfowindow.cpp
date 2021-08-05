@@ -51,8 +51,14 @@ CalibrationProgressInfoWindow::CalibrationProgressInfoWindow(QList<QString> came
 	progressStackWidget->addWidget(extrinsicsWidget);
 	progressStackWidget->setCurrentWidget(intrinsicsWidget);
 
+	cancelButton = new QPushButton("Cancel");
+	cancelButton->setIcon(QIcon::fromTheme("discard"));
+	cancelButton->setMinimumSize(30,30);
+	connect(cancelButton, &QPushButton::clicked, this, &CalibrationProgressInfoWindow::reject);
+
 	layout->addWidget(operationLabel,0,0);
 	layout->addWidget(progressBarBox,1,0);
+	layout->addWidget(cancelButton,2,0, Qt::AlignRight);
 }
 
 void CalibrationProgressInfoWindow::updateIntrinsicsProgressSlot(int count, int frameCount, int threadNumber) {
@@ -66,4 +72,9 @@ void CalibrationProgressInfoWindow::updateExtrinsicsProgressSlot(int count, int 
 	operationLabel->setText("Calibrating Extrinsics...");
 	extrinsicsProgressBars[threadNumber]->setRange(0,frameCount);
 	extrinsicsProgressBars[threadNumber]->setValue(count);
+}
+
+void CalibrationProgressInfoWindow::keyPressEvent(QKeyEvent *e) {
+    if(e->key() != Qt::Key_Escape)
+        QDialog::keyPressEvent(e);
 }
