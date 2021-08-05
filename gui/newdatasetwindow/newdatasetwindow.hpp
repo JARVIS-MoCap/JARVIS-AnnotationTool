@@ -39,7 +39,6 @@ class NewDatasetWindow : public QWidget {
 
 	signals:
 		void createDataset(QList<RecordingItem> recordings, QList<QString> entities, QList<QString> keypoints);
-		void toggleExitButton(bool toggle);
 
 	private:
 		DatasetConfig	*m_datasetConfig;

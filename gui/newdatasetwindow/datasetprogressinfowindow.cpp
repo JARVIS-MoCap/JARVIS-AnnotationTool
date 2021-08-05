@@ -10,8 +10,8 @@
 #include <QGridLayout>
 
 
-DatasetProgressInfoWindow::DatasetProgressInfoWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
-	setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+DatasetProgressInfoWindow::DatasetProgressInfoWindow(QWidget *parent) : QDialog(parent) {
+	setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 	this->resize(700,120);
 	this->setMinimumSize(500,140);
 	setWindowTitle("Dataset Creation Progress");
@@ -67,4 +67,9 @@ void DatasetProgressInfoWindow::copyImagesStatusSlot(int frameCount, int totalNu
 	}
 	progressBar->setRange(0, totalNumFrames);
 	progressBar->setValue(frameCount);
+}
+
+void DatasetProgressInfoWindow::keyPressEvent(QKeyEvent *e) {
+    if(e->key() != Qt::Key_Escape)
+        QDialog::keyPressEvent(e);
 }

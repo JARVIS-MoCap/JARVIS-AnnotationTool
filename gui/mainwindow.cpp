@@ -123,7 +123,6 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	connect(settingsWindow, &SettingsWindow::minViewsChanged, editorWidget, &EditorWidget::minViewsChanged);
 	connect(settingsWindow, &SettingsWindow::errorThresholdChanged, editorWidget, &EditorWidget::errorThresholdChanged);
 	connect(editorWidget, &EditorWidget::datasetLoaded, settingsWindow, &SettingsWindow::datasetLoadedSlot);
-	connect(newDatasetWindow, &NewDatasetWindow::toggleExitButton, mainBar, &MainBar::toggleExitButtonSlot);
 	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded, editorWidget, &EditorWidget::datasetLoadedSlot);
 	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded, editorWidget, &EditorWidget::datasetLoaded);
 }

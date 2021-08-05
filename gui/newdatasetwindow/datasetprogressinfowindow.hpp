@@ -14,9 +14,11 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QProgressBar>
+#include <QDialog>
+#include <QKeyEvent>
 
 
-class DatasetProgressInfoWindow : public QWidget {
+class DatasetProgressInfoWindow : public QDialog {
 	Q_OBJECT
 	public:
 		explicit DatasetProgressInfoWindow(QWidget *parent = nullptr);
@@ -39,6 +41,8 @@ class DatasetProgressInfoWindow : public QWidget {
 		QProgressBar *progressBar;
 		QString m_currentSegmentName = "";
 
+		void keyPressEvent(QKeyEvent *e);
+		
 	private slots:
 
 

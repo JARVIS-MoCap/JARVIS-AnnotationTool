@@ -182,21 +182,16 @@ void NewDatasetWindow::samplingMethodChangedSlot(const QString &method) {
 }
 
 void NewDatasetWindow::createDatasetClickedSlot() {
-	createButton->setEnabled(false);
-	emit toggleExitButton(false);
 	emit createDataset(recordingsTable->getItems(), entitiesItemList->getItems(), keypointsItemList->getItems());
-	datasetProgressInfoWindow->show();
+	datasetProgressInfoWindow->exec();
 }
 
 void NewDatasetWindow::datasetCreatedSot() {
-	createButton->setEnabled(true);
-	emit toggleExitButton(true);
-	datasetProgressInfoWindow->hide();
+	datasetProgressInfoWindow->accept();
 }
 
 void NewDatasetWindow::datasetCreationFailedSlot(QString errorMsg) {
 	m_errorMsg->showMessage(errorMsg + "\nDataset Creation aborted...");
-	createButton->setEnabled(true);
 }
 
 
