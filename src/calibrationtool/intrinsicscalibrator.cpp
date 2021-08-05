@@ -22,7 +22,6 @@ IntrinsicsCalibrator::IntrinsicsCalibrator(CalibrationConfig *calibrationConfig,
 
 
 void IntrinsicsCalibrator::run() {
-  std::cout << "Detecting Checkerboards for Camera_" << m_cameraName << "..." << std::endl;
   std::vector<cv::Point3f> checkerBoardPoints;
   for (int i = 0; i < m_calibrationConfig->patternHeight; i++)
     for (int j = 0; j < m_calibrationConfig->patternWidth; j++)
@@ -51,7 +50,7 @@ void IntrinsicsCalibrator::run() {
       corners.clear();
       size = img.size();
       int frameIndex = cap.get(cv::CAP_PROP_POS_FRAMES);
-      //cap.set(cv::CAP_PROP_POS_FRAMES, frameIndex+40);
+      cap.set(cv::CAP_PROP_POS_FRAMES, frameIndex+40);
       if (frameIndex > frameCount) read_success = false;
       cbdetect::find_corners(img, cbCorners, params);
       bool patternFound = (cbCorners.p.size() >= m_calibrationConfig->patternHeight*m_calibrationConfig->patternWidth);
@@ -65,7 +64,7 @@ void IntrinsicsCalibrator::run() {
         imagePointsAll.push_back(corners);
         objectPointsAll.push_back(checkerBoardPoints);
       }
-      emit intrinsicsProgress(counter, frameCount, m_threadNumber);
+      emit intrinsicsProgress(counter*40, frameCount, m_threadNumber);
       counter++;
     }
   }
@@ -76,16 +75,15 @@ void IntrinsicsCalibrator::run() {
     objectPoints.push_back(objectPointsAll[(int)k]);
   }
 
-  std::cout << "Calibrating Camera_" << m_cameraName << " using "<< imagePoints.size() << " Images..." << std::endl;
   cv::Mat K, D;
   std::vector< cv::Mat > rvecs, tvecs;
   double repro_error = calibrateCamera(objectPoints, imagePoints, size, K, D, rvecs, tvecs,
     cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST, cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 80, 1e-6));
-  std::cout << "Camera_" << m_cameraName <<  " calibrated with Reprojection Error: " << repro_error << std::endl;
 
   cv::FileStorage fs1(m_parametersSavePath + "/Intrinsics/Intrinsics_" + m_cameraName + ".yaml", cv::FileStorage::WRITE);
   fs1 << "intrinsicMatrix" << K.t();
   fs1 << "distortionCoefficients" << D;
+  emit finishedIntrinsics(repro_error, m_threadNumber);
 }
 
 

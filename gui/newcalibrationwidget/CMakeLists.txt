@@ -4,9 +4,13 @@ add_library(${PROJECT_NAME}
   newcalibrationwidget.hpp
   extrinsicspairlist.hpp
   calibrationprogressinfowindow.hpp
+  calibrationstatisticswindow.hpp
+  calibrationchartview.hpp
   newcalibrationwidget.cpp
   extrinsicspairlist.cpp
   calibrationprogressinfowindow.cpp
+  calibrationstatisticswindow.cpp
+  calibrationchartview.cpp
 )
 
 target_include_directories(${PROJECT_NAME}

@@ -24,6 +24,9 @@ class CalibrationTool : public QObject {
 	Q_OBJECT
   public:
     explicit CalibrationTool(CalibrationConfig *calibrationConfig);
+		QMap<int, double> getIntrinsicsReproErrors() {return m_intrinsicsReproErrors;};
+		QMap<int, double> getExtrinsicsReproErrors() {return m_extrinsicsReproErrors;};
+
 
   public slots:
     void makeCalibrationSet();
@@ -35,6 +38,13 @@ class CalibrationTool : public QObject {
 
   private:
     CalibrationConfig *m_calibrationConfig;
+		QMap<int, double> m_intrinsicsReproErrors;
+		QMap<int, double> m_extrinsicsReproErrors;
+
+	private slots:
+	void finishedIntrinsicsSlot(double reproError, int threadNumber);
+	void finishedExtrinsicsSlot(double reproError, int threadNumber);
+
 
 };
 

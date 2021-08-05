@@ -17,14 +17,13 @@ CalibrationTool::CalibrationTool(CalibrationConfig *calibrationConfig) :
 }
 
 void CalibrationTool::makeCalibrationSet()  {
-  std::cout << "Calibrating!!" << std::endl;
-
   if (m_calibrationConfig->seperateIntrinsics) {
 		QThreadPool *threadPool = QThreadPool::globalInstance();
     int thread = 0;
 		for (const auto& cam : m_calibrationConfig->cameraNames) {
 			IntrinsicsCalibrator *intrinsicsCalibrator = new IntrinsicsCalibrator(m_calibrationConfig, cam,thread++);
       connect(intrinsicsCalibrator, &IntrinsicsCalibrator::intrinsicsProgress, this, &CalibrationTool::intrinsicsProgress);
+      connect(intrinsicsCalibrator, &IntrinsicsCalibrator::finishedIntrinsics, this, &CalibrationTool::finishedIntrinsicsSlot);
  			threadPool->start(intrinsicsCalibrator);
 		}
     while (!threadPool->waitForDone(10)) {
@@ -37,6 +36,7 @@ void CalibrationTool::makeCalibrationSet()  {
     for (const auto & pair : m_calibrationConfig->cameraPairs) {
       ExtrinsicsCalibrator *extrinsicsCalibrator = new ExtrinsicsCalibrator(m_calibrationConfig, pair, thread++);
       connect(extrinsicsCalibrator, &ExtrinsicsCalibrator::extrinsicsProgress, this, &CalibrationTool::extrinsicsProgress);
+      connect(extrinsicsCalibrator, &ExtrinsicsCalibrator::finishedExtrinsics, this, &CalibrationTool::finishedExtrinsicsSlot);
       threadPool->start(extrinsicsCalibrator);
     }
     while (!threadPool->waitForDone(10)) {
@@ -44,4 +44,12 @@ void CalibrationTool::makeCalibrationSet()  {
     }
   }
   emit calibrationFinished();
+}
+
+void CalibrationTool::finishedIntrinsicsSlot(double reproError, int threadNumber) {
+  m_intrinsicsReproErrors[threadNumber] = reproError;
+}
+
+void CalibrationTool::finishedExtrinsicsSlot(double reproError, int threadNumber) {
+  m_extrinsicsReproErrors[threadNumber] = reproError;
 }

@@ -13,13 +13,11 @@
 
 CalibrationProgressInfoWindow::CalibrationProgressInfoWindow(QList<QString> cameraNames, QList<QList<QString>> cameraPairs, QWidget *parent) : QDialog(parent) {
 	setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
-	this->resize(700,40+30*cameraNames.size());
-	this->setMinimumSize(500,40+30*cameraNames.size());
 	setWindowTitle("Calibration Set Creation Progress");
 	QGridLayout *layout = new QGridLayout(this);
 	operationLabel = new QLabel("");
 	operationLabel->setWordWrap(true);
-	operationLabel->setMinimumSize(100,40);
+	operationLabel->setMinimumSize(100,30);
 	QGroupBox *progressBarBox = new QGroupBox("");
 	QGridLayout *progresslayout = new QGridLayout(progressBarBox);
 	progresslayout->setMargin(0);
@@ -30,6 +28,8 @@ CalibrationProgressInfoWindow::CalibrationProgressInfoWindow(QList<QString> came
 	for (int i = 0; i < cameraNames.size(); i++) {
 		QLabel *camLabel = new QLabel(cameraNames[i]);
 		QProgressBar* bar = new QProgressBar(this);
+		bar->setMinimumSize(500,25);
+		bar->setMaximumSize(9999,25);
 		intrinsicsProgressBars.append(bar);
 		intrinsicslayout->addWidget(camLabel, i,0);
 		intrinsicslayout->addWidget(bar,i,1);
@@ -40,6 +40,8 @@ CalibrationProgressInfoWindow::CalibrationProgressInfoWindow(QList<QString> came
 	for (int i = 0; i < cameraPairs.size(); i++) {
 		QLabel *pairLabel = new QLabel(cameraPairs[i][0] + " --> " + cameraPairs[i][cameraPairs[i].size()-1]);
  		QProgressBar* bar = new QProgressBar(this);
+		bar->setMinimumSize(500,25);
+		bar->setMaximumSize(9999,25);
 		extrinsicsProgressBars.append(bar);
 		extrinsicslayout->addWidget(pairLabel, i,0);
 		extrinsicslayout->addWidget(bar,i,1);

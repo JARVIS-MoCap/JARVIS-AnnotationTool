@@ -16,6 +16,7 @@
 #include "extrinsicspairlist.hpp"
 #include "calibrationtool.hpp"
 #include "calibrationprogressinfowindow.hpp"
+#include "calibrationstatisticswindow.hpp"
 
 #include <QPushButton>
 #include <QTableWidget>

@@ -34,6 +34,8 @@ class ExtrinsicsCalibrator : public QObject, public QRunnable {
 
 	signals:
 		void extrinsicsProgress(int counter, int frameCount, int threadNumber);
+		void finishedExtrinsics(double reproError, int threadNumber);
+
 
 	private:
 		struct Intrinsics {

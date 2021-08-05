@@ -138,8 +138,6 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	configurationlayout->addWidget(checkerboardWiget,i++,0,1,2);
 	configurationlayout->addWidget(bottomSpacer,i++,0,1,2);
 
-
-
 	QGroupBox *camerasBox = new QGroupBox("Cameras", this);
 	//camerasBox->setMinimumSize(1000,400);
 	QGridLayout *cameraslayout = new QGridLayout(camerasBox);
@@ -227,6 +225,17 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 void NewCalibrationWidget::calibrationFinishedSlot() {
 	calibrationProgressInfoWindow->accept();
 	delete calibrationProgressInfoWindow;
+	QMap<int, double> intrinsicsReproErrors = calibrationTool->getIntrinsicsReproErrors();
+	QMap<int, double> extrinsicsReproErrors = calibrationTool->getExtrinsicsReproErrors();
+	for (int i = 0; i < m_calibrationConfig->cameraNames.size(); i++) {
+		std::cout << m_calibrationConfig->cameraNames[i].toStdString() << ": " << intrinsicsReproErrors[i] << std::endl;
+	}
+	for (int i = 0; i < m_calibrationConfig->cameraPairs.size(); i++) {
+		std::cout << m_calibrationConfig->cameraPairs[i][0].toStdString() << " --> "  << m_calibrationConfig->cameraPairs[i][1].toStdString() << ": " << extrinsicsReproErrors[i] << std::endl;
+	}
+	CalibrationStatisticsWindow *calibrationStatisticsWindow = new CalibrationStatisticsWindow(m_calibrationConfig->cameraNames, m_calibrationConfig->cameraPairs, intrinsicsReproErrors,  extrinsicsReproErrors,this);
+	calibrationStatisticsWindow->exec();
+
 }
 
 
@@ -358,6 +367,7 @@ void NewCalibrationWidget::loadPresetSlot(const QString& preset) {
 	sideLengthEdit->setValue(settings->value("sideLength").toDouble());
 	settings->endGroup();
 	settings->endGroup();
+	extrinsicsPairList->cameraNamesChangedSlot(cameraList->getItems());
 }
 
 
