@@ -13,6 +13,7 @@
 #include <QGroupBox>
 #include <QDirIterator>
 #include <QThread>
+#include <QMessageBox>
 
 
 NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
@@ -63,6 +64,11 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	//make sure it emits edited signal when changing text
 	LabelWithToolTip *extrinsicsPathLabel = new LabelWithToolTip("  Extrinsics Folder Path");
 	extrinsicsPathWidget = new DirPathWidget("Select Extrinsics Path");
+	LabelWithToolTip *maxSamplingFrameRateLabel = new LabelWithToolTip("  Max. Sampling Framerate");
+	maxSamplingFrameRateEdit = new QSpinBox();
+	maxSamplingFrameRateEdit->setRange(1,100);
+	maxSamplingFrameRateEdit->setValue(20);
+
 	QLabel *checkerBoardLabel = new QLabel("Checkerboard Layout");
 	checkerBoardLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
 	int i = 0;
@@ -78,6 +84,8 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	generallayout->addWidget(intrinsicsPathWidget,i++,1);
 	generallayout->addWidget(extrinsicsPathLabel,i,0);
 	generallayout->addWidget(extrinsicsPathWidget,i++,1);
+	generallayout->addWidget(maxSamplingFrameRateLabel,i,0);
+	generallayout->addWidget(maxSamplingFrameRateEdit,i++,1);
 	QWidget *generalSpacer = new QWidget(configurationBox);
 	generalSpacer->setMinimumSize(0,20);
 
@@ -191,6 +199,7 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	QString extrinsicsPath = extrinsicsPathWidget->path();
 	QList<QString> cameraNames = cameraList->getItems();
 	QList<QList<QString>> cameraPairs = extrinsicsPairList->getItems();
+
 	if (seperateRadioWidget->state()) {
 		if (!checkIntrinsics(intrinsicsPath)) {
 			m_errorMsg->showMessage("Could not find  all Intrinsics Recordings. Make sure the Path is correct and the recording names match the camera names given.");
@@ -210,6 +219,7 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	m_calibrationConfig->calibrateExtrinsics = calibrateExtrinsicsRadioWidget->state();
 	m_calibrationConfig->intrinsicsPath = intrinsicsPathWidget->path();
 	m_calibrationConfig->extrinsicsPath = extrinsicsPathWidget->path();
+	m_calibrationConfig->maxSamplingFrameRate = maxSamplingFrameRateEdit->value();
 	m_calibrationConfig->framesForIntrinsics = intrinsicsFramesEdit->value();
 	m_calibrationConfig->framesForExtrinsics = extrinsicsFramesEdit->value();
 	m_calibrationConfig->patternWidth = widthEdit->value();
@@ -217,6 +227,16 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	m_calibrationConfig->patternSideLength = sideLengthEdit->value();
 	m_calibrationConfig->cameraNames = cameraList->getItems();
 	m_calibrationConfig->cameraPairs = extrinsicsPairList->getItems();
+
+	if (!checkCalibrationExists(m_calibrationConfig->calibrationSetPath + "/" + m_calibrationConfig->calibrationSetName)) {
+		return;
+	}
+
+	if (!checkCheckerboard()) {
+		m_errorMsg->showMessage("Your Checkerboard is symmetric, make sure you use an asymmetric checkerboard (see calibration guide).");
+		return;
+	}
+
 	calibrationProgressInfoWindow = new CalibrationProgressInfoWindow(m_calibrationConfig->cameraNames, m_calibrationConfig->cameraPairs, this);
 	connect(calibrationTool, &CalibrationTool::intrinsicsProgress, calibrationProgressInfoWindow, &CalibrationProgressInfoWindow::updateIntrinsicsProgressSlot);
 	connect(calibrationTool, &CalibrationTool::extrinsicsProgress, calibrationProgressInfoWindow, &CalibrationProgressInfoWindow::updateExtrinsicsProgressSlot);
@@ -278,6 +298,28 @@ bool NewCalibrationWidget::checkExtrinsics(const QString& path) {
 	return allFilesValid;
 }
 
+bool NewCalibrationWidget::checkCheckerboard() {
+	std::cout << "Checker: " << m_calibrationConfig->patternWidth%2 + m_calibrationConfig->patternHeight%2 <<std::endl;
+	if (m_calibrationConfig->patternWidth%2 + m_calibrationConfig->patternHeight%2 == 1) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+bool NewCalibrationWidget::checkCalibrationExists(const QString &path) {
+	if (QFile::exists(path)) {
+		QMessageBox::StandardButton reply;
+		reply = QMessageBox::question(this, "", "Calibration already exists! Continue anyways?",
+	                                QMessageBox::Yes|QMessageBox::No);
+	  if (reply == QMessageBox::No) {
+	    return false;
+	  }
+	}
+	return true;
+}
+
 
 bool NewCalibrationWidget::checkIsValidRecording(const QString& path, const QString& recording) {
 	bool validFileFound = false;
@@ -335,6 +377,7 @@ void NewCalibrationWidget::savePresetSlot(const QString& preset) {
 	settings->setValue("calibrateExtrinsics", calibrateExtrinsicsRadioWidget->state());
 	settings->setValue("intrinsicsFolder", intrinsicsPathWidget->path());
 	settings->setValue("extrinsicsFolder", extrinsicsPathWidget->path());
+	settings->setValue("maxSamplingFrameRate", maxSamplingFrameRateEdit->value());
 	settings->setValue("intrinsicsFrames", intrinsicsFramesEdit->value());
 	settings->setValue("extrinsicsFrames", extrinsicsFramesEdit->value());
 	settings->setValue("patternWidth", widthEdit->value());
@@ -365,6 +408,7 @@ void NewCalibrationWidget::loadPresetSlot(const QString& preset) {
 	extrinsicsPathWidget->setPath(settings->value("extrinsicsFolder").toString());
 	intrinsicsFramesEdit->setValue(settings->value("intrinsicsFrames").toInt());
 	extrinsicsFramesEdit->setValue(settings->value("extrinsicsFrames").toInt());
+	maxSamplingFrameRateEdit->setValue(settings->value("maxSamplingFrameRate").toInt());
 	widthEdit->setValue(settings->value("patternWidth").toInt());
 	heightEdit->setValue(settings->value("patternHeight").toInt());
 	sideLengthEdit->setValue(settings->value("sideLength").toDouble());

@@ -64,6 +64,8 @@ void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
   cv::VideoCapture cap1((m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" + cameraPair[1] + "/" + cameraPair[0] + "." + format1).toStdString());
   cv::VideoCapture cap2((m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" + cameraPair[1] + "/" + cameraPair[1] + "." + format2).toStdString());
   int frameCount = cap1.get(cv::CAP_PROP_FRAME_COUNT);
+  int frameRate = cap1.get(cv::CAP_PROP_FPS);
+  int skipIndex = std::max(frameRate/m_calibrationConfig->maxSamplingFrameRate-1,0);
 
   std::vector<std::vector<cv::Point3f>> objectPointsAll, objectPoints;
   std::vector<std::vector<cv::Point2f>> imagePointsAll1, imagePointsAll2, imagePoints1, imagePoints2;
@@ -85,8 +87,8 @@ void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
     read_success = read_success1 && read_success2;
     if (read_success) {
       int frameIndex = cap1.get(cv::CAP_PROP_POS_FRAMES);
-      cap1.set(cv::CAP_PROP_POS_FRAMES, frameIndex+40);
-      cap2.set(cv::CAP_PROP_POS_FRAMES, frameIndex+40);
+      cap1.set(cv::CAP_PROP_POS_FRAMES, frameIndex+skipIndex);
+      cap2.set(cv::CAP_PROP_POS_FRAMES, frameIndex+skipIndex);
       if (frameIndex > frameCount) read_success = false;
       corners1.clear();
       corners2.clear();
@@ -110,7 +112,7 @@ void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
           objectPointsAll.push_back(checkerBoardPoints);
         }
       }
-      emit extrinsicsProgress(counter*40, frameCount, m_threadNumber);
+      emit extrinsicsProgress(counter*(skipIndex+1), frameCount, m_threadNumber);
       counter++;
     }
   }

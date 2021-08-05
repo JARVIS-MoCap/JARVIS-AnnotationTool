@@ -24,7 +24,7 @@ class ConfigurableItemList : public QWidget {
 
 		QList<QString> getItems();
 		void clear() {itemSelectorList->clear();};
-		void addItem(QString item) {itemSelectorList->addItem(item);}; 
+		void addItem(const QString &item);
 
 	signals:
 		void itemsChanged(QList<QString> items);
@@ -46,6 +46,7 @@ class ConfigurableItemList : public QWidget {
 		void moveItemDownSlot();
 		void addItemSlot();
 		void removeItemSlot();
+		void currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous);
 };
 
 

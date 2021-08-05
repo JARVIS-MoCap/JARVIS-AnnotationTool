@@ -30,6 +30,8 @@ void IntrinsicsCalibrator::run() {
   QString format = getFormat(m_calibrationConfig->intrinsicsPath, QString::fromStdString(m_cameraName));
   cv::VideoCapture cap(m_calibrationConfig->intrinsicsPath.toStdString() + "/" + m_cameraName + "." + format.toStdString());
   int frameCount = cap.get(cv::CAP_PROP_FRAME_COUNT);
+  int frameRate = cap.get(cv::CAP_PROP_FPS);
+  int skipIndex = std::max(frameRate/m_calibrationConfig->maxSamplingFrameRate-1,0);
 
   std::vector< std::vector< cv::Point3f > > objectPointsAll, objectPoints;
   std::vector< std::vector< cv::Point2f > > imagePointsAll, imagePoints;
@@ -51,7 +53,7 @@ void IntrinsicsCalibrator::run() {
       corners.clear();
       size = img.size();
       int frameIndex = cap.get(cv::CAP_PROP_POS_FRAMES);
-      cap.set(cv::CAP_PROP_POS_FRAMES, frameIndex+40);
+      cap.set(cv::CAP_PROP_POS_FRAMES, frameIndex+skipIndex);
       if (frameIndex > frameCount) read_success = false;
       cbdetect::find_corners(img, cbCorners, params);
       bool patternFound = (cbCorners.p.size() >= m_calibrationConfig->patternHeight*m_calibrationConfig->patternWidth);
@@ -65,7 +67,7 @@ void IntrinsicsCalibrator::run() {
         imagePointsAll.push_back(corners);
         objectPointsAll.push_back(checkerBoardPoints);
       }
-      emit intrinsicsProgress(counter*40, frameCount, m_threadNumber);
+      emit intrinsicsProgress(counter*(skipIndex+1), frameCount, m_threadNumber);
       counter++;
     }
   }

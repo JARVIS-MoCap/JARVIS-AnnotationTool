@@ -17,10 +17,14 @@
 
 ConfigurableItemList::ConfigurableItemList(QString name, QWidget *parent) :
 			m_name(name), QWidget(parent) {
+
+
 	QGridLayout *labelselectorlayout = new QGridLayout(this);
+
 	itemSelectorList = new QListWidget(this);
 	itemSelectorList->setFont(QFont("Sans Serif", 12));
-	itemSelectorList->setAlternatingRowColors(true);
+	connect(itemSelectorList, &QListWidget::currentItemChanged, this, &ConfigurableItemList::currentItemChangedSlot);
+	//itemSelectorList->setAlternatingRowColors(true);
 	connect(itemSelectorList, &QListWidget::itemDoubleClicked, this, &ConfigurableItemList::itemSelectedSlot);
 	moveItemUpButton = new QPushButton();
 	moveItemUpButton->setIcon(QIcon::fromTheme("up"));
@@ -49,7 +53,9 @@ ConfigurableItemList::ConfigurableItemList(QString name, QWidget *parent) :
 QList<QString> ConfigurableItemList::getItems() {
 	QList <QString> items;
 	for (const auto& item : itemSelectorList->findItems("",Qt::MatchContains)) {
-		items.append(item->text());
+		if (item->text() != "") {
+			items.append(item->text());
+		}
 	}
 	return items;
 }
@@ -61,8 +67,10 @@ void ConfigurableItemList::itemSelectedSlot(QListWidgetItem *item) {
 void ConfigurableItemList::moveItemUpSlot() {
 	int row = itemSelectorList->currentRow();
 	QListWidgetItem *item = itemSelectorList->takeItem(row);
-	int newRow = std::max(row-1,0);
+	QListWidgetItem *seperatorItem = itemSelectorList->takeItem(row);
+	int newRow = std::max(row-2,0);
 	itemSelectorList->insertItem(newRow,item);
+	itemSelectorList->insertItem(newRow+1,seperatorItem);
 	itemSelectorList->setCurrentRow(newRow);
 	emit itemsChanged(getItems());
 }
@@ -70,8 +78,10 @@ void ConfigurableItemList::moveItemUpSlot() {
 void ConfigurableItemList::moveItemDownSlot() {
 	int row = itemSelectorList->currentRow();
 	QListWidgetItem *item = itemSelectorList->takeItem(row);
-	int newRow = std::min(row+1,itemSelectorList->count());
+	QListWidgetItem *seperatorItem = itemSelectorList->takeItem(row);
+	int newRow = std::min(row+2,itemSelectorList->count());
 	itemSelectorList->insertItem(newRow,item);
+	itemSelectorList->insertItem(newRow+1,seperatorItem);
 	itemSelectorList->setCurrentRow(newRow);
 	emit itemsChanged(getItems());
 }
@@ -82,7 +92,7 @@ void ConfigurableItemList::addItemSlot() {
 	items.append(QInputDialog::getText(this,m_name,"Enter Label:", QLineEdit::Normal));
 	if (!items.isEmpty()) {
 		for (const auto & item : items) {
-			itemSelectorList->addItem(item);
+			addItem(item);
 		}
 		emit itemsChanged(getItems());
 	}
@@ -90,5 +100,28 @@ void ConfigurableItemList::addItemSlot() {
 
 void ConfigurableItemList::removeItemSlot() {
 	delete itemSelectorList->takeItem(itemSelectorList->currentRow());
+	delete itemSelectorList->takeItem(itemSelectorList->currentRow()+1);
 	emit itemsChanged(getItems());
+}
+
+void ConfigurableItemList::addItem(const QString &text) {
+	QListWidgetItem * item = new QListWidgetItem();
+	item->setSizeHint(QSize (100, 27));
+	item->setText(text);
+	item->setFlags(item->flags() ^ Qt::ItemIsSelectable);
+	itemSelectorList->addItem(item);
+	QListWidgetItem * seperatorItem = new QListWidgetItem();
+	seperatorItem->setSizeHint(QSize (100, 3));
+	seperatorItem->setFlags(Qt::NoItemFlags);
+	seperatorItem->setBackground(QColor(46, 50, 60));
+	itemSelectorList->addItem(seperatorItem);
+}
+
+void ConfigurableItemList::currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous) {
+	if (current != nullptr) {
+		current->setBackgroundColor(QColor(100,164,32));
+	}
+	if (previous != nullptr) {
+		previous->setBackgroundColor(QColor(34, 36, 40));
+	}
 }

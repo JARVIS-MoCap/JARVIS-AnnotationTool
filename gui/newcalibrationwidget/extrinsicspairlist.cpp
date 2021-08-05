@@ -21,8 +21,7 @@ ExtrinsicsPairList::ExtrinsicsPairList(QString name, QWidget *parent) :
 	QGridLayout *labelselectorlayout = new QGridLayout(this);
 	itemSelectorList = new QListWidget(this);
 	itemSelectorList->setFont(QFont("Sans Serif", 12));
-	itemSelectorList->setAlternatingRowColors(true);
-	connect(itemSelectorList, &QListWidget::itemDoubleClicked, this, &ExtrinsicsPairList::itemSelectedSlot);
+	connect(itemSelectorList, &QListWidget::currentItemChanged, this, &ExtrinsicsPairList::currentItemChangedSlot);
 	moveItemUpButton = new QPushButton();
 	moveItemUpButton->setIcon(QIcon::fromTheme("up"));
 	moveItemUpButton->setMinimumSize(35,35);
@@ -57,24 +56,24 @@ void ExtrinsicsPairList::setItems(QList<QList<QString>> items) {
 	for (const auto & newPair : items) {
 		if (newPair.size() == 2) {
 			m_cameraPairs.append(newPair);
-			itemSelectorList->addItem(newPair[0] + " --> " + newPair[1]);
+			addItem(newPair[0] + " --> " + newPair[1]);
 		}
 		else if (newPair.size() == 3) {
 			m_cameraPairs.append(newPair);
-			itemSelectorList->addItem(newPair[0] + " --> " + newPair[1] + " --> " + newPair[2]);
+			addItem(newPair[0] + " --> " + newPair[1] + " --> " + newPair[2]);
 		}
 	}
-}
-
-void ExtrinsicsPairList::itemSelectedSlot(QListWidgetItem *item) {
+	itemSelectorList->setCurrentRow(0);
 }
 
 void ExtrinsicsPairList::moveItemUpSlot() {
 	int row = itemSelectorList->currentRow();
 	QListWidgetItem *item = itemSelectorList->takeItem(row);
-	int newRow = std::max(row-1,0);
+	QListWidgetItem *seperatorItem = itemSelectorList->takeItem(row);
+	int newRow = std::max(row-2,0);
 	itemSelectorList->insertItem(newRow,item);
-	m_cameraPairs.move(itemSelectorList->currentRow(), newRow);
+	itemSelectorList->insertItem(newRow+1,seperatorItem);
+	m_cameraPairs.move(itemSelectorList->currentRow()/2, newRow/2);
 	itemSelectorList->setCurrentRow(newRow);
 
 }
@@ -82,9 +81,11 @@ void ExtrinsicsPairList::moveItemUpSlot() {
 void ExtrinsicsPairList::moveItemDownSlot() {
 	int row = itemSelectorList->currentRow();
 	QListWidgetItem *item = itemSelectorList->takeItem(row);
-	int newRow = std::min(row+1,itemSelectorList->count());
+	QListWidgetItem *seperatorItem = itemSelectorList->takeItem(row);
+	int newRow = std::min(row+2,itemSelectorList->count());
 	itemSelectorList->insertItem(newRow,item);
-	m_cameraPairs.move(itemSelectorList->currentRow(), newRow);
+	itemSelectorList->insertItem(newRow+1,seperatorItem);
+	m_cameraPairs.move(itemSelectorList->currentRow()/2, newRow/2);
 	itemSelectorList->setCurrentRow(newRow);
 }
 
@@ -95,23 +96,45 @@ void ExtrinsicsPairList::addItemSlot() {
 	QList<QString> newPair = pairCreatorWindow->getCameraPair();
 	if (newPair.size() == 2) {
 		m_cameraPairs.append(newPair);
-		itemSelectorList->addItem(newPair[0] + " --> " + newPair[1]);
+		addItem(newPair[0] + " --> " + newPair[1]);
 	}
 	else if (newPair.size() == 3) {
 		m_cameraPairs.append(newPair);
-		itemSelectorList->addItem(newPair[0] + " --> " + newPair[1] + " --> " + newPair[1]);
+		addItem(newPair[0] + " --> " + newPair[1] + " --> " + newPair[1]);
 	}
 }
 
 void ExtrinsicsPairList::removeItemSlot() {
 	delete itemSelectorList->takeItem(itemSelectorList->currentRow());
-	m_cameraPairs.removeAt(itemSelectorList->currentRow());
+	delete itemSelectorList->takeItem(itemSelectorList->currentRow()+1);
+	m_cameraPairs.removeAt(itemSelectorList->currentRow()/2);
 }
 
 void ExtrinsicsPairList::cameraNamesChangedSlot(QList<QString> cameraNames) {
 	m_cameraNames = cameraNames;
 }
 
+void ExtrinsicsPairList::addItem(const QString &text) {
+	QListWidgetItem * item = new QListWidgetItem();
+	item->setSizeHint(QSize (100, 27));
+	item->setText(text);
+	item->setFlags(item->flags() ^ Qt::ItemIsSelectable);
+	itemSelectorList->addItem(item);
+	QListWidgetItem * seperatorItem = new QListWidgetItem();
+	seperatorItem->setSizeHint(QSize (100, 3));
+	seperatorItem->setFlags(Qt::NoItemFlags);
+	seperatorItem->setBackground(QColor(46, 50, 60));
+	itemSelectorList->addItem(seperatorItem);
+}
+
+void ExtrinsicsPairList::currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous) {
+	if (current != nullptr)  {
+		current->setBackgroundColor(QColor(100,164,32));
+	}
+	if (previous != nullptr) {
+		previous->setBackgroundColor(QColor(34, 36, 40));
+	}
+}
 
 
 PairCreatorWindow::PairCreatorWindow(QList<QString> cameraNames, QWidget *parent) : QDialog(parent) {

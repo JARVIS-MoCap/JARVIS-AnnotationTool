@@ -59,6 +59,7 @@ class NewCalibrationWidget : public QWidget {
 		YesNoRadioWidget *calibrateExtrinsicsRadioWidget;
 		DirPathWidget *intrinsicsPathWidget;
 		DirPathWidget *extrinsicsPathWidget;
+		QSpinBox *maxSamplingFrameRateEdit;
 		QSpinBox *intrinsicsFramesEdit;
 		QSpinBox *extrinsicsFramesEdit;
 		QSpinBox *widthEdit;
@@ -75,6 +76,8 @@ class NewCalibrationWidget : public QWidget {
 
 		bool checkIntrinsics(const QString& path);
 		bool checkExtrinsics(const QString& path);
+		bool checkCheckerboard();
+		bool checkCalibrationExists(const QString& path);
 		bool checkIsValidRecording(const QString& path, const QString& recording);
 
 

@@ -42,12 +42,15 @@ class ExtrinsicsPairList : public QWidget {
 		QPushButton *addItemButton;
 		QPushButton  *deleteItemButton;
 
+		void addItem(const QString &text);
+
 	private slots:
-		void itemSelectedSlot(QListWidgetItem *item);
 		void moveItemUpSlot();
 		void moveItemDownSlot();
 		void addItemSlot();
 		void removeItemSlot();
+		void currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous);
+
 };
 
 class PairCreatorWindow : public QDialog {
@@ -72,7 +75,6 @@ class PairCreatorWindow : public QDialog {
 	private slots:
 		void modeToggledSlot(bool toggle);
 		void cancelClickedSlot();
-
 };
 
 

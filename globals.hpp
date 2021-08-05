@@ -83,6 +83,7 @@ struct CalibrationConfig {
 	bool calibrateExtrinsics;
 	QString intrinsicsPath;
 	QString extrinsicsPath;
+	int maxSamplingFrameRate;
 	int framesForIntrinsics;
 	int framesForExtrinsics;
 	int patternWidth;
