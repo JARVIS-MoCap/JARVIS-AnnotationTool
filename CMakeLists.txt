@@ -59,7 +59,7 @@ add_subdirectory(src)
 
 
 if(APPLE)
-	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11")
+	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15")
   set(ICON_NAME "icon.icns")
   set(ICON_PATH "${PROJECT_SOURCE_DIR}/IconThemes/DarkIconTheme/${ICON_NAME}")
   set(hand_ICON ${ICON_PATH})

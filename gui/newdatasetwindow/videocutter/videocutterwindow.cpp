@@ -42,6 +42,7 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
 	videoplayerlayout->setMargin(0);
 	videoplayerlayout->setSpacing(0);
 	videoWidget = new QVideoWidget(this);
+	videoWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	rangeOverview = new RangeOverview();
 	rangeOverview->setMinimumSize(500,3);
 	videoplayerlayout->addWidget(videoWidget,0,0);
