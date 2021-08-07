@@ -1,5 +1,5 @@
-QT_ARCH = i386
-QT_BUILDABI = i386-little_endian-ilp32
+QT_ARCH = x86_64
+QT_BUILDABI = x86_64-little_endian-lp64
 QT.global.enabled_features = c++11 c++14 c++17 c++1z c99 c11 thread future concurrent signaling_nan static
 QT.global.disabled_features = shared cross_compile framework rpath shared appstore-compliant debug_and_release simulator_and_device build_all c++2a pkg-config force_asserts separate_debug_info
 CONFIG += release no_plugin_manifest static

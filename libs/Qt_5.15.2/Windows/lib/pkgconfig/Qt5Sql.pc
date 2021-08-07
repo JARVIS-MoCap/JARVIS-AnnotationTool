@@ -1,4 +1,4 @@
-prefix=C:/Qt5static_v5.15.2_minimal
+prefix=C:/qt/Qt5static_v5.15.2
 exec_prefix=${prefix}
 libdir=${prefix}/lib
 includedir=${prefix}/include

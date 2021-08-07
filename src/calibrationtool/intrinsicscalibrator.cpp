@@ -28,8 +28,10 @@ void IntrinsicsCalibrator::run() {
       checkerBoardPoints.push_back(cv::Point3f((float)j * m_calibrationConfig->patternSideLength, (float)i * m_calibrationConfig->patternSideLength, 0));
   std::vector<std::string> fileNames;
   QString format = getFormat(m_calibrationConfig->intrinsicsPath, QString::fromStdString(m_cameraName));
+  std::cout << m_calibrationConfig->intrinsicsPath.toStdString() + "/" + m_cameraName + "." + format.toStdString() << std::endl;
   cv::VideoCapture cap(m_calibrationConfig->intrinsicsPath.toStdString() + "/" + m_cameraName + "." + format.toStdString());
   int frameCount = cap.get(cv::CAP_PROP_FRAME_COUNT);
+  std::cout << "FRAMES " << frameCount << std::endl;
   int frameRate = cap.get(cv::CAP_PROP_FPS);
   int skipIndex = std::max(frameRate/m_calibrationConfig->maxSamplingFrameRate-1,0);
 
@@ -46,8 +48,8 @@ void IntrinsicsCalibrator::run() {
 
   bool read_success = true;
   int counter = 0;
+  cv::Mat img;
   while (read_success && !m_interrupt) {
-    cv::Mat img;
     read_success = cap.read(img);
     if (read_success) {
       corners.clear();

@@ -78,7 +78,7 @@ set_target_properties(ocv.3rdparty.dshow PROPERTIES
 add_library(opencv_core STATIC IMPORTED)
 
 set_target_properties(opencv_core PROPERTIES
-  INTERFACE_LINK_LIBRARIES "C:/Strawberry/c/i686-w64-mingw32/lib/libz.a"
+  INTERFACE_LINK_LIBRARIES "C:/Strawberry/c/x86_64-w64-mingw32/lib/libz.a"
 )
 
 # Create imported target opencv_flann
@@ -106,7 +106,7 @@ set_target_properties(opencv_features2d PROPERTIES
 add_library(opencv_imgcodecs STATIC IMPORTED)
 
 set_target_properties(opencv_imgcodecs PROPERTIES
-  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:opencv_core>;\$<LINK_ONLY:opencv_imgproc>;opencv_core;opencv_imgproc;C:/Strawberry/c/i686-w64-mingw32/lib/libz.a;C:/Strawberry/c/lib/libjpeg.a;\$<LINK_ONLY:libwebp>;C:/Strawberry/c/lib/libpng.a;C:/Strawberry/c/i686-w64-mingw32/lib/libz.a;C:/Strawberry/c/lib/libtiff.a"
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:opencv_core>;\$<LINK_ONLY:opencv_imgproc>;opencv_core;opencv_imgproc;C:/Strawberry/c/x86_64-w64-mingw32/lib/libz.a;C:/Strawberry/c/lib/libjpeg.a;\$<LINK_ONLY:libwebp>;C:/Strawberry/c/lib/libpng.a;C:/Strawberry/c/x86_64-w64-mingw32/lib/libz.a;C:/Strawberry/c/lib/libtiff.a"
 )
 
 # Create imported target opencv_videoio

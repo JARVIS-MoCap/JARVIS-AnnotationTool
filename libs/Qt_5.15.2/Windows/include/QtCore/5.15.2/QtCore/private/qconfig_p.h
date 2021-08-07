@@ -3,7 +3,7 @@
 #define QT_FEATURE_alloca_malloc_h 1
 #define QT_FEATURE_alloca 1
 #define QT_FEATURE_android_style_assets -1
-#define QT_FEATURE_avx2 1
+#define QT_FEATURE_avx2 -1
 #define QT_FEATURE_private_tests -1
 #define QT_FEATURE_dbus 1
 #define QT_FEATURE_dbus_linked -1
