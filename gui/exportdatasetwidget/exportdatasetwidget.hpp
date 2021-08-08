@@ -19,6 +19,8 @@
 #include <QSpinBox>
 #include <QComboBox>
 #include <QErrorMessage>
+#include <QTextBrowser>
+#include <QTextDocument>
 
 
 class ExportDatasetWidget : public QWidget {
