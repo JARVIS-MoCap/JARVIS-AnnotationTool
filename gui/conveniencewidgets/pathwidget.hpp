@@ -28,10 +28,12 @@ class DirPathWidget : public QWidget {
 
 	private:
 		QString m_name;
+		QString m_currentPath;
 		QLineEdit *pathEdit;
 		QPushButton *pathButton;
 
 	private slots:
+		void pathEditedSlot();
 		void pathChangedSlot(const QString& path);
 		void pathClickedSlot();
 

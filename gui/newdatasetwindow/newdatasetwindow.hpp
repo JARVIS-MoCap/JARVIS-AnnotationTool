@@ -16,6 +16,8 @@
 #include "datasetcreator.hpp"
 #include "datasetprogressinfowindow.hpp"
 #include "labelwithtooltip.hpp"
+#include "pathwidget.hpp"
+
 
 
 #include <QPushButton>
@@ -50,8 +52,7 @@ class NewDatasetWindow : public QWidget {
 		QList<QString> presets;
 
 		QLineEdit *datasetNameEdit;
-		QLineEdit *datasetPathEdit;
-		QPushButton *datasetPathButton;
+		DirPathWidget *datasetPathWidget;
 		QRadioButton *videosButton;
 		QRadioButton *imagesButton;
 		QSpinBox *numCamerasBox;
@@ -73,8 +74,7 @@ class NewDatasetWindow : public QWidget {
 
 		private slots:
 			void datasetNameChangedSlot(const QString &name);
-			void datasetPathChangedSlot(const QString &path);
-			void datasetPathClickedSlot();
+			void datasetPathChangedSlot(const QString &dir);
 			void numCamerasChangedSlot(int num);
 			void frameSetsRecordingChandedSlot(int num);
 			void samplingMethodChangedSlot(const QString &method);

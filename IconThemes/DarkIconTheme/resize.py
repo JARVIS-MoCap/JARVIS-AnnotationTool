@@ -3,7 +3,7 @@ import os
 import cairosvg
 import numpy as np
 
-directory = "/home/trackingsetup/Documents/AnnotationTool/IconThemes/DarkIconTheme"
+directory = "/home/timo/Documents/AnnotationTool/IconThemes/DarkIconTheme"
 
 categories = ["actions", "emblems", "panels", "status"]
 resolutions = [16,22,24,32,48,128,256,512]

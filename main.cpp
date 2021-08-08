@@ -73,6 +73,7 @@ int main(int argc, char **argv)
   qRegisterMetaTypeStreamOperators<QList<QList<QString>>>("QList<QList<QString>>");
   qRegisterMetaTypeStreamOperators<QMap<int,int> >("QMap<int,int>");
 	qRegisterMetaTypeStreamOperators<QList<RecordingItem> >("QList<RecordingItem>");
+  qRegisterMetaTypeStreamOperators<QMap<QString, double> >("QMap<QString, double>");
 	//qRegisterMetaTypeStreamOperators<QVector<QPoint> >("QVector<QPoint>");
 	//LOGUTILS::initLogging(1,0);
 	//qInstallMessageHandler(LOGUTILS::myMessageHandler);

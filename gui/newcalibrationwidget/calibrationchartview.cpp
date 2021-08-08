@@ -9,36 +9,52 @@
 
 #include <random>
 
-CalibrationChartView::CalibrationChartView(QList<QString> names, std::vector<double> reproErrors) : m_names(names), m_reproErrors(reproErrors) {
-	update();
+CalibrationChartView::CalibrationChartView(QList<QString> names, std::vector<double> reproErrors, QString mode) : m_names(names), m_reproErrors(reproErrors), m_mode(mode) {
+	if (m_mode == "interactive") {
+		update(0);
+	}
+	else {
+		update();
+	}
 }
 
 void CalibrationChartView::update(int selectedIndex) {
 	QChart *chart = new QChart();
-	//chart->setAnimationOptions(QChart::SeriesAnimations);
 	chart->setTheme(QChart::ChartThemeDark);
 	chart->setBackgroundBrush(QBrush(QColor(34, 36, 40)));
 	chart->legend()->setVisible(false);
 	if (selectedIndex != -1) {
-		chart->setTitle(m_names[selectedIndex]);
+		if (m_mode == "interactive") {
+			chart->setTitle(m_names[selectedIndex]);
+		}
 	}
 	else {
-		chart->setTitle(" ");
+		if (m_mode == "interactive") {
+			chart->setTitle(" ");
+		}
 	}
-	//float minValue = *std::min_element(m_reproErrors->begin(), m_reproErrors->end());
 	float maxValue = *std::max_element(m_reproErrors.begin(), m_reproErrors.end());
 
 	QValueAxis *axisY = new QValueAxis();
+	axisY->setTitleText("Reprojection Erro [px]");
 	axisY->setRange(0,maxValue);
 
-	chart->addAxis(axisY, Qt::AlignLeft);
+	if (m_mode != "interactive") {
+		QBarCategoryAxis *axisX = new QBarCategoryAxis();
+		axisX->append(m_names);
+		chart->addAxis(axisX, Qt::AlignLeft);
+	}
+
+	chart->addAxis(axisY, Qt::AlignBottom);
 	this->setChart(chart);
 	int count = 0;
 	m_barSeriesList.clear();
 	for (const auto& error : m_reproErrors) {
-		QBarSeries *series = new QBarSeries();
+		QHorizontalStackedBarSeries *series = new QHorizontalStackedBarSeries();
 		m_barSeriesList.append(series);
-		connect(series, &QBarSeries::hovered, this, &CalibrationChartView::onHoverSlot);
+		if (m_mode == "interactive") {
+			connect(series, &QBarSeries::hovered, this, &CalibrationChartView::onHoverSlot);
+		}
 		QBarSet * set = new QBarSet("Test");
 		if (count != selectedIndex) {
 			set->setColor(QColor(100,164,32));
@@ -57,7 +73,7 @@ void CalibrationChartView::update(int selectedIndex) {
 }
 
 void CalibrationChartView::onHoverSlot() {
-	QBarSeries* series = qobject_cast<QBarSeries*>(QObject::sender());
+	QHorizontalStackedBarSeries* series = qobject_cast<QHorizontalStackedBarSeries*>(QObject::sender());
 	int index = m_barSeriesList.indexOf(series);
 	update(index);
 }

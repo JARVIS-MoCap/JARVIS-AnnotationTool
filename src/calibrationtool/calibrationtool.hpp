@@ -46,7 +46,7 @@ class CalibrationTool : public QObject {
 
 	private slots:
 		void finishedIntrinsicsSlot(double reproError, int threadNumber);
-		void finishedExtrinsicsSlot(double reproError, int threadNumber);
+		void finishedExtrinsicsSlot(double reproError, QMap<QString, double> intrinsicsErrorMap, int threadNumber);
 
 
 };

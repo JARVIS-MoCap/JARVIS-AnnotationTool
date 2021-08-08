@@ -48,18 +48,8 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	connect (datasetNameEdit, &QLineEdit::textEdited, this, &NewDatasetWindow::datasetNameChangedSlot);
 
 	LabelWithToolTip *datasetPathLabel = new LabelWithToolTip("New Dataset Path", "");
-	QWidget *datasetPathWidget = new QWidget(configBox);
-	QGridLayout *pathwidgetlayout = new QGridLayout(datasetPathWidget);
-	pathwidgetlayout->setMargin(0);
-	datasetPathEdit = new QLineEdit(m_datasetConfig->datasetPath, configBox);
-	connect (datasetPathEdit, &QLineEdit::textEdited, this, &NewDatasetWindow::datasetPathChangedSlot);
-	datasetPathButton = new QPushButton();
-	datasetPathButton->setMinimumSize(25,25);
-	datasetPathButton->setMaximumSize(25,25);
-	datasetPathButton->setIcon(QIcon::fromTheme("folder"));
-	connect(datasetPathButton, &QPushButton::clicked, this, &NewDatasetWindow::datasetPathClickedSlot);
-	pathwidgetlayout->addWidget(datasetPathEdit,0,0);
-	pathwidgetlayout->addWidget(datasetPathButton,0,1);
+	DirPathWidget *datasetPathWidget = new DirPathWidget("Select new Dataset Path");
+	connect (datasetPathWidget, &DirPathWidget::pathChanged, this, &NewDatasetWindow::datasetPathChangedSlot);
 
 	LabelWithToolTip *numCamerasLabel = new LabelWithToolTip("Number of Cameras", "kdsff");
 	numCamerasBox = new QSpinBox(configBox);
@@ -100,11 +90,11 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	QWidget *buttonBarWidget = new QWidget(this);
 	buttonBarWidget->setMaximumSize(100000,50);
 	QGridLayout *buttonbarlayout = new QGridLayout(buttonBarWidget);
-	saveButton = new QPushButton("Save");
+	saveButton = new QPushButton("Save Preset");
 	saveButton->setIcon(QIcon::fromTheme("upload"));
 	saveButton->setMinimumSize(40,40);
 	connect(saveButton, &QPushButton::clicked, this, &NewDatasetWindow::savePresetsClickedSlot);
-	loadButton = new QPushButton("Load");
+	loadButton = new QPushButton("Load Preset");
 	loadButton->setIcon(QIcon::fromTheme("download"));
 	loadButton->setMinimumSize(40,40);
 	connect(loadButton, &QPushButton::clicked, this, &NewDatasetWindow::loadPresetsClickedSlot);
@@ -159,15 +149,6 @@ void NewDatasetWindow::datasetPathChangedSlot(const QString &path) {
 	m_datasetConfig->datasetPath = path;
 }
 
-void NewDatasetWindow::datasetPathClickedSlot() {
-	QString dir = QFileDialog::getExistingDirectory(this,"Dataset Path", "./",
-				QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-	if (dir != "") {
-		datasetPathEdit->setText(dir);
-		m_datasetConfig->datasetPath = dir;
-	}
-}
-
 
 void NewDatasetWindow::numCamerasChangedSlot(int num) {
 	m_datasetConfig->numCameras = num;
@@ -182,6 +163,18 @@ void NewDatasetWindow::samplingMethodChangedSlot(const QString &method) {
 }
 
 void NewDatasetWindow::createDatasetClickedSlot() {
+	if (m_datasetConfig->datasetPath == "") {
+		m_errorMsg->showMessage("Dataset Path is empty. Dataset Creation aborted...");
+		return;
+	}
+	if (m_datasetConfig->datasetName == "") {
+		m_errorMsg->showMessage("Dataset Name is empty. Dataset Creation aborted...");
+		return;
+	}
+	if (recordingsTable->getItems().size() == 0) {
+		m_errorMsg->showMessage("No Recording selected. Dataset Creation aborted...");
+		return;
+	}
 	emit createDataset(recordingsTable->getItems(), entitiesItemList->getItems(), keypointsItemList->getItems());
 	datasetProgressInfoWindow->exec();
 }

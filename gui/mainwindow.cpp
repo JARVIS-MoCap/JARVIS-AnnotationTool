@@ -41,6 +41,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	statusBar()->showMessage(tr("Ready"), 2000);
 
 	settingsWindow = new SettingsWindow(this);
+	helpWindow = new HelpWindow(this);
 
 	mainBar = new MainBar(this);
 	this->addToolBar(mainBar);
@@ -109,6 +110,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	//--- SIGNAL-SLOT Connections ---//
 	//-> Incoming Signals
 	connect(mainBar, &MainBar::openSettingsWindow, this, &MainWindow::openSettingsWindowSlot);
+	connect(mainBar, &MainBar::openHelpWindow, this, &MainWindow::openHelpWindowSlot);
 	connect(editorWidget, &EditorWidget::quitClicked, this, &MainWindow::quitClickedSlot);
 	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded, this, &MainWindow::datasetLoadedSlot);
 	connect(mainBar, &MainBar::exitToMainPage, this, &MainWindow::exitToMainPageSlot);
@@ -131,8 +133,12 @@ void MainWindow::openSettingsWindowSlot() {
 	settingsWindow->show();
 }
 
+void MainWindow::openHelpWindowSlot() {
+	helpWindow->show();
+}
+
 void MainWindow::loadDatasetClickedSlot() {
-	loadDatasetWindow->show();
+	loadDatasetWindow->exec();
 }
 
 void MainWindow::newDatasetClickedSlot() {

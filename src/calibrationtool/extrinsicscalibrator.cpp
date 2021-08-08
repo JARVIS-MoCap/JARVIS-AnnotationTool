@@ -127,12 +127,11 @@ void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
   }
 
   Intrinsics i1,i2;
+  QMap<QString, double> intrinsicsErrorMap;
   bool intrinsicsFound = tryLoadIntrinsics(cameraPair, i1,i2);
-  if (intrinsicsFound) {
-  }
-  else {
-    calibrateIntrinsicsStep(cameraPair[0].toStdString(), objectPoints, imagePoints1, size, i1);
-    calibrateIntrinsicsStep(cameraPair[1].toStdString(), objectPoints, imagePoints2, size, i2);
+  if (!intrinsicsFound) {
+    intrinsicsErrorMap[cameraPair[0]] = calibrateIntrinsicsStep(cameraPair[0].toStdString(), objectPoints, imagePoints1, size, i1);
+    intrinsicsErrorMap[cameraPair[1]] = calibrateIntrinsicsStep(cameraPair[1].toStdString(), objectPoints, imagePoints2, size, i2);
   }
 
   double mean_repro_error = stereoCalibrationStep(objectPoints, imagePoints1, imagePoints2, i1,i2,e, size, 1.2);
@@ -147,7 +146,7 @@ void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
   mean_repro_error = cv::stereoCalibrate(objectPoints, imagePoints1, imagePoints2, i1.K, i1.D, i2.K, i2.D, size, e.R, e.T, e.E, e.F,errs,
         cv::CALIB_FIX_INTRINSIC, cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 120, 1e-7));
 
-  emit finishedExtrinsics(mean_repro_error, m_threadNumber); //TODO: this is not quite right for triplet, do average over both instead or something
+  emit finishedExtrinsics(mean_repro_error, intrinsicsErrorMap, m_threadNumber); //TODO: this is not quite right for triplet, do average over both instead or something
 }
 
 double ExtrinsicsCalibrator::stereoCalibrationStep(std::vector<std::vector<cv::Point3f>> &objectPoints, std::vector<std::vector<cv::Point2f>> &imagePoints1,
@@ -171,7 +170,7 @@ double ExtrinsicsCalibrator::stereoCalibrationStep(std::vector<std::vector<cv::P
   return mean_repro_error;
 }
 
-void ExtrinsicsCalibrator::calibrateIntrinsicsStep(std::string cameraName, std::vector<std::vector<cv::Point3f>> objectPoints, std::vector<std::vector<cv::Point2f>> imagePoints,
+double ExtrinsicsCalibrator::calibrateIntrinsicsStep(std::string cameraName, std::vector<std::vector<cv::Point3f>> objectPoints, std::vector<std::vector<cv::Point2f>> imagePoints,
         cv::Size size, Intrinsics &intrinsics) {
   std::cout << "Calibrating Camera_" << cameraName << " using "<< imagePoints.size() << " Images..." << std::endl;
   std::vector< cv::Mat > rvecs, tvecs;
@@ -182,6 +181,8 @@ void ExtrinsicsCalibrator::calibrateIntrinsicsStep(std::string cameraName, std::
   cv::FileStorage fs1(m_parametersSavePath + "/Intrinsics/Intrinsics_" + cameraName + ".yaml", cv::FileStorage::WRITE);
   fs1 << "intrinsicMatrix" << intrinsics.K.t();
   fs1 << "distortionCoefficients" << intrinsics.D;
+
+  return repro_error;
 }
 
 QString ExtrinsicsCalibrator::getFormat(const QString& path, const QString& cameraName) {

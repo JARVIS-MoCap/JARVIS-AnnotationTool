@@ -19,17 +19,20 @@ CalibrationStatisticsWindow::CalibrationStatisticsWindow(QList<QString> cameraNa
 	QGridLayout *layout = new QGridLayout(this);
 
 
-	QLabel *intrinsicsChartLabel = new QLabel("Intrinsics Reprojection Errors");
-	intrinsicsChartLabel->setFont(QFont("Sans Serif", 14, QFont::Bold));
+	QLabel *intrinsicsChartLabel;
+	if (intrinsicsReproErrors.size() > 0) {
+		intrinsicsChartLabel = new QLabel("Intrinsics Reprojection Errors");
+		intrinsicsChartLabel->setFont(QFont("Sans Serif", 14, QFont::Bold));
 
-	std::vector<double> intrinsicsReproErrorsVec;
-	for (const auto& error : intrinsicsReproErrors) {
-		intrinsicsReproErrorsVec.push_back(error);
+		std::vector<double> intrinsicsReproErrorsVec;
+		for (const auto& error : intrinsicsReproErrors) {
+			intrinsicsReproErrorsVec.push_back(error);
+		}
+		intrinsicsChartView = new CalibrationChartView(cameraNames, intrinsicsReproErrorsVec);
 	}
-	intrinsicsChartView = new CalibrationChartView(cameraNames, intrinsicsReproErrorsVec);
 
 	QLabel *extrinsicsChartLabel;
-	if (cameraPairs.size() > 0) {
+	if (extrinsicsReproErrors.size() > 0) {
 		extrinsicsChartLabel = new QLabel("Extrinsic Reprojection Errors");
 		extrinsicsChartLabel->setFont(QFont("Sans Serif", 14, QFont::Bold));
 
@@ -46,19 +49,22 @@ CalibrationStatisticsWindow::CalibrationStatisticsWindow(QList<QString> cameraNa
 		for (const auto& error : extrinsicsReproErrors) {
 			extrinsicsReproErrorsVec.push_back(error);
 		}
-		extrinsicsChartView = new CalibrationChartView(cameraPairNames, extrinsicsReproErrorsVec);
+		extrinsicsChartView = new CalibrationChartView(cameraPairNames, extrinsicsReproErrorsVec, "interactive");
 	}
 
 	closeButton = new QPushButton("Close");
 	closeButton->setMinimumSize(30,30);
 	connect(closeButton, &QPushButton::clicked, this, &CalibrationStatisticsWindow::accept);
 
-
-	layout->addWidget(intrinsicsChartLabel,0,0, Qt::AlignCenter);
-	layout->addWidget(intrinsicsChartView,1,0);
-	if (cameraPairs.size() > 0) {
+	if (intrinsicsReproErrors.size() > 0) {
+		layout->addWidget(intrinsicsChartLabel,0,0, Qt::AlignCenter);
+		layout->addWidget(intrinsicsChartView,1,0);
+	}
+	if (extrinsicsReproErrors.size() > 0) {
 		layout->addWidget(extrinsicsChartLabel,0,1, Qt::AlignCenter);
 		layout->addWidget(extrinsicsChartView,1,1);
+	}
+	if (intrinsicsReproErrors.size() > 0 && extrinsicsReproErrors.size() > 0) {
 		layout->addWidget(closeButton,2,0,1,2, Qt::AlignRight);
 	}
 	else {

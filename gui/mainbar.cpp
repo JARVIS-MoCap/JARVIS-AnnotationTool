@@ -23,6 +23,11 @@ MainBar::MainBar(QWidget *parent) : QToolBar(parent) {
 	createToolBarButton(settingsButton, settingsAction, QIcon::fromTheme("settings"),
 				true, false, QSize(50,50));
 	connect(settingsAction, &QAction::triggered, this, &MainBar::openSettingsWindow);
+	helpButton = new QToolButton(this);
+	helpAction = new QAction(this);
+	createToolBarButton(helpButton, helpAction, QIcon::fromTheme("help"),
+				true, false, QSize(50,50));
+	connect(helpAction, &QAction::triggered, this, &MainBar::openHelpWindow);
 	exitButton = new QToolButton(this);
 	exitAction = new QAction(this);
 	createToolBarButton(exitButton, exitAction, QIcon::fromTheme("home"),
@@ -33,5 +38,6 @@ MainBar::MainBar(QWidget *parent) : QToolBar(parent) {
 	this->addWidget(nameLabel);
 	this->addWidget(spacer1);
 	this->addWidget(settingsButton);
+	this->addWidget(helpButton);
 	this->addWidget(exitButton);
 }

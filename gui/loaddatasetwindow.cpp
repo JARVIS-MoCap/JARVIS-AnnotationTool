@@ -12,11 +12,12 @@
 #include <QFileDialog>
 
 
-LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
+LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
+	setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+	setWindowTitle("Load Dataset");
 	this->resize(600,400);
 	this->setMinimumSize(600,200);
 	settings = new QSettings();
-	setWindowTitle("Load Dataset");
 	QGridLayout *loaddatasetlayout = new QGridLayout(this);
 
 	datasetFolderBox = new QGroupBox("Select Dataset Folder");
@@ -30,12 +31,25 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Wind
 	datasetFolderButton->setMinimumSize(40,40);
 	datasetFolderButton->setIcon(QIcon::fromTheme("folder"));
 	connect(datasetFolderButton, &QPushButton::clicked, this, &LoadDatasetWindow::datasetFolderClickedSlot);
+	datasetfolderlayout->addWidget(datasetFolderEdit,0,0);
+	datasetfolderlayout->addWidget(datasetFolderButton,0,1);
+	QWidget *buttonWidget = new QWidget(this);
+	buttonWidget->setMaximumSize(10000,50);
+	QGridLayout *buttonlayout = new QGridLayout(buttonWidget);
+	QWidget *spacer = new QWidget(buttonWidget);
+	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	loadDatasetButton = new QPushButton("Load Dataset");
 	loadDatasetButton->setMinimumSize(40,40);
 	loadDatasetButton->setIcon(QIcon::fromTheme("download"));
 	connect(loadDatasetButton, &QPushButton::clicked, this, &LoadDatasetWindow::loadDatasetClickedSlot);
-	datasetfolderlayout->addWidget(datasetFolderEdit,0,0);
-	datasetfolderlayout->addWidget(datasetFolderButton,0,1);
+	cancelButton = new QPushButton("Cancel");
+	cancelButton->setMinimumSize(40,40);
+	cancelButton->setIcon(QIcon::fromTheme("discard"));
+	connect(cancelButton, &QPushButton::clicked, this, &LoadDatasetWindow::reject);
+	buttonlayout->addWidget(spacer,0,0);
+	buttonlayout->addWidget(cancelButton,0,1);
+	buttonlayout->addWidget(loadDatasetButton,0,2);
+
 
 	cameraOrderBox = new QGroupBox("Camera Order");
 	QGridLayout *cameraorderlayout = new QGridLayout(cameraOrderBox);
@@ -56,7 +70,8 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Wind
 
 	loaddatasetlayout->addWidget(datasetFolderBox,0,0);
 	loaddatasetlayout->addWidget(cameraOrderBox,1,0);
-	loaddatasetlayout->addWidget(loadDatasetButton,2,0,Qt::AlignRight);
+	loaddatasetlayout->addWidget(buttonWidget,2,0);
+
 }
 
 void LoadDatasetWindow::datasetFolderClickedSlot() {

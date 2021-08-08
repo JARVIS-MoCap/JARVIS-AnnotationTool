@@ -19,15 +19,16 @@
 class CalibrationChartView : public QChartView {
 	Q_OBJECT
 	public:
-		explicit CalibrationChartView(QList<QString> names, std::vector<double> reproErrors);
+		explicit CalibrationChartView(QList<QString> names, std::vector<double> reproErrors, QString mode = "normal");
 
 	public slots:
 
 	private:
 		void update(int selectedIndex = -1);
+		QString m_mode;
 		std::vector<double> m_reproErrors;
 		QList <QString> m_names;
-		QList<QBarSeries*> m_barSeriesList;
+		QList<QHorizontalStackedBarSeries*> m_barSeriesList;
 
 	private slots:
 		void onHoverSlot();

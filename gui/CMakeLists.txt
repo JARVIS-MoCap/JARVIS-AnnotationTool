@@ -6,6 +6,7 @@ add_subdirectory(newcalibrationwidget)
 add_subdirectory(exportdatasetwidget)
 add_subdirectory(editor)
 add_subdirectory(conveniencewidgets)
+add_subdirectory(helpwindow)
 
 
 add_library(${PROJECT_NAME}
@@ -33,6 +34,7 @@ target_link_libraries(${PROJECT_NAME}
   newcalibrationwidget
   exportdatasetwidget
   conveniencewidgets
+  helpwindow
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused)

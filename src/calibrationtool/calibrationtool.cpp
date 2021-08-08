@@ -18,6 +18,8 @@ CalibrationTool::CalibrationTool(CalibrationConfig *calibrationConfig) :
 
 void CalibrationTool::makeCalibrationSet()  {
   m_calibrationCanceled = false;
+  m_intrinsicsReproErrors.clear();
+  m_extrinsicsReproErrors.clear();
   if (m_calibrationConfig->seperateIntrinsics) {
     std::cout << "Calib Exteinsics: " << m_calibrationConfig->calibrateExtrinsics << std::endl;
 		QThreadPool *threadPool = QThreadPool::globalInstance();
@@ -58,8 +60,15 @@ void CalibrationTool::finishedIntrinsicsSlot(double reproError, int threadNumber
   m_intrinsicsReproErrors[threadNumber] = reproError;
 }
 
-void CalibrationTool::finishedExtrinsicsSlot(double reproError, int threadNumber) {
+void CalibrationTool::finishedExtrinsicsSlot(double reproError, QMap<QString, double> intrinsicsErrorMap,int threadNumber) {
   m_extrinsicsReproErrors[threadNumber] = reproError;
+  if (intrinsicsErrorMap.size() == 2) {
+    for (const auto & key : intrinsicsErrorMap.keys()) {
+      std::cout << key.toStdString() << std::endl;
+      m_intrinsicsReproErrors[m_calibrationConfig->cameraNames.indexOf(key)] = intrinsicsErrorMap[key];
+    }
+    //intrinsicsErrorMap[m_calibrationConfig->cameraNames.indexOf(intrinsicsErrorMap)]
+  }
 }
 
 void CalibrationTool::cancelCalibrationSlot() {

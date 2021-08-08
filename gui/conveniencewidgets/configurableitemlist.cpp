@@ -62,6 +62,11 @@ QList<QString> ConfigurableItemList::getItems() {
 
 
 void ConfigurableItemList::itemSelectedSlot(QListWidgetItem *item) {
+	QString label = QInputDialog::getText(this,m_name,"Change Label:", QLineEdit::Normal, item->text());
+	if (label != "") {
+		item->setText(label);
+		emit itemsChanged(getItems());
+	}
 }
 
 void ConfigurableItemList::moveItemUpSlot() {
@@ -88,14 +93,11 @@ void ConfigurableItemList::moveItemDownSlot() {
 
 
 void ConfigurableItemList::addItemSlot() {
-	QList<QString> items;
-	items.append(QInputDialog::getText(this,m_name,"Enter Label:", QLineEdit::Normal));
-	if (!items.isEmpty()) {
-		for (const auto & item : items) {
-			addItem(item);
-		}
-		emit itemsChanged(getItems());
+	QString label = QInputDialog::getText(this,m_name,"Enter Label:", QLineEdit::Normal);
+	if (label != "") {
+		addItem(label);
 	}
+	emit itemsChanged(getItems());
 }
 
 void ConfigurableItemList::removeItemSlot() {

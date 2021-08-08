@@ -10,6 +10,7 @@
 #include "globals.hpp"
 #include "mainbar.hpp"
 #include "settingswindow.hpp"
+#include "helpwindow.hpp"
 #include "loaddatasetwindow.hpp"
 #include "newdatasetwindow.hpp"
 #include "newcalibrationwidget.hpp"
@@ -27,12 +28,14 @@ class MainWindow : public QMainWindow {
 
 	public slots:
 		void openSettingsWindowSlot();
+		void openHelpWindowSlot();
 		void quitClickedSlot();
 
 	private:
 		void closeEvent(QCloseEvent *event);
 
 		SettingsWindow *settingsWindow;
+		HelpWindow *helpWindow;
 
 		MainBar *mainBar;
 		QStackedWidget *stackedWidget;

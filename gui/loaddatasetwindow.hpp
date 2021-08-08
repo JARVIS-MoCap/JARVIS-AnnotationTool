@@ -19,8 +19,9 @@
 #include <QToolBar>
 #include <QGroupBox>
 #include <QListWidget>
+#include <QDialog>
 
-class LoadDatasetWindow : public QWidget {
+class LoadDatasetWindow : public QDialog {
 	Q_OBJECT
 	public:
 		explicit LoadDatasetWindow(QWidget *parent = nullptr);
@@ -39,6 +40,7 @@ class LoadDatasetWindow : public QWidget {
 		QLineEdit *datasetFolderEdit;
 		QPushButton *datasetFolderButton;
 		QPushButton *loadDatasetButton;
+		QPushButton *cancelButton;
 
 		QGroupBox *cameraOrderBox;
 		QListWidget *cameraOrderList;

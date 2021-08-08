@@ -17,6 +17,7 @@
 #include "calibrationtool.hpp"
 #include "calibrationprogressinfowindow.hpp"
 #include "calibrationstatisticswindow.hpp"
+#include "namesuggestiondialog.hpp"
 
 #include <QPushButton>
 #include <QTableWidget>
@@ -59,6 +60,7 @@ class NewCalibrationWidget : public QWidget {
 		YesNoRadioWidget *calibrateExtrinsicsRadioWidget;
 		DirPathWidget *intrinsicsPathWidget;
 		DirPathWidget *extrinsicsPathWidget;
+		QPushButton *updateNamesListButton;
 		QSpinBox *maxSamplingFrameRateEdit;
 		QSpinBox *intrinsicsFramesEdit;
 		QSpinBox *extrinsicsFramesEdit;
@@ -86,6 +88,8 @@ class NewCalibrationWidget : public QWidget {
 		void loadPresetsClickedSlot();
 		void savePresetSlot(const QString& preset);
 		void loadPresetSlot(const QString& preset);
+
+		void updateNamesListSlot();
 		void calibrateClickedSlot();
 		void calibrationFinishedSlot();
 		void calibrationCanceledSlot();

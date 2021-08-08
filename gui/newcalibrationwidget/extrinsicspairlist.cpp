@@ -100,7 +100,7 @@ void ExtrinsicsPairList::addItemSlot() {
 	}
 	else if (newPair.size() == 3) {
 		m_cameraPairs.append(newPair);
-		addItem(newPair[0] + " --> " + newPair[1] + " --> " + newPair[1]);
+		addItem(newPair[0] + " --> " + newPair[1] + " --> " + newPair[2]);
 	}
 }
 

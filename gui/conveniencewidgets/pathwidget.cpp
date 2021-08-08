@@ -11,10 +11,12 @@
 
 DirPathWidget::DirPathWidget(const QString& name, const QString& defaultPath, QWidget *parent) :
 	m_name(name),  QWidget(parent) {
+		m_currentPath = QDir::homePath();
 	QGridLayout *layout = new QGridLayout(this);
 	layout->setMargin(0);
 	pathEdit = new QLineEdit(defaultPath, this);
-	connect (pathEdit, &QLineEdit::textEdited, this, &DirPathWidget::pathChangedSlot);
+	connect (pathEdit, &QLineEdit::returnPressed, this, &DirPathWidget::pathEditedSlot);
+	connect (pathEdit, &QLineEdit::textChanged, this, &DirPathWidget::pathChangedSlot);
 	pathButton = new QPushButton();
 	pathButton->setMinimumSize(25,25);
 	pathButton->setMaximumSize(25,25);
@@ -24,14 +26,32 @@ DirPathWidget::DirPathWidget(const QString& name, const QString& defaultPath, QW
 	layout->addWidget(pathButton,0,1);
 }
 
-void DirPathWidget::pathChangedSlot(const QString& path) {
+void DirPathWidget::pathEditedSlot() {
+	QString path = pathEdit->text();
+	if (path == "") {
+		m_currentPath	= QDir::homePath();
+	}
+	else {
+		m_currentPath = path;
+	}
 	emit pathChanged(path);
 }
 
+void DirPathWidget::pathChangedSlot(const QString& path) {
+	if (path == "") {
+		m_currentPath	= QDir::homePath();
+	}
+	else {
+		m_currentPath = path;
+	}
+	//emit pathChanged(path);
+}
+
 void DirPathWidget::pathClickedSlot() {
-	QString dir = QFileDialog::getExistingDirectory(this,m_name, "./",
+	QString dir = QFileDialog::getExistingDirectory(this,m_name, m_currentPath,
 				QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-	if (dir != "") {
+	if (dir != "" && pathEdit->text() != dir) {
 		pathEdit->setText(dir);
+		emit pathChanged(dir);
 	}
 }
