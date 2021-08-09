@@ -13,6 +13,7 @@
 
 NameSuggestionDialog::NameSuggestionDialog(QString name, QList<QString> cameraNames, QWidget *parent) :
 			m_name(name), m_cameraNames(cameraNames), QDialog(parent) {
+	setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 	this->setWindowTitle("Detected " + name);
 	this->setMinimumSize(600,250);
 
