@@ -24,6 +24,7 @@ DatasetCreator::DatasetCreator(DatasetConfig *datasetConfig) : m_datasetConfig(d
 }
 
 void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings, QList<QString> entities, QList<QString> keypoints) {
+	m_creationCanceled = false;
 	m_recordingItems = recordings;
 	m_entitiesList = entities;
 	m_keypointsList = keypoints;
@@ -51,16 +52,25 @@ void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings, QList<QS
 			timeLineWindows.append(fullWindow);
 			emit currentSegmentChanged("");
 			QList<int> frameNumbers = extractFrames(recording.path, timeLineWindows, cameras);
-			createSavefile(recording.path, cameras, m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName + "/" + recording.name, frameNumbers);
+			if (!m_creationCanceled) {
+				createSavefile(recording.path, cameras, m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName + "/" + recording.name, frameNumbers);
+			}
 		}
 		QMap<QString, QList<TimeLineWindow>> recordingSubsets = getRecordingSubsets(recording.timeLineList);
 		for (const auto &subsetName : recordingSubsets.keys()) {
 			emit currentSegmentChanged(subsetName);
 			QList<int> frameNumbers = extractFrames(recording.path, recordingSubsets[subsetName], cameras);
-			createSavefile(recording.path, cameras, m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName + "/" + path + "/" + subsetName, frameNumbers);
+			if (!m_creationCanceled) {
+				createSavefile(recording.path, cameras, m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName + "/" + path + "/" + subsetName, frameNumbers);
+			}
+			else {
+				break;
+			}
 		}
 	}
-	emit datasetCreated();
+	if (!m_creationCanceled) {
+		emit datasetCreated();
+	}
 }
 
 QList<QString> DatasetCreator::getCameraNames(const QString& path) {
@@ -151,13 +161,14 @@ QList<int> DatasetCreator::extractFrames(const QString &path, QList<TimeLineWind
 		for (int i = 0; i < m_datasetConfig->numCameras; i++) {
 			VideoStreamer *streamer = new VideoStreamer(path + "/" + cameras[i] + "." + m_datasetConfig->videoFormat, timeLineWindows, m_datasetConfig->frameSetsRecording, i);
 			connect(streamer, &VideoStreamer::computedDCTs, this, &DatasetCreator::computedDCTsSlot);
+			connect(this, &DatasetCreator::creationCanceled, streamer, &VideoStreamer::creationCanceledSlot);
 			if (i == 0) {
 				connect(streamer, &VideoStreamer::dctProgress, this, &DatasetCreator::dctProgress);
 			}
 			streamers.append(streamer);
  			threadPool->start(streamer);
 		}
-		while (!threadPool->waitForDone(100)) {
+		while (!threadPool->waitForDone(10)) {
 			QCoreApplication::instance()->processEvents();
 		}
 
@@ -218,8 +229,10 @@ QList<QString> DatasetCreator::getAndCopyFrames(const QString& recording, QList<
 		QString videoPath = recording + "/" + camera + "." + m_datasetConfig->videoFormat;
 		QString destinationPath = dataFolder + "/" + camera;
 		ImageWriter *writer = new ImageWriter(videoPath, destinationPath, frameNumbers, threadNumber);
+		connect(this, &DatasetCreator::creationCanceled, writer, &ImageWriter::creationCanceledSlot);
 		if (threadNumber == 0) {
 			connect(writer, &ImageWriter::copyImagesStatus, this, &DatasetCreator::copyImagesStatus);
+
 		}
 		threadNumber++;
 		writers.append(writer);
@@ -228,7 +241,7 @@ QList<QString> DatasetCreator::getAndCopyFrames(const QString& recording, QList<
 	for (const auto &frameNumber : frameNumbers) {
 		frameNames.append("Frame_" + QString::number(frameNumber) + ".jpg");
 	}
-	while (!threadPool->waitForDone(100)) {
+	while (!threadPool->waitForDone(10)) {
 		QCoreApplication::instance()->processEvents();
 	}
 	return frameNames;
@@ -296,77 +309,8 @@ void DatasetCreator::computedDCTsSlot(QList<cv::Mat> dctImages, QMap<int,int> fr
 	}
 }
 
-
-VideoStreamer::VideoStreamer(const QString &videoPath, QList<TimeLineWindow> timeLineWindows, int numFramesToExtract, int threadNumber) {
-	m_cap = new cv::VideoCapture(videoPath.toStdString());
-	m_threadNumber = threadNumber;
-	m_timeLineWindows = timeLineWindows;
-	m_numFramesToExtract = numFramesToExtract;
-}
-
-void VideoStreamer::run() {
-	bool readFrame = true;
-	int frameCount = 0;
-	int indexCount = 0;
-	int totalFrames = 0;
-	int minFrameCount = 0;
-	int subSamplingRate = 10;
-	cv::Mat img,dctImage;
-	for (const auto & window : m_timeLineWindows) {
-		int windowSize = window.end-window.start;
-		totalFrames += windowSize;
-		if (minFrameCount == 0 || windowSize < minFrameCount) minFrameCount = windowSize;
-	}
-	while (m_numFramesToExtract > minFrameCount/subSamplingRate) {
-		subSamplingRate = subSamplingRate/2;
-	}
-
-	for (const auto & window : m_timeLineWindows) {
-		frameCount = window.start;
-		while (frameCount < window.end) {
-			if (m_threadNumber == 0 && indexCount % 1 == 0) {
-				emit dctProgress(indexCount, totalFrames/subSamplingRate);
-			}
-			m_cap->set(cv::CAP_PROP_POS_FRAMES, frameCount);
-			readFrame = m_cap->read(img);
-			if (readFrame) {
-				cv::resize(img, img, cv::Size(160, 128));
-				cv::cvtColor(img,img, cv::COLOR_BGR2GRAY);
-				img.convertTo(img, CV_32FC1);
-				cv::dct(img/255.0, dctImage);
-				dctImage = dctImage(cv::Rect(0,0,20,16));
-				m_dctImages.append(dctImage);
-				m_frameNumberMap[indexCount++] = frameCount;
-				frameCount += subSamplingRate;
-			}
-		}
-	}
-	emit computedDCTs(m_dctImages, m_frameNumberMap, m_threadNumber);
-}
-
-
-ImageWriter::ImageWriter(const QString &videoPath, const QString &destinationPath, QList<int> frameNumbers, int threadNumber) :
-	m_destinationPath(destinationPath), m_frameNumbers(frameNumbers), m_threadNumber(threadNumber) {
-		m_cap = new cv::VideoCapture(videoPath.toStdString());
-}
-
-void ImageWriter::run() {
-	int totalNumFrames = m_frameNumbers.size();
-	int frameCount = 0;
-
-	for (const auto & frameNumber : m_frameNumbers) {
-		cv::Mat frame;
-		m_cap->set(cv::CAP_PROP_POS_FRAMES, frameNumber-1);
-		if (m_cap->read(frame)) {
-			cv::imwrite((m_destinationPath + "/" +  "Frame_" + QString::number(frameNumber) + ".jpg").toStdString(), frame);
-			frameCount++;
-		}
-		else {
-			std::cout << "Error reading Frame"<< std::endl;
-			return;
-		}
-		if (m_threadNumber == 0 && frameCount % 1 == 0) {
-			emit copyImagesStatus(frameCount, totalNumFrames);
-		}
-	}
+void DatasetCreator::cancelCreationSlot() {
+	std::cout << "CANCEL CREATION" << std::endl;
+	m_creationCanceled = true;
+	emit creationCanceled();
 }

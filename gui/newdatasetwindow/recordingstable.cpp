@@ -19,14 +19,19 @@
 RecordingsTable::RecordingsTable(QString name, DatasetConfig *datasetConfig, QWidget *parent) :
 			m_name(name), m_datasetConfig(datasetConfig), QWidget(parent) {
 	QGridLayout *layout = new QGridLayout(this);
+	layout->setMargin(3);
 	m_errorMsg = new QErrorMessage();
+
+	m_currentDir = QDir(QDir::homePath());
 
 	recordingsTable = new QTableWidget(0, 5);
 	recordingsTable->setAlternatingRowColors(true);
 	QStringList labels;
 	labels << "Name" << "Path"  << "Segments" << "" << "";
 	recordingsTable->setHorizontalHeaderLabels(labels);
-	recordingsTable->horizontalHeader()-> setSectionResizeMode(1, QHeaderView::Stretch);
+	recordingsTable->horizontalHeader()-> setSectionResizeMode(0, QHeaderView::Stretch);
+	recordingsTable->horizontalHeader()-> setSectionResizeMode(1, QHeaderView::ResizeToContents);
+
 	recordingsTable->setColumnWidth(2, 155);
 	recordingsTable->setColumnWidth(3, 30);
 	recordingsTable->setColumnWidth(4, 30);
@@ -35,7 +40,7 @@ RecordingsTable::RecordingsTable(QString name, DatasetConfig *datasetConfig, QWi
 	recordingsTable->setSelectionMode(QAbstractItemView::NoSelection);
 	connect(recordingsTable, &QTableWidget::itemChanged, this, &RecordingsTable::nameEditedSlot);
 
-	addItemButton = new QPushButton();
+	addItemButton = new QPushButton("Add Recording");
 	addItemButton->setIcon(QIcon::fromTheme("plus"));
 	addItemButton->setMinimumSize(35,35);
 	connect(addItemButton, &QPushButton::clicked, this, &RecordingsTable::addItemSlot);
@@ -58,30 +63,26 @@ int RecordingsTable::getNumberSubfolders(QString path) {
 	return count;
 }
 
-bool RecordingsTable::isValidRecordingFolder(QString path) {
-	if (getNumberSubfolders(path) == m_datasetConfig->numCameras) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
 
 void RecordingsTable::addItemSlot() {
-	QString dir = QFileDialog::getExistingDirectory(this,m_name, "/media/trackingsetup/Elements/Recordings/Ralph/Ralph_Test_15072021",
+
+	QString dir = QFileDialog::getExistingDirectory(this,m_name, m_currentDir.path(),
 				QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 	if (dir == "") {
 		return;
 	}
-	if (isValidRecordingFolder(dir)) {
+	int numValidRecordings = getNumberSubfolders(dir);
+	if (numValidRecordings != 0) {
 		RecordingItem recordingItem;
+		m_datasetConfig->numCameras = numValidRecordings;
 		recordingItem.name = dir.split("/").takeLast();
 		recordingItem.path = dir;
 		m_recordingItems.append(recordingItem);
+		m_currentDir = QDir(dir);
+		m_currentDir.cdUp();
 	}
 	else {
-		m_errorMsg->showMessage("Selected folder is not a valid recording folder. Make sure there are exactly " +
-											      QString::number(m_datasetConfig->numCameras) + " recording files in this folder.");
+		m_errorMsg->showMessage("Selected folder is not a valid recording folder.");
 	}
 	updateTable();
 }

@@ -23,8 +23,6 @@ Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames) : m_d
 	}
 	m_numCameras = m_cameraNames.size();
 	if (m_numCameras == 0) {
-		QErrorMessage *msg = new QErrorMessage();
-		msg->showMessage("This directory does not contain any subdirectories! Make sure the savefiles for each camera are stored in a seperate subdirectory (even if just one camera is used).");
 		return;
 	}
 	QList<QFile*> saveFiles;
@@ -32,8 +30,6 @@ Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames) : m_d
 		QFile *file = new QFile(datasetFolder + "/" + m_cameraNames[i] +"/annotations.csv");
 		saveFiles.append(file);
 		if (!file->open(QIODevice::ReadOnly)) {
-			QErrorMessage *msg = new QErrorMessage();
-			msg->showMessage("Error reading savefile for Camera " + m_cameraNames[i] + "! Make sure a savefile called 'annotations.csv' exists in the cameras directory.");
 			return;
 		}
 	}

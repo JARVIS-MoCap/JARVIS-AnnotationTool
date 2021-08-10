@@ -17,7 +17,8 @@
 
 
 HelpWindow::HelpWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
-	this->setMinimumSize(1100,800);
+	this->resize(1100,800);
+	this->setMinimumSize(600,400);
 	QGridLayout *layout = new QGridLayout(this);
 	mainSplitter = new QSplitter(this);
 	layout->addWidget(mainSplitter,0,0);
@@ -28,7 +29,7 @@ HelpWindow::HelpWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	tableOfContents->setColumnCount(1);
 	tableOfContents->setHeaderLabel("Table of Contents");
 	tableOfContents->setMaximumSize(300,100000);
-	connect(tableOfContents, &QTreeWidget::itemDoubleClicked, this, &HelpWindow::itemSlectedSlot);
+	connect(tableOfContents, &QTreeWidget::itemClicked, this, &HelpWindow::itemSlectedSlot);
 
 	QTreeWidgetItem *gettingStartedItem = new QTreeWidgetItem(tableOfContents, QStringList(QString("Getting Started")));
 	QTreeWidgetItem *introductionItem = new QTreeWidgetItem(gettingStartedItem, QStringList(QString("Introduction")));
@@ -73,16 +74,18 @@ void HelpWindow::setDocument(const QString &path) {
 	QTextDocument *doc = new QTextDocument();
 	//doc->setBaseUrl(QUrl("C:\\Users\\timoh\\Documents\\AnnotationTool\\help\\"));
 	std::cout << doc->baseUrl().path().toStdString() << std::endl;
-	QFile f1("/github-markdown.css");
+	QFile f1("github-markdown.css");
 	f1.open(QFile::ReadOnly | QFile::Text);
 	QTextStream in1(&f1);
 	doc->setDefaultStyleSheet(in1.readAll());
 	textBrowser->setDocument(doc);
+	f1.close();
 
 	QFile f(path);
 	f.open(QFile::ReadOnly | QFile::Text);
 	QTextStream in(&f);
 	QString html = in.readAll();
 	doc->setHtml(html);
+	f.close();
 
 }

@@ -37,8 +37,6 @@ class DatasetControlWidget : public QWidget {
 	private:
 		void getAnnotationCounts(int frameIndex, int &annotatedCount, int &totalCount);
 
-		QLineEdit *imgSetEdit;
-		QLabel *imgSetTotalLabel;
 		QTableWidget *framesTable;
 
 		int m_currentFrameIndex = 0;

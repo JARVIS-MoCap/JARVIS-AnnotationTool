@@ -4,9 +4,11 @@ add_library(${PROJECT_NAME}
   labelwithtooltip.hpp
   pathwidget.hpp
   configurableitemlist.hpp
+  presetswindow.hpp
   labelwithtooltip.cpp
   pathwidget.cpp
   configurableitemlist.cpp
+  presetswindow.cpp
 )
 
 target_include_directories(${PROJECT_NAME}

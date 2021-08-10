@@ -40,9 +40,11 @@ class DatasetProgressInfoWindow : public QDialog {
 		QLabel *operationLabel;
 		QProgressBar *progressBar;
 		QString m_currentSegmentName = "";
+		QPushButton *cancelButton;
+
 
 		void keyPressEvent(QKeyEvent *e);
-		
+
 	private slots:
 
 

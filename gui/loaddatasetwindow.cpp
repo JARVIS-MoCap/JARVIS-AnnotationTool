@@ -10,12 +10,14 @@
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QFileDialog>
+#include <QErrorMessage>
+
 
 
 LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
 	setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 	setWindowTitle("Load Dataset");
-	this->resize(600,400);
+	this->resize(700,500);
 	this->setMinimumSize(600,200);
 	settings = new QSettings();
 	QGridLayout *loaddatasetlayout = new QGridLayout(this);
@@ -54,14 +56,14 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
 	cameraOrderBox = new QGroupBox("Camera Order");
 	QGridLayout *cameraorderlayout = new QGridLayout(cameraOrderBox);
 	cameraOrderList = new QListWidget(cameraOrderBox);
-	cameraOrderList->setAlternatingRowColors(true);
+	connect(cameraOrderList, &QListWidget::currentItemChanged, this, &LoadDatasetWindow::currentItemChangedSlot);
 	initCameraListFromSettings();
 	upButton = new QPushButton();
-	upButton->setMinimumSize(35,35);
+	upButton->setMinimumSize(30,30);
 	upButton->setIcon(QIcon::fromTheme("up"));
 	connect(upButton, &QPushButton::clicked, this, &LoadDatasetWindow::moveLabelUpSlot);
 	downButton = new QPushButton();
-	downButton->setMinimumSize(35,35);
+	downButton->setMinimumSize(30,30);
 	downButton->setIcon(QIcon::fromTheme("down"));
 	connect(downButton, &QPushButton::clicked, this, &LoadDatasetWindow::moveLabelDownSlot);
 	cameraorderlayout->addWidget(cameraOrderList,0,0,1,2);
@@ -75,7 +77,16 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
 }
 
 void LoadDatasetWindow::datasetFolderClickedSlot() {
-	QString dir = QFileDialog::getExistingDirectory(this,"Dataset Folder", "./",
+	QString currentPath;
+	if (datasetFolderEdit->text() != "") {
+		QDir curDir = QDir(datasetFolderEdit->text());
+		curDir.cdUp();
+		currentPath = curDir.path();
+	}
+	else {
+		currentPath = QDir::homePath();
+	}
+	QString dir = QFileDialog::getExistingDirectory(this,"Dataset Folder", currentPath,
 				QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 	if (dir != "") {
 		datasetFolderEdit->setText(dir);
@@ -96,6 +107,10 @@ void LoadDatasetWindow::loadDatasetClickedSlot() {
 			emit datasetLoaded();
 			this->close();
 		}
+		else {
+			QErrorMessage *msg = new QErrorMessage(this);
+			msg->showMessage("Folder is not a valid Dataset Folder.");
+		}
  }
 }
 
@@ -113,7 +128,7 @@ void LoadDatasetWindow::initCameraListFromSettings() {
 		}
 		m_cameraNames = cameraNames;
 		for (const auto& cam : m_cameraNames) {
-			cameraOrderList->addItem(cam);
+			addItem(cam);
 		}
 	}
 }
@@ -122,7 +137,7 @@ void LoadDatasetWindow::updateCameraOrderList(const QString& dir) {
 	cameraOrderList->clear();
 	m_cameraNames = QDir(dir).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
 	for (const auto& cam : m_cameraNames) {
-		cameraOrderList->addItem(cam);
+		addItem(cam);
 	}
 }
 
@@ -130,18 +145,46 @@ void LoadDatasetWindow::moveLabelUpSlot() {
 	int row = cameraOrderList->currentRow();
 	if (row == -1) return;
 	QListWidgetItem *item = cameraOrderList->takeItem(row);
-	int newRow = std::max(row-1,0);
+	QListWidgetItem *seperatorItem = cameraOrderList->takeItem(row);
+	int newRow = std::max(row-2,0);
 	cameraOrderList->insertItem(newRow,item);
+	cameraOrderList->insertItem(newRow+1,seperatorItem);
 	cameraOrderList->setCurrentRow(newRow);
-	m_cameraNames.move(row, newRow);
+	m_cameraNames.move(row/2, newRow/2);
+	cameraOrderList->setCurrentRow(newRow);
 }
 
 void LoadDatasetWindow::moveLabelDownSlot() {
 	int row = cameraOrderList->currentRow();
 	if (row == -1) return;
 	QListWidgetItem *item = cameraOrderList->takeItem(row);
-	int newRow = std::min(row+1,cameraOrderList->count());
+	QListWidgetItem *seperatorItem = cameraOrderList->takeItem(row);
+	int newRow = std::min(row+2,cameraOrderList->count());
 	cameraOrderList->insertItem(newRow,item);
+	cameraOrderList->insertItem(newRow+1,seperatorItem);
 	cameraOrderList->setCurrentRow(newRow);
-	m_cameraNames.move(row, newRow);
+	m_cameraNames.move(row/2, newRow/2);
+	cameraOrderList->setCurrentRow(newRow);
+}
+
+void LoadDatasetWindow::addItem(const QString &text) {
+	QListWidgetItem * item = new QListWidgetItem();
+	item->setSizeHint(QSize (100, 27));
+	item->setText(text);
+	item->setFlags(item->flags() ^ Qt::ItemIsSelectable);
+	cameraOrderList->addItem(item);
+	QListWidgetItem * seperatorItem = new QListWidgetItem();
+	seperatorItem->setSizeHint(QSize (100, 3));
+	seperatorItem->setFlags(Qt::NoItemFlags);
+	seperatorItem->setBackground(QColor(46, 50, 60));
+	cameraOrderList->addItem(seperatorItem);
+}
+
+void LoadDatasetWindow::currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous) {
+	if (current != nullptr)  {
+		current->setBackgroundColor(QColor(100,164,32));
+	}
+	if (previous != nullptr) {
+		previous->setBackgroundColor(QColor(34, 36, 40));
+	}
 }

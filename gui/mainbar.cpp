@@ -9,6 +9,7 @@
 MainBar::MainBar(QWidget *parent) : QToolBar(parent) {
 	this->setFixedHeight(60);
 	this->setMovable(false);
+	this->setIconSize(QSize(30, 30));
 	QLabel *iconLabel = new QLabel(this);
 	iconLabel->setPixmap((QIcon::fromTheme("hand")).pixmap(50,50));
 	QWidget *nameSpacer = new QWidget(this);
@@ -33,12 +34,18 @@ MainBar::MainBar(QWidget *parent) : QToolBar(parent) {
 	createToolBarButton(exitButton, exitAction, QIcon::fromTheme("home"),
 				true, false, QSize(50,50));
 	connect(exitAction, &QAction::triggered, this, &MainBar::exitToMainPage);
+	QWidget *endSpacer = new QWidget(this);
+	endSpacer->setMinimumSize(5,5);
 
 	this->addWidget(exitButton);
+	this->addSeparator();
 	this->addWidget(settingsButton);
+	this->addSeparator();
 	this->addWidget(helpButton);
 	this->addWidget(spacer1);
-	this->addWidget(iconLabel);
-	this->addWidget(nameSpacer);
 	this->addWidget(nameLabel);
+	this->addWidget(nameSpacer);
+	this->addWidget(iconLabel);
+	this->addWidget(endSpacer);
+
 }

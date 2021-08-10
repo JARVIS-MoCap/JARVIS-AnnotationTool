@@ -19,6 +19,7 @@ ExtrinsicsPairList::ExtrinsicsPairList(QString name, QWidget *parent) :
 			m_name(name), QWidget(parent) {
 
 	QGridLayout *labelselectorlayout = new QGridLayout(this);
+	labelselectorlayout->setMargin(3);
 	itemSelectorList = new QListWidget(this);
 	itemSelectorList->setFont(QFont("Sans Serif", 12));
 	connect(itemSelectorList, &QListWidget::currentItemChanged, this, &ExtrinsicsPairList::currentItemChangedSlot);
@@ -68,6 +69,8 @@ void ExtrinsicsPairList::setItems(QList<QList<QString>> items) {
 
 void ExtrinsicsPairList::moveItemUpSlot() {
 	int row = itemSelectorList->currentRow();
+	std::cout << row << std ::endl;
+	if (row == -1) return;
 	QListWidgetItem *item = itemSelectorList->takeItem(row);
 	QListWidgetItem *seperatorItem = itemSelectorList->takeItem(row);
 	int newRow = std::max(row-2,0);
@@ -80,6 +83,8 @@ void ExtrinsicsPairList::moveItemUpSlot() {
 
 void ExtrinsicsPairList::moveItemDownSlot() {
 	int row = itemSelectorList->currentRow();
+	std::cout << row << std ::endl;
+	if (row == -1) return;
 	QListWidgetItem *item = itemSelectorList->takeItem(row);
 	QListWidgetItem *seperatorItem = itemSelectorList->takeItem(row);
 	int newRow = std::min(row+2,itemSelectorList->count());
@@ -105,9 +110,10 @@ void ExtrinsicsPairList::addItemSlot() {
 }
 
 void ExtrinsicsPairList::removeItemSlot() {
-	delete itemSelectorList->takeItem(itemSelectorList->currentRow());
-	delete itemSelectorList->takeItem(itemSelectorList->currentRow()+1);
-	m_cameraPairs.removeAt(itemSelectorList->currentRow()/2);
+	int row = itemSelectorList->currentRow();
+	delete itemSelectorList->takeItem(row);
+	delete itemSelectorList->takeItem(row);
+	m_cameraPairs.removeAt(row/2);
 }
 
 void ExtrinsicsPairList::cameraNamesChangedSlot(QList<QString> cameraNames) {

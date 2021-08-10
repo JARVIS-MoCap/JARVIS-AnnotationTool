@@ -30,48 +30,46 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 
 	calibrationSetup = new QWidget(stackedWidget);
 	QGridLayout *calibrationsetuplayout = new QGridLayout(calibrationSetup);
-	QGroupBox *infoBox = new QGroupBox(calibrationSetup);
-	QGridLayout *infolayout = new QGridLayout(infoBox);
-	infolayout->setMargin(4);
-	infolayout->setSpacing(10);
-	QLabel *infoIcon = new QLabel();
-	infoIcon->setPixmap(QIcon::fromTheme("info2").pixmap(QSize(60, 60)));
-	QLabel *infoLabel = new QLabel("Select the folders containing the intrinsic and extrinsic parameters for all the cameras respectively.");
-	infoLabel->setWordWrap(true);
-	infolayout->addWidget(infoIcon,0,0);
-	infolayout->addWidget(infoLabel,0,1);
 
 	intrinsicsBox = new QGroupBox("Intrinsic Camera Parameters");
 	QGridLayout *intrinsicslayout = new QGridLayout(intrinsicsBox);
-	QLabel *intrinsicsPathLabel = new QLabel("Intrinsics Path",intrinsicsBox);
+	QLabel *intrinsicsPathLabel = new QLabel("Intrinsics Path:",intrinsicsBox);
 	intrinsicsPathEdit = new QLineEdit(intrinsicsBox);
 	intrinsicsPathButton = new QPushButton();
 	intrinsicsPathButton->setMinimumSize(30,30);
 	intrinsicsPathButton->setIcon(QIcon::fromTheme("folder"));
 	connect(intrinsicsPathButton, &QPushButton::clicked, this, &ReprojectionWidget::intrinsicsPathClickedSlot);
-	intrinsicslayout->addWidget(intrinsicsPathLabel,0,0);
-	intrinsicslayout->addWidget(intrinsicsPathEdit,0,1);
-	intrinsicslayout->addWidget(intrinsicsPathButton,0,2);
+	intrinsicslayout->addWidget(intrinsicsPathLabel,0,0,1,2);
+	intrinsicslayout->addWidget(intrinsicsPathEdit,1,0);
+	intrinsicslayout->addWidget(intrinsicsPathButton,1,2);
+
+	QWidget *spacer = new QWidget(this);
+	spacer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
 	extrinsicsBox = new QGroupBox("Extrinsic Camera Parameters");
 	QGridLayout *extrinsicslayout = new QGridLayout(extrinsicsBox);
+	QWidget *primaryWidget = new QWidget(this);
+	QGridLayout *primarylayout = new QGridLayout(primaryWidget);
+	QLabel *primaryLabel = new QLabel("Primary");
+	primarylayout->setMargin(0);
 	primaryCombo = new QComboBox(extrinsicsBox);
-	extrinsicslayout->addWidget(primaryCombo,0,0);
-	QLabel *extrinsicsPathLabel = new QLabel("Extrinsics Path" ,extrinsicsBox);
+	primarylayout->addWidget(primaryLabel,0,0);
+	primarylayout->addWidget(primaryCombo,0,1);
+	QLabel *extrinsicsPathLabel = new QLabel("Extrinsics Path:" ,extrinsicsBox);
 	extrinsicsPathEdit = new QLineEdit(extrinsicsBox);
 	extrinsicsPathButton = new QPushButton();
 	extrinsicsPathButton->setMinimumSize(30,30);
 	extrinsicsPathButton->setIcon(QIcon::fromTheme("folder"));
 	connect(extrinsicsPathButton, &QPushButton::clicked, this, &ReprojectionWidget::extrinsicsPathClickedSlot);
-	extrinsicslayout->addWidget(primaryCombo,0,0,1,3);
-	extrinsicslayout->addWidget(extrinsicsPathLabel,1,0);
-	extrinsicslayout->addWidget(extrinsicsPathEdit,1,1);
-	extrinsicslayout->addWidget(extrinsicsPathButton,1,2);
+	extrinsicslayout->addWidget(primaryWidget,0,0,1,2);
+	extrinsicslayout->addWidget(extrinsicsPathLabel,1,0,1,2);
+	extrinsicslayout->addWidget(extrinsicsPathEdit,2,0);
+	extrinsicslayout->addWidget(extrinsicsPathButton,2,1);
 	initReprojectionButton = new QPushButton("Initialise Reprojection Tool");
 	connect(initReprojectionButton, &QPushButton::clicked, this, &ReprojectionWidget::initReprojectionClickedSlot);
 
-	calibrationsetuplayout->addWidget(infoBox,0,0);
-	calibrationsetuplayout->addWidget(intrinsicsBox,1,0);
+	calibrationsetuplayout->addWidget(intrinsicsBox,0,0);
+	calibrationsetuplayout->addWidget(spacer,1,0);
 	calibrationsetuplayout->addWidget(extrinsicsBox,2,0);
 	calibrationsetuplayout->addWidget(initReprojectionButton,3,0,Qt::AlignRight);
 
@@ -141,24 +139,20 @@ void ReprojectionWidget::switchToggledSlot(bool toggle) {
 void ReprojectionWidget::intrinsicsPathClickedSlot() {
 	QString path = QFileDialog::getExistingDirectory(this, "Select Intrinsics Parameter Path", m_parameterDir.path());
 	if (path != "") {
-		if (checkIntrinsicsPath(path)) {
-			m_parameterDir.setPath(path);
-			m_parameterDir.cdUp();
-			intrinsicsPathEdit->setText(path);
-			m_intrinsicsPathValid = true;
-		}
+		m_parameterDir.setPath(path);
+		m_parameterDir.cdUp();
+		intrinsicsPathEdit->setText(path);
+		m_intrinsicsPathValid = true;
 	}
 }
 
 void ReprojectionWidget::extrinsicsPathClickedSlot() {
 	QString path = QFileDialog::getExistingDirectory(this, "Select Extrnsics Parameter Path", m_parameterDir.path());
 	if (path != "") {
-		if (checkExtrinsicsPath(path)) {
-			m_parameterDir.setPath(path);
-			m_parameterDir.cdUp();
-			extrinsicsPathEdit->setText(path);
-			m_extrinsicsPathValid = true;
-		}
+		m_parameterDir.setPath(path);
+		m_parameterDir.cdUp();
+		extrinsicsPathEdit->setText(path);
+		m_extrinsicsPathValid = true;
 	}
 }
 
@@ -225,8 +219,13 @@ void ReprojectionWidget::loadPaths() {
 			intrinsicsPathEdit->setText(settings->value("IntrinsicsPath").toString());
 			extrinsicsPathEdit->setText(settings->value("ExtrinsicsPath").toString());
 			primaryCombo->setCurrentIndex(settings->value("PrimaryIndex").toInt());
-			m_parameterDir.setPath(settings->value("ExtrinsicsPath").toString());
-			m_parameterDir.cdUp();
+			if (settings->contains("ExtrinsicsPath")) {
+				m_parameterDir.setPath(settings->value("ExtrinsicsPath").toString());
+				m_parameterDir.cdUp();
+			}
+			else {
+				m_parameterDir.setPath(QDir::homePath());
+			}
 
 		}
 	settings->endGroup();

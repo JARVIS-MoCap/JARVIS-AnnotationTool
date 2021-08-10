@@ -49,6 +49,8 @@ class LoadDatasetWindow : public QDialog {
 
 		QList<QString> m_cameraNames;
 
+		void addItem(const QString &text);
+
 
 		private slots:
 			void datasetFolderClickedSlot();
@@ -56,6 +58,7 @@ class LoadDatasetWindow : public QDialog {
 			void moveLabelUpSlot();
 			void moveLabelDownSlot();
 			void updateCameraOrderList(const QString& dir);
+			void currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous);
 
 };
 

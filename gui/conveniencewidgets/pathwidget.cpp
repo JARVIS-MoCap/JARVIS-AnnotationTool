@@ -11,7 +11,12 @@
 
 DirPathWidget::DirPathWidget(const QString& name, const QString& defaultPath, QWidget *parent) :
 	m_name(name),  QWidget(parent) {
+	if (defaultPath != "") {
+		m_currentPath = defaultPath;
+	}
+	else {
 		m_currentPath = QDir::homePath();
+	}
 	QGridLayout *layout = new QGridLayout(this);
 	layout->setMargin(0);
 	pathEdit = new QLineEdit(defaultPath, this);
@@ -32,7 +37,9 @@ void DirPathWidget::pathEditedSlot() {
 		m_currentPath	= QDir::homePath();
 	}
 	else {
-		m_currentPath = path;
+		QDir dir = QDir(path);
+		dir.cdUp();
+		m_currentPath = dir.path();
 	}
 	emit pathChanged(path);
 }
@@ -42,7 +49,9 @@ void DirPathWidget::pathChangedSlot(const QString& path) {
 		m_currentPath	= QDir::homePath();
 	}
 	else {
-		m_currentPath = path;
+		QDir dir = QDir(path);
+		dir.cdUp();
+		m_currentPath = dir.path();
 	}
 	//emit pathChanged(path);
 }
@@ -54,4 +63,8 @@ void DirPathWidget::pathClickedSlot() {
 		pathEdit->setText(dir);
 		emit pathChanged(dir);
 	}
+}
+
+void DirPathWidget::setDefaultPath(const QString &path) {
+	m_currentPath = path;
 }

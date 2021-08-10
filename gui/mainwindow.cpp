@@ -34,7 +34,7 @@ void createToolBarButton(QToolButton *button, QAction*action, QIcon icon, bool e
 
 
 MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
-	this->setMinimumSize(800,800);
+	this->setMinimumSize(800,200);
 	this->showMaximized();
 	this->setWindowTitle("Annotation Tool");
 	this->setWindowIcon(QIcon("icons/hand.png"));

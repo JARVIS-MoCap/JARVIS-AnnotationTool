@@ -15,15 +15,6 @@ DatasetControlWidget::DatasetControlWidget(QWidget *parent) : QWidget(parent) {
 	QLabel *datasetControlLabel = new QLabel("Dataset Control");
 	datasetControlLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
 
-	QLabel *imgSetSelectorLabel = new QLabel("Select ImgSet");
-	QWidget *imgSetSpacer = new QWidget(this);
-	imgSetSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	imgSetEdit = new QLineEdit(this);
-	imgSetEdit->setText("1");
-	imgSetEdit->setMaximumSize(60,30);
-	connect(imgSetEdit, &QLineEdit::returnPressed, this, &DatasetControlWidget::imgSetChangedSlot);
-	imgSetTotalLabel = new QLabel("/ 0");
-
 	framesTable = new QTableWidget(0, 2);
 	framesTable->setAlternatingRowColors(true);
 	framesTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -39,13 +30,9 @@ DatasetControlWidget::DatasetControlWidget(QWidget *parent) : QWidget(parent) {
 
 	QWidget *spacer = new QWidget(this);
 
-	layout->addWidget(datasetControlLabel,0,0,1,4);
-	layout->addWidget(imgSetSelectorLabel,1,0);
-	layout->addWidget(imgSetSpacer,1,1);
-	layout->addWidget(imgSetEdit,1,2);
-	layout->addWidget(imgSetTotalLabel,1,3);
-	layout->addWidget(framesTable,2,0,1,4);
-	layout->addWidget(spacer,3,0,1,4);
+	layout->addWidget(datasetControlLabel,0,0);
+	layout->addWidget(framesTable,1,0);
+	layout->addWidget(spacer,3,0);
 
 	//--- SIGNAL-SLOT Connections ---//
 	//-> Incoming Signals
@@ -80,8 +67,6 @@ void DatasetControlWidget::datasetLoadedSlot() {
 		 h += framesTable->rowHeight(i);
 	framesTable->setMaximumSize(10000,h);
 	selectionChangedSlot(0,0);
-	imgSetTotalLabel->setText("/ " + QString::number(Dataset::dataset->imgSets().size()));
-	imgSetEdit->setValidator( new QIntValidator(1, Dataset::dataset->imgSets().size(), this) );
 }
 
 void DatasetControlWidget::getAnnotationCounts(int frameIndex, int &annotatedCount, int &totalCount) {
@@ -107,7 +92,6 @@ void DatasetControlWidget::selectionChangedSlot(int row,int) {
 }
 
 void DatasetControlWidget::frameChangedSlot(int imgSetIndex, int frameIndex) {
-	imgSetEdit->setText(QString::number(imgSetIndex+1));
 	m_currentImgSetIndex = imgSetIndex;
 	m_currentFrameIndex = frameIndex;
 	for (int i = 0; i < framesTable->rowCount(); i++) {
@@ -139,5 +123,5 @@ void DatasetControlWidget::keypointStateChangedSlot(KeypointState state, Keypoin
 }
 
 void DatasetControlWidget::imgSetChangedSlot() {
-	emit imgSetChanged(imgSetEdit->text().toInt()-1);
+	emit imgSetChanged(m_currentImgSetIndex);
 }

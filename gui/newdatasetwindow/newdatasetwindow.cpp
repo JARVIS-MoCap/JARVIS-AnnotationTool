@@ -14,7 +14,7 @@
 #include <QInputDialog>
 #include <QDirIterator>
 #include <QThread>
-
+#include <QMessageBox>
 
 NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	this->resize(800,800);
@@ -41,33 +41,23 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	connect(savePresetsWindow, SIGNAL(savePreset(QString)), this, SLOT(savePresetSlot(QString)));
 
 	QGroupBox *configBox = new QGroupBox("Configuration");
-	configBox->setMinimumSize(0,200);
+	configBox->setMinimumSize(0,180);
 	QGridLayout *configlayout = new QGridLayout(configBox);
 	LabelWithToolTip *datasetNameLabel = new LabelWithToolTip("New Dataset Name", "");
 	datasetNameEdit = new QLineEdit(m_datasetConfig->datasetName, configBox);
-	connect (datasetNameEdit, &QLineEdit::textEdited, this, &NewDatasetWindow::datasetNameChangedSlot);
 
 	LabelWithToolTip *datasetPathLabel = new LabelWithToolTip("New Dataset Path", "");
-	DirPathWidget *datasetPathWidget = new DirPathWidget("Select new Dataset Path");
-	connect (datasetPathWidget, &DirPathWidget::pathChanged, this, &NewDatasetWindow::datasetPathChangedSlot);
-
-	LabelWithToolTip *numCamerasLabel = new LabelWithToolTip("Number of Cameras", "kdsff");
-	numCamerasBox = new QSpinBox(configBox);
-	numCamerasBox->setMinimum(0);
-	numCamerasBox->setValue(m_datasetConfig->numCameras);
-	connect(numCamerasBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &NewDatasetWindow::numCamerasChangedSlot);
-	LabelWithToolTip *frameSetsRecordingLabel = new LabelWithToolTip("Frames per Recording", "kdsff");
+	datasetPathWidget = new DirPathWidget("Select new Dataset Path");
+	LabelWithToolTip *frameSetsRecordingLabel = new LabelWithToolTip("Framesets to extract per Recording", "kdsff");
 	frameSetsRecordingBox = new QSpinBox(configBox);
 	frameSetsRecordingBox->setMinimum(0);
 	frameSetsRecordingBox->setMaximum(9999999);
 	frameSetsRecordingBox->setValue(m_datasetConfig->frameSetsRecording);
-	connect(frameSetsRecordingBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &NewDatasetWindow::frameSetsRecordingChandedSlot);
 	LabelWithToolTip *samplingMethodLabel = new LabelWithToolTip("Sampling Method", "kdsff");
 	samplingMethodCombo = new QComboBox(configBox);
 	samplingMethodCombo->addItem("uniform");
 	samplingMethodCombo->addItem("kmeans");
 	samplingMethodCombo->setCurrentText(m_datasetConfig->samplingMethod);
-	connect(samplingMethodCombo, &QComboBox::currentTextChanged, this, &NewDatasetWindow::samplingMethodChangedSlot);
 
 	QGroupBox *recordingsBox = new QGroupBox("Recordings");
 	QGridLayout *recordingslayout = new QGridLayout(recordingsBox);
@@ -112,12 +102,10 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	configlayout->addWidget(datasetNameEdit,0,1,1,2);
 	configlayout->addWidget(datasetPathLabel,1,0);
 	configlayout->addWidget(datasetPathWidget,1,1,1,2);
-	configlayout->addWidget(numCamerasLabel,2,0);
-	configlayout->addWidget(numCamerasBox,2,1,1,2);
-	configlayout->addWidget(frameSetsRecordingLabel,3,0);
-	configlayout->addWidget(frameSetsRecordingBox,3,1,1,2);
-	configlayout->addWidget(samplingMethodLabel,4,0);
-	configlayout->addWidget(samplingMethodCombo,4,1,1,2);
+	configlayout->addWidget(frameSetsRecordingLabel,2,0);
+	configlayout->addWidget(frameSetsRecordingBox,2,1,1,2);
+	configlayout->addWidget(samplingMethodLabel,3,0);
+	configlayout->addWidget(samplingMethodCombo,3,1,1,2);
 
 	layout->addWidget(newDatasetLabel,0,0,1,2);
 	layout->addWidget(configBox,1,0,1,2);
@@ -137,32 +125,18 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	connect(datasetCreator, &DatasetCreator::startedClustering, datasetProgressInfoWindow, &DatasetProgressInfoWindow::startedClusteringSlot);
 	connect(datasetCreator, &DatasetCreator::finishedClustering, datasetProgressInfoWindow, &DatasetProgressInfoWindow::finishedClusteringSlot);
 	connect(datasetCreator, &DatasetCreator::copyImagesStatus, datasetProgressInfoWindow, &DatasetProgressInfoWindow::copyImagesStatusSlot);
+	connect(datasetProgressInfoWindow, &DatasetProgressInfoWindow::rejected, datasetCreator, &DatasetCreator::cancelCreationSlot);
 
 
-}
 
-void NewDatasetWindow::datasetNameChangedSlot(const QString &name) {
-	m_datasetConfig->datasetName = name;
-}
-
-void NewDatasetWindow::datasetPathChangedSlot(const QString &path) {
-	m_datasetConfig->datasetPath = path;
-}
-
-
-void NewDatasetWindow::numCamerasChangedSlot(int num) {
-	m_datasetConfig->numCameras = num;
-}
-
-void NewDatasetWindow::frameSetsRecordingChandedSlot(int num) {
-	m_datasetConfig->frameSetsRecording = num;
-}
-
-void NewDatasetWindow::samplingMethodChangedSlot(const QString &method) {
-	m_datasetConfig->samplingMethod = method;
 }
 
 void NewDatasetWindow::createDatasetClickedSlot() {
+	m_datasetConfig->datasetName = datasetNameEdit->text();
+	m_datasetConfig->datasetPath = datasetPathWidget->path();
+	m_datasetConfig->frameSetsRecording = frameSetsRecordingBox->value();
+	m_datasetConfig->samplingMethod = samplingMethodCombo->currentText();
+
 	if (m_datasetConfig->datasetPath == "") {
 		m_errorMsg->showMessage("Dataset Path is empty. Dataset Creation aborted...");
 		return;
@@ -175,6 +149,26 @@ void NewDatasetWindow::createDatasetClickedSlot() {
 		m_errorMsg->showMessage("No Recording selected. Dataset Creation aborted...");
 		return;
 	}
+	if (recordingsTable->getItems().size() == 0) {
+		m_errorMsg->showMessage("Add at least one entity to the list...");
+		return;
+	}
+	if (recordingsTable->getItems().size() == 0) {
+		m_errorMsg->showMessage("Add at least one recording...");
+		return;
+	}
+	if (entitiesItemList->getItems().size() == 0) {
+		m_errorMsg->showMessage("Add at least one entity...");
+		return;
+	}
+	if (keypointsItemList->getItems().size() == 0) {
+		m_errorMsg->showMessage("Add at least one keypoint...");
+		return;
+	}
+	if (!checkDatasetExists(m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName)) {
+		return;
+	}
+
 	emit createDataset(recordingsTable->getItems(), entitiesItemList->getItems(), keypointsItemList->getItems());
 	datasetProgressInfoWindow->exec();
 }
@@ -231,4 +225,16 @@ void NewDatasetWindow::loadPresetSlot(const QString& preset) {
 	}
 	settings->endGroup();
 	settings->endGroup();
+}
+
+bool NewDatasetWindow::checkDatasetExists(const QString &path) {
+	if (QFile::exists(path)) {
+		QMessageBox::StandardButton reply;
+		reply = QMessageBox::question(this, "", "Dataset already exists! Continue anyways?",
+	                                QMessageBox::Yes|QMessageBox::No);
+	  if (reply == QMessageBox::No) {
+	    return false;
+	  }
+	}
+	return true;
 }

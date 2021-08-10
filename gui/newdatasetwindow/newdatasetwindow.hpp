@@ -55,7 +55,6 @@ class NewDatasetWindow : public QWidget {
 		DirPathWidget *datasetPathWidget;
 		QRadioButton *videosButton;
 		QRadioButton *imagesButton;
-		QSpinBox *numCamerasBox;
 		QSpinBox *frameSetsRecordingBox;
 		QComboBox *samplingMethodCombo;
 
@@ -70,19 +69,14 @@ class NewDatasetWindow : public QWidget {
 
 		QErrorMessage *m_errorMsg;
 
+		bool checkDatasetExists(const QString &path);
+
 
 
 		private slots:
-			void datasetNameChangedSlot(const QString &name);
-			void datasetPathChangedSlot(const QString &dir);
-			void numCamerasChangedSlot(int num);
-			void frameSetsRecordingChandedSlot(int num);
-			void samplingMethodChangedSlot(const QString &method);
-
 			void createDatasetClickedSlot();
 			void datasetCreatedSot();
 			void datasetCreationFailedSlot(QString errorMsg);
-
 
 			void savePresetsClickedSlot();
 			void loadPresetsClickedSlot();

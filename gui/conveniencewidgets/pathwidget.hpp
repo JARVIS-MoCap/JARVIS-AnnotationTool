@@ -22,6 +22,7 @@ class DirPathWidget : public QWidget {
 		explicit DirPathWidget(const QString& name, const QString& defaultPath = "", QWidget *parent = nullptr);
 		void setPath(const QString& path) {pathEdit->setText(path);};
 		QString path() {return pathEdit->text();};
+		void setDefaultPath(const QString &path);
 
 	signals:
 		void pathChanged(const QString &path);

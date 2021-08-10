@@ -15,6 +15,7 @@
 #include <QThread>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QScrollArea>
 
 
 NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
@@ -41,10 +42,22 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	newCalibrationLabel->setFont(QFont("Sans Serif", 18, QFont::Bold));
 
 	QGroupBox *configurationBox = new QGroupBox("Configuration", this);
-	QGridLayout *configurationlayout = new QGridLayout(configurationBox);
+	configurationBox->setMaximumSize(800,9999);
+	QScrollArea *configScrollArea = new QScrollArea(configurationBox);
+	configScrollArea->setFrameShape(QFrame::NoFrame);
+	QWidget *configWidget = new QWidget(configScrollArea);
+	configWidget->setObjectName("configWidget");
+	configWidget->setStyleSheet("QWidget#configWidget{background-color: rgba(66,66,66,50%)}");
+	QGridLayout *configurationlayout = new QGridLayout(configWidget);
+	QGridLayout *configurationlayoutout = new QGridLayout(configurationBox);
+	configurationlayoutout->setMargin(3);
+	configurationlayout->setMargin(7);
+	configurationlayoutout->addWidget(configScrollArea);
+	configScrollArea->setWidgetResizable(true);
+	configScrollArea->setWidget(configWidget);
 
 	QLabel *generalLabel = new QLabel("General");
-	QWidget *generalWidget = new QWidget(configurationBox);
+	QWidget *generalWidget = new QWidget(configWidget);
 	QGridLayout *generallayout = new QGridLayout(generalWidget);
 	generallayout->setMargin(0);
 	generalLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
@@ -62,6 +75,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	connect(calibrateExtrinsicsRadioWidget, &YesNoRadioWidget::stateChanged, this, &NewCalibrationWidget::calibrateExtrinsicsRadioStateChangedSlot);
 	LabelWithToolTip *intrinsicsPathLabel = new LabelWithToolTip("  Intrinsics Folder Path");
 	intrinsicsPathWidget = new DirPathWidget("Select Intrinsics Path");
+	connect(intrinsicsPathWidget, &DirPathWidget::pathChanged, this, &NewCalibrationWidget::intrinsicsPathChangedSlot);
 	LabelWithToolTip *extrinsicsPathLabel = new LabelWithToolTip("  Extrinsics Folder Path");
 	extrinsicsPathWidget = new DirPathWidget("Select Extrinsics Path");
 	updateNamesListButton = new QPushButton("Update Camera Names",this);
@@ -85,12 +99,12 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	generallayout->addWidget(extrinsicsPathLabel,i,0);
 	generallayout->addWidget(extrinsicsPathWidget,i++,1);
 	generallayout->addWidget(updateNamesListButton,i++,0,1,2, Qt::AlignRight);
-	QWidget *generalSpacer = new QWidget(configurationBox);
+	QWidget *generalSpacer = new QWidget(configWidget);
 	generalSpacer->setMinimumSize(0,20);
 
 	QLabel *calibParamsLabel = new QLabel("Calibration Parameters");
 	calibParamsLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
-	QWidget *calibParamsWidget = new QWidget(configurationBox);
+	QWidget *calibParamsWidget = new QWidget(configWidget);
 	QGridLayout *calibparamslayout = new QGridLayout(calibParamsWidget);
 	calibparamslayout->setMargin(0);
 	LabelWithToolTip *maxSamplingFrameRateLabel = new LabelWithToolTip("  Max. Sampling Framerate");
@@ -112,10 +126,10 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	calibparamslayout->addWidget(intrinsicsFramesEdit,i++,1);
 	calibparamslayout->addWidget(extrinsicsFramesLabel,i,0);
 	calibparamslayout->addWidget(extrinsicsFramesEdit,i++,1);
-	QWidget *calibParamsSpacer = new QWidget(configurationBox);
+	QWidget *calibParamsSpacer = new QWidget(configWidget);
 	calibParamsSpacer->setMinimumSize(0,20);
 
-	QWidget *checkerboardWiget = new QWidget(configurationBox);
+	QWidget *checkerboardWiget = new QWidget(configWidget);
 	QGridLayout *checkerboardwidgetlayout = new QGridLayout(checkerboardWiget);
 	checkerboardwidgetlayout->setMargin(0);
 	LabelWithToolTip *widthLabel = new LabelWithToolTip("  Pattern Width");
@@ -137,7 +151,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	checkerboardwidgetlayout->addWidget(heightEdit,i++,1);
 	checkerboardwidgetlayout->addWidget(sideLengthLabel,i,0);
 	checkerboardwidgetlayout->addWidget(sideLengthEdit,i++,1);
-	QWidget *bottomSpacer = new QWidget(configurationBox);
+	QWidget *bottomSpacer = new QWidget(configWidget);
 	bottomSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	i = 0;
@@ -241,6 +255,7 @@ void NewCalibrationWidget::updateNamesListSlot() {
 				cameraList->addItem(name);
 			}
 		}
+		extrinsicsPairList->cameraNamesChangedSlot(cameraList->getItems());
 	}
 	QList<QList<QString>> detectedPairs;
 	QString extrinsicsPath = extrinsicsPathWidget->path();
@@ -507,6 +522,14 @@ void NewCalibrationWidget::loadPresetSlot(const QString& preset) {
 	settings->endGroup();
 	settings->endGroup();
 	extrinsicsPairList->cameraNamesChangedSlot(cameraList->getItems());
+}
+
+void NewCalibrationWidget::intrinsicsPathChangedSlot(const QString &path) {
+	if (extrinsicsPathWidget->path() == "") {
+		QDir intrinsicsDir = QDir(path);
+		intrinsicsDir.cdUp();
+		extrinsicsPathWidget->setDefaultPath(intrinsicsDir.path());
+	}
 }
 
 

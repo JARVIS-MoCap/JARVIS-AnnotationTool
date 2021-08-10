@@ -2,18 +2,17 @@ project (src)
 
 
 add_subdirectory(calibrationtool)
+add_subdirectory(datasetcreator)
 
 add_library(${PROJECT_NAME}
 	keypoint.hpp
 	colormap.hpp
 	dataset.hpp
-	datasetcreator.hpp
 	reprojectiontool.hpp
 	switch.hpp
 	keypoint.cpp
 	colormap.cpp
 	dataset.cpp
-	datasetcreator.cpp
 	reprojectiontool.cpp
 	switch.cpp
 )

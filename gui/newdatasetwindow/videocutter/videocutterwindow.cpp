@@ -23,10 +23,10 @@
 
 VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWidget *parent)
 	: m_timeLineWindows(timeLineWindows), QWidget(parent, Qt::Window) {
-	this->resize(800,800);
-	this->setMinimumSize(600,600);
+	this->resize(1200,800);
+	this->setMinimumSize(800,600);
 	settings = new QSettings();
-	setWindowTitle("Video Cutter");
+	setWindowTitle("Video Segmentation Tool");
 	QGridLayout *layout = new QGridLayout(this);
 	m_savedTimeLineWindows = timeLineWindows;
 	m_initialTimeLineWindows = timeLineWindows;
@@ -108,16 +108,18 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
 
   QWidget *buttonSpacer = new QWidget();
   buttonSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  addTimeLineElementButton = new QPushButton("Add Element");
+  addTimeLineElementButton = new QPushButton("Add Segment");
   addTimeLineElementButton->setMinimumSize(40,40);
   connect(addTimeLineElementButton, &QPushButton::clicked, this, &VideoCutterWindow::addTimeLineElementButtonClickedSlot);
   saveCancelWidget = new QWidget();
   QGridLayout *savecancellayout = new QGridLayout(saveCancelWidget);
   savecancellayout->setMargin(0);
   cancelElementButton = new QPushButton("Cancel");
+	cancelElementButton->setIcon(QIcon::fromTheme("discard"));
   cancelElementButton->setMinimumSize(40,40);
   connect(cancelElementButton, &QPushButton::clicked, this, &VideoCutterWindow::cancelElementClickedSlot);
-  saveElementButton = new QPushButton("Save");
+  saveElementButton = new QPushButton("Add");
+	saveElementButton->setIcon(QIcon::fromTheme("plus"));
   saveElementButton->setMinimumSize(40,40);
   savecancellayout->addWidget(cancelElementButton, 0,0);
   savecancellayout->addWidget(saveElementButton, 0,1);
@@ -134,7 +136,7 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
   buttonlayout->addWidget(addTimeLineElementButton, 0,8);
   buttonlayout->addWidget(saveCancelWidget, 0,9);
 
-  QGroupBox *timeWindowBox = new QGroupBox("Time Windows");
+  QGroupBox *timeWindowBox = new QGroupBox("Segments");
   QGridLayout *timewindowboxlayout = new QGridLayout(timeWindowBox);
   timewindowboxlayout->setMargin(0);
   timeWindowTable = new QTableWidget(0, 5);
@@ -432,8 +434,8 @@ void VideoCutterWindow::updateTimeWindowTable() {
     iconItem->setFlags(iconItem->flags() ^ Qt::ItemIsEditable);
     QTableWidgetItem* nameItem = new QTableWidgetItem();
     if (m_timeLineWindows[i].name == "") {
-      nameItem->setText("Window " + QString::number(m_WindowCounter));
-      m_timeLineWindows[i].name = "Window " + QString::number(m_WindowCounter++);
+      nameItem->setText("Segment " + QString::number(m_WindowCounter));
+      m_timeLineWindows[i].name = "Segment " + QString::number(m_WindowCounter++);
     }
     else {
       nameItem->setText(m_timeLineWindows[i].name);
@@ -663,6 +665,14 @@ void VideoCutterWindow::closeEvent (QCloseEvent * event ) {
 		event->accept();
 	}
 	else {
-		std::cout << "Not saved!" << std::endl;
+		QMessageBox::StandardButton reply;
+		reply = QMessageBox::question(this, "", "Discard new Segmentation?\n",
+	                                QMessageBox::Yes|QMessageBox::No);
+
+		if (reply == QMessageBox::Yes) {
+			m_timeLineWindows = m_initialTimeLineWindows;
+			m_savedTimeLineWindows = m_timeLineWindows;
+			event->accept();
+		}
 	}
 }

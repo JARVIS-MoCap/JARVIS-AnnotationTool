@@ -20,6 +20,8 @@
 #include <QToolBar>
 #include <QTableWidget>
 #include <QErrorMessage>
+#include <QDir>
+
 
 class RecordingsTable : public QWidget {
 	Q_OBJECT
@@ -45,9 +47,9 @@ class RecordingsTable : public QWidget {
 		int m_editingIndex;
 		bool m_editingActive = false;
 		QMap<int, QList<TimeLineWindow>> m_windowsMap;
+		QDir m_currentDir;
 
 		int getNumberSubfolders(QString path);
-		bool isValidRecordingFolder(QString path);
 		void updateTable();
 		void editVideo(QString path);
 		QList<QString> getVideoPaths(const QString& path);

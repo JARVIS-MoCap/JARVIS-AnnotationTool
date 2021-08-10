@@ -10,13 +10,15 @@
 #include "globals.hpp"
 
 #include <QToolButton>
-#include <QTableWidget>
+#include <QPushButton>
+#include <QListWidget>
 #include <QLabel>
 #include <QGridLayout>
 #include <QSettings>
 #include <QToolBar>
+#include <QDialog>
 
-class PresetsWindow : public QWidget {
+class PresetsWindow : public QDialog {
 	Q_OBJECT
 	public:
 		explicit PresetsWindow(QList<QString> *presets, const QString& type = "load",
@@ -27,19 +29,23 @@ class PresetsWindow : public QWidget {
 		QList<QString> *m_presets;
 		QString m_name;
 		int m_selectedRow = 0;
+		QString m_type;
 
 		QWidget *bottomFiller;
 		QToolBar *loadToolBar;
 		QToolBar *saveToolBar;
 		QToolButton *discardButton;
 		QAction *discardAction;
-		QToolButton *loadButton;
-		QAction *loadAction;
-		QLineEdit *currentPreset;
+		QLineEdit *selectedPresetEdit;
 		QLineEdit *newPresetEdit;
 		QToolButton *saveButton;
 		QAction *saveAction;
-		QTableWidget *presetsTable;
+		QListWidget *presetsList;
+		QPushButton *loadButton;
+		QPushButton *closeButton;
+
+
+		void addItem(const QString &text);
 
 	public slots:
 		void updateListSlot();
@@ -52,8 +58,10 @@ class PresetsWindow : public QWidget {
 		void discardClickedSlot();
 		void loadClickedSlot();
 		void saveClickedSlot();
-		void rowChangedSlot();
+		void currentPresetChangedSlot (int row);
+		void presetClickedSlot(QListWidgetItem *item);
 		void presetNameEditedSlot(const QString& name);
+		void currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous);
 };
 
 #endif

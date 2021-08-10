@@ -96,6 +96,8 @@ class NewCalibrationWidget : public QWidget {
 		void sperateRadioStateChangedSlot(bool state);
 		void calibrateExtrinsicsRadioStateChangedSlot(bool state);
 
+		void intrinsicsPathChangedSlot(const QString &path);
+
 };
 
 

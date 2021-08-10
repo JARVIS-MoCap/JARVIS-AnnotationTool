@@ -18,8 +18,8 @@
 ConfigurableItemList::ConfigurableItemList(QString name, QWidget *parent) :
 			m_name(name), QWidget(parent) {
 
-
 	QGridLayout *labelselectorlayout = new QGridLayout(this);
+	labelselectorlayout->setMargin(3);
 
 	itemSelectorList = new QListWidget(this);
 	itemSelectorList->setFont(QFont("Sans Serif", 12));
@@ -71,6 +71,7 @@ void ConfigurableItemList::itemSelectedSlot(QListWidgetItem *item) {
 
 void ConfigurableItemList::moveItemUpSlot() {
 	int row = itemSelectorList->currentRow();
+	if (row == -1) return;
 	QListWidgetItem *item = itemSelectorList->takeItem(row);
 	QListWidgetItem *seperatorItem = itemSelectorList->takeItem(row);
 	int newRow = std::max(row-2,0);
@@ -82,6 +83,7 @@ void ConfigurableItemList::moveItemUpSlot() {
 
 void ConfigurableItemList::moveItemDownSlot() {
 	int row = itemSelectorList->currentRow();
+	if (row == -1) return;
 	QListWidgetItem *item = itemSelectorList->takeItem(row);
 	QListWidgetItem *seperatorItem = itemSelectorList->takeItem(row);
 	int newRow = std::min(row+2,itemSelectorList->count());
@@ -101,8 +103,9 @@ void ConfigurableItemList::addItemSlot() {
 }
 
 void ConfigurableItemList::removeItemSlot() {
-	delete itemSelectorList->takeItem(itemSelectorList->currentRow());
-	delete itemSelectorList->takeItem(itemSelectorList->currentRow()+1);
+	int row = itemSelectorList->currentRow();
+	delete itemSelectorList->takeItem(row);
+	delete itemSelectorList->takeItem(row);
 	emit itemsChanged(getItems());
 }
 

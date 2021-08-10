@@ -23,9 +23,15 @@ DatasetProgressInfoWindow::DatasetProgressInfoWindow(QWidget *parent) : QDialog(
 	operationLabel->setWordWrap(true);
 	progressBar = new QProgressBar(this);
 
+	cancelButton = new QPushButton("Cancel");
+	cancelButton->setIcon(QIcon::fromTheme("discard"));
+	cancelButton->setMinimumSize(30,30);
+	connect(cancelButton, &QPushButton::clicked, this, &DatasetProgressInfoWindow::reject);
+
 	layout->addWidget(recordingLabel,0,0);
 	layout->addWidget(operationLabel,1,0);
 	layout->addWidget(progressBar,3,0);
+	layout->addWidget(cancelButton,4,0, Qt::AlignRight);
 
 
 }

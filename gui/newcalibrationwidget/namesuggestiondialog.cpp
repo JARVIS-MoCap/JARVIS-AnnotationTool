@@ -15,7 +15,8 @@ NameSuggestionDialog::NameSuggestionDialog(QString name, QList<QString> cameraNa
 			m_name(name), m_cameraNames(cameraNames), QDialog(parent) {
 	setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 	this->setWindowTitle("Detected " + name);
-	this->setMinimumSize(600,250);
+	this->resize(600,400);
+	this->setMinimumSize(400,200);
 
 	QGridLayout *layout = new QGridLayout(this);
 	QLabel *descriptionLabel = new QLabel("Add the following " + name + "?");
@@ -30,11 +31,11 @@ NameSuggestionDialog::NameSuggestionDialog(QString name, QList<QString> cameraNa
 
 	cancelButton = new QPushButton("Cancel",this);
 	cancelButton->setIcon(QIcon::fromTheme("discard"));
-	cancelButton->setMinimumSize(30,30);
+	cancelButton->setMinimumSize(40,40);
 	connect(cancelButton, &QPushButton::clicked, this, &NameSuggestionDialog::reject);
 	addButton = new QPushButton("Add", this);
 	addButton->setIcon(QIcon::fromTheme("add"));
-	addButton->setMinimumSize(30,30);
+	addButton->setMinimumSize(40,40);
 	connect(addButton, &QPushButton::clicked, this, &NameSuggestionDialog::accept);
 	QWidget *spacer = new QWidget(this);
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
