@@ -71,6 +71,7 @@ if(APPLE)
   set_source_files_properties(${hand_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
   file(COPY ${ICON_PATH} DESTINATION "${PROJECT_NAME}.app/Contents/Resources")
   file(COPY "${PROJECT_SOURCE_DIR}/IconThemes" DESTINATION "${PROJECT_NAME}.app/Contents/Resources")
+  file(COPY "${PROJECT_SOURCE_DIR}/help" DESTINATION "${PROJECT_NAME}.app/Contents/Resources")
 
   add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${ICON_PATH} "${PROJECT_NAME}.app/Contents/Resources"
       main.cpp

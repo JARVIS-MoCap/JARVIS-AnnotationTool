@@ -49,11 +49,11 @@ HelpWindow::HelpWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	tableOfContents->addTopLevelItem(gettingStartedItem);
 	tableOfContents->addTopLevelItem(calibrationItem);
 
-	m_contentMap[introductionItem] = "introduction.html";
-	m_contentMap[exampleItem] = "example.html";
-	m_contentMap[ownDataItem] = "owndata.html";
-	m_contentMap[recordingCalibrationItem] = "recordingcalibration.html";
-	m_contentMap[createCalibrationItem] = "createcalibration.html";
+	m_contentMap[introductionItem] = "help/introduction.html";
+	m_contentMap[exampleItem] = "help/example.html";
+	m_contentMap[ownDataItem] = "help/owndata.html";
+	m_contentMap[recordingCalibrationItem] = "help/recordingcalibration.html";
+	m_contentMap[createCalibrationItem] = "help/createcalibration.html";
 
 
 	mainSplitter->addWidget(tableOfContents);
@@ -72,9 +72,7 @@ void HelpWindow::itemSlectedSlot(QTreeWidgetItem *item, int column) {
 
 void HelpWindow::setDocument(const QString &path) {
 	QTextDocument *doc = new QTextDocument();
-	//doc->setBaseUrl(QUrl("C:\\Users\\timoh\\Documents\\AnnotationTool\\help\\"));
-	std::cout << doc->baseUrl().path().toStdString() << std::endl;
-	QFile f1("github-markdown.css");
+	QFile f1("help/github-markdown.css");
 	f1.open(QFile::ReadOnly | QFile::Text);
 	QTextStream in1(&f1);
 	doc->setDefaultStyleSheet(in1.readAll());
