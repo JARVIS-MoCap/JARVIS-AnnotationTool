@@ -24,7 +24,7 @@ class ImageWriter : public QObject, public QRunnable {
 		void creationCanceledSlot();
 
 	signals:
-		void copyImagesStatus(int frameCount, int totalNumFrames);
+		void copyImagesStatus(int frameCount, int totalNumFrames, int threadNumber);
 
 	private:
 		cv::VideoCapture *m_cap;

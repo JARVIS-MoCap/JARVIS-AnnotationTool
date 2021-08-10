@@ -28,7 +28,6 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	QThread *thread = new QThread;
 	datasetCreator->moveToThread(thread);
 	thread->start();
-	datasetProgressInfoWindow = new DatasetProgressInfoWindow(this);
 	m_errorMsg = new QErrorMessage();
 
 	QLabel *newDatasetLabel = new QLabel("New Dataset");
@@ -46,7 +45,7 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	LabelWithToolTip *datasetNameLabel = new LabelWithToolTip("New Dataset Name", "");
 	datasetNameEdit = new QLineEdit(m_datasetConfig->datasetName, configBox);
 
-	LabelWithToolTip *datasetPathLabel = new LabelWithToolTip("New Dataset Path", "");
+	LabelWithToolTip *datasetPathLabel = new LabelWithToolTip("New Dataset Path");
 	datasetPathWidget = new DirPathWidget("Select new Dataset Path");
 	LabelWithToolTip *frameSetsRecordingLabel = new LabelWithToolTip("Framesets to extract per Recording", "kdsff");
 	frameSetsRecordingBox = new QSpinBox(configBox);
@@ -119,13 +118,6 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	connect(datasetCreator, &DatasetCreator::datasetCreationFailed, this, &NewDatasetWindow::datasetCreationFailedSlot);
 
 	//Signal relay
-	connect(datasetCreator, &DatasetCreator::dctProgress, datasetProgressInfoWindow, &DatasetProgressInfoWindow::dctProgressSlot);
-	connect(datasetCreator, &DatasetCreator::recordingBeingProcessedChanged, datasetProgressInfoWindow, &DatasetProgressInfoWindow::recordingBeingProcessedChangedSlot);
-	connect(datasetCreator, &DatasetCreator::currentSegmentChanged, datasetProgressInfoWindow, &DatasetProgressInfoWindow::segmentNameChangedSlot);
-	connect(datasetCreator, &DatasetCreator::startedClustering, datasetProgressInfoWindow, &DatasetProgressInfoWindow::startedClusteringSlot);
-	connect(datasetCreator, &DatasetCreator::finishedClustering, datasetProgressInfoWindow, &DatasetProgressInfoWindow::finishedClusteringSlot);
-	connect(datasetCreator, &DatasetCreator::copyImagesStatus, datasetProgressInfoWindow, &DatasetProgressInfoWindow::copyImagesStatusSlot);
-	connect(datasetProgressInfoWindow, &DatasetProgressInfoWindow::rejected, datasetCreator, &DatasetCreator::cancelCreationSlot);
 
 
 
@@ -170,11 +162,20 @@ void NewDatasetWindow::createDatasetClickedSlot() {
 	}
 
 	emit createDataset(recordingsTable->getItems(), entitiesItemList->getItems(), keypointsItemList->getItems());
+	datasetProgressInfoWindow = new DatasetProgressInfoWindow(this);
+	connect(datasetProgressInfoWindow, &DatasetProgressInfoWindow::rejected, datasetCreator, &DatasetCreator::cancelCreationSlot);
+	connect(datasetCreator, &DatasetCreator::dctProgress, datasetProgressInfoWindow, &DatasetProgressInfoWindow::dctProgressSlot);
+	connect(datasetCreator, &DatasetCreator::recordingBeingProcessedChanged, datasetProgressInfoWindow, &DatasetProgressInfoWindow::recordingBeingProcessedChangedSlot);
+	connect(datasetCreator, &DatasetCreator::currentSegmentChanged, datasetProgressInfoWindow, &DatasetProgressInfoWindow::segmentNameChangedSlot);
+	connect(datasetCreator, &DatasetCreator::startedClustering, datasetProgressInfoWindow, &DatasetProgressInfoWindow::startedClusteringSlot);
+	connect(datasetCreator, &DatasetCreator::finishedClustering, datasetProgressInfoWindow, &DatasetProgressInfoWindow::finishedClusteringSlot);
+	connect(datasetCreator, &DatasetCreator::copyImagesStatus, datasetProgressInfoWindow, &DatasetProgressInfoWindow::copyImagesStatusSlot);
 	datasetProgressInfoWindow->exec();
 }
 
 void NewDatasetWindow::datasetCreatedSot() {
 	datasetProgressInfoWindow->accept();
+	delete datasetProgressInfoWindow;
 }
 
 void NewDatasetWindow::datasetCreationFailedSlot(QString errorMsg) {

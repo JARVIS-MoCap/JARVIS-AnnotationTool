@@ -34,15 +34,14 @@ void VideoStreamer::run() {
 		if (minFrameCount == 0 || windowSize < minFrameCount) minFrameCount = windowSize;
 	}
 	while (m_numFramesToExtract > minFrameCount/subSamplingRate) {
-		subSamplingRate = subSamplingRate/2;
+		subSamplingRate = std::max(1,subSamplingRate/2);
 	}
 
 	for (const auto & window : m_timeLineWindows) {
 		frameCount = window.start;
 		while (frameCount < window.end) {
-			if (m_threadNumber == 0 && indexCount % 1 == 0) {
-				emit dctProgress(indexCount, totalFrames/subSamplingRate);
-			}
+			std::cout << "FrameCOunt " << frameCount << std::endl;
+			emit dctProgress(indexCount, totalFrames/subSamplingRate, m_threadNumber);
 			m_cap->set(cv::CAP_PROP_POS_FRAMES, frameCount);
 			readFrame = m_cap->read(img);
 			if (readFrame) {
@@ -56,10 +55,12 @@ void VideoStreamer::run() {
 				frameCount += subSamplingRate;
 			}
 			if (m_interrupt) {
+				m_cap->release();
 				return;
 			}
 		}
 	}
+	m_cap->release();
 	emit computedDCTs(m_dctImages, m_frameNumberMap, m_threadNumber);
 }
 

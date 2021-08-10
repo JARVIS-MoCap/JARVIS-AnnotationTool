@@ -13,6 +13,7 @@
 #include <QGroupBox>
 #include <QInputDialog>
 #include <QDirIterator>
+#include <QErrorMessage>
 
 
 ExtrinsicsPairList::ExtrinsicsPairList(QString name, QWidget *parent) :
@@ -23,6 +24,7 @@ ExtrinsicsPairList::ExtrinsicsPairList(QString name, QWidget *parent) :
 	itemSelectorList = new QListWidget(this);
 	itemSelectorList->setFont(QFont("Sans Serif", 12));
 	connect(itemSelectorList, &QListWidget::currentItemChanged, this, &ExtrinsicsPairList::currentItemChangedSlot);
+	connect(itemSelectorList, &QListWidget::itemDoubleClicked, this, &ExtrinsicsPairList::itemDoubleClickedSlot);
 	moveItemUpButton = new QPushButton();
 	moveItemUpButton->setIcon(QIcon::fromTheme("up"));
 	moveItemUpButton->setMinimumSize(35,35);
@@ -99,6 +101,11 @@ void ExtrinsicsPairList::addItemSlot() {
 	PairCreatorWindow* pairCreatorWindow = new PairCreatorWindow(m_cameraNames, this);
 	pairCreatorWindow->exec();
 	QList<QString> newPair = pairCreatorWindow->getCameraPair();
+	if (m_cameraPairs.contains(newPair)) {
+		QErrorMessage *m_errorMsg = new QErrorMessage(this);
+		m_errorMsg->showMessage("Camera Pair exists already!");
+		return;
+	}
 	if (newPair.size() == 2) {
 		m_cameraPairs.append(newPair);
 		addItem(newPair[0] + " --> " + newPair[1]);
@@ -139,6 +146,27 @@ void ExtrinsicsPairList::currentItemChangedSlot(QListWidgetItem *current, QListW
 	}
 	if (previous != nullptr) {
 		previous->setBackgroundColor(QColor(34, 36, 40));
+	}
+}
+
+void ExtrinsicsPairList::itemDoubleClickedSlot(QListWidgetItem *item) {
+	QList<QString> pair = m_cameraPairs[itemSelectorList->row(item)/2];
+	PairCreatorWindow* pairCreatorWindow = new PairCreatorWindow(m_cameraNames, this);
+	pairCreatorWindow->setCameraPair(pair);
+	pairCreatorWindow->exec();
+	QList<QString> newPair = pairCreatorWindow->getCameraPair();
+	if (m_cameraPairs.contains(newPair)) {
+		QErrorMessage *m_errorMsg = new QErrorMessage(this);
+		m_errorMsg->showMessage("Camera Pair exists already!");
+		return;
+	}
+	if (newPair.size() == 2) {
+		m_cameraPairs[itemSelectorList->row(item)/2] = newPair;
+		item->setText(newPair[0] + " --> " + newPair[1]);
+	}
+	else if (newPair.size() == 3) {
+		m_cameraPairs[itemSelectorList->row(item)/2] = newPair;
+		item->setText(newPair[0] + " --> " + newPair[1] + " --> " + newPair[2]);
 	}
 }
 
@@ -230,6 +258,10 @@ QList<QString> PairCreatorWindow::getCameraPair() {
 			pair.append(primaryCombo->currentText());
 			pair.append(secondaryCombo->currentText());
 		}
+		else {
+			QErrorMessage *m_errorMsg = new QErrorMessage(this);
+			m_errorMsg->showMessage("Primary and Secondary can't be the same camera!");
+		}
 	}
 	else if (m_mode == 1) {
 		if (primary != "" && intermediate != "" && secondary != "" && (primary != intermediate) && (primary != secondary) && (secondary != intermediate)) {
@@ -237,6 +269,29 @@ QList<QString> PairCreatorWindow::getCameraPair() {
 			pair.append(intermediateCombo->currentText());
 			pair.append(secondaryCombo->currentText());
 		}
+		else {
+			QErrorMessage *m_errorMsg = new QErrorMessage(this);
+			m_errorMsg->showMessage("Primary, Intermediate and Secondary can't be the same camera!");
+		}
 	}
 	return pair;
+}
+
+void PairCreatorWindow::setCameraPair(QList<QString> cameraPair) {
+	if (cameraPair.size() == 2) {
+		intermediateLabel->hide();
+		intermediateCombo->hide();
+		m_mode = 0;
+		primaryCombo->setCurrentText(cameraPair[0]);
+		secondaryCombo->setCurrentText(cameraPair[1]);
+	}
+	else {
+		threeCamButton->setChecked(true);
+		intermediateLabel->show();
+		intermediateCombo->show();
+		m_mode = 1;
+		primaryCombo->setCurrentText(cameraPair[0]);
+		intermediateCombo->setCurrentText(cameraPair[1]);
+		secondaryCombo->setCurrentText(cameraPair[2]);
+	}
 }

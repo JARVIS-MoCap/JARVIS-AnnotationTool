@@ -36,6 +36,7 @@ PresetsWindow::PresetsWindow(QList<QString> *presets, const QString& type, const
 	QLabel *selectedPresetLabel = new QLabel("Preset Name: ", loadToolBar);
 	selectedPresetEdit = new QLineEdit(loadToolBar);
 	selectedPresetEdit->setPlaceholderText("Select a Preset...");
+	selectedPresetEdit->setStyleSheet("background-color:palette(Window);");
 	selectedPresetEdit->setReadOnly(true);
 	discardButton = new QToolButton(loadToolBar);
 	discardAction = new QAction(loadToolBar);

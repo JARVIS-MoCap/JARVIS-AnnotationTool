@@ -29,9 +29,11 @@ void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings, QList<QS
 	m_entitiesList = entities;
 	m_keypointsList = keypoints;
 	for (const auto & recording : m_recordingItems) {
-		emit recordingBeingProcessedChanged(recording.name);
+		m_dctMap.clear();
 		QString path = recording.path.split('/').takeLast();
 		QList<QString> cameras = getCameraNames(recording.path);
+		m_datasetConfig->numCameras = cameras.size();
+		emit recordingBeingProcessedChanged(recording.name, cameras);
 		m_datasetConfig->videoFormat = getVideoFormat(recording.path);
 		if (m_datasetConfig->videoFormat == "") {
 			emit datasetCreationFailed("All videos must have the same format!");
@@ -162,9 +164,7 @@ QList<int> DatasetCreator::extractFrames(const QString &path, QList<TimeLineWind
 			VideoStreamer *streamer = new VideoStreamer(path + "/" + cameras[i] + "." + m_datasetConfig->videoFormat, timeLineWindows, m_datasetConfig->frameSetsRecording, i);
 			connect(streamer, &VideoStreamer::computedDCTs, this, &DatasetCreator::computedDCTsSlot);
 			connect(this, &DatasetCreator::creationCanceled, streamer, &VideoStreamer::creationCanceledSlot);
-			if (i == 0) {
-				connect(streamer, &VideoStreamer::dctProgress, this, &DatasetCreator::dctProgress);
-			}
+			connect(streamer, &VideoStreamer::dctProgress, this, &DatasetCreator::dctProgress);
 			streamers.append(streamer);
  			threadPool->start(streamer);
 		}
@@ -230,10 +230,7 @@ QList<QString> DatasetCreator::getAndCopyFrames(const QString& recording, QList<
 		QString destinationPath = dataFolder + "/" + camera;
 		ImageWriter *writer = new ImageWriter(videoPath, destinationPath, frameNumbers, threadNumber);
 		connect(this, &DatasetCreator::creationCanceled, writer, &ImageWriter::creationCanceledSlot);
-		if (threadNumber == 0) {
-			connect(writer, &ImageWriter::copyImagesStatus, this, &DatasetCreator::copyImagesStatus);
-
-		}
+		connect(writer, &ImageWriter::copyImagesStatus, this, &DatasetCreator::copyImagesStatus);
 		threadNumber++;
 		writers.append(writer);
 		threadPool->start(writer);
@@ -248,19 +245,18 @@ QList<QString> DatasetCreator::getAndCopyFrames(const QString& recording, QList<
 }
 
 void DatasetCreator::createSavefile(const QString& recording, QList<QString> cameras, const QString& dataFolder, QList<int> frameNumbers) {
-	QList<QFile*> saveFiles;
+	QList<QString> frameNames = getAndCopyFrames(recording, cameras, dataFolder, frameNumbers);
 	for (const auto & camera : cameras) {
 		QDir dir;
 		dir.mkpath(dataFolder + "/" + camera);
-		QFile *file = new QFile(dataFolder + "/" + camera +"/annotations.csv");
-		saveFiles.append(file);
-		if (!file->open(QIODevice::WriteOnly)) {
+		QFile file = QFile(dataFolder + "/" + camera + "/annotations.csv");
+		if (!file.open(QIODevice::WriteOnly)) {
 			std::cout << "Can't open File" << std::endl;
 			QErrorMessage *msg = new QErrorMessage();
 			msg->showMessage("Error writing savefile. Make sure you have the right permissions...");
 			return;
 		}
-		 QTextStream stream(file);
+		 QTextStream stream(&file);
 		 stream << "Scorer";
 		 int num_columns = m_keypointsList.size()*3*m_entitiesList.size();
 		 for (int i = 0; i < num_columns; i++) {
@@ -285,23 +281,19 @@ void DatasetCreator::createSavefile(const QString& recording, QList<QString> cam
 
 		 }
 		 stream << "\n";
-	}
-	QList<QString> frameNames = getAndCopyFrames(recording, cameras, dataFolder, frameNumbers);
-
-	for (int cam = 0; cam < m_datasetConfig->numCameras; cam++) {
-		for (const auto &frameName : frameNames) {
-			QTextStream stream(saveFiles[cam]);
-			stream << frameName << ",";
-			for (int i = 0; i < m_keypointsList.size()*m_entitiesList.size(); i++) {
-					stream << ",," << 0 << ",";
-			}
-		 stream << "\n";
-		}
-		saveFiles[cam]->close();
+		 for (const auto &frameName : frameNames) {
+			 stream << frameName << ",";
+			 for (int i = 0; i < m_keypointsList.size()*m_entitiesList.size(); i++) {
+					 stream << ",," << 0 << ",";
+			 }
+			stream << "\n";
+		 }
+		 file.close();
 	}
 }
 
 void DatasetCreator::computedDCTsSlot(QList<cv::Mat> dctImages, QMap<int,int> frameNumberMap, int threadNumber) {
+	std::cout << "comüputed DCTS " << threadNumber << std::endl;
 	m_dctMap[threadNumber] = dctImages;
 	m_frameNumberMap = frameNumberMap;
 	if (m_dctMap.size() == m_datasetConfig->numCameras) {
@@ -310,7 +302,6 @@ void DatasetCreator::computedDCTsSlot(QList<cv::Mat> dctImages, QMap<int,int> fr
 }
 
 void DatasetCreator::cancelCreationSlot() {
-	std::cout << "CANCEL CREATION" << std::endl;
 	m_creationCanceled = true;
 	emit creationCanceled();
 }

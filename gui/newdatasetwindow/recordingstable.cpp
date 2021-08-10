@@ -23,6 +23,7 @@ RecordingsTable::RecordingsTable(QString name, DatasetConfig *datasetConfig, QWi
 	m_errorMsg = new QErrorMessage();
 
 	m_currentDir = QDir(QDir::homePath());
+	m_currentDir	= QDir("/media/timo/2,0 TB Volume");
 
 	recordingsTable = new QTableWidget(0, 5);
 	recordingsTable->setAlternatingRowColors(true);
@@ -32,7 +33,7 @@ RecordingsTable::RecordingsTable(QString name, DatasetConfig *datasetConfig, QWi
 	recordingsTable->horizontalHeader()-> setSectionResizeMode(0, QHeaderView::Stretch);
 	recordingsTable->horizontalHeader()-> setSectionResizeMode(1, QHeaderView::ResizeToContents);
 
-	recordingsTable->setColumnWidth(2, 155);
+	recordingsTable->setColumnWidth(2, 255);
 	recordingsTable->setColumnWidth(3, 30);
 	recordingsTable->setColumnWidth(4, 30);
 	recordingsTable->verticalHeader()->hide();
@@ -88,9 +89,8 @@ void RecordingsTable::addItemSlot() {
 }
 
 void RecordingsTable::updateTable() {
-	recordingsTable->setIconSize(QSize(150, 20));
+	recordingsTable->setIconSize(QSize(250, 20));
 	recordingsTable->setRowCount(m_recordingItems.size());
-	std::cout << m_recordingItems.size() << std::endl;
 	for (int i = 0; i < m_recordingItems.size(); i++) {
 		QTableWidgetItem* nameItem = new QTableWidgetItem();
 		nameItem->setText(m_recordingItems[i].name);
@@ -100,17 +100,16 @@ void RecordingsTable::updateTable() {
 		QPushButton *editButton = new QPushButton(recordingsTable);
     editButton->setIcon(QIcon::fromTheme("scissors"));
     connect(editButton, &QPushButton::clicked, this, &RecordingsTable::editRecordingClickedSlot);
-		auto it = m_windowsMap.find(i);
 		QImage timeLineImage;
-		if (it != m_windowsMap.end()) {
-			timeLineImage = createTimeLineImage(it.value(), m_recordingItems[i].frameCount);
+		if (m_recordingItems[i].timeLineList.size() != 0) {
+			timeLineImage = createTimeLineImage(m_recordingItems[i].timeLineList, m_recordingItems[i].frameCount);
 		}
 		else {
 			timeLineImage = QImage(100, 1, QImage::Format_RGB888);
 			timeLineImage.fill(QColor(80,80,80));
 		}
 		QTableWidgetItem* iconItem = new QTableWidgetItem();
-    iconItem->setIcon(QIcon(QPixmap::fromImage(timeLineImage).scaled(150,20)));
+    iconItem->setIcon(QIcon(QPixmap::fromImage(timeLineImage).scaled(250,20)));
     iconItem->setFlags(iconItem->flags() ^ Qt::ItemIsEditable);
 		QPushButton *deleteButton = new QPushButton(recordingsTable);
     deleteButton->setIcon(QIcon::fromTheme("discard"));
@@ -131,16 +130,8 @@ void RecordingsTable::deleteRecordingClickedSlot() {
 			if (row < m_editingIndex) m_editingIndex--;
 			std::cout << "Row " << row << std::endl;
       m_recordingItems.removeAt(row);
-			m_windowsMap.remove(row);
 			deletedItem = true;
     }
-		else if (deletedItem == true) {
-			auto it = m_windowsMap.find(row);
-			if (it != m_windowsMap.end()) {
-					m_windowsMap[row-1] = m_windowsMap[row];
-					m_windowsMap.remove(row);
-			}
-		}
   }
   updateTable();
 }
@@ -159,7 +150,7 @@ void RecordingsTable::editRecordingClickedSlot() {
 }
 
 void RecordingsTable::editVideo(QString path) {
-	VideoCutterWindow * videoCutterWindow = new VideoCutterWindow(m_windowsMap[m_editingIndex]);
+	VideoCutterWindow * videoCutterWindow = new VideoCutterWindow(m_recordingItems[m_editingIndex].timeLineList);
 	QList<QString> videoPaths = getVideoPaths(path);
 	videoCutterWindow->openVideos(videoPaths);
 	connect(videoCutterWindow, &VideoCutterWindow::editingFinished, this, &RecordingsTable::editingFinishedSlot);
@@ -167,13 +158,13 @@ void RecordingsTable::editVideo(QString path) {
 }
 
 void RecordingsTable::editingFinishedSlot(QList<TimeLineWindow> timeLineWindows, int frameCount) {
+	std::cout << m_editingIndex << std::endl;
 	m_frameCount = frameCount;
-	m_windowsMap[m_editingIndex] = timeLineWindows;
 	m_recordingItems[m_editingIndex].timeLineList = timeLineWindows;
 	m_recordingItems[m_editingIndex].frameCount = frameCount;
 	QImage timeLineImage = createTimeLineImage(timeLineWindows, frameCount);
 	QTableWidgetItem* iconItem = new QTableWidgetItem();
-	iconItem->setIcon(QIcon(QPixmap::fromImage(timeLineImage).scaled(150,20)));
+	iconItem->setIcon(QIcon(QPixmap::fromImage(timeLineImage).scaled(250,20)));
 	iconItem->setFlags(iconItem->flags() ^ Qt::ItemIsEditable);
 	recordingsTable->setItem(m_editingIndex,2,iconItem);
 	m_editingActive = false;

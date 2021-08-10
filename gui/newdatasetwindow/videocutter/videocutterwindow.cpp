@@ -30,6 +30,7 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
 	QGridLayout *layout = new QGridLayout(this);
 	m_savedTimeLineWindows = timeLineWindows;
 	m_initialTimeLineWindows = timeLineWindows;
+	m_WindowCounter = m_timeLineWindows.size();
 
 	mainSplitter = new QSplitter(this);
 	mainSplitter->setOrientation(Qt::Vertical);
@@ -672,6 +673,8 @@ void VideoCutterWindow::closeEvent (QCloseEvent * event ) {
 		if (reply == QMessageBox::Yes) {
 			m_timeLineWindows = m_initialTimeLineWindows;
 			m_savedTimeLineWindows = m_timeLineWindows;
+			emit editingFinished(m_timeLineWindows, m_frameCount);
+			emit closingWindow();
 			event->accept();
 		}
 	}

@@ -46,7 +46,6 @@ class RecordingsTable : public QWidget {
 		QList<RecordingItem> m_recordingItems;
 		int m_editingIndex;
 		bool m_editingActive = false;
-		QMap<int, QList<TimeLineWindow>> m_windowsMap;
 		QDir m_currentDir;
 
 		int getNumberSubfolders(QString path);

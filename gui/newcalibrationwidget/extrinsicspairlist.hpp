@@ -50,6 +50,8 @@ class ExtrinsicsPairList : public QWidget {
 		void addItemSlot();
 		void removeItemSlot();
 		void currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous);
+		void itemDoubleClickedSlot(QListWidgetItem *item);
+
 
 };
 
@@ -58,6 +60,7 @@ class PairCreatorWindow : public QDialog {
 	public:
 		explicit PairCreatorWindow(QList<QString> cameraNames, QWidget *parent = nullptr);
 		QList<QString> getCameraPair();
+		void setCameraPair(QList<QString> cameraPair);
 
 	private:
 		int m_mode = 0;

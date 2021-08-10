@@ -26,7 +26,7 @@ class VideoStreamer : public QObject, public QRunnable {
 
 	signals:
 		void computedDCTs(QList<cv::Mat> dctImages, QMap<int,int> frameNumberMap, int threadNumber);
-		void dctProgress(int index, int windowSize);
+		void dctProgress(int index, int windowSize, int threadNumber);
 
 
 	private:

@@ -29,12 +29,12 @@ class DatasetCreator : public QObject {
 			void gotAllDCTs();
 			void datasetCreated();
 			void datasetCreationFailed(QString errorMsg);
-			void recordingBeingProcessedChanged(QString recording);
+			void recordingBeingProcessedChanged(QString recording, QList<QString> cameras);
 			void currentSegmentChanged(QString segmentName);
-			void dctProgress(int index, int windowSize);
+			void dctProgress(int index, int windowSizeint, int threadNumber);
 			void startedClustering();
 			void finishedClustering();
-			void copyImagesStatus(int frameCount, int totalNumFrames);
+			void copyImagesStatus(int frameCount, int totalNumFrames, int threadNumber);
 			void creationCanceled();
 
 		public slots:

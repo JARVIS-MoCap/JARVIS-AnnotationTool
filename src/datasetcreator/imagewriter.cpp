@@ -34,19 +34,18 @@ void ImageWriter::run() {
 		}
 		else {
 			std::cout << "Error reading Frame"<< std::endl;
+			m_cap->release();
 			return;
 		}
-		if (m_threadNumber == 0 && frameCount % 1 == 0) {
-			emit copyImagesStatus(frameCount, totalNumFrames);
-		}
+		emit copyImagesStatus(frameCount, totalNumFrames, m_threadNumber);
 		if (m_interrupt) {
-			std::cout << "JABSFKBAFKJFAB" << std::endl;
+			m_cap->release();
 			return;
 		}
 	}
+	m_cap->release();
 }
 
 void ImageWriter::creationCanceledSlot() {
-	std::cout << "caaaancle" << std::endl;
 	m_interrupt = true;
 }

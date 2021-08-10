@@ -16,6 +16,8 @@
 #include <QProgressBar>
 #include <QDialog>
 #include <QKeyEvent>
+#include <QGroupBox>
+#include <QGridLayout>
 
 
 class DatasetProgressInfoWindow : public QDialog {
@@ -24,21 +26,23 @@ class DatasetProgressInfoWindow : public QDialog {
 		explicit DatasetProgressInfoWindow(QWidget *parent = nullptr);
 
 	public slots:
-		void recordingBeingProcessedChangedSlot(QString recording);
+		void recordingBeingProcessedChangedSlot(QString recording, QList<QString> cameras);
 		void segmentNameChangedSlot(QString segmentName);
-		void dctProgressSlot(int index, int windowSize);
+		void dctProgressSlot(int index, int windowSize, int threadNumber);
 		void startedClusteringSlot();
 		void finishedClusteringSlot();
 		void copyingFramesSlot();
-		void copyImagesStatusSlot(int frameCount, int totalNumFrames);
+		void copyImagesStatusSlot(int frameCount, int totalNumFrames, int threadNumber);
 
 
 	signals:
 
 	private:
+		QGridLayout *layout;
+		QGroupBox *progressGroup;
 		QLabel *recordingLabel;
 		QLabel *operationLabel;
-		QProgressBar *progressBar;
+		QList<QProgressBar*> progressBars;
 		QString m_currentSegmentName = "";
 		QPushButton *cancelButton;
 

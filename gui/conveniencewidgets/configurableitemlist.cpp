@@ -13,6 +13,7 @@
 #include <QGroupBox>
 #include <QInputDialog>
 #include <QDirIterator>
+#include <QErrorMessage>
 
 
 ConfigurableItemList::ConfigurableItemList(QString name, QWidget *parent) :
@@ -24,7 +25,6 @@ ConfigurableItemList::ConfigurableItemList(QString name, QWidget *parent) :
 	itemSelectorList = new QListWidget(this);
 	itemSelectorList->setFont(QFont("Sans Serif", 12));
 	connect(itemSelectorList, &QListWidget::currentItemChanged, this, &ConfigurableItemList::currentItemChangedSlot);
-	//itemSelectorList->setAlternatingRowColors(true);
 	connect(itemSelectorList, &QListWidget::itemDoubleClicked, this, &ConfigurableItemList::itemSelectedSlot);
 	moveItemUpButton = new QPushButton();
 	moveItemUpButton->setIcon(QIcon::fromTheme("up"));
@@ -64,8 +64,14 @@ QList<QString> ConfigurableItemList::getItems() {
 void ConfigurableItemList::itemSelectedSlot(QListWidgetItem *item) {
 	QString label = QInputDialog::getText(this,m_name,"Change Label:", QLineEdit::Normal, item->text());
 	if (label != "") {
-		item->setText(label);
-		emit itemsChanged(getItems());
+		if(!getItems().contains(label)) {
+			item->setText(label);
+			emit itemsChanged(getItems());
+		}
+		else {
+			QErrorMessage *m_errorMsg = new QErrorMessage(this);
+			m_errorMsg->showMessage("Name already taken!");
+		}
 	}
 }
 
@@ -97,7 +103,13 @@ void ConfigurableItemList::moveItemDownSlot() {
 void ConfigurableItemList::addItemSlot() {
 	QString label = QInputDialog::getText(this,m_name,"Enter Label:", QLineEdit::Normal);
 	if (label != "") {
-		addItem(label);
+		if(!getItems().contains(label)) {
+			addItem(label);
+		}
+		else {
+			QErrorMessage *m_errorMsg = new QErrorMessage(this);
+			m_errorMsg->showMessage("Name already taken!");
+		}
 	}
 	emit itemsChanged(getItems());
 }
