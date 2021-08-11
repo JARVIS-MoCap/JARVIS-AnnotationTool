@@ -33,6 +33,7 @@ class ExtrinsicsCalibrator : public QObject, public QRunnable {
 	signals:
 		void extrinsicsProgress(int counter, int frameCount, int threadNumber);
 		void finishedExtrinsics(double reproError, QMap<QString, double> intrinsicsErrorMap, int threadNumber);
+		void calibrationError(const QString &errorMsg);
 
 	public slots:
 		void calibrationCanceledSlot();
@@ -58,7 +59,7 @@ class ExtrinsicsCalibrator : public QObject, public QRunnable {
 		bool m_interrupt = false;
 		QList<QString> m_validRecordingFormats = {"avi", "mp4", "mov", "wmv"};
 
-		void calibrateExtrinsicsPair(QList<QString> cameraPair, Extrinsics &e);
+		bool calibrateExtrinsicsPair(QList<QString> cameraPair, Extrinsics &e);
 		double stereoCalibrationStep(std::vector<std::vector<cv::Point3f>> &objectPoints, std::vector<std::vector<cv::Point2f>> &imagePoints1,
 		      std::vector<std::vector<cv::Point2f>> &imagePoints2, Intrinsics &i1, Intrinsics &i2, Extrinsics &e, cv::Size size, double thresholdFactor);
 		double calibrateIntrinsicsStep(std::string cameraName, std::vector<std::vector<cv::Point3f>> objectPoints, std::vector<std::vector<cv::Point2f>> imagePoints,

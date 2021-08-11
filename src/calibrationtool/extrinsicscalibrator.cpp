@@ -27,7 +27,9 @@ void ExtrinsicsCalibrator::run() {
   Extrinsics extrinsics1, extrinsics2;
 
   if (numCameras == 2) {
-    calibrateExtrinsicsPair(m_cameraPair, extrinsics1);
+    if (!calibrateExtrinsicsPair(m_cameraPair, extrinsics1)) {
+      return;
+    }
     if (m_interrupt) return;
     cv::FileStorage fse(m_parametersSavePath + "/Extrinsics/Extrinsics_" + m_cameraPair[0].toStdString() + "_" + m_cameraPair[1].toStdString() + ".yaml", cv::FileStorage::WRITE);
     fse << "R" << extrinsics1.R.t();
@@ -38,8 +40,11 @@ void ExtrinsicsCalibrator::run() {
   else if (numCameras == 3) {
     QList<QString> cameraPair1 = {m_cameraPair[0], m_cameraPair[1]};
     QList<QString> cameraPair2 = {m_cameraPair[1], m_cameraPair[2]};
-    calibrateExtrinsicsPair(cameraPair1, extrinsics1);
-    calibrateExtrinsicsPair(cameraPair2, extrinsics2);
+    bool success1 = calibrateExtrinsicsPair(cameraPair1, extrinsics1);
+    bool success2 = calibrateExtrinsicsPair(cameraPair2, extrinsics2);
+    if (!success1 || !success2) {
+      return;
+    }
     if (m_interrupt) return;
     cv::Mat T1_t = extrinsics1.R.t() * extrinsics1.T;
     cv::Mat T2_t = extrinsics2.R.t() * extrinsics2.T;
@@ -54,7 +59,7 @@ void ExtrinsicsCalibrator::run() {
 }
 
 
-void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Extrinsics &e) {
+bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Extrinsics &e) {
   std::vector<cv::Point3f> checkerBoardPoints;
   for (int i = 0; i < m_calibrationConfig->patternHeight; i++)
     for (int j = 0; j < m_calibrationConfig->patternWidth; j++)
@@ -71,7 +76,6 @@ void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
   std::vector<std::vector<cv::Point2f>> imagePointsAll1, imagePointsAll2, imagePoints1, imagePoints2;
   std::vector<cv::Point2f> corners1, corners2;
 	cv::Size size;
-  cbdetect::Corner cbCorners1, cbCorners2;
   std::vector<cbdetect::Board> boards1, boards2;
   cbdetect::Params params;
   params.corner_type = cbdetect::SaddlePoint;
@@ -80,8 +84,8 @@ void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
 
   bool read_success = true;
   int counter = 0;
+  cv::Mat img1,img2;
   while (read_success && !m_interrupt) {
-    cv::Mat img1,img2;
     bool read_success1 = cap1.read(img1);
     bool read_success2 = cap2.read(img2);
     read_success = read_success1 && read_success2;
@@ -94,6 +98,7 @@ void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
       corners2.clear();
       size = img1.size();
 
+      cbdetect::Corner cbCorners1, cbCorners2;
       cbdetect::find_corners(img1, cbCorners1, params);
       cbdetect::find_corners(img2, cbCorners2, params);
       bool patternFound1 = (cbCorners1.p.size() >= m_calibrationConfig->patternHeight*m_calibrationConfig->patternWidth);
@@ -102,6 +107,7 @@ void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
       if (patternFound1 && patternFound2) {
         cbdetect::boards_from_corners(img1, cbCorners1, boards1, params);
         cbdetect::boards_from_corners(img2, cbCorners2, boards2, params);
+
         patternFound1 = boardToCorners(boards1[0], cbCorners1, corners1);
         patternFound2 = boardToCorners(boards2[0], cbCorners2, corners2);
         if (patternFound1 && patternFound2) {
@@ -116,8 +122,12 @@ void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
       counter++;
     }
   }
+  if (m_interrupt) return false;
 
-  if (m_interrupt) return;
+  if(objectPointsAll.size() < m_calibrationConfig->framesForExtrinsics) {
+    emit calibrationError("Not enough valid checkerboards found...");
+    return false;
+  }
 
   double keep_ratio = imagePointsAll1.size() / (double)std::min( m_calibrationConfig->framesForExtrinsics, (int)imagePointsAll1.size());
   for (double k = 0; k < imagePointsAll1.size(); k += keep_ratio) {
@@ -134,11 +144,11 @@ void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
     intrinsicsErrorMap[cameraPair[1]] = calibrateIntrinsicsStep(cameraPair[1].toStdString(), objectPoints, imagePoints2, size, i2);
   }
 
-  double mean_repro_error = stereoCalibrationStep(objectPoints, imagePoints1, imagePoints2, i1,i2,e, size, 1.2);
+  double mean_repro_error = stereoCalibrationStep(objectPoints, imagePoints1, imagePoints2, i1,i2,e, size, 1.4);
   std::cout << "Mean Reprojection Error after Stage 1: " << mean_repro_error << std::endl;
   std::cout << "Number Images for Stage 2: " <<imagePoints1.size() << std::endl;
 
-  mean_repro_error = stereoCalibrationStep(objectPoints, imagePoints1, imagePoints2, i1,i2,e, size, 1.4);
+  mean_repro_error = stereoCalibrationStep(objectPoints, imagePoints1, imagePoints2, i1,i2,e, size, 1.6);
   std::cout << "Mean Reprojection Error after Stage 2: " << mean_repro_error << std::endl;
   std::cout << "Final Number Images: " <<imagePoints1.size() << std::endl;
 
@@ -147,6 +157,8 @@ void ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
         cv::CALIB_FIX_INTRINSIC, cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 120, 1e-7));
 
   emit finishedExtrinsics(mean_repro_error, intrinsicsErrorMap, m_threadNumber); //TODO: this is not quite right for triplet, do average over both instead or something
+  return true;
+
 }
 
 double ExtrinsicsCalibrator::stereoCalibrationStep(std::vector<std::vector<cv::Point3f>> &objectPoints, std::vector<std::vector<cv::Point2f>> &imagePoints1,
@@ -224,23 +236,39 @@ void ExtrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1, cv
 
 
 bool ExtrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners, std::vector<cv::Point2f> &corners) {
-  if (board.idx.size()-2 == 6) {
+  if (board.idx.size()-2 == m_calibrationConfig->patternHeight) {
     for(int i = 1; i < board.idx.size() - 1; ++i) {
-      for(int j = 1; j < board.idx[i].size() - 1; ++j) {
-        if(board.idx[i][j] < 0) {
-          return false;
+      if (board.idx[i].size()-2 == m_calibrationConfig->patternWidth) {
+        for(int j = 1; j < board.idx[i].size() - 1; ++j) {
+          if(board.idx[i][j] < 0) {
+            return false;
+          }
+          if (board.idx[i][j] >= cbCorners.p.size()) {
+            return false;
+          }
+          corners.push_back(static_cast<cv::Point2f>(cbCorners.p[board.idx[i][j]]));
         }
-        corners.push_back(static_cast<cv::Point2f>(cbCorners.p[board.idx[i][j]]));
+      }
+      else {
+        return false;
       }
     }
   }
   else {
     for(int j = 1; j < board.idx[0].size() - 1; ++j) {
       for(int i = 1; i < board.idx.size() - 1; ++i) {
-        if(board.idx[board.idx.size() - 1 -i][j] < 0) {
+        if (board.idx.size()-2 == m_calibrationConfig->patternWidth && board.idx[i].size()-2 == m_calibrationConfig->patternHeight) {
+          if(board.idx[board.idx.size() - 1 -i][j] < 0) {
+            return false;
+          }
+          if (board.idx[board.idx.size() - 1 -i][j] >= cbCorners.p.size()) {
+            return false;
+          }
+          corners.push_back(static_cast<cv::Point2f>(cbCorners.p[board.idx[board.idx.size() - 1 -i][j]]));
+        }
+        else {
           return false;
         }
-        corners.push_back(static_cast<cv::Point2f>(cbCorners.p[board.idx[board.idx.size() - 1 -i][j]]));
       }
     }
   }

@@ -136,14 +136,21 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	widthEdit = new QSpinBox();
 	widthEdit->setRange(0,20);
 	widthEdit->setValue(9);
+	connect(widthEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &NewCalibrationWidget::checkerBoardPatternChangesSlot);
 	LabelWithToolTip *heightLabel = new LabelWithToolTip("  Pattern Height");
 	heightEdit = new QSpinBox();
 	heightEdit->setRange(0,20);
 	heightEdit->setValue(6);
+	connect(heightEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &NewCalibrationWidget::checkerBoardPatternChangesSlot);
 	LabelWithToolTip *sideLengthLabel = new LabelWithToolTip("  Side Length [mm]");
 	sideLengthEdit = new QDoubleSpinBox();
 	sideLengthEdit->setRange(0.0,1000.0);
 	sideLengthEdit->setValue(26.7);
+
+
+	checkerBoardPreview = new QLabel(this);
+	checkerBoardPatternChangesSlot(0);
+
 	i = 0;
 	checkerboardwidgetlayout->addWidget(widthLabel,i,0);
 	checkerboardwidgetlayout->addWidget(widthEdit,i++,1);
@@ -151,6 +158,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	checkerboardwidgetlayout->addWidget(heightEdit,i++,1);
 	checkerboardwidgetlayout->addWidget(sideLengthLabel,i,0);
 	checkerboardwidgetlayout->addWidget(sideLengthEdit,i++,1);
+	checkerboardwidgetlayout->addWidget(checkerBoardPreview,i++,1, Qt::AlignCenter);
 	QWidget *bottomSpacer = new QWidget(configWidget);
 	bottomSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -208,6 +216,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 
 	connect(calibrationTool, &CalibrationTool::calibrationFinished, this, &NewCalibrationWidget::calibrationFinishedSlot);
 	connect(calibrationTool, &CalibrationTool::calibrationCanceled, this, &NewCalibrationWidget::calibrationCanceledSlot);
+	connect(calibrationTool, &CalibrationTool::calibrationError, this, &NewCalibrationWidget::calibrationErrorSlot);
 
 	//Signal Relay:
 	connect(cameraList, &ConfigurableItemList::itemsChanged, extrinsicsPairList, &ExtrinsicsPairList::cameraNamesChangedSlot);
@@ -369,6 +378,12 @@ void NewCalibrationWidget::calibrationCanceledSlot() {
 	delete calibrationProgressInfoWindow;
 }
 
+void NewCalibrationWidget::calibrationErrorSlot(const QString &errorMsg) {
+	m_errorMsg->showMessage("Calibration unsuccessful! " + errorMsg);
+	calibrationProgressInfoWindow->accept();
+	delete calibrationProgressInfoWindow;
+}
+
 
 bool NewCalibrationWidget::checkIntrinsics(const QString& path) {
 	QList<QString> cameraNames = cameraList->getItems();
@@ -451,6 +466,28 @@ void NewCalibrationWidget::calibrateExtrinsicsRadioStateChangedSlot(bool state) 
 	else {
 		extrinsicsPathWidget->setEnabled(false);
 	}
+}
+
+
+QImage NewCalibrationWidget::createCheckerboardPreview() {
+	int width = widthEdit->value();
+	int height = heightEdit->value();
+	QImage checkerBoardImage(width+1, height+1, QImage::Format_RGB888);
+	for (int i = 0; i < width+1; i++) {
+		for (int j = 0; j < height+1; j++) {
+			if ((i+j)%2 == 0) {
+				checkerBoardImage.setPixelColor(i,j,QColor(0,0,0));
+			}
+			else {
+				checkerBoardImage.setPixelColor(i,j,QColor(255,255,255));
+			}
+		}
+	}
+	return checkerBoardImage;
+}
+
+void NewCalibrationWidget::checkerBoardPatternChangesSlot(int val) {
+	checkerBoardPreview->setPixmap(QPixmap::fromImage(createCheckerboardPreview().scaled((widthEdit->value()+1)*24,(heightEdit->value()+1)*24)));
 }
 
 void NewCalibrationWidget::savePresetsClickedSlot() {

@@ -185,7 +185,7 @@ void EditorWidget::previousClickedSlot() {
 		if (m_currentFrameIndex == 0) {
 			previousButton->setEnabled(false);
 		}
-		else if (m_currentFrameIndex == m_currentImgSet->numCameras - 2) {
+		if (m_currentFrameIndex == m_currentImgSet->numCameras - 2) {
 			nextButton->setEnabled(true);
 		}
 	}
@@ -199,7 +199,7 @@ void EditorWidget::nextClickedSlot() {
 		if (m_currentFrameIndex == m_currentImgSet->numCameras-1) {
 			nextButton->setEnabled(false);
 		}
-		else if (m_currentFrameIndex == 1) {
+		if (m_currentFrameIndex == 1) {
 			previousButton->setEnabled(true);
 		}
 	}

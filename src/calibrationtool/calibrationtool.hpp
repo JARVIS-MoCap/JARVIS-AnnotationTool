@@ -37,6 +37,7 @@ class CalibrationTool : public QObject {
     void extrinsicsProgress(int counter, int frameCount, int threadNumber);
     void calibrationFinished();
 		void calibrationCanceled();
+		void calibrationError(const QString & errorMsg);
 
   private:
     CalibrationConfig *m_calibrationConfig;
@@ -47,7 +48,7 @@ class CalibrationTool : public QObject {
 	private slots:
 		void finishedIntrinsicsSlot(double reproError, int threadNumber);
 		void finishedExtrinsicsSlot(double reproError, QMap<QString, double> intrinsicsErrorMap, int threadNumber);
-
+		void calibrationErrorSlot(const QString &errorMsg);
 
 };
 

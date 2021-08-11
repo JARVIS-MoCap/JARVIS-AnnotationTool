@@ -67,6 +67,7 @@ class NewCalibrationWidget : public QWidget {
 		QSpinBox *widthEdit;
 		QSpinBox *heightEdit;
 		QDoubleSpinBox *sideLengthEdit;
+		QLabel *checkerBoardPreview;
 
 		ConfigurableItemList *cameraList;
 
@@ -81,6 +82,7 @@ class NewCalibrationWidget : public QWidget {
 		bool checkCheckerboard();
 		bool checkCalibrationExists(const QString& path);
 		bool checkIsValidRecording(const QString& path, const QString& recording);
+		QImage createCheckerboardPreview();
 
 
 	private slots:
@@ -93,8 +95,10 @@ class NewCalibrationWidget : public QWidget {
 		void calibrateClickedSlot();
 		void calibrationFinishedSlot();
 		void calibrationCanceledSlot();
+		void calibrationErrorSlot(const QString &errorMsg);
 		void sperateRadioStateChangedSlot(bool state);
 		void calibrateExtrinsicsRadioStateChangedSlot(bool state);
+		void checkerBoardPatternChangesSlot(int val);
 
 		void intrinsicsPathChangedSlot(const QString &path);
 

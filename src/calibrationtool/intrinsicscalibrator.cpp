@@ -28,10 +28,8 @@ void IntrinsicsCalibrator::run() {
       checkerBoardPoints.push_back(cv::Point3f((float)j * m_calibrationConfig->patternSideLength, (float)i * m_calibrationConfig->patternSideLength, 0));
   std::vector<std::string> fileNames;
   QString format = getFormat(m_calibrationConfig->intrinsicsPath, QString::fromStdString(m_cameraName));
-  std::cout << m_calibrationConfig->intrinsicsPath.toStdString() + "/" + m_cameraName + "." + format.toStdString() << std::endl;
   cv::VideoCapture cap(m_calibrationConfig->intrinsicsPath.toStdString() + "/" + m_cameraName + "." + format.toStdString());
   int frameCount = cap.get(cv::CAP_PROP_FRAME_COUNT);
-  std::cout << "FRAMES " << frameCount << std::endl;
   int frameRate = cap.get(cv::CAP_PROP_FPS);
   int skipIndex = std::max(frameRate/m_calibrationConfig->maxSamplingFrameRate-1,0);
 
@@ -132,23 +130,39 @@ void IntrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1, cv
 
 
 bool IntrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners, std::vector<cv::Point2f> &corners) {
-  if (board.idx.size()-2 == 6) {
+  if (board.idx.size()-2 == m_calibrationConfig->patternHeight) {
     for(int i = 1; i < board.idx.size() - 1; ++i) {
-      for(int j = 1; j < board.idx[i].size() - 1; ++j) {
-        if(board.idx[i][j] < 0) {
-          return false;
+      if (board.idx[i].size()-2 == m_calibrationConfig->patternWidth) {
+        for(int j = 1; j < board.idx[i].size() - 1; ++j) {
+          if(board.idx[i][j] < 0) {
+            return false;
+          }
+          if (board.idx[i][j] >= cbCorners.p.size()) {
+            return false;
+          }
+          corners.push_back(static_cast<cv::Point2f>(cbCorners.p[board.idx[i][j]]));
         }
-        corners.push_back(static_cast<cv::Point2f>(cbCorners.p[board.idx[i][j]]));
+      }
+      else {
+        return false;
       }
     }
   }
   else {
     for(int j = 1; j < board.idx[0].size() - 1; ++j) {
       for(int i = 1; i < board.idx.size() - 1; ++i) {
-        if(board.idx[board.idx.size() - 1 -i][j] < 0) {
+        if (board.idx.size()-2 == m_calibrationConfig->patternWidth && board.idx[i].size()-2 == m_calibrationConfig->patternHeight) {
+          if(board.idx[board.idx.size() - 1 -i][j] < 0) {
+            return false;
+          }
+          if (board.idx[board.idx.size() - 1 -i][j] >= cbCorners.p.size()) {
+            return false;
+          }
+          corners.push_back(static_cast<cv::Point2f>(cbCorners.p[board.idx[board.idx.size() - 1 -i][j]]));
+        }
+        else {
           return false;
         }
-        corners.push_back(static_cast<cv::Point2f>(cbCorners.p[board.idx[board.idx.size() - 1 -i][j]]));
       }
     }
   }

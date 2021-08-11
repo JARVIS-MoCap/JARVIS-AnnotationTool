@@ -17,12 +17,12 @@ CalibrationTool::CalibrationTool(CalibrationConfig *calibrationConfig) :
 }
 
 void CalibrationTool::makeCalibrationSet()  {
+  delayl(100);  //Wait for GUI Thread to setup progressWindow before potentially slamming it with calibration task
   m_calibrationCanceled = false;
   m_intrinsicsReproErrors.clear();
   m_extrinsicsReproErrors.clear();
   if (m_calibrationConfig->seperateIntrinsics) {
-    std::cout << "Calib Exteinsics: " << m_calibrationConfig->calibrateExtrinsics << std::endl;
-		QThreadPool *threadPool = QThreadPool::globalInstance();
+    QThreadPool *threadPool = QThreadPool::globalInstance();
     int thread = 0;
 		for (const auto& cam : m_calibrationConfig->cameraNames) {
 			IntrinsicsCalibrator *intrinsicsCalibrator = new IntrinsicsCalibrator(m_calibrationConfig, cam, thread++);
@@ -43,6 +43,7 @@ void CalibrationTool::makeCalibrationSet()  {
       ExtrinsicsCalibrator *extrinsicsCalibrator = new ExtrinsicsCalibrator(m_calibrationConfig, pair, thread++);
       connect(extrinsicsCalibrator, &ExtrinsicsCalibrator::extrinsicsProgress, this, &CalibrationTool::extrinsicsProgress);
       connect(extrinsicsCalibrator, &ExtrinsicsCalibrator::finishedExtrinsics, this, &CalibrationTool::finishedExtrinsicsSlot);
+      connect(extrinsicsCalibrator, &ExtrinsicsCalibrator::calibrationError, this, &CalibrationTool::calibrationErrorSlot);
       connect(this, &CalibrationTool::calibrationCanceled, extrinsicsCalibrator, &ExtrinsicsCalibrator::calibrationCanceledSlot);
 
       threadPool->start(extrinsicsCalibrator);
@@ -74,4 +75,12 @@ void CalibrationTool::finishedExtrinsicsSlot(double reproError, QMap<QString, do
 void CalibrationTool::cancelCalibrationSlot() {
   m_calibrationCanceled = true;
   emit calibrationCanceled();
+}
+
+void CalibrationTool::calibrationErrorSlot(const QString &errorMsg) {
+  std::cout << "Here" << std::endl;
+  if(!m_calibrationCanceled) {
+    m_calibrationCanceled = true;
+    emit calibrationError(errorMsg);
+  }
 }

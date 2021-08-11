@@ -245,10 +245,12 @@ QList<QString> DatasetCreator::getAndCopyFrames(const QString& recording, QList<
 }
 
 void DatasetCreator::createSavefile(const QString& recording, QList<QString> cameras, const QString& dataFolder, QList<int> frameNumbers) {
-	QList<QString> frameNames = getAndCopyFrames(recording, cameras, dataFolder, frameNumbers);
 	for (const auto & camera : cameras) {
 		QDir dir;
 		dir.mkpath(dataFolder + "/" + camera);
+	}
+	QList<QString> frameNames = getAndCopyFrames(recording, cameras, dataFolder, frameNumbers);
+	for (const auto & camera : cameras) {
 		QFile file = QFile(dataFolder + "/" + camera + "/annotations.csv");
 		if (!file.open(QIODevice::WriteOnly)) {
 			std::cout << "Can't open File" << std::endl;
