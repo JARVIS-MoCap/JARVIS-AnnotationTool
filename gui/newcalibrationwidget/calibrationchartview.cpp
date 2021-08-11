@@ -36,7 +36,7 @@ void CalibrationChartView::update(int selectedIndex) {
 	float maxValue = *std::max_element(m_reproErrors.begin(), m_reproErrors.end());
 
 	QValueAxis *axisY = new QValueAxis();
-	axisY->setTitleText("Reprojection Erro [px]");
+	axisY->setTitleText("Reprojection Error [px]");
 	axisY->setRange(0,maxValue);
 
 	if (m_mode != "interactive") {
