@@ -40,8 +40,8 @@ CalibrationProgressInfoWindow::CalibrationProgressInfoWindow(QList<QString> came
 	for (int i = 0; i < cameraPairs.size(); i++) {
 		QLabel *pairLabel = new QLabel(cameraPairs[i][0] + " --> " + cameraPairs[i][cameraPairs[i].size()-1]);
  		QProgressBar* bar = new QProgressBar(this);
-		bar->setMinimumSize(500,25);
-		bar->setMaximumSize(9999,25);
+		bar->setMinimumSize(500, 25);
+		bar->setMaximumSize(9999, 25);
 		extrinsicsProgressBars.append(bar);
 		extrinsicslayout->addWidget(pairLabel, i,0);
 		extrinsicslayout->addWidget(bar,i,1);
@@ -62,13 +62,21 @@ CalibrationProgressInfoWindow::CalibrationProgressInfoWindow(QList<QString> came
 }
 
 void CalibrationProgressInfoWindow::updateIntrinsicsProgressSlot(int count, int frameCount, int threadNumber) {
+	progressStackWidget->widget(1)->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+	progressStackWidget->widget(0)->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	//this->resize(700, 100+30*intrinsicsProgressBars.size());
+	this->adjustSize();
 	operationLabel->setText("Calibrating Intrinsics...");
 	intrinsicsProgressBars[threadNumber]->setRange(0,frameCount);
 	intrinsicsProgressBars[threadNumber]->setValue(count);
 }
 
 void CalibrationProgressInfoWindow::updateExtrinsicsProgressSlot(int count, int frameCount, int threadNumber) {
+	//this->resize(700, 100+30*extrinsicsProgressBars.size());
+	progressStackWidget->widget(0)->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+	progressStackWidget->widget(1)->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	progressStackWidget->setCurrentIndex(1);
+	this->adjustSize();
 	operationLabel->setText("Calibrating Extrinsics...");
 	extrinsicsProgressBars[threadNumber]->setRange(0,frameCount);
 	extrinsicsProgressBars[threadNumber]->setValue(count);

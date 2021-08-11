@@ -64,16 +64,19 @@ void DatasetProgressInfoWindow::dctProgressSlot(int index, int windowSize, int t
 		progressBars[threadNumber]->setRange(0, windowSize);
 		progressBars[threadNumber]->setValue(index);
 	}
+	this->adjustSize();
 }
 
 void DatasetProgressInfoWindow::startedClusteringSlot() {
 	operationLabel->setText("Started k-means Clustering. This might take a while...");
 	progressGroup->hide();
+	this->adjustSize();
 }
 
 void DatasetProgressInfoWindow::finishedClusteringSlot() {
 	operationLabel->setText("Finished k-means Clustering!");
 	progressGroup->show();
+	this->adjustSize();
 }
 
 void DatasetProgressInfoWindow::copyingFramesSlot() {
@@ -90,6 +93,7 @@ void DatasetProgressInfoWindow::copyImagesStatusSlot(int frameCount, int totalNu
 		progressBars[threadNumber]->setRange(0, totalNumFrames);
 		progressBars[threadNumber]->setValue(frameCount);
 	}
+	this->adjustSize();
 }
 
 void DatasetProgressInfoWindow::keyPressEvent(QKeyEvent *e) {

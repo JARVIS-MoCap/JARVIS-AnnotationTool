@@ -137,7 +137,10 @@ void LoadDatasetWindow::updateCameraOrderList(const QString& dir) {
 	cameraOrderList->clear();
 	m_cameraNames = QDir(dir).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
 	for (const auto& cam : m_cameraNames) {
-		addItem(cam);
+		if (QFile::exists(dir + "/" + cam + "/annotations.csv")) {
+			addItem(cam);
+		}
+
 	}
 }
 

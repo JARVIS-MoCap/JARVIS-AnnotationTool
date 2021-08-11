@@ -148,8 +148,16 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	sideLengthEdit->setValue(26.7);
 
 
+	checkerBoardPreviewBox = new QGroupBox(this);
+	QGridLayout *checkerboardpreviewlayout = new QGridLayout(checkerBoardPreviewBox);
+	checkerboardpreviewlayout->setMargin(0);
+	checkerBoardPreviewBox->setStyleSheet("QGroupBox {  border: 4px solid palette(highlight);}");
 	checkerBoardPreview = new QLabel(this);
+	checkerBoardPreviewLabel = new QLabel("<font color=#64a420>Make sure this matches your Checkerboard!</font>");
+	checkerBoardPreviewLabel->setFont(QFont("Sans Serif", 10));
+	checkerboardpreviewlayout->addWidget(checkerBoardPreview,0,0, Qt::AlignCenter);
 	checkerBoardPatternChangesSlot(0);
+
 
 	i = 0;
 	checkerboardwidgetlayout->addWidget(widthLabel,i,0);
@@ -158,7 +166,10 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	checkerboardwidgetlayout->addWidget(heightEdit,i++,1);
 	checkerboardwidgetlayout->addWidget(sideLengthLabel,i,0);
 	checkerboardwidgetlayout->addWidget(sideLengthEdit,i++,1);
-	checkerboardwidgetlayout->addWidget(checkerBoardPreview,i++,1, Qt::AlignCenter);
+	checkerboardwidgetlayout->addWidget(checkerBoardPreviewBox,i++,1, Qt::AlignCenter);
+	checkerboardwidgetlayout->addWidget(checkerBoardPreviewLabel,i++,1, Qt::AlignCenter);
+
+
 	QWidget *bottomSpacer = new QWidget(configWidget);
 	bottomSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -321,14 +332,16 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	}
 
 	if (seperateRadioWidget->state()) {
-		if (!checkIntrinsics(intrinsicsPath)) {
-			m_errorMsg->showMessage("Could not find  all Intrinsics Recordings. Make sure the Path is correct and the recording names match the camera names given.");
+		QString errorMsg;
+		if (!checkIntrinsics(intrinsicsPath, errorMsg)) {
+			m_errorMsg->showMessage(errorMsg);
 			return;
 		}
 	}
 	if (!seperateRadioWidget->state() || calibrateExtrinsicsRadioWidget->state()) {
-		if (!checkExtrinsics(extrinsicsPath)) {
-			m_errorMsg->showMessage("Could not find  all Extrinsics Recordings. Make sure the Path is correct and the folder structure and recording names match the camera pairs you defined.");
+		QString errorMsg;
+		if (!checkExtrinsics(extrinsicsPath, errorMsg)) {
+			m_errorMsg->showMessage(errorMsg);
 			return;
 		}
 	}
@@ -387,11 +400,12 @@ void NewCalibrationWidget::calibrationErrorSlot(const QString &errorMsg) {
 }
 
 
-bool NewCalibrationWidget::checkIntrinsics(const QString& path) {
+bool NewCalibrationWidget::checkIntrinsics(const QString& path, QString &errorMsg) {
 	QList<QString> cameraNames = cameraList->getItems();
 	bool allFilesValid = true;
 	for (const auto & cam : cameraNames) {
 		if (!checkIsValidRecording(path, cam)) {
+			errorMsg = "Recording for camera \"" + cam + "\" not found.";
 			allFilesValid = false;
 		}
 	}
@@ -399,21 +413,37 @@ bool NewCalibrationWidget::checkIntrinsics(const QString& path) {
 }
 
 
-bool NewCalibrationWidget::checkExtrinsics(const QString& path) {
+bool NewCalibrationWidget::checkExtrinsics(const QString& path, QString & errorMsg) {
 	QList<QList<QString>> cameraPairs = extrinsicsPairList->getItems();
 	bool allFilesValid = true;
 	for (const auto & pair : cameraPairs) {
 		if (pair.size() == 2) {
-			bool primaryValid = checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[0]);
-			bool secondaryValid = checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[1]);
-			if (!primaryValid || !secondaryValid) allFilesValid = false;
+			if (!checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[0])) {
+				errorMsg = "Recording for primary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
+				allFilesValid = false;
+			}
+			if (!checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[1])) {
+				errorMsg = "Recording for secondary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
+				allFilesValid = false;
+			}
 		}
 		else if (pair.size() == 3) {
-			bool primaryValid1 = checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[0]);
-			bool secondaryValid1 = checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[1]);
-			bool primaryValid2 = checkIsValidRecording(path + "/" + pair[1] + "-" + pair[2], pair[1]);
-			bool secondaryValid2 = checkIsValidRecording(path + "/" + pair[1] + "-" + pair[2], pair[2]);
-			if (!primaryValid1 || !secondaryValid1 || !primaryValid2 || !secondaryValid2) allFilesValid = false;
+			if(!checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[0])) {
+				errorMsg = "Recording for primary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
+				allFilesValid = false;
+			}
+			if (!checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[1])) {
+				errorMsg = "Recording for secondary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
+				allFilesValid = false;
+			}
+			if (!checkIsValidRecording(path + "/" + pair[1] + "-" + pair[2], pair[1])) {
+				errorMsg = "Recording for primary camera in pair \"" + pair[1] + " --> " + pair[2] + "\" not found.";
+				allFilesValid = false;
+			}
+			if (!checkIsValidRecording(path + "/" + pair[1] + "-" + pair[2], pair[2])) {
+				errorMsg = "Recording for secondary camera in pair \"" + pair[1] + " --> " + pair[2] + "\" not found.";
+				allFilesValid = false;
+			}
 		}
 	}
 	return allFilesValid;
@@ -489,7 +519,15 @@ QImage NewCalibrationWidget::createCheckerboardPreview() {
 }
 
 void NewCalibrationWidget::checkerBoardPatternChangesSlot(int val) {
-	checkerBoardPreview->setPixmap(QPixmap::fromImage(createCheckerboardPreview().scaled((widthEdit->value()+1)*24,(heightEdit->value()+1)*24)));
+	checkerBoardPreview->setPixmap(QPixmap::fromImage(createCheckerboardPreview().scaled((widthEdit->value()+1)*20,(heightEdit->value()+1)*20)));
+	if ((widthEdit->value()+ heightEdit->value()) % 2 == 0) {
+		checkerBoardPreviewBox->setStyleSheet("QGroupBox {  border: 4px solid rgba(164,32,34,255);}");
+		checkerBoardPreviewLabel->setText("<font color=#a42022>Use an assymetric Checkerboard!</font>");
+	}
+	else {
+		checkerBoardPreviewBox->setStyleSheet("QGroupBox {  border: 4px solid palette(highlight);}");
+		checkerBoardPreviewLabel->setText("<font color=#64a420>Make sure this matches your Checkerboard!</font>");
+	}
 }
 
 void NewCalibrationWidget::savePresetsClickedSlot() {

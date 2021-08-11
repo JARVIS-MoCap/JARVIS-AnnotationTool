@@ -67,7 +67,9 @@ class NewCalibrationWidget : public QWidget {
 		QSpinBox *widthEdit;
 		QSpinBox *heightEdit;
 		QDoubleSpinBox *sideLengthEdit;
+		QGroupBox *checkerBoardPreviewBox;
 		QLabel *checkerBoardPreview;
+		QLabel *checkerBoardPreviewLabel;
 
 		ConfigurableItemList *cameraList;
 
@@ -77,8 +79,8 @@ class NewCalibrationWidget : public QWidget {
 		QPushButton *saveButton;
 		QPushButton *calibrateButton;
 
-		bool checkIntrinsics(const QString& path);
-		bool checkExtrinsics(const QString& path);
+		bool checkIntrinsics(const QString& path, QString & errorMsg);
+		bool checkExtrinsics(const QString& path, QString & errorMsg);
 		bool checkCheckerboard();
 		bool checkCalibrationExists(const QString& path);
 		bool checkIsValidRecording(const QString& path, const QString& recording);

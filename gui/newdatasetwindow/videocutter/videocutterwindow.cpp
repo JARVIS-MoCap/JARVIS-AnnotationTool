@@ -547,14 +547,19 @@ void VideoCutterWindow::cancelClickedSlot() {
 
 void VideoCutterWindow::continueClickedSlot() {
 	if (!(m_savedTimeLineWindows == m_timeLineWindows)) {
-		QMessageBox::StandardButton reply;
-		reply = QMessageBox::question(this, "", "Save Segmentation to File?\n",
-	                                QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Cancel);
-		if (reply == QMessageBox::Cancel) {
-			return;
-		}
-		else if (reply == QMessageBox::Yes) {
-			saveSegmentation();
+		if (m_timeLineWindows.size() > 0) {
+			QMessageBox::StandardButton reply;
+			reply = QMessageBox::question(this, "", "Save Segmentation to File?\n",
+		                                QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Cancel);
+			if (reply == QMessageBox::Cancel) {
+				return;
+			}
+			else if (reply == QMessageBox::Yes) {
+				saveSegmentation();
+			}
+			else {
+				m_savedTimeLineWindows = m_timeLineWindows;
+			}
 		}
 		else {
 			m_savedTimeLineWindows = m_timeLineWindows;
@@ -564,6 +569,11 @@ void VideoCutterWindow::continueClickedSlot() {
 }
 
 bool VideoCutterWindow::saveSegmentation() {
+	if (m_timeLineWindows.size() == 0) {
+		QErrorMessage *errorMsg = new QErrorMessage();
+		errorMsg->showMessage("No Segments to save...");
+		return true;
+	}
 	QFileDialog fd(this);
 	QString fileName = fd.getSaveFileName(this, "Save Segmentation", "./segmentation.csv",
   									 			tr("CSV Files (*.csv)"));

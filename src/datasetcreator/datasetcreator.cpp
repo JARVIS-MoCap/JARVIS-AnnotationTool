@@ -30,7 +30,6 @@ void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings, QList<QS
 	m_keypointsList = keypoints;
 	for (const auto & recording : m_recordingItems) {
 		m_dctMap.clear();
-		QString path = recording.path.split('/').takeLast();
 		QList<QString> cameras = getCameraNames(recording.path);
 		m_datasetConfig->numCameras = cameras.size();
 		emit recordingBeingProcessedChanged(recording.name, cameras);
@@ -55,7 +54,14 @@ void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings, QList<QS
 			emit currentSegmentChanged("");
 			QList<int> frameNumbers = extractFrames(recording.path, timeLineWindows, cameras);
 			if (!m_creationCanceled) {
-				createSavefile(recording.path, cameras, m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName + "/" + recording.name, frameNumbers);
+				QString savepath;
+				if (m_recordingItems.size() == 1) {
+					savepath =  m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName;
+				}
+				else {
+					savepath = m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName + "/" + recording.name;
+				}
+				createSavefile(recording.path, cameras, savepath, frameNumbers);
 			}
 		}
 		QMap<QString, QList<TimeLineWindow>> recordingSubsets = getRecordingSubsets(recording.timeLineList);
@@ -63,7 +69,14 @@ void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings, QList<QS
 			emit currentSegmentChanged(subsetName);
 			QList<int> frameNumbers = extractFrames(recording.path, recordingSubsets[subsetName], cameras);
 			if (!m_creationCanceled) {
-				createSavefile(recording.path, cameras, m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName + "/" + path + "/" + subsetName, frameNumbers);
+				QString savepath;
+				if (m_recordingItems.size() == 1) {
+					savepath =  m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName + "/" + subsetName;
+				}
+				else {
+					savepath = m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName + "/" + recording.name + "/" + subsetName;
+				}
+				createSavefile(recording.path, cameras, savepath, frameNumbers);
 			}
 			else {
 				break;

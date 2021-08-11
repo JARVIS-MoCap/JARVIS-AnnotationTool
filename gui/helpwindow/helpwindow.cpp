@@ -59,6 +59,8 @@ HelpWindow::HelpWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	mainSplitter->addWidget(tableOfContents);
 	mainSplitter->addWidget(textBrowser);
 
+	setDocument("help/introduction.html");
+
 }
 
 void HelpWindow::itemSlectedSlot(QTreeWidgetItem *item, int column) {
@@ -66,8 +68,6 @@ void HelpWindow::itemSlectedSlot(QTreeWidgetItem *item, int column) {
 	if (it != m_contentMap.end()) {
 		setDocument(m_contentMap[item]);
 	}
-
-
 }
 
 void HelpWindow::setDocument(const QString &path) {
