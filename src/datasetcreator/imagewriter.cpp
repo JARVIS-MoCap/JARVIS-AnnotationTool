@@ -28,10 +28,7 @@ void ImageWriter::run() {
 	for (const auto & frameNumber : m_frameNumbers) {
 		cv::Mat frame;
 		m_cap->set(cv::CAP_PROP_POS_FRAMES, frameNumber-1);
-		if (m_cap->read(frame)) {
-			//std::cout << frame.size() << std::endl;
-			//std::cout << (m_destinationPath + "/" +  "Frame_" + QString::number(frameNumber) + ".jpg").toStdString() << std::endl;
-			std::cout << cv::imwrite((m_destinationPath + "/" +  "Frame_" + QString::number(frameNumber) + ".jpg").toStdString(), frame) << std::endl;
+		if (m_cap->read(frame) && cv::imwrite((m_destinationPath + "/" +  "Frame_" + QString::number(frameNumber) + ".jpg").toStdString(), frame)) {
 			frameCount++;
 		}
 		else {

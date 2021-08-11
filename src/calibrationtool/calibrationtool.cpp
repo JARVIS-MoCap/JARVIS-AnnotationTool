@@ -28,7 +28,9 @@ void CalibrationTool::makeCalibrationSet()  {
 			IntrinsicsCalibrator *intrinsicsCalibrator = new IntrinsicsCalibrator(m_calibrationConfig, cam, thread++);
       connect(intrinsicsCalibrator, &IntrinsicsCalibrator::intrinsicsProgress, this, &CalibrationTool::intrinsicsProgress);
       connect(intrinsicsCalibrator, &IntrinsicsCalibrator::finishedIntrinsics, this, &CalibrationTool::finishedIntrinsicsSlot);
+      connect(intrinsicsCalibrator, &IntrinsicsCalibrator::calibrationError, this, &CalibrationTool::calibrationErrorSlot);
       connect(this, &CalibrationTool::calibrationCanceled, intrinsicsCalibrator, &IntrinsicsCalibrator::calibrationCanceledSlot);
+
  			threadPool->start(intrinsicsCalibrator);
 		}
     while (!threadPool->waitForDone(10)) {
@@ -78,7 +80,6 @@ void CalibrationTool::cancelCalibrationSlot() {
 }
 
 void CalibrationTool::calibrationErrorSlot(const QString &errorMsg) {
-  std::cout << "Here" << std::endl;
   if(!m_calibrationCanceled) {
     m_calibrationCanceled = true;
     emit calibrationError(errorMsg);

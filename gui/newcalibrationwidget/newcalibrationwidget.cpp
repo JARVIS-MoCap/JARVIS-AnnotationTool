@@ -201,6 +201,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	QWidget *middleSpacer = new QWidget();
 	middleSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	calibrateButton = new QPushButton("Calibrate");
+	calibrateButton->setIcon(QIcon::fromTheme("start"));
 	calibrateButton->setMinimumSize(40,40);
 	connect(calibrateButton, &QPushButton::clicked, this, &NewCalibrationWidget::calibrateClickedSlot);
 	buttonbarlayout->addWidget(saveButton, 0,0);
@@ -380,6 +381,7 @@ void NewCalibrationWidget::calibrationCanceledSlot() {
 
 void NewCalibrationWidget::calibrationErrorSlot(const QString &errorMsg) {
 	m_errorMsg->showMessage("Calibration unsuccessful! " + errorMsg);
+	m_errorMsg->resize(500,200);
 	calibrationProgressInfoWindow->accept();
 	delete calibrationProgressInfoWindow;
 }
@@ -429,7 +431,7 @@ bool NewCalibrationWidget::checkCheckerboard() {
 bool NewCalibrationWidget::checkCalibrationExists(const QString &path) {
 	if (QFile::exists(path)) {
 		QMessageBox::StandardButton reply;
-		reply = QMessageBox::question(this, "", "Calibration already exists! Continue anyways?",
+		reply = QMessageBox::question(this, "", "Calibration already exists! Continue anyway?",
 	                                QMessageBox::Yes|QMessageBox::No);
 	  if (reply == QMessageBox::No) {
 	    return false;

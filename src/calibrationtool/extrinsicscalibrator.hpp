@@ -57,7 +57,7 @@ class ExtrinsicsCalibrator : public QObject, public QRunnable {
 		QList<QString> m_cameraPair;
 		int m_threadNumber;
 		bool m_interrupt = false;
-		QList<QString> m_validRecordingFormats = {"avi", "mp4", "mov", "wmv"};
+		QList<QString> m_validRecordingFormats = {"avi", "mp4", "mov", "wmv", "AVI", "MP4", "WMV"};
 
 		bool calibrateExtrinsicsPair(QList<QString> cameraPair, Extrinsics &e);
 		double stereoCalibrationStep(std::vector<std::vector<cv::Point3f>> &objectPoints, std::vector<std::vector<cv::Point2f>> &imagePoints1,

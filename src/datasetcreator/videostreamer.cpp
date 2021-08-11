@@ -33,14 +33,19 @@ void VideoStreamer::run() {
 		totalFrames += windowSize;
 		if (minFrameCount == 0 || windowSize < minFrameCount) minFrameCount = windowSize;
 	}
-	while (m_numFramesToExtract > minFrameCount/subSamplingRate) {
-		subSamplingRate = std::max(1,subSamplingRate/2);
+	bool zeroReached = false;
+	while (m_numFramesToExtract*4 > minFrameCount/subSamplingRate && !zeroReached) {
+		subSamplingRate = subSamplingRate/2;
+		if (subSamplingRate == 0) {
+			zeroReached = true;
+			subSamplingRate = 1;
+		}
 	}
+	std::cout << "Subsampling Rate: " << subSamplingRate << std::endl;
 
 	for (const auto & window : m_timeLineWindows) {
 		frameCount = window.start;
 		while (frameCount < window.end) {
-			std::cout << "FrameCOunt " << frameCount << std::endl;
 			emit dctProgress(indexCount, totalFrames/subSamplingRate, m_threadNumber);
 			m_cap->set(cv::CAP_PROP_POS_FRAMES, frameCount);
 			readFrame = m_cap->read(img);

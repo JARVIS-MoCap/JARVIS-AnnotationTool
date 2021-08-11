@@ -9,7 +9,6 @@
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
-#include <QErrorMessage>
 #include <QDirIterator>
 #include <QThreadPool>
 
@@ -24,6 +23,7 @@ DatasetCreator::DatasetCreator(DatasetConfig *datasetConfig) : m_datasetConfig(d
 }
 
 void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings, QList<QString> entities, QList<QString> keypoints) {
+	delayl(100);
 	m_creationCanceled = false;
 	m_recordingItems = recordings;
 	m_entitiesList = entities;
@@ -116,7 +116,7 @@ bool DatasetCreator::checkFrameCounts(const QString& recording, QList<QString> c
 	for (const auto & camera : cameras) {
 		cv::VideoCapture cap((recording + "/" + camera + "." + m_datasetConfig->videoFormat).toStdString());
 		if(!cap.isOpened()){
-    	std::cout << "Error opening video stream or file" << std::endl;
+			emit datasetCreationFailed("Error opening video stream or file");
     	return false;
   	}
 
@@ -253,9 +253,7 @@ void DatasetCreator::createSavefile(const QString& recording, QList<QString> cam
 	for (const auto & camera : cameras) {
 		QFile file = QFile(dataFolder + "/" + camera + "/annotations.csv");
 		if (!file.open(QIODevice::WriteOnly)) {
-			std::cout << "Can't open File" << std::endl;
-			QErrorMessage *msg = new QErrorMessage();
-			msg->showMessage("Error writing savefile. Make sure you have the right permissions...");
+			emit datasetCreationFailed("Can't open file " + dataFolder + "/" + camera + "/annotations.csv" + " !");;
 			return;
 		}
 		 QTextStream stream(&file);
@@ -295,7 +293,6 @@ void DatasetCreator::createSavefile(const QString& recording, QList<QString> cam
 }
 
 void DatasetCreator::computedDCTsSlot(QList<cv::Mat> dctImages, QMap<int,int> frameNumberMap, int threadNumber) {
-	std::cout << "comüputed DCTS " << threadNumber << std::endl;
 	m_dctMap[threadNumber] = dctImages;
 	m_frameNumberMap = frameNumberMap;
 	if (m_dctMap.size() == m_datasetConfig->numCameras) {

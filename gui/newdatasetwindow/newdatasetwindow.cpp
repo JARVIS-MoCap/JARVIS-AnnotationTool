@@ -28,7 +28,7 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	QThread *thread = new QThread;
 	datasetCreator->moveToThread(thread);
 	thread->start();
-	m_errorMsg = new QErrorMessage();
+	m_errorMsg = new QErrorMessage(this);
 
 	QLabel *newDatasetLabel = new QLabel("New Dataset");
 	newDatasetLabel->setFont(QFont("Sans Serif", 18, QFont::Bold));
@@ -90,6 +90,7 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	QWidget *middleSpacer = new QWidget();
 	middleSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	createButton = new QPushButton("Create");
+	createButton->setIcon(QIcon::fromTheme("start"));
 	createButton->setMinimumSize(40,40);
 	connect(createButton, &QPushButton::clicked, this, &NewDatasetWindow::createDatasetClickedSlot);
 	buttonbarlayout->addWidget(saveButton, 0,0);
@@ -179,6 +180,8 @@ void NewDatasetWindow::datasetCreatedSot() {
 }
 
 void NewDatasetWindow::datasetCreationFailedSlot(QString errorMsg) {
+	datasetProgressInfoWindow->accept();
+	delete datasetProgressInfoWindow;
 	m_errorMsg->showMessage(errorMsg + "\nDataset Creation aborted...");
 }
 
@@ -231,7 +234,7 @@ void NewDatasetWindow::loadPresetSlot(const QString& preset) {
 bool NewDatasetWindow::checkDatasetExists(const QString &path) {
 	if (QFile::exists(path)) {
 		QMessageBox::StandardButton reply;
-		reply = QMessageBox::question(this, "", "Dataset already exists! Continue anyways?",
+		reply = QMessageBox::question(this, "", "Dataset already exists! Continue anyway?",
 	                                QMessageBox::Yes|QMessageBox::No);
 	  if (reply == QMessageBox::No) {
 	    return false;

@@ -73,6 +73,11 @@ void IntrinsicsCalibrator::run() {
   }
   if (m_interrupt) return;
 
+  if (objectPointsAll.size() < m_calibrationConfig->framesForIntrinsics) {
+    emit calibrationError("Found " + QString::number(objectPointsAll.size()) + " valid checkerboards. Make sure your checkerboard parameters are set correctly or specify a lower number of frames to use.");
+    return;
+  }
+
   double keep_ratio = imagePointsAll.size() / (double)std::min(m_calibrationConfig->framesForIntrinsics, (int)imagePointsAll.size());
   for (double k = 0; k < imagePointsAll.size(); k += keep_ratio) {
     imagePoints.push_back(imagePointsAll[(int)k]);

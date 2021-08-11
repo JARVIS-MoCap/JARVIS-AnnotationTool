@@ -125,7 +125,7 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
   if (m_interrupt) return false;
 
   if(objectPointsAll.size() < m_calibrationConfig->framesForExtrinsics) {
-    emit calibrationError("Not enough valid checkerboards found...");
+    emit calibrationError("Found " + QString::number(objectPointsAll.size()) + " valid checkerboard pairs. Make sure your checkerboard parameters are set correctly or specify a lower number of frames to use.");
     return false;
   }
 

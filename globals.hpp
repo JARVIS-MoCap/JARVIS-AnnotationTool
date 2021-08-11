@@ -47,7 +47,7 @@ typedef struct DatasetConfig {
 	int numCameras= 12;
 	int frameSetsRecording = 10;
 	QString samplingMethod = "kmeans";
-	QList<QString> validRecordingFormats = {"avi", "mp4", "mov", "wmv"};
+	QList<QString> validRecordingFormats = {"avi", "mp4", "mov", "wmv", "AVI", "MP4", "WMV"};
 
 } DatasetConfig;
 

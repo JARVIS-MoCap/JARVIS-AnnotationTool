@@ -36,6 +36,7 @@ class IntrinsicsCalibrator : public QObject, public QRunnable {
 	signals:
 		void intrinsicsProgress(int counter, int frameCount, int threadNumber);
 		void finishedIntrinsics(double reproError, int threadNumber);
+		void calibrationError(const QString &errorMsg);
 
 	private:
     struct Intrinsics {
@@ -49,7 +50,7 @@ class IntrinsicsCalibrator : public QObject, public QRunnable {
 		std::string m_cameraName;
 		int m_threadNumber;
 		bool m_interrupt = false;
-		QList<QString> m_validRecordingFormats = {"avi", "mp4", "mov", "wmv"};
+		QList<QString> m_validRecordingFormats = {"avi", "mp4", "mov", "wmv", "AVI", "MP4", "WMV"};
 
 		void checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1);
 		bool boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners, std::vector<cv::Point2f> &corners);

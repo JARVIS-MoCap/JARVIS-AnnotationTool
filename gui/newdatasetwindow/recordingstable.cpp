@@ -23,7 +23,6 @@ RecordingsTable::RecordingsTable(QString name, DatasetConfig *datasetConfig, QWi
 	m_errorMsg = new QErrorMessage();
 
 	m_currentDir = QDir(QDir::homePath());
-	m_currentDir	= QDir("/media/timo/2,0 TB Volume");
 
 	recordingsTable = new QTableWidget(0, 5);
 	recordingsTable->setAlternatingRowColors(true);
