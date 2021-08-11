@@ -2,13 +2,15 @@ project (conveniencewidgets)
 
 add_library(${PROJECT_NAME}
   labelwithtooltip.hpp
-  pathwidget.hpp
-  configurableitemlist.hpp
-  presetswindow.hpp
   labelwithtooltip.cpp
+  pathwidget.hpp
   pathwidget.cpp
+  configurableitemlist.hpp
   configurableitemlist.cpp
+  presetswindow.hpp
   presetswindow.cpp
+  switch.hpp
+  switch.cpp
 )
 
 target_include_directories(${PROJECT_NAME}

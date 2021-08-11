@@ -1,9 +1,11 @@
-/*------------------------------------------------------------
- *  extrinsicscalibrator.hpp
- *  Created: 30. July 2021
- *  Author:  Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			 extrinsicscalibrator.hpp
+	* Created: 	 30. July 2021
+	* Author:		 Timo Hueser
+	* Contact: 	 timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef EXTRINSICSCALIBRATOR_H
 #define EXTRINSICSCALIBRATOR_H
@@ -26,6 +28,7 @@
 
 class ExtrinsicsCalibrator : public QObject, public QRunnable {
 	Q_OBJECT
+
 	public:
 		explicit ExtrinsicsCalibrator(CalibrationConfig *calibrationConfig, QList<QString> cameraPair, int threadNumber);
 		void run();
@@ -70,7 +73,5 @@ class ExtrinsicsCalibrator : public QObject, public QRunnable {
 		QString getFormat(const QString& path, const QString& cameraName);
 
 };
-
-
 
 #endif

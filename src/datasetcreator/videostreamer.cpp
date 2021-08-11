@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  videostreamer.cpp
- *  Created:  09. August 2021
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+/*****************************************************************
+* File:			  videostreamer.cpp
+* Created: 	  09. August 2021
+* Author:		  Timo Hueser
+* Contact: 	  timo.hueser@gmail.com
+* Copyright:  2021 Timo Hueser
+* License:    GPL v3.0
+*****************************************************************/
 
 #include "videostreamer.hpp"
 
@@ -13,12 +16,15 @@
 #include <QDirIterator>
 #include <QThreadPool>
 
-VideoStreamer::VideoStreamer(const QString &videoPath, QList<TimeLineWindow> timeLineWindows, int numFramesToExtract, int threadNumber) {
+
+VideoStreamer::VideoStreamer(const QString &videoPath, QList<TimeLineWindow> timeLineWindows,
+			int numFramesToExtract, int threadNumber) {
 	m_cap = new cv::VideoCapture(videoPath.toStdString());
 	m_threadNumber = threadNumber;
 	m_timeLineWindows = timeLineWindows;
 	m_numFramesToExtract = numFramesToExtract;
 }
+
 
 void VideoStreamer::run() {
 	bool readFrame = true;
@@ -41,7 +47,6 @@ void VideoStreamer::run() {
 			subSamplingRate = 1;
 		}
 	}
-	std::cout << "Subsampling Rate: " << subSamplingRate << std::endl;
 
 	for (const auto & window : m_timeLineWindows) {
 		frameCount = window.start;
@@ -68,6 +73,7 @@ void VideoStreamer::run() {
 	m_cap->release();
 	emit computedDCTs(m_dctImages, m_frameNumberMap, m_threadNumber);
 }
+
 
 void VideoStreamer::creationCanceledSlot() {
 	m_interrupt = true;

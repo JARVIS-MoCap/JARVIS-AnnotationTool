@@ -1,9 +1,11 @@
-/*------------------------------------------------------------
- *  extrinsicscalibrator.cpp
- *  Created: 30. July 2021
- *  Author:  Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *------------------------------------------------------------*/
+/*****************************************************************
+  * File:			 extrinsicscalibrator.cpp
+  * Created: 	 30. July 2021
+  * Author:		 Timo Hueser
+  * Contact: 	 timo.hueser@gmail.com
+  * Copyright:  2021 Timo Hueser
+  * License:    GPL v3.0
+  *****************************************************************/
 
 #include "extrinsicscalibrator.hpp"
 
@@ -13,12 +15,17 @@
 #include <QThreadPool>
 #include <QDir>
 
-ExtrinsicsCalibrator::ExtrinsicsCalibrator(CalibrationConfig *calibrationConfig, QList<QString> cameraPair, int threadNumber) :
-  m_calibrationConfig(calibrationConfig), m_cameraPair(cameraPair), m_threadNumber(threadNumber){
+
+ExtrinsicsCalibrator::ExtrinsicsCalibrator(CalibrationConfig *calibrationConfig,
+      QList<QString> cameraPair, int threadNumber) : m_calibrationConfig(calibrationConfig),
+        m_cameraPair(cameraPair), m_threadNumber(threadNumber) {
   QDir dir;
-  dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" + m_calibrationConfig->calibrationSetName + "/Intrinsics");
-  dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" + m_calibrationConfig->calibrationSetName + "/Extrinsics");
-  m_parametersSavePath = (m_calibrationConfig->calibrationSetPath + "/" + m_calibrationConfig->calibrationSetName).toStdString();
+  dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" +
+             m_calibrationConfig->calibrationSetName + "/Intrinsics");
+  dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" +
+             m_calibrationConfig->calibrationSetName + "/Extrinsics");
+  m_parametersSavePath = (m_calibrationConfig->calibrationSetPath + "/" +
+                          m_calibrationConfig->calibrationSetName).toStdString();
 }
 
 
@@ -31,12 +38,15 @@ void ExtrinsicsCalibrator::run() {
       return;
     }
     if (m_interrupt) return;
-    cv::FileStorage fse(m_parametersSavePath + "/Extrinsics/Extrinsics_" + m_cameraPair[0].toStdString() + "_" + m_cameraPair[1].toStdString() + ".yaml", cv::FileStorage::WRITE);
+    cv::FileStorage fse(m_parametersSavePath + "/Extrinsics/Extrinsics_" +
+                        m_cameraPair[0].toStdString() + "_" + m_cameraPair[1].toStdString() +
+                        ".yaml", cv::FileStorage::WRITE);
     fse << "R" << extrinsics1.R.t();
     fse << "T" << extrinsics1.T;
     fse << "E" << extrinsics1.E;
     fse << "F" << extrinsics1.F;
   }
+
   else if (numCameras == 3) {
     QList<QString> cameraPair1 = {m_cameraPair[0], m_cameraPair[1]};
     QList<QString> cameraPair2 = {m_cameraPair[1], m_cameraPair[2]};
@@ -50,7 +60,9 @@ void ExtrinsicsCalibrator::run() {
     cv::Mat T2_t = extrinsics2.R.t() * extrinsics2.T;
     cv::Mat R = extrinsics2.R*extrinsics1.R;
     cv::Mat T = R*(T1_t + extrinsics1.R.t()*T2_t);
-    cv::FileStorage fse(m_parametersSavePath + "/Extrinsics/Extrinsics_" + m_cameraPair[0].toStdString() + "_" + m_cameraPair[2].toStdString() + ".yaml", cv::FileStorage::WRITE);
+    cv::FileStorage fse(m_parametersSavePath + "/Extrinsics/Extrinsics_" +
+                        m_cameraPair[0].toStdString() + "_" + m_cameraPair[2].toStdString() +
+                        ".yaml", cv::FileStorage::WRITE);
     fse << "R" << R.t();
     fse << "T" << T;
     fse << "E" << extrinsics1.E;
@@ -63,17 +75,25 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
   std::vector<cv::Point3f> checkerBoardPoints;
   for (int i = 0; i < m_calibrationConfig->patternHeight; i++)
     for (int j = 0; j < m_calibrationConfig->patternWidth; j++)
-      checkerBoardPoints.push_back(cv::Point3f((float)j * m_calibrationConfig->patternSideLength, (float)i * m_calibrationConfig->patternSideLength, 0));
-  QString format1 = getFormat(m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" + cameraPair[1], cameraPair[0]);
-  QString format2 = getFormat(m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" + cameraPair[1], cameraPair[1]);
-  cv::VideoCapture cap1((m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" + cameraPair[1] + "/" + cameraPair[0] + "." + format1).toStdString());
-  cv::VideoCapture cap2((m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" + cameraPair[1] + "/" + cameraPair[1] + "." + format2).toStdString());
+      checkerBoardPoints.push_back(cv::Point3f((float)j * m_calibrationConfig->patternSideLength,
+                                   (float)i * m_calibrationConfig->patternSideLength, 0));
+  QString format1 = getFormat(m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] +
+                              "-" + cameraPair[1], cameraPair[0]);
+  QString format2 = getFormat(m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" +
+                              cameraPair[1], cameraPair[1]);
+
+  cv::VideoCapture cap1((m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" +
+                         cameraPair[1] + "/" + cameraPair[0] + "." + format1).toStdString());
+  cv::VideoCapture cap2((m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" +
+                         cameraPair[1] + "/" + cameraPair[1] + "." + format2).toStdString());
+
   int frameCount = cap1.get(cv::CAP_PROP_FRAME_COUNT);
   int frameRate = cap1.get(cv::CAP_PROP_FPS);
   int skipIndex = std::max(frameRate/m_calibrationConfig->maxSamplingFrameRate-1,0);
 
   std::vector<std::vector<cv::Point3f>> objectPointsAll, objectPoints;
-  std::vector<std::vector<cv::Point2f>> imagePointsAll1, imagePointsAll2, imagePoints1, imagePoints2;
+  std::vector<std::vector<cv::Point2f>> imagePointsAll1, imagePointsAll2,
+                                        imagePoints1, imagePoints2;
   std::vector<cv::Point2f> corners1, corners2;
 	cv::Size size;
   std::vector<cbdetect::Board> boards1, boards2;
@@ -101,8 +121,10 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
       cbdetect::Corner cbCorners1, cbCorners2;
       cbdetect::find_corners(img1, cbCorners1, params);
       cbdetect::find_corners(img2, cbCorners2, params);
-      bool patternFound1 = (cbCorners1.p.size() >= m_calibrationConfig->patternHeight*m_calibrationConfig->patternWidth);
-      bool patternFound2 = (cbCorners2.p.size() >= m_calibrationConfig->patternHeight*m_calibrationConfig->patternWidth);
+      bool patternFound1 = (cbCorners1.p.size() >=
+                            m_calibrationConfig->patternHeight*m_calibrationConfig->patternWidth);
+      bool patternFound2 = (cbCorners2.p.size() >=
+                            m_calibrationConfig->patternHeight*m_calibrationConfig->patternWidth);
 
       if (patternFound1 && patternFound2) {
         cbdetect::boards_from_corners(img1, cbCorners1, boards1, params);
@@ -125,11 +147,14 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
   if (m_interrupt) return false;
 
   if(objectPointsAll.size() < m_calibrationConfig->framesForExtrinsics) {
-    emit calibrationError("Found " + QString::number(objectPointsAll.size()) + " valid checkerboard pairs. Make sure your checkerboard parameters are set correctly or specify a lower number of frames to use.");
+    emit calibrationError("Found " + QString::number(objectPointsAll.size()) +
+                          " valid checkerboard pairs. Make sure your checkerboard " +
+                          "parameters are set correctly or specify a lower number of frames to use.");
     return false;
   }
 
-  double keep_ratio = imagePointsAll1.size() / (double)std::min( m_calibrationConfig->framesForExtrinsics, (int)imagePointsAll1.size());
+  double keep_ratio = imagePointsAll1.size() / (double)std::min( m_calibrationConfig->framesForExtrinsics,
+                      (int)imagePointsAll1.size());
   for (double k = 0; k < imagePointsAll1.size(); k += keep_ratio) {
     imagePoints1.push_back(imagePointsAll1[(int)k]);
     imagePoints2.push_back(imagePointsAll2[(int)k]);
@@ -140,8 +165,10 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
   QMap<QString, double> intrinsicsErrorMap;
   bool intrinsicsFound = tryLoadIntrinsics(cameraPair, i1,i2);
   if (!intrinsicsFound) {
-    intrinsicsErrorMap[cameraPair[0]] = calibrateIntrinsicsStep(cameraPair[0].toStdString(), objectPoints, imagePoints1, size, i1);
-    intrinsicsErrorMap[cameraPair[1]] = calibrateIntrinsicsStep(cameraPair[1].toStdString(), objectPoints, imagePoints2, size, i2);
+    intrinsicsErrorMap[cameraPair[0]] = calibrateIntrinsicsStep(cameraPair[0].toStdString(),
+                                                                objectPoints, imagePoints1, size, i1);
+    intrinsicsErrorMap[cameraPair[1]] = calibrateIntrinsicsStep(cameraPair[1].toStdString(),
+                                                                objectPoints, imagePoints2, size, i2);
   }
 
   double mean_repro_error = stereoCalibrationStep(objectPoints, imagePoints1, imagePoints2, i1,i2,e, size, 1.4);
@@ -153,24 +180,33 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
   std::cout << "Final Number Images: " <<imagePoints1.size() << std::endl;
 
   cv::Mat errs;
-  mean_repro_error = cv::stereoCalibrate(objectPoints, imagePoints1, imagePoints2, i1.K, i1.D, i2.K, i2.D, size, e.R, e.T, e.E, e.F,errs,
-        cv::CALIB_FIX_INTRINSIC, cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 120, 1e-7));
+  mean_repro_error = cv::stereoCalibrate(objectPoints, imagePoints1, imagePoints2,
+                                         i1.K, i1.D, i2.K, i2.D, size, e.R, e.T, e.E, e.F,errs,
+                                         cv::CALIB_FIX_INTRINSIC,
+                                         cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 120, 1e-7));
 
-  emit finishedExtrinsics(mean_repro_error, intrinsicsErrorMap, m_threadNumber); //TODO: this is not quite right for triplet, do average over both instead or something
+  emit finishedExtrinsics(mean_repro_error, intrinsicsErrorMap, m_threadNumber);
+  //TODO: this is not quite right for triplet, do average over both instead or something
   return true;
 
 }
 
-double ExtrinsicsCalibrator::stereoCalibrationStep(std::vector<std::vector<cv::Point3f>> &objectPoints, std::vector<std::vector<cv::Point2f>> &imagePoints1,
-      std::vector<std::vector<cv::Point2f>> &imagePoints2, Intrinsics &i1, Intrinsics &i2, Extrinsics &e, cv::Size size, double thresholdFactor) {
+
+double ExtrinsicsCalibrator::stereoCalibrationStep(std::vector<std::vector<cv::Point3f>> &objectPoints,
+      std::vector<std::vector<cv::Point2f>> &imagePoints1,
+      std::vector<std::vector<cv::Point2f>> &imagePoints2,
+      Intrinsics &i1, Intrinsics &i2, Extrinsics &e, cv::Size size, double thresholdFactor) {
   cv::Mat errs;
-  double mean_repro_error  = cv::stereoCalibrate(objectPoints, imagePoints1, imagePoints2, i1.K, i1.D, i2.K, i2.D, size, e.R, e.T, e.E, e.F,errs,
-        cv::CALIB_FIX_INTRINSIC, cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 80, 1e-6));
+
+  double mean_repro_error  = cv::stereoCalibrate(objectPoints, imagePoints1, imagePoints2,
+                                                 i1.K, i1.D, i2.K, i2.D, size, e.R, e.T, e.E, e.F,errs,
+                                                 cv::CALIB_FIX_INTRINSIC,
+                                                 cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 80, 1e-6));
 
   std::vector< std::vector< cv::Point3f > > objectPoints_2;
   std::vector< std::vector< cv::Point2f > > imagePoints1_2, imagePoints2_2;
   for (int i = 0; i < errs.size[0]; i++) {
-    if (std::max(errs.at<double>(i,0), errs.at<double>(i,1)) < thresholdFactor*mean_repro_error) {
+    if (std::max(errs.at<double>(i,0), errs.at<double>(i,1)) < thresholdFactor * mean_repro_error) {
       imagePoints1_2.push_back(imagePoints1[i]);
       imagePoints2_2.push_back(imagePoints2[i]);
       objectPoints_2.push_back(objectPoints[i]);
@@ -182,13 +218,15 @@ double ExtrinsicsCalibrator::stereoCalibrationStep(std::vector<std::vector<cv::P
   return mean_repro_error;
 }
 
-double ExtrinsicsCalibrator::calibrateIntrinsicsStep(std::string cameraName, std::vector<std::vector<cv::Point3f>> objectPoints, std::vector<std::vector<cv::Point2f>> imagePoints,
-        cv::Size size, Intrinsics &intrinsics) {
-  std::cout << "Calibrating Camera_" << cameraName << " using "<< imagePoints.size() << " Images..." << std::endl;
+
+double ExtrinsicsCalibrator::calibrateIntrinsicsStep(std::string cameraName,
+      std::vector<std::vector<cv::Point3f>> objectPoints,
+      std::vector<std::vector<cv::Point2f>> imagePoints, cv::Size size, Intrinsics &intrinsics) {
   std::vector< cv::Mat > rvecs, tvecs;
-  double repro_error = calibrateCamera(objectPoints, imagePoints, size, intrinsics.K, intrinsics.D, rvecs, tvecs,
-    cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST, cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 80, 1e-6));
-  std::cout << "Camera_" << cameraName <<  " calibrated with Reprojection Error: " << repro_error << std::endl;
+
+  double repro_error = calibrateCamera(objectPoints, imagePoints, size, intrinsics.K,
+                                       intrinsics.D, rvecs, tvecs, cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST,
+                                       cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 80, 1e-6));
 
   cv::FileStorage fs1(m_parametersSavePath + "/Intrinsics/Intrinsics_" + cameraName + ".yaml", cv::FileStorage::WRITE);
   fs1 << "intrinsicMatrix" << intrinsics.K.t();
@@ -197,6 +235,7 @@ double ExtrinsicsCalibrator::calibrateIntrinsicsStep(std::string cameraName, std
   return repro_error;
 }
 
+
 QString ExtrinsicsCalibrator::getFormat(const QString& path, const QString& cameraName) {
   QString usedFormat;
 	for (const auto& format : m_validRecordingFormats) {
@@ -204,6 +243,7 @@ QString ExtrinsicsCalibrator::getFormat(const QString& path, const QString& came
 	}
 	return usedFormat;
 }
+
 
 void ExtrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1) {
   int width = m_calibrationConfig->patternWidth;
@@ -235,7 +275,8 @@ void ExtrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1, cv
 }
 
 
-bool ExtrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners, std::vector<cv::Point2f> &corners) {
+bool ExtrinsicsCalibrator::boardToCorners(cbdetect::Board &board,
+      cbdetect::Corner &cbCorners, std::vector<cv::Point2f> &corners) {
   if (board.idx.size()-2 == m_calibrationConfig->patternHeight) {
     for(int i = 1; i < board.idx.size() - 1; ++i) {
       if (board.idx[i].size()-2 == m_calibrationConfig->patternWidth) {
@@ -257,7 +298,8 @@ bool ExtrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corn
   else {
     for(int j = 1; j < board.idx[0].size() - 1; ++j) {
       for(int i = 1; i < board.idx.size() - 1; ++i) {
-        if (board.idx.size()-2 == m_calibrationConfig->patternWidth && board.idx[i].size()-2 == m_calibrationConfig->patternHeight) {
+        if (board.idx.size()-2 == m_calibrationConfig->patternWidth &&
+            board.idx[i].size()-2 == m_calibrationConfig->patternHeight) {
           if(board.idx[board.idx.size() - 1 -i][j] < 0) {
             return false;
           }
@@ -275,10 +317,13 @@ bool ExtrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corn
   return true;
 }
 
+
 bool ExtrinsicsCalibrator::tryLoadIntrinsics(QList<QString> cameraPair, Intrinsics &i1, Intrinsics &i2) {
-  int numCameras = cameraPair.size();
-  cv::FileStorage fsr1(m_parametersSavePath + "/Intrinsics/Intrinsics_" + cameraPair[0].toStdString() + ".yaml", cv::FileStorage::READ);
-	cv::FileStorage fsr2(m_parametersSavePath + "/Intrinsics/Intrinsics_" + cameraPair[1].toStdString() + ".yaml", cv::FileStorage::READ);
+  cv::FileStorage fsr1(m_parametersSavePath + "/Intrinsics/Intrinsics_" +
+                       cameraPair[0].toStdString() + ".yaml", cv::FileStorage::READ);
+	cv::FileStorage fsr2(m_parametersSavePath + "/Intrinsics/Intrinsics_" +
+                       cameraPair[1].toStdString() + ".yaml", cv::FileStorage::READ);
+
   if (fsr1.isOpened() && fsr2.isOpened()) {
     fsr1["intrinsicMatrix"] >> i1.K;
     fsr1["distortionCoefficients"] >> i1.D;
@@ -290,6 +335,7 @@ bool ExtrinsicsCalibrator::tryLoadIntrinsics(QList<QString> cameraPair, Intrinsi
   }
   return false;
 }
+
 
 void ExtrinsicsCalibrator::calibrationCanceledSlot() {
   m_interrupt = true;

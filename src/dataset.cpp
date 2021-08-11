@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  dataset.cpp
- *  Created:  10. July 2018
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+/*****************************************************************
+ * File:			  dataset.cpp
+ * Created: 	  23. October 2020
+ * Author:		  Timo Hueser
+ * Contact: 	  timo.hueser@gmail.com
+ * Copyright:  2021 Timo Hueser
+ * License:    GPL v3.0
+ *****************************************************************/
 
 #include "dataset.hpp"
 
@@ -10,6 +13,7 @@
 #include <QDir>
 #include <QTextStream>
 #include <QErrorMessage>
+
 
 Dataset * Dataset::dataset = nullptr;
 
@@ -99,6 +103,7 @@ void Dataset::save(const QString& datasetFolder) {
 	QString dataFolder = datasetFolder;
 	if (datasetFolder == "") dataFolder = m_datasetFolder;
 	QList<QFile*> saveFiles;
+
 	for (int i = 0; i < m_numCameras; i++) {
 		QFile *file = new QFile(dataFolder + "/" + m_cameraNames[i] +"/annotations.csv");
 		saveFiles.append(file);
@@ -132,6 +137,7 @@ void Dataset::save(const QString& datasetFolder) {
 		 }
 		 stream << "\n";
 	}
+
 	for (auto& imgSet : m_imgSets) {
 		for (int cam = 0; cam < m_numCameras; cam++) {
 			QTextStream stream(saveFiles[cam]);
@@ -156,6 +162,7 @@ void Dataset::save(const QString& datasetFolder) {
 			stream << "\n";
 		}
 	}
+	
 	for (int i = 0; i < m_numCameras; i++) {
 		saveFiles[i]->close();
 	}

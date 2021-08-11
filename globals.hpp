@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  globals.hpp
- *  Created: 23. October 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+ /*****************************************************************
+	* File:			  globals.hpp
+	* Created: 	  23. October 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
@@ -27,20 +30,20 @@ enum KeypointShape {Circle, Rectangle, Triangle};
 
 
 //----- Structs Definitions ----//
-typedef struct Frame {
+struct Frame {
 	QString imagePath;
 	QSize imageDimensions;
 	int numKeypoints;
 	QList<Keypoint*> keypoints;
 	QMap<QString, Keypoint*> keypointMap;
-}Frame;
+};
 
-typedef struct ImgSet {
+struct ImgSet {
 	int numCameras;
 	QList<Frame*> frames;
-} ImgSet;
+};
 
-typedef struct DatasetConfig {
+struct DatasetConfig {
 	QString datasetName = "New Dataset";
 	QString datasetPath = ".";
 	QString videoFormat = "";
@@ -49,7 +52,7 @@ typedef struct DatasetConfig {
 	QString samplingMethod = "kmeans";
 	QList<QString> validRecordingFormats = {"avi", "mp4", "mov", "wmv", "AVI", "MP4", "WMV"};
 
-} DatasetConfig;
+};
 
 struct TimeLineWindow {
 	QString name;

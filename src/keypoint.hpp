@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  keypoint.hpp
- *  Created: 23. October 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+ /*****************************************************************
+	* File:			  keypoint.hpp
+	* Created: 	  23. October 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef KEYPOINT_H
 #define KEYPOINT_H
@@ -12,6 +15,7 @@
 
 class Keypoint : public QObject {
 	Q_OBJECT
+	
 	public:
 		explicit Keypoint(QString entity, QString bopdypart, QColor color = QColor(255,255,255), QPointF coordinates = QPointF(0,0));
 		~Keypoint();
@@ -38,18 +42,16 @@ class Keypoint : public QObject {
 		void stateChanged(KeypointState state, KeypointState previousState, int frameIndex);
 
 	private:
-		QPointF m_coordinates{0,0};
 		KeypointState m_state = NotAnnotated;
 		QString m_entity;
 		QString m_bodypart;
-		QString m_ID;
 		QColor m_color;
+		QPointF m_coordinates{0,0};
+		QString m_ID;
 		bool m_reprojected = false;
 		bool m_showName = false;
 		bool m_isSuppessed = false;
 		int m_frameIndex = 0;
-
-
 };
 
 #endif

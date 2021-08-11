@@ -1,9 +1,11 @@
-/*------------------------------------------------------------
- *  intrinsicscalibrator.cpp
- *  Created: 30. July 2021
- *  Author:  Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			 intrinsicscalibrator.cpp
+	* Created: 	 30. July 2021
+	* Author:		 Timo Hueser
+	* Contact: 	 timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "intrinsicscalibrator.hpp"
 
@@ -13,11 +15,15 @@
 #include <QThreadPool>
 #include <QDir>
 
-IntrinsicsCalibrator::IntrinsicsCalibrator(CalibrationConfig *calibrationConfig, const QString& cameraName, int threadNumber) :
-  m_calibrationConfig(calibrationConfig), m_cameraName(cameraName.toStdString()), m_threadNumber(threadNumber){
+
+IntrinsicsCalibrator::IntrinsicsCalibrator(CalibrationConfig *calibrationConfig,
+      const QString& cameraName, int threadNumber) :
+      m_calibrationConfig(calibrationConfig), m_cameraName(cameraName.toStdString()), m_threadNumber(threadNumber){
   QDir dir;
-  dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" + m_calibrationConfig->calibrationSetName + "/Intrinsics");
-  m_parametersSavePath = (m_calibrationConfig->calibrationSetPath + "/" + m_calibrationConfig->calibrationSetName).toStdString();
+  dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" +
+             m_calibrationConfig->calibrationSetName + "/Intrinsics");
+  m_parametersSavePath = (m_calibrationConfig->calibrationSetPath + "/" +
+                          m_calibrationConfig->calibrationSetName).toStdString();
 }
 
 
@@ -25,10 +31,13 @@ void IntrinsicsCalibrator::run() {
   std::vector<cv::Point3f> checkerBoardPoints;
   for (int i = 0; i < m_calibrationConfig->patternHeight; i++)
     for (int j = 0; j < m_calibrationConfig->patternWidth; j++)
-      checkerBoardPoints.push_back(cv::Point3f((float)j * m_calibrationConfig->patternSideLength, (float)i * m_calibrationConfig->patternSideLength, 0));
+      checkerBoardPoints.push_back(cv::Point3f((float)j * m_calibrationConfig->patternSideLength,
+                                   (float)i * m_calibrationConfig->patternSideLength, 0));
   std::vector<std::string> fileNames;
-  QString format = getFormat(m_calibrationConfig->intrinsicsPath, QString::fromStdString(m_cameraName));
-  cv::VideoCapture cap(m_calibrationConfig->intrinsicsPath.toStdString() + "/" + m_cameraName + "." + format.toStdString());
+  QString format = getFormat(m_calibrationConfig->intrinsicsPath,
+                             QString::fromStdString(m_cameraName));
+  cv::VideoCapture cap(m_calibrationConfig->intrinsicsPath.toStdString() + "/" +
+                       m_cameraName + "." + format.toStdString());
   int frameCount = cap.get(cv::CAP_PROP_FRAME_COUNT);
   int frameRate = cap.get(cv::CAP_PROP_FPS);
   int skipIndex = std::max(frameRate/m_calibrationConfig->maxSamplingFrameRate-1,0);
@@ -56,7 +65,8 @@ void IntrinsicsCalibrator::run() {
       cap.set(cv::CAP_PROP_POS_FRAMES, frameIndex+skipIndex);
       if (frameIndex > frameCount) read_success = false;
       cbdetect::find_corners(img, cbCorners, params);
-      bool patternFound = (cbCorners.p.size() >= m_calibrationConfig->patternHeight*m_calibrationConfig->patternWidth);
+      bool patternFound = (cbCorners.p.size() >= m_calibrationConfig->patternHeight *
+                           m_calibrationConfig->patternWidth);
 
       if (patternFound) {
         cbdetect::boards_from_corners(img, cbCorners, boards, params);
@@ -74,11 +84,14 @@ void IntrinsicsCalibrator::run() {
   if (m_interrupt) return;
 
   if (objectPointsAll.size() < m_calibrationConfig->framesForIntrinsics) {
-    emit calibrationError("Found " + QString::number(objectPointsAll.size()) + " valid checkerboards. Make sure your checkerboard parameters are set correctly or specify a lower number of frames to use.");
+    emit calibrationError("Found " + QString::number(objectPointsAll.size()) +
+                          " valid checkerboards. Make sure your checkerboard parameters " +
+                          "are set correctly or specify a lower number of frames to use.");
     return;
   }
 
   double keep_ratio = imagePointsAll.size() / (double)std::min(m_calibrationConfig->framesForIntrinsics, (int)imagePointsAll.size());
+
   for (double k = 0; k < imagePointsAll.size(); k += keep_ratio) {
     imagePoints.push_back(imagePointsAll[(int)k]);
     objectPoints.push_back(objectPointsAll[(int)k]);
@@ -103,6 +116,7 @@ QString IntrinsicsCalibrator::getFormat(const QString& path, const QString& came
 	}
 	return usedFormat;
 }
+
 
 void IntrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1) {
   int width = m_calibrationConfig->patternWidth;
@@ -134,7 +148,8 @@ void IntrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1, cv
 }
 
 
-bool IntrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners, std::vector<cv::Point2f> &corners) {
+bool IntrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners,
+      std::vector<cv::Point2f> &corners) {
   if (board.idx.size()-2 == m_calibrationConfig->patternHeight) {
     for(int i = 1; i < board.idx.size() - 1; ++i) {
       if (board.idx[i].size()-2 == m_calibrationConfig->patternWidth) {
@@ -156,7 +171,8 @@ bool IntrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corn
   else {
     for(int j = 1; j < board.idx[0].size() - 1; ++j) {
       for(int i = 1; i < board.idx.size() - 1; ++i) {
-        if (board.idx.size()-2 == m_calibrationConfig->patternWidth && board.idx[i].size()-2 == m_calibrationConfig->patternHeight) {
+        if (board.idx.size()-2 == m_calibrationConfig->patternWidth &&
+            board.idx[i].size()-2 == m_calibrationConfig->patternHeight) {
           if(board.idx[board.idx.size() - 1 -i][j] < 0) {
             return false;
           }
@@ -173,6 +189,7 @@ bool IntrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corn
   }
   return true;
 }
+
 
 void IntrinsicsCalibrator::calibrationCanceledSlot() {
   m_interrupt = true;

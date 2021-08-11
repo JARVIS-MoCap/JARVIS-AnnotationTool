@@ -1,9 +1,11 @@
 /*****************************************************************
- * File:			loaddatasetwindow.cpp
- * Created: 	03. December 2020
- * Author:		Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *****************************************************************/
+	* File:			  loaddatasetwindow.cpp
+	* Created: 	  23. October 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "loaddatasetwindow.hpp"
 
@@ -11,7 +13,6 @@
 #include <QLineEdit>
 #include <QFileDialog>
 #include <QErrorMessage>
-
 
 
 LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
@@ -185,9 +186,9 @@ void LoadDatasetWindow::addItem(const QString &text) {
 
 void LoadDatasetWindow::currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous) {
 	if (current != nullptr)  {
-		current->setBackgroundColor(QColor(100,164,32));
+		current->setBackground(QColor(100,164,32));
 	}
 	if (previous != nullptr) {
-		previous->setBackgroundColor(QColor(34, 36, 40));
+		previous->setBackground(QColor(34, 36, 40));
 	}
 }

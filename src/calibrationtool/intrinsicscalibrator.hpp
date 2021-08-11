@@ -1,9 +1,11 @@
-/*------------------------------------------------------------
- *  intrinsicscalibrator.hpp
- *  Created: 30. July 2021
- *  Author:  Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			 intrinsicscalibrator.hpp
+	* Created: 	 30. July 2021
+	* Author:		 Timo Hueser
+	* Contact: 	 timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef INTRINSICSCALIBRATOR_H
 #define INTRINSICSCALIBRATOR_H
@@ -26,17 +28,19 @@
 
 class IntrinsicsCalibrator : public QObject, public QRunnable {
 	Q_OBJECT
-	public:
-		explicit IntrinsicsCalibrator(CalibrationConfig *calibrationConfig, const QString& cameraName, int threadNumber);
-		void run();
 
-	public slots:
-		void calibrationCanceledSlot();
+	public:
+		explicit IntrinsicsCalibrator(CalibrationConfig *calibrationConfig,
+					const QString& cameraName, int threadNumber);
+		void run();
 
 	signals:
 		void intrinsicsProgress(int counter, int frameCount, int threadNumber);
 		void finishedIntrinsics(double reproError, int threadNumber);
 		void calibrationError(const QString &errorMsg);
+
+	public slots:
+		void calibrationCanceledSlot();
 
 	private:
     struct Intrinsics {
@@ -50,10 +54,12 @@ class IntrinsicsCalibrator : public QObject, public QRunnable {
 		std::string m_cameraName;
 		int m_threadNumber;
 		bool m_interrupt = false;
-		QList<QString> m_validRecordingFormats = {"avi", "mp4", "mov", "wmv", "AVI", "MP4", "WMV"};
+		QList<QString> m_validRecordingFormats = {"avi", "mp4", "mov", "wmv",
+																							"AVI", "MP4", "WMV"};
 
 		void checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1);
-		bool boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners, std::vector<cv::Point2f> &corners);
+		bool boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners,
+					std::vector<cv::Point2f> &corners);
 		QString getFormat(const QString& path, const QString& cameraName);
 };
 

@@ -32,8 +32,6 @@ class MainWindow : public QMainWindow {
 		void quitClickedSlot();
 
 	private:
-		void closeEvent(QCloseEvent *event);
-
 		SettingsWindow *settingsWindow;
 		HelpWindow *helpWindow;
 

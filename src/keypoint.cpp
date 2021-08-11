@@ -1,30 +1,28 @@
-/*------------------------------------------------------------
- *  keypoint.cpp
- *  Created:  10. July 2018
- *  Author:   Timo Hüser
- *
- *------------------------------------------------------------*/
+/*****************************************************************
+ * File:			  keypoint.cpp
+ * Created: 	  23. October 2020
+ * Author:		  Timo Hueser
+ * Contact: 	  timo.hueser@gmail.com
+ * Copyright:  2021 Timo Hueser
+ * License:    GPL v3.0
+ *****************************************************************/
 
 #include "keypoint.hpp"
+
 
 Keypoint::Keypoint(QString entity,QString bodypart, QColor color, QPointF coordinates)
 			: m_entity(entity), m_bodypart(bodypart), m_color(color), m_coordinates(coordinates) {
 	m_ID = m_entity + "/" + m_bodypart;
-	//--- SIGNAL-SLOT Connections ---//
-	//-> Incoming Signals
-
-	//<- Outgoing Signals
-
-	//<-> Relayed Signals
 }
 
 Keypoint::~Keypoint() {
-	std::cout << "deleting Keypoint" << std::endl;
 }
+
 
 void Keypoint::setCoordinates(QPointF point) {
 	m_coordinates = point;
 }
+
 
 void Keypoint::setState(KeypointState state) {
 	if (m_state != state) {

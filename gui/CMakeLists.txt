@@ -1,5 +1,6 @@
 project (gui)
 
+
 add_subdirectory(Qt-DarkStyle)
 add_subdirectory(newdatasetwindow)
 add_subdirectory(newcalibrationwidget)
@@ -8,15 +9,14 @@ add_subdirectory(editor)
 add_subdirectory(conveniencewidgets)
 add_subdirectory(helpwindow)
 
-
 add_library(${PROJECT_NAME}
     mainwindow.hpp
-    mainbar.hpp
-    settingswindow.hpp
-    loaddatasetwindow.hpp
     mainwindow.cpp
+    mainbar.hpp
     mainbar.cpp
+    settingswindow.hpp
     settingswindow.cpp
+    loaddatasetwindow.hpp
     loaddatasetwindow.cpp
 )
 
@@ -37,4 +37,4 @@ target_link_libraries(${PROJECT_NAME}
   helpwindow
 )
 
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused -Wno-sign-compare -Werror)

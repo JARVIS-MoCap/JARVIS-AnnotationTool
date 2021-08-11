@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  dataset.hpp
- *  Created: 23. October 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+ /*****************************************************************
+	* File:			  dataset.hpp
+	* Created: 	  23. October 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef DATASET_H
 #define DATASET_H
@@ -14,6 +17,7 @@
 
 class Dataset : public QObject {
 	Q_OBJECT
+
 	public:
 		explicit Dataset(const QString& datasetFolder, QList<QString> cameraNames = {});
 		static Dataset *dataset;
@@ -26,8 +30,8 @@ class Dataset : public QObject {
 		QList<QString> bodypartsList() const {return m_bodypartsList;}
 		bool loadSuccessfull() const {return m_loadSuccessfull;}
 
-		signals:
-			void keypointStateChanged(KeypointState state, KeypointState previousState, int frameIndex);
+	signals:
+		void keypointStateChanged(KeypointState state, KeypointState previousState, int frameIndex);
 
 	private:
 		bool GetImageSizeEx(QString fn, int *x,int *y);
@@ -44,8 +48,6 @@ class Dataset : public QObject {
 		QList<QString> m_bodypartsList;
 		QList<QString> m_entitiesList;
 		ColorMap *m_colorMap;
-
-
 };
 
 #endif

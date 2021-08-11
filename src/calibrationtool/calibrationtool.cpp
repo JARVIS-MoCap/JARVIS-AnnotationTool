@@ -1,9 +1,11 @@
-/*------------------------------------------------------------
- *  calibrationtool.cpp
- *  Created: 30. July 2021
- *  Author:  Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *------------------------------------------------------------*/
+/*****************************************************************
+  * File:			  calibrationtool.cpp
+  * Created: 	  30. July 2021
+  * Author:		  Timo Hueser
+  * Contact: 	  timo.hueser@gmail.com
+  * Copyright:  2021 Timo Hueser
+  * License:    GPL v3.0
+  *****************************************************************/
 
 #include "calibrationtool.hpp"
 
@@ -12,9 +14,11 @@
 
 #include <QThreadPool>
 
+
 CalibrationTool::CalibrationTool(CalibrationConfig *calibrationConfig) :
     m_calibrationConfig(calibrationConfig) {
 }
+
 
 void CalibrationTool::makeCalibrationSet()  {
   delayl(100);  //Wait for GUI Thread to setup progressWindow before potentially slamming it with calibration task
@@ -59,25 +63,27 @@ void CalibrationTool::makeCalibrationSet()  {
   }
 }
 
+
 void CalibrationTool::finishedIntrinsicsSlot(double reproError, int threadNumber) {
   m_intrinsicsReproErrors[threadNumber] = reproError;
 }
+
 
 void CalibrationTool::finishedExtrinsicsSlot(double reproError, QMap<QString, double> intrinsicsErrorMap,int threadNumber) {
   m_extrinsicsReproErrors[threadNumber] = reproError;
   if (intrinsicsErrorMap.size() == 2) {
     for (const auto & key : intrinsicsErrorMap.keys()) {
-      std::cout << key.toStdString() << std::endl;
       m_intrinsicsReproErrors[m_calibrationConfig->cameraNames.indexOf(key)] = intrinsicsErrorMap[key];
     }
-    //intrinsicsErrorMap[m_calibrationConfig->cameraNames.indexOf(intrinsicsErrorMap)]
   }
 }
+
 
 void CalibrationTool::cancelCalibrationSlot() {
   m_calibrationCanceled = true;
   emit calibrationCanceled();
 }
+
 
 void CalibrationTool::calibrationErrorSlot(const QString &errorMsg) {
   if(!m_calibrationCanceled) {

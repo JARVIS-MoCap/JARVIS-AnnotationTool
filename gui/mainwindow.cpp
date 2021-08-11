@@ -159,6 +159,3 @@ void MainWindow::exitToMainPageSlot() {
 	}
 	stackedWidget->setCurrentWidget(datasetWidget);
 }
-
-void MainWindow::closeEvent (QCloseEvent *event) {
-}

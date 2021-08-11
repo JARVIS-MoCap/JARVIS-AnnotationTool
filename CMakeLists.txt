@@ -3,8 +3,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(AnnotationTool VERSION 0.2.0  LANGUAGES CXX)
 
-#find_package(Qt5 COMPONENTS Widgets Core Gui Charts REQUIRED)
-
 if(APPLE)
   set(OS_LIB_DIR "MacOS")
 elseif(WIN32)
@@ -17,8 +15,6 @@ elseif(UNIX)
     set(OS_LIB_DIR "Ubuntu_1804")
   endif()
 endif()
-
-#set(CMAKE_PREFIX_PATH "libs/${STATIC_LIB_LOCATION}")
 
 set(Qt5_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5")
 set(Qt5Core_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Core")
@@ -78,14 +74,15 @@ if(APPLE)
       globals.hpp
       gui/Qt-DarkStyle/darkstyle.qrc
   )
-
   set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_ICONFILE ${ICON_NAME})
+
 elseif(WIN32)
   add_executable(${PROJECT_NAME}
       main.cpp
       globals.hpp
       gui/Qt-DarkStyle/darkstyle.qrc
   )
+
 elseif (UNIX)
   add_executable(${PROJECT_NAME}
       main.cpp

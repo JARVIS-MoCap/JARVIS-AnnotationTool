@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  reprojectiontool.hpp
- *  Created: 02. December 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  reprojectiontool.hpp
+	* Created: 	  02. December 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef REPROJECTIONTOOL_H
 #define REPROJECTIONTOOL_H
@@ -16,7 +19,8 @@
 class ReprojectionTool : public QObject {
 	Q_OBJECT
 	public:
-		explicit ReprojectionTool(QList<QString> intrinsicsPaths, QList<QString> extrinsicsPaths, int primaryIndex);
+		explicit ReprojectionTool(QList<QString> intrinsicsPaths, QList<QString> extrinsicsPaths,
+					int primaryIndex);
 		cv::Mat reconstructPoint3D(QList<QPointF> points, QList<int> camerasToUse);
 		QList<QPointF> reprojectPoint(cv::Mat point3D);
 
@@ -37,12 +41,9 @@ class ReprojectionTool : public QObject {
 		void readIntrinsics(const QString& path, CameraIntrinics& cameraIntrinics);
 		void readExtrinsincs(const QString& path, CameraExtrinsics& cameraExtrinsics);
 
-
 		QList<CameraIntrinics> m_cameraIntrinsicsList;
 		int m_primaryIndex;
 		QList<CameraExtrinsics> m_cameraExtrinsicsList;
-
-
 
 };
 
