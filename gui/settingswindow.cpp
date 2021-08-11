@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  settingswindow.cpp
- *  Created: 23. October 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  settingswindow.cpp
+	* Created: 	  23. October 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "settingswindow.hpp"
 
@@ -122,6 +125,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	loadSettings();
 }
 
+
 void SettingsWindow::datasetLoadedSlot() {
 	int i = 0;
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
@@ -134,7 +138,8 @@ void SettingsWindow::datasetLoadedSlot() {
 		QComboBox * keypointShapeCombo = new QComboBox();
 		keypointShapeCombo->addItem("Circle");
 		keypointShapeCombo->addItem("Rectangle");
-		connect(keypointShapeCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &SettingsWindow::keypointShapeChangedSlot);
+		connect(keypointShapeCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+						this, &SettingsWindow::keypointShapeChangedSlot);
 		keypointShapeCombosList.append(keypointShapeCombo);
 		QLabel *colorMapLabel = new QLabel(" Colormap"); //Make preview thingy here??
 		QComboBox *colorMapCombo = new QComboBox();
@@ -143,7 +148,8 @@ void SettingsWindow::datasetLoadedSlot() {
 		colorMapCombo->addItem("Jet");
 		colorMapCombo->addItem("Fixed");
 		colorMapCombo->addItem("Single");
-		connect(colorMapCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &SettingsWindow::colorMapChangedSlot);
+		connect(colorMapCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+						this, &SettingsWindow::colorMapChangedSlot);
 		QLabel *colormapPreviewLabel = new QLabel();
 		colormapPreviewsList.append(colormapPreviewLabel);
 		colormapPreviewLabel->setMinimumSize(200,20);
@@ -169,6 +175,7 @@ void SettingsWindow::datasetLoadedSlot() {
 	}
 }
 
+
 void SettingsWindow::loadSettings() {
 	settings->beginGroup("Settings");
 	settings->beginGroup("ReprojectionSettings");
@@ -188,9 +195,11 @@ void SettingsWindow::loadSettings() {
 	settings->endGroup();
 }
 
+
 void SettingsWindow::imageTranformationChangedSlot() {
 	emit imageTranformationChanged(hueBox->value(), saturationBox->value(), brightnessBox->value());
 }
+
 
 void SettingsWindow::grayScaleToggledSlot(int state) {
 	if (state == Qt::Checked) {
@@ -214,22 +223,27 @@ void SettingsWindow::grayScaleToggledSlot(int state) {
 	}
 }
 
+
 void SettingsWindow::hueResetClickedSlot() {
 	hueSlider->setValue(0);
 }
+
 
 void SettingsWindow::saturationResetClickedSlot() {
 	saturationSlider->setValue(100);
 }
 
+
 void SettingsWindow::brightnessResetClickedSlot() {
 	brightnessSlider->setValue(100);
 }
+
 
 void SettingsWindow::keypointShapeChangedSlot(int index) {
 	int entityIndex = keypointShapeCombosList.indexOf(qobject_cast<QComboBox*>(sender()));
 	emit keypointShapeChanged(Dataset::dataset->entitiesList()[entityIndex], static_cast<KeypointShape>(index));
 }
+
 
 QImage SettingsWindow::createColorMapPreview(ColorMap::ColorMapType type, QColor color) {
 	QImage colormapPreview(Dataset::dataset->bodypartsList().size(), 1, QImage::Format_RGB888);
@@ -240,22 +254,27 @@ QImage SettingsWindow::createColorMapPreview(ColorMap::ColorMapType type, QColor
 	return colormapPreview;
 }
 
+
 void SettingsWindow::colorMapChangedSlot(int index) {
 	int entityIndex = colorMapCombosList.indexOf(qobject_cast<QComboBox*>(sender()));
 	colorMapTypeList[entityIndex] = static_cast<ColorMap::ColorMapType>(index);
 	colorChooserButtonsList[entityIndex]->setEnabled(index != 0);
 	QImage colormapPreview = createColorMapPreview(colorMapTypeList[entityIndex], colorsList[entityIndex]);
 	colormapPreviewsList[entityIndex]->setPixmap(QPixmap::fromImage(colormapPreview).scaled(200,20));
-	emit colorMapChanged(Dataset::dataset->entitiesList()[entityIndex], colorMapTypeList[entityIndex], colorsList[entityIndex]);
+	emit colorMapChanged(Dataset::dataset->entitiesList()[entityIndex],
+											 colorMapTypeList[entityIndex], colorsList[entityIndex]);
 }
+
 
 void SettingsWindow::colorChooserClickedSlot() {
 	int entityIndex = colorChooserButtonsList.indexOf(qobject_cast<QPushButton*>(sender()));
 	colorsList[entityIndex] = QColorDialog::getColor(colorsList[entityIndex], this);
 	QImage colormapPreview = createColorMapPreview(colorMapTypeList[entityIndex], colorsList[entityIndex]);
 	colormapPreviewsList[entityIndex]->setPixmap(QPixmap::fromImage(colormapPreview).scaled(200,20));
-	emit colorMapChanged(Dataset::dataset->entitiesList()[entityIndex], colorMapTypeList[entityIndex], colorsList[entityIndex]);
+	emit colorMapChanged(Dataset::dataset->entitiesList()[entityIndex],
+											 colorMapTypeList[entityIndex], colorsList[entityIndex]);
 }
+
 
 void SettingsWindow::minViewsChangedSlot(int val) {
 	settings->beginGroup("Settings");
@@ -265,6 +284,7 @@ void SettingsWindow::minViewsChangedSlot(int val) {
 	settings->endGroup();
 	emit minViewsChanged(val);
 }
+
 
 void SettingsWindow::errorThresholdChangedSlot(double val) {
 	settings->beginGroup("Settings");

@@ -1,9 +1,11 @@
 /*****************************************************************
- * File:			configurableitemlist.cpp
- * Created: 	08. July 2021
- * Author:		Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *****************************************************************/
+	* File:			  configurableitemlist.cpp
+	* Created: 	  23. October 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "configurableitemlist.hpp"
 
@@ -17,7 +19,7 @@
 
 
 ConfigurableItemList::ConfigurableItemList(QString name, QWidget *parent) :
-			m_name(name), QWidget(parent) {
+			QWidget(parent), m_name(name) {
 
 	QGridLayout *labelselectorlayout = new QGridLayout(this);
 	labelselectorlayout->setMargin(3);
@@ -75,6 +77,7 @@ void ConfigurableItemList::itemSelectedSlot(QListWidgetItem *item) {
 	}
 }
 
+
 void ConfigurableItemList::moveItemUpSlot() {
 	int row = itemSelectorList->currentRow();
 	if (row == -1) return;
@@ -86,6 +89,7 @@ void ConfigurableItemList::moveItemUpSlot() {
 	itemSelectorList->setCurrentRow(newRow);
 	emit itemsChanged(getItems());
 }
+
 
 void ConfigurableItemList::moveItemDownSlot() {
 	int row = itemSelectorList->currentRow();
@@ -114,12 +118,14 @@ void ConfigurableItemList::addItemSlot() {
 	emit itemsChanged(getItems());
 }
 
+
 void ConfigurableItemList::removeItemSlot() {
 	int row = itemSelectorList->currentRow();
 	delete itemSelectorList->takeItem(row);
 	delete itemSelectorList->takeItem(row);
 	emit itemsChanged(getItems());
 }
+
 
 void ConfigurableItemList::addItem(const QString &text) {
 	QListWidgetItem * item = new QListWidgetItem();
@@ -134,11 +140,13 @@ void ConfigurableItemList::addItem(const QString &text) {
 	itemSelectorList->addItem(seperatorItem);
 }
 
-void ConfigurableItemList::currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous) {
+
+void ConfigurableItemList::currentItemChangedSlot(QListWidgetItem *current,
+			QListWidgetItem *previous) {
 	if (current != nullptr) {
-		current->setBackgroundColor(QColor(100,164,32));
+		current->setBackground(QColor(100,164,32));
 	}
 	if (previous != nullptr) {
-		previous->setBackgroundColor(QColor(34, 36, 40));
+		previous->setBackground(QColor(34, 36, 40));
 	}
 }

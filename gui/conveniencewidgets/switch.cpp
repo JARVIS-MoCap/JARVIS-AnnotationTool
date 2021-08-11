@@ -1,94 +1,94 @@
 #include "switch.hpp"
 
-Switch::Switch(QWidget *parent) : QAbstractButton(parent),
-_height(16),
-_opacity(0.000),
-_switch(false),
-_margin(3),
-_thumb(QColor(32, 100, 164)),
-_anim(new QPropertyAnimation(this, "offset", this))
-{
-    setOffset(_height / 2);
-    _y = _height / 2;
-    setBrush(QColor(100,164,32));
+Switch::Switch(QWidget *parent) : QAbstractButton(parent) {
+	m_anim = new QPropertyAnimation(this, "offset", this);
+	setOffset(m_height / 2);
+	m_y = m_height / 2;
+	setBrush(QColor(100,164,32));
 }
 
-Switch::Switch(const QBrush &brush, QWidget *parent) : QAbstractButton(parent),
-_height(16),
-_switch(false),
-_opacity(0.000),
-_margin(3),
-_thumb(QColor(32, 100, 164)),
-_anim(new QPropertyAnimation(this, "offset", this))
-{
-    setOffset(_height / 2);
-    _y = _height / 2;
-    setBrush(brush);
+
+void Switch::setOffset(int o) {
+	m_x = o;
+	update();
 }
+
 
 void Switch::paintEvent(QPaintEvent *e) {
-    QPainter p(this);
-    p.setPen(Qt::NoPen);
-    if (isEnabled()) {
-        p.setBrush(_switch ? brush() : QColor(22, 24, 26));
-        p.setOpacity(_switch ? 0.5 : 0.38);
-        p.setRenderHint(QPainter::Antialiasing, true);
-        p.drawRoundedRect(QRect(_margin, _margin, width() - 2 * _margin, height() - 2 * _margin), 8.0, 8.0);
-        p.setBrush(_thumb);
-        p.setOpacity(1.0);
-        p.drawEllipse(QRectF(offset() - (_height / 2), _y - (_height / 2), height(), height()));
-    } else {
-        p.setBrush(QColor(22, 24, 26));
-        p.setOpacity(0.12);
-        p.drawRoundedRect(QRect(_margin, _margin, width() - 2 * _margin, height() - 2 * _margin), 8.0, 8.0);
-        p.setOpacity(1.0);
-        p.setBrush(QColor("#BDBDBD"));
-        p.drawEllipse(QRectF(offset() - (_height / 2), _y - (_height / 2), height(), height()));
-    }
+	Q_UNUSED(e);
+	QPainter p(this);
+	p.setPen(Qt::NoPen);
+	if (isEnabled()) {
+		p.setBrush(m_switch ? brush() : QColor(22, 24, 26));
+		p.setOpacity(m_switch ? 0.5 : 0.38);
+		p.setRenderHint(QPainter::Antialiasing, true);
+		p.drawRoundedRect(QRect(m_margin, m_margin, width() - 2 * m_margin,
+														height() - 2 * m_margin), 8.0, 8.0);
+		p.setBrush(m_thumb);
+		p.setOpacity(1.0);
+		p.drawEllipse(QRectF(offset() - (m_height / 2), m_y - (m_height / 2),
+												 height(), height()));
+	}
+	else {
+		p.setBrush(QColor(22, 24, 26));
+		p.setOpacity(0.12);
+		p.drawRoundedRect(QRect(m_margin, m_margin, width() - 2 * m_margin,
+														height() - 2 * m_margin), 8.0, 8.0);
+		p.setOpacity(1.0);
+		p.setBrush(QColor("#BDBDBD"));
+		p.drawEllipse(QRectF(offset() - (m_height / 2), m_y - (m_height / 2),
+												 height(), height()));
+	}
 }
+
 
 void Switch::mouseReleaseEvent(QMouseEvent *e) {
-    if (e->button() & Qt::LeftButton) {
-        _switch = _switch ? false : true;
-        _thumb = _switch ? _brush : QBrush(QColor(32, 100, 164));
-        if (_switch) {
-            _anim->setStartValue(_height / 2);
-            _anim->setEndValue(width() - _height);
-            _anim->setDuration(120);
-            _anim->start();
-        } else {
-            _anim->setStartValue(offset());
-            _anim->setEndValue(_height / 2);
-            _anim->setDuration(120);
-            _anim->start();
-        }
-    }
-    emit toggled(_switch);
-    QAbstractButton::mouseReleaseEvent(e);
+	Q_UNUSED(e);
+	if (e->button() & Qt::LeftButton) {
+		m_switch = m_switch ? false : true;
+	  m_thumb = m_switch ? m_brush : QBrush(QColor(32, 100, 164));
+		if (m_switch) {
+			m_anim->setStartValue(m_height / 2);
+			m_anim->setEndValue(width() - m_height);
+			m_anim->setDuration(120);
+			m_anim->start();
+		}
+		else {
+			m_anim->setStartValue(offset());
+			m_anim->setEndValue(m_height / 2);
+			m_anim->setDuration(120);
+			m_anim->start();
+		}
+	}
+	emit toggled(m_switch);
+	QAbstractButton::mouseReleaseEvent(e);
 }
+
 
 void Switch::enterEvent(QEvent *e) {
-    setCursor(Qt::PointingHandCursor);
-    QAbstractButton::enterEvent(e);
+	setCursor(Qt::PointingHandCursor);
+	QAbstractButton::enterEvent(e);
 }
+
 
 QSize Switch::sizeHint() const {
-    return QSize(2 * (_height + _margin), _height + 2 * _margin);
+	return QSize(2 * (m_height + m_margin), m_height + 2 * m_margin);
 }
 
+
 void Switch::setToggled(bool toggle) {
-  _switch = toggle;
-  _thumb = _switch ? _brush : QBrush(QColor(32, 100, 164));
-  if (_switch) {
-    _anim->setStartValue(_height / 2);
-    _anim->setEndValue(width() - _height);
-    _anim->setDuration(120);
-    _anim->start();
-  }
-  else {
-    _anim->setStartValue(offset());
-    _anim->setEndValue(_height / 2);
-    _anim->setDuration(120);
-    _anim->start();
-  }
+	m_switch = toggle;
+	m_thumb = m_switch ? m_brush : QBrush(QColor(32, 100, 164));
+	if (m_switch) {
+		m_anim->setStartValue(m_height / 2);
+		m_anim->setEndValue(width() - m_height);
+		m_anim->setDuration(120);
+		m_anim->start();
+	}
+	else {
+		m_anim->setStartValue(offset());
+		m_anim->setEndValue(m_height / 2);
+		m_anim->setDuration(120);
+		m_anim->start();
+	}
 }

@@ -1,16 +1,19 @@
 /*****************************************************************
- * File:			pathwidget.cpp
- * Created: 	01. August 2021
- * Author:		Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *****************************************************************/
+	* File:			  pathwidget.cpp
+	* Created: 	  01. August 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "pathwidget.hpp"
 
 #include <QFileDialog>
 
+
 DirPathWidget::DirPathWidget(const QString& name, const QString& defaultPath, QWidget *parent) :
-	m_name(name),  QWidget(parent) {
+	QWidget(parent), m_name(name) {
 	if (defaultPath != "") {
 		m_currentPath = defaultPath;
 	}
@@ -31,6 +34,7 @@ DirPathWidget::DirPathWidget(const QString& name, const QString& defaultPath, QW
 	layout->addWidget(pathButton,0,1);
 }
 
+
 void DirPathWidget::pathEditedSlot() {
 	QString path = pathEdit->text();
 	if (path == "") {
@@ -44,6 +48,7 @@ void DirPathWidget::pathEditedSlot() {
 	emit pathChanged(path);
 }
 
+
 void DirPathWidget::pathChangedSlot(const QString& path) {
 	if (path == "") {
 		m_currentPath	= QDir::homePath();
@@ -53,8 +58,8 @@ void DirPathWidget::pathChangedSlot(const QString& path) {
 		dir.cdUp();
 		m_currentPath = dir.path();
 	}
-	//emit pathChanged(path);
 }
+
 
 void DirPathWidget::pathClickedSlot() {
 	QString dir = QFileDialog::getExistingDirectory(this,m_name, m_currentPath,
@@ -64,6 +69,7 @@ void DirPathWidget::pathClickedSlot() {
 		emit pathChanged(dir);
 	}
 }
+
 
 void DirPathWidget::setDefaultPath(const QString &path) {
 	m_currentPath = path;

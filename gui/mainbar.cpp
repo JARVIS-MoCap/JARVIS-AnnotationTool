@@ -1,10 +1,14 @@
-/*------------------------------------------------------------
- *  mainbar.cpp
- *  Created:  27. October 2020
- *  Author:   Timo Hüser
- * *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  mainbar.cpp
+	* Created: 	  23. October 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "mainbar.hpp"
+
 
 MainBar::MainBar(QWidget *parent) : QToolBar(parent) {
 	this->setFixedHeight(60);

@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  mainwindow.cpp
- *  Created: 23. October 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  mainwindow.cpp
+	* Created: 	  23. October 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "mainwindow.hpp"
 
@@ -13,6 +16,8 @@
 #include <QStatusBar>
 #include <QMenuBar>
 
+
+//This is a global funciton, probably not ideal to have it here
 void createToolBarButton(QToolButton *button, QAction*action, QIcon icon, bool enabled,
 			bool checkable, QSize minSize) {
 	button->setMinimumSize(minSize);
@@ -41,41 +46,48 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	setCentralWidget(stackedWidget);
 
 	datasetWidget = new QWidget(this);
-	QSpacerItem *datasetTopSpacer = new QSpacerItem(100,200,QSizePolicy::Maximum,QSizePolicy::Maximum);
-	QSpacerItem *datasetBottomSpacer = new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Expanding);
 	QGridLayout *datasetlayout = new QGridLayout(datasetWidget);
 	datasetlayout->setSpacing(16);
+	QSpacerItem *datasetTopSpacer = new QSpacerItem(100,200,QSizePolicy::Maximum,QSizePolicy::Maximum);
+	QSpacerItem *datasetBottomSpacer = new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Expanding);
+
 	QLabel *datasetLabel = new QLabel("What do you want to do?");
 	datasetLabel->setFont(QFont("Sans Serif", 22, QFont::Bold));
 	datasetLabel->setStyleSheet("QLabel {color: rgb(32,100,164)}");
+
 	loadDatasetButton = new QPushButton("Annotate Dataset");
 	loadDatasetButton->setMinimumSize(450,80);
 	loadDatasetButton->setFont(QFont("Sans Serif", 18, QFont::Bold));
-	loadDatasetButton->setStyleSheet(" QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
-													 "QPushButton:hover { background-color: rgb(68,74,89); }"
-													 "QPushButton { color: rgb(100,164,32);}");
+	loadDatasetButton->setStyleSheet("QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
+													 				 "QPushButton:hover { background-color: rgb(68,74,89); }"
+													 				 "QPushButton { color: rgb(100,164,32);}");
+
 	newDatasetButton = new QPushButton("Create new Dataset");
 	newDatasetButton->setMinimumSize(450,80);
 	newDatasetButton->setFont(QFont("Sans Serif", 18, QFont::Bold));
-	newDatasetButton->setStyleSheet(" QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
-													 "QPushButton:hover { background-color: rgb(68,74,89); }"
-													 "QPushButton { color: rgb(100,164,32);}");
-	 newCalibrationButton = new QPushButton("Create new Calibration");
-	 newCalibrationButton->setMinimumSize(450,80);
-	 newCalibrationButton->setFont(QFont("Sans Serif", 18, QFont::Bold));
-	 newCalibrationButton->setStyleSheet(" QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
-														"QPushButton:hover { background-color: rgb(68,74,89); }"
-														"QPushButton { color: rgb(100,164,32);}");
-		exportDatasetButton = new QPushButton("Export Trainingset");
-		exportDatasetButton->setMinimumSize(450,80);
-		exportDatasetButton->setFont(QFont("Sans Serif", 18, QFont::Bold));
-		exportDatasetButton->setStyleSheet(" QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
-														 "QPushButton:hover { background-color: rgb(68,74,89); }"
-														 "QPushButton { color: rgb(100,164,32);}");
+	newDatasetButton->setStyleSheet("QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
+													 				"QPushButton:hover { background-color: rgb(68,74,89); }"
+													 				"QPushButton { color: rgb(100,164,32);}");
+
+	newCalibrationButton = new QPushButton("Create new Calibration");
+	newCalibrationButton->setMinimumSize(450,80);
+	newCalibrationButton->setFont(QFont("Sans Serif", 18, QFont::Bold));
+	newCalibrationButton->setStyleSheet("QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
+																			"QPushButton:hover { background-color: rgb(68,74,89); }"
+																			"QPushButton { color: rgb(100,164,32);}");
+
+	exportDatasetButton = new QPushButton("Export Trainingset");
+	exportDatasetButton->setMinimumSize(450,80);
+	exportDatasetButton->setFont(QFont("Sans Serif", 18, QFont::Bold));
+	exportDatasetButton->setStyleSheet("QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
+													 					 "QPushButton:hover { background-color: rgb(68,74,89); }"
+													 				 	 "QPushButton { color: rgb(100,164,32);}");
+
 	connect(loadDatasetButton, &QPushButton::clicked, this, &MainWindow::loadDatasetClickedSlot);
-	connect (newDatasetButton, &QPushButton::clicked, this, &MainWindow::newDatasetClickedSlot);
-	connect (newCalibrationButton, &QPushButton::clicked, this, &MainWindow::newCalibrationClickedSlot);
-	connect (exportDatasetButton, &QPushButton::clicked, this, &MainWindow::exportDatasetClickedSlot);
+	connect(newDatasetButton, &QPushButton::clicked, this, &MainWindow::newDatasetClickedSlot);
+	connect(newCalibrationButton, &QPushButton::clicked, this, &MainWindow::newCalibrationClickedSlot);
+	connect(exportDatasetButton, &QPushButton::clicked, this, &MainWindow::exportDatasetClickedSlot);
+
 	datasetlayout->addItem(datasetTopSpacer,0,0);
 	datasetlayout->addWidget(datasetLabel,1,0,Qt::AlignCenter);
 	datasetlayout->addWidget(loadDatasetButton,2,0,Qt::AlignCenter);
@@ -120,41 +132,49 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded, editorWidget, &EditorWidget::datasetLoaded);
 }
 
+
 void MainWindow::openSettingsWindowSlot() {
 	settingsWindow->show();
 }
+
 
 void MainWindow::openHelpWindowSlot() {
 	helpWindow->show();
 }
 
+
 void MainWindow::loadDatasetClickedSlot() {
 	loadDatasetWindow->exec();
 }
+
 
 void MainWindow::newDatasetClickedSlot() {
 	stackedWidget->setCurrentWidget(newDatasetWindow);
 }
 
+
 void MainWindow::newCalibrationClickedSlot() {
 	stackedWidget->setCurrentWidget(newCalibrationWidget);
 }
+
 
 void MainWindow::exportDatasetClickedSlot() {
 	stackedWidget->setCurrentWidget(exportDatasetWidget);
 }
 
+
 void MainWindow::datasetLoadedSlot() {
 	stackedWidget->setCurrentWidget(editorWidget);
 }
+
 
 void MainWindow::quitClickedSlot() {
 	this->close();
 }
 
+
 void MainWindow::exitToMainPageSlot() {
 	if (stackedWidget->currentWidget() == editorWidget) {
-		std::cout << "Saving Dataset" << std::endl;
 		Dataset::dataset->save();
 	}
 	stackedWidget->setCurrentWidget(datasetWidget);

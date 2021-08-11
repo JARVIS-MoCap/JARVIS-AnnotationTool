@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  presetswindow.hpp
- *  Created: 23. October 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  presetswindow.hpp
+	* Created: 	  23. October 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef PRESETSWINDOW_H
 #define PRESETSWINDOW_H
@@ -18,18 +21,27 @@
 #include <QToolBar>
 #include <QDialog>
 
+
 class PresetsWindow : public QDialog {
 	Q_OBJECT
+
 	public:
 		explicit PresetsWindow(QList<QString> *presets, const QString& type = "load",
 					const QString& name = "default", QWidget *parent = nullptr);
 
+	signals:
+		void savePreset(const QString& name);
+		void loadPreset(const QString& name);
+
+	public slots:
+		void updateListSlot();
+
 	private:
 		QSettings *settings;
 		QList<QString> *m_presets;
+		QString m_type;
 		QString m_name;
 		int m_selectedRow = 0;
-		QString m_type;
 
 		QWidget *bottomFiller;
 		QToolBar *loadToolBar;
@@ -44,15 +56,7 @@ class PresetsWindow : public QDialog {
 		QPushButton *loadButton;
 		QPushButton *closeButton;
 
-
 		void addItem(const QString &text);
-
-	public slots:
-		void updateListSlot();
-
-	signals:
-		void savePreset(const QString& name);
-		void loadPreset(const QString& name);
 
 	private slots:
 		void discardClickedSlot();

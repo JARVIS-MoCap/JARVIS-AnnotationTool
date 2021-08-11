@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  settingswindow.hpp
- *  Created: 23. October 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  settingswindow.hpp
+	* Created: 	  23. October 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef SETTINGSWINDOW_H
 #define SETTINGSWINDOW_H
@@ -24,11 +27,9 @@
 
 class SettingsWindow : public QWidget {
 	Q_OBJECT
+
 	public:
 		explicit SettingsWindow(QWidget *parent = nullptr);
-
-	public slots:
-		void datasetLoadedSlot();
 
 	signals:
 		void imageTranformationChanged(int hueFactor, int saturationFactor, int brightnessFactor);
@@ -37,6 +38,9 @@ class SettingsWindow : public QWidget {
 		void colorMapChanged(const QString& entity, ColorMap::ColorMapType type, QColor color);
 		void minViewsChanged(int val);
 		void errorThresholdChanged(float val);
+
+	public slots:
+		void datasetLoadedSlot();
 
 	private:
 		void loadSettings();
@@ -70,17 +74,17 @@ class SettingsWindow : public QWidget {
 		QSpinBox *minViewsEdit;
 		QDoubleSpinBox *errorThresholdEdit;
 
-		private slots:
-			void imageTranformationChangedSlot();
-			void grayScaleToggledSlot(int state);
-			void hueResetClickedSlot();
-			void saturationResetClickedSlot();
-			void brightnessResetClickedSlot();
-			void keypointShapeChangedSlot(int index);
-			void colorMapChangedSlot(int index);
-			void colorChooserClickedSlot();
-			void minViewsChangedSlot(int val);
-			void errorThresholdChangedSlot(double val);
+	private slots:
+		void imageTranformationChangedSlot();
+		void grayScaleToggledSlot(int state);
+		void hueResetClickedSlot();
+		void saturationResetClickedSlot();
+		void brightnessResetClickedSlot();
+		void keypointShapeChangedSlot(int index);
+		void colorMapChangedSlot(int index);
+		void colorChooserClickedSlot();
+		void minViewsChangedSlot(int val);
+		void errorThresholdChangedSlot(double val);
 
 };
 

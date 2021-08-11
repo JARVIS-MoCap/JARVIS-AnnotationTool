@@ -1,9 +1,11 @@
-/*------------------------------------------------------------
- *  configurableitemlist.hpp
- *  Created: 08. July 2021
- *  Author:   Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  configurableitemlist.hpp
+	* Created: 	  23. October 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef CONFIGURABLEITEMLIST_H
 #define CONFIGURABLEITEMLIST_H
@@ -17,11 +19,12 @@
 #include <QToolBar>
 #include <QListWidget>
 
+
 class ConfigurableItemList : public QWidget {
 	Q_OBJECT
+
 	public:
 		explicit ConfigurableItemList(QString name, QWidget *parent = nullptr);
-
 		QList<QString> getItems();
 		void clear() {itemSelectorList->clear();};
 		void addItem(const QString &item);
@@ -37,9 +40,6 @@ class ConfigurableItemList : public QWidget {
 		QPushButton *addItemButton;
 		QPushButton  *deleteItemButton;
 
-	public slots:
-		//void setNumberOfCamerasSlot(int num);
-
 	private slots:
 		void itemSelectedSlot(QListWidgetItem *item);
 		void moveItemUpSlot();
@@ -48,6 +48,5 @@ class ConfigurableItemList : public QWidget {
 		void removeItemSlot();
 		void currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous);
 };
-
 
 #endif

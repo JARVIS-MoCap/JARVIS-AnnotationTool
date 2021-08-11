@@ -1,9 +1,11 @@
-/*------------------------------------------------------------
- *  pathwidget.hpp
- *  Created: 	01. August 2021
- *  Author:   Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  pathwidget.hpp
+	* Created: 	  01. August 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef PATHWIDGET_H
 #define PATHWIDGET_H
@@ -18,8 +20,10 @@
 
 class DirPathWidget : public QWidget {
 	Q_OBJECT
+
 	public:
-		explicit DirPathWidget(const QString& name, const QString& defaultPath = "", QWidget *parent = nullptr);
+		explicit DirPathWidget(const QString& name, const QString& defaultPath = "",
+					QWidget *parent = nullptr);
 		void setPath(const QString& path) {pathEdit->setText(path);};
 		QString path() {return pathEdit->text();};
 		void setDefaultPath(const QString &path);

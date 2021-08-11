@@ -1,9 +1,11 @@
-/*------------------------------------------------------------
- *  labelwithtooltip.hpp
- *  Created: 01. August 2021
- *  Author:   Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  labelwithtooltip.hpp
+	* Created: 	  01. August 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef LABELWITHTOOLTIP_H
 #define LABELWITHTOOLTIP_H
