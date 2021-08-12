@@ -15,6 +15,7 @@ LabelWithToolTip::LabelWithToolTip(QString name, QString toolTip, QWidget *paren
 	layout->setMargin(0);
 	QLabel *label = new QLabel(name);
 	QWidget *spacer = new QWidget(this);
+	spacer->setMinimumSize(20,0);
 	label->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 	int i = 1;
 	if (toolTip != "") {

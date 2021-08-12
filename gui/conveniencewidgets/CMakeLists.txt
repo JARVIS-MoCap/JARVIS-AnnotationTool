@@ -12,6 +12,8 @@ add_library(${PROJECT_NAME}
   presetswindow.cpp
   switch.hpp
   switch.cpp
+  yesnoradiowidget.hpp
+  yesnoradiowidget.cpp
 )
 
 target_include_directories(${PROJECT_NAME}

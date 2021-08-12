@@ -10,7 +10,10 @@
 
 #include "globals.hpp"
 #include "presetswindow.hpp"
-
+#include "labelwithtooltip.hpp"
+#include "pathwidget.hpp"
+#include "yesnoradiowidget.hpp"
+#include "compositionchartview.hpp"
 
 #include <QPushButton>
 #include <QTableWidget>
@@ -18,9 +21,10 @@
 #include <QSettings>
 #include <QListWidget>
 #include <QSpinBox>
+#include <QDoubleSpinBox>
 #include <QComboBox>
 #include <QErrorMessage>
-
+#include <QRadioButton>
 
 class ExportTrainingsetWidget : public QWidget {
 	Q_OBJECT
@@ -38,6 +42,22 @@ class ExportTrainingsetWidget : public QWidget {
 		PresetsWindow *loadPresetsWindow;
 		PresetsWindow *savePresetsWindow;
 		QList<QString> presets;
+
+		QLineEdit *trainingsetNameEdit;
+		DirPathWidget *trainingsetSavePathWidget;
+		QRadioButton *type2DButton;
+		QRadioButton *type3DButton;
+		DirPathWidget *intrinsicsPathWidget;
+		DirPathWidget *extrinsicsPathWidget;
+		QDoubleSpinBox *validationFractionEdit;
+		YesNoRadioWidget *shuffleBeforeSplitWidget;
+		QSpinBox *shuffleSeedEdit;
+		QLineEdit *numberFramesTrainingEdit;
+		QLineEdit *numberFramesValidationEdit;
+		QLineEdit *numberEntitiesEdit;
+		QLineEdit *numberKeypointsEdit;
+		CompositionChartView *compositionChartView;
+
 
 		QPushButton *saveButton;
 		QPushButton *loadButton;

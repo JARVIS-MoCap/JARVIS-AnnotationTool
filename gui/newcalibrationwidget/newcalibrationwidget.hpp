@@ -18,6 +18,7 @@
 #include "calibrationprogressinfowindow.hpp"
 #include "calibrationstatisticswindow.hpp"
 #include "namesuggestiondialog.hpp"
+#include "yesnoradiowidget.hpp"
 
 #include <QPushButton>
 #include <QTableWidget>
@@ -30,7 +31,6 @@
 #include <QErrorMessage>
 #include <QRadioButton>
 
-class YesNoRadioWidget;
 
 class NewCalibrationWidget : public QWidget {
 	Q_OBJECT
@@ -103,24 +103,8 @@ class NewCalibrationWidget : public QWidget {
 		void checkerBoardPatternChangesSlot(int val);
 
 		void intrinsicsPathChangedSlot(const QString &path);
-
 };
 
-
-class YesNoRadioWidget : public QWidget {
-	Q_OBJECT
-	public:
-			explicit YesNoRadioWidget(QWidget *parent = nullptr);
-			void setState(bool state);
-			bool state() {return yesButton->isChecked();};
-
-	signals:
-		void stateChanged(bool state);
-
-	private:
-		QRadioButton *yesButton;
-		QRadioButton *noButton;
-};
 
 
 #endif
