@@ -76,37 +76,37 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 																			"QPushButton:hover { background-color: rgb(68,74,89); }"
 																			"QPushButton { color: rgb(100,164,32);}");
 
-	exportDatasetButton = new QPushButton("Export Trainingset");
-	exportDatasetButton->setMinimumSize(450,80);
-	exportDatasetButton->setFont(QFont("Sans Serif", 18, QFont::Bold));
-	exportDatasetButton->setStyleSheet("QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
+	exportTrainigsetButton = new QPushButton("Export Trainingset");
+	exportTrainigsetButton->setMinimumSize(450,80);
+	exportTrainigsetButton->setFont(QFont("Sans Serif", 18, QFont::Bold));
+	exportTrainigsetButton->setStyleSheet("QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
 													 					 "QPushButton:hover { background-color: rgb(68,74,89); }"
 													 				 	 "QPushButton { color: rgb(100,164,32);}");
 
 	connect(loadDatasetButton, &QPushButton::clicked, this, &MainWindow::loadDatasetClickedSlot);
 	connect(newDatasetButton, &QPushButton::clicked, this, &MainWindow::newDatasetClickedSlot);
 	connect(newCalibrationButton, &QPushButton::clicked, this, &MainWindow::newCalibrationClickedSlot);
-	connect(exportDatasetButton, &QPushButton::clicked, this, &MainWindow::exportDatasetClickedSlot);
+	connect(exportTrainigsetButton, &QPushButton::clicked, this, &MainWindow::exportTrainingsetClickedSlot);
 
 	datasetlayout->addItem(datasetTopSpacer,0,0);
 	datasetlayout->addWidget(datasetLabel,1,0,Qt::AlignCenter);
 	datasetlayout->addWidget(loadDatasetButton,2,0,Qt::AlignCenter);
 	datasetlayout->addWidget(newDatasetButton,3,0,Qt::AlignCenter);
 	datasetlayout->addWidget(newCalibrationButton,4,0,Qt::AlignCenter);
-	datasetlayout->addWidget(exportDatasetButton,5,0,Qt::AlignCenter);
+	datasetlayout->addWidget(exportTrainigsetButton,5,0,Qt::AlignCenter);
 	datasetlayout->addItem(datasetBottomSpacer,6,0);
 
 
 	loadDatasetWindow = new LoadDatasetWindow(this);
 	newDatasetWindow = new NewDatasetWindow(this);
 	newCalibrationWidget = new NewCalibrationWidget(this);
-	exportDatasetWidget = new ExportDatasetWidget(this);
+	exportTrainingsetWidget = new ExportTrainingsetWidget(this);
 	editorWidget = new EditorWidget(this);
 
 	stackedWidget->addWidget(datasetWidget);
 	stackedWidget->addWidget(newDatasetWindow);
 	stackedWidget->addWidget(newCalibrationWidget);
-	stackedWidget->addWidget(exportDatasetWidget);
+	stackedWidget->addWidget(exportTrainingsetWidget);
 	stackedWidget->addWidget(editorWidget);
 
 
@@ -158,8 +158,8 @@ void MainWindow::newCalibrationClickedSlot() {
 }
 
 
-void MainWindow::exportDatasetClickedSlot() {
-	stackedWidget->setCurrentWidget(exportDatasetWidget);
+void MainWindow::exportTrainingsetClickedSlot() {
+	stackedWidget->setCurrentWidget(exportTrainingsetWidget);
 }
 
 

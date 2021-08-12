@@ -22,6 +22,9 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	settings = new QSettings();
 	setWindowTitle("New Dataset");
 	QGridLayout *layout = new QGridLayout(this);
+	layout->setVerticalSpacing(20);
+	layout->setHorizontalSpacing(100);
+
 
 	m_datasetConfig = new DatasetConfig;
 	datasetCreator = new DatasetCreator(m_datasetConfig);

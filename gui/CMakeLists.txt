@@ -4,7 +4,7 @@ project (gui)
 add_subdirectory(Qt-DarkStyle)
 add_subdirectory(newdatasetwindow)
 add_subdirectory(newcalibrationwidget)
-add_subdirectory(exportdatasetwidget)
+add_subdirectory(exporttrainingsetwidget)
 add_subdirectory(editor)
 add_subdirectory(conveniencewidgets)
 add_subdirectory(helpwindow)
@@ -32,7 +32,7 @@ target_link_libraries(${PROJECT_NAME}
   editor
   newdatasetwindow
   newcalibrationwidget
-  exportdatasetwidget
+  exporttrainingset
   conveniencewidgets
   helpwindow
 )

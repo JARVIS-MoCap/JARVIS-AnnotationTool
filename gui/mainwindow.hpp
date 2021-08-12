@@ -17,7 +17,7 @@
 #include "loaddatasetwindow.hpp"
 #include "newdatasetwindow.hpp"
 #include "newcalibrationwidget.hpp"
-#include "exportdatasetwidget.hpp"
+#include "exporttrainingsetwidget.hpp"
 #include "editorwidget.hpp"
 
 #include <QMainWindow>
@@ -46,19 +46,19 @@ class MainWindow : public QMainWindow {
 		QPushButton *loadDatasetButton;
 		QPushButton *newDatasetButton;
 		QPushButton *newCalibrationButton;
-		QPushButton *exportDatasetButton;
+		QPushButton *exportTrainigsetButton;
 
 		LoadDatasetWindow *loadDatasetWindow;
 		NewDatasetWindow *newDatasetWindow;
 		NewCalibrationWidget *newCalibrationWidget;
-		ExportDatasetWidget *exportDatasetWidget;
+		ExportTrainingsetWidget *exportTrainingsetWidget;
 		EditorWidget *editorWidget;
 
 	private slots:
 		void loadDatasetClickedSlot();
 		void newDatasetClickedSlot();
 		void newCalibrationClickedSlot();
-		void exportDatasetClickedSlot();
+		void exportTrainingsetClickedSlot();
 		void datasetLoadedSlot();
 		void exitToMainPageSlot();
 };

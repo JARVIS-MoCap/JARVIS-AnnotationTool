@@ -530,6 +530,15 @@ void NewCalibrationWidget::checkerBoardPatternChangesSlot(int val) {
 	}
 }
 
+void NewCalibrationWidget::intrinsicsPathChangedSlot(const QString &path) {
+	if (extrinsicsPathWidget->path() == "") {
+		QDir intrinsicsDir = QDir(path);
+		intrinsicsDir.cdUp();
+		extrinsicsPathWidget->setDefaultPath(intrinsicsDir.path());
+	}
+}
+
+
 void NewCalibrationWidget::savePresetsClickedSlot() {
 	savePresetsWindow->updateListSlot();
 	savePresetsWindow->show();
@@ -599,14 +608,6 @@ void NewCalibrationWidget::loadPresetSlot(const QString& preset) {
 	settings->endGroup();
 	settings->endGroup();
 	extrinsicsPairList->cameraNamesChangedSlot(cameraList->getItems());
-}
-
-void NewCalibrationWidget::intrinsicsPathChangedSlot(const QString &path) {
-	if (extrinsicsPathWidget->path() == "") {
-		QDir intrinsicsDir = QDir(path);
-		intrinsicsDir.cdUp();
-		extrinsicsPathWidget->setDefaultPath(intrinsicsDir.path());
-	}
 }
 
 
