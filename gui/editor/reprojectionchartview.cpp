@@ -1,5 +1,5 @@
 /*****************************************************************
-	* File:			  datasetcontrolview.cpp
+	* File:			  reprojectionchartview.cpp
 	* Created: 	  03. December 2020
 	* Author:		  Timo Hueser
 	* Contact: 	  timo.hueser@gmail.com
@@ -8,8 +8,6 @@
 	*****************************************************************/
 
 #include "reprojectionchartview.hpp"
-
-#include <random>
 
 
 ReprojectionChartView::ReprojectionChartView() {
@@ -22,7 +20,6 @@ void ReprojectionChartView::update(std::vector<double> *reproErrors, int selecte
 	}
 	if (m_reproErrors == nullptr) return;
 	QChart *chart = new QChart();
-	//chart->setAnimationOptions(QChart::SeriesAnimations);
 	chart->setTheme(QChart::ChartThemeDark);
 	chart->setBackgroundBrush(QBrush(QColor(34, 36, 40)));
 	chart->legend()->setVisible(false);
@@ -32,7 +29,6 @@ void ReprojectionChartView::update(std::vector<double> *reproErrors, int selecte
 	else {
 		chart->setTitle(" ");
 	}
-	//float minValue = *std::min_element(m_reproErrors->begin(), m_reproErrors->end());
 	float maxValue = *std::max_element(m_reproErrors->begin(), m_reproErrors->end());
 
 	QValueAxis *axisY = new QValueAxis();

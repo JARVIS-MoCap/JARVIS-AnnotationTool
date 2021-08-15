@@ -1,9 +1,11 @@
-/*------------------------------------------------------------
- *  newcalibrationwidget.hpp
- *  Created: 30. July 2021
- *  Author:   Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  newcalibrationwidget.hpp
+	* Created: 	  01. August 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef NEWCALIBRATIONWIDGET_H
 #define NEWCALIBRATIONWIDGET_H
@@ -34,10 +36,9 @@
 
 class NewCalibrationWidget : public QWidget {
 	Q_OBJECT
+
 	public:
 		explicit NewCalibrationWidget(QWidget *parent = nullptr);
-
-	public slots:
 
 	signals:
 		void makeCalibrationSet();
@@ -107,7 +108,5 @@ class NewCalibrationWidget : public QWidget {
 
 		void intrinsicsPathChangedSlot(const QString &path);
 };
-
-
 
 #endif

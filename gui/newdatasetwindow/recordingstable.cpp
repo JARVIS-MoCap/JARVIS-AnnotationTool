@@ -17,7 +17,7 @@
 
 
 RecordingsTable::RecordingsTable(QString name, DatasetConfig *datasetConfig, QWidget *parent) :
-			m_name(name), m_datasetConfig(datasetConfig), QWidget(parent) {
+			QWidget(parent), m_name(name), m_datasetConfig(datasetConfig) {
 	QGridLayout *layout = new QGridLayout(this);
 	layout->setMargin(3);
 	m_errorMsg = new QErrorMessage();
@@ -47,6 +47,7 @@ RecordingsTable::RecordingsTable(QString name, DatasetConfig *datasetConfig, QWi
 	layout->addWidget(recordingsTable,0,0);
 	layout->addWidget(addItemButton,1,0, Qt::AlignRight);
 }
+
 
 QList<RecordingItem> RecordingsTable::getItems() {
 	return m_recordingItems;
@@ -123,13 +124,11 @@ void RecordingsTable::updateTable() {
 }
 
 void RecordingsTable::deleteRecordingClickedSlot() {
-	bool deletedItem = false;
 	for(int row=0; row < recordingsTable->rowCount(); row++){
     if(sender() == recordingsTable->cellWidget(row,4)) {
 			if (row < m_editingIndex) m_editingIndex--;
 			std::cout << "Row " << row << std::endl;
       m_recordingItems.removeAt(row);
-			deletedItem = true;
     }
   }
   updateTable();

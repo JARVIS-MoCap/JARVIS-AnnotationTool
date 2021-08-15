@@ -1,9 +1,11 @@
 /*****************************************************************
- * File:			calibrationstatisticswindow.cpp
- * Created: 	05. August 2021
- * Author:		Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *****************************************************************/
+	* File:			  calibrationstatisticswindow.cpp
+	* Created: 	  05. August 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "calibrationstatisticswindow.hpp"
 
@@ -11,13 +13,14 @@
 #include <QGroupBox>
 
 
-CalibrationStatisticsWindow::CalibrationStatisticsWindow(QList<QString> cameraNames, QList<QList<QString>> cameraPairs, QMap<int,double> intrinsicsReproErrors,
-				QMap<int,double> extrinsicsReproErrors, QWidget *parent) :
-				m_cameraNames(cameraNames), m_cameraPairs(cameraPairs), m_intrinsicsReproErrors(intrinsicsReproErrors), m_extrinsicsReproErrors(extrinsicsReproErrors), QDialog(parent) {
+CalibrationStatisticsWindow::CalibrationStatisticsWindow(QList<QString> cameraNames,
+			QList<QList<QString>> cameraPairs, QMap<int,double> intrinsicsReproErrors,
+			QMap<int,double> extrinsicsReproErrors, QWidget *parent) :
+		 	QDialog(parent), m_cameraNames(cameraNames), m_cameraPairs(cameraPairs),
+			m_intrinsicsReproErrors(intrinsicsReproErrors), m_extrinsicsReproErrors(extrinsicsReproErrors) {
 	setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 	setWindowTitle("Calibration Error Statistics");
 	QGridLayout *layout = new QGridLayout(this);
-
 
 	QLabel *intrinsicsChartLabel;
 	if (intrinsicsReproErrors.size() > 0) {
@@ -49,7 +52,8 @@ CalibrationStatisticsWindow::CalibrationStatisticsWindow(QList<QString> cameraNa
 		for (const auto& error : extrinsicsReproErrors) {
 			extrinsicsReproErrorsVec.push_back(error);
 		}
-		extrinsicsChartView = new CalibrationChartView(cameraPairNames, extrinsicsReproErrorsVec, "interactive");
+		extrinsicsChartView = new CalibrationChartView(cameraPairNames, extrinsicsReproErrorsVec,
+																									 "interactive");
 	}
 
 	closeButton = new QPushButton("Close");

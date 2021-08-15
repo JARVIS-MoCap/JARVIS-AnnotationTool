@@ -1,9 +1,11 @@
 /*****************************************************************
- * File:			helpwindow.cpp
- * Created: 	08. August 2021
- * Author:		Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *****************************************************************/
+	* File:			  helpwindow.cpp
+	* Created: 	  08. August 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "helpwindow.hpp"
 
@@ -31,16 +33,23 @@ HelpWindow::HelpWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	tableOfContents->setMaximumSize(300,100000);
 	connect(tableOfContents, &QTreeWidget::itemClicked, this, &HelpWindow::itemSlectedSlot);
 
-	QTreeWidgetItem *gettingStartedItem = new QTreeWidgetItem(tableOfContents, QStringList(QString("Getting Started")));
-	QTreeWidgetItem *introductionItem = new QTreeWidgetItem(gettingStartedItem, QStringList(QString("Introduction")));
-	QTreeWidgetItem *exampleItem = new QTreeWidgetItem(gettingStartedItem, QStringList(QString("Exploring the Example Dataset")));
-	QTreeWidgetItem *ownDataItem = new QTreeWidgetItem(gettingStartedItem, QStringList(QString("Working with your own Data")));
+	QTreeWidgetItem *gettingStartedItem = new QTreeWidgetItem(tableOfContents,
+																						QStringList(QString("Getting Started")));
+	QTreeWidgetItem *introductionItem = new QTreeWidgetItem(gettingStartedItem,
+																					QStringList(QString("Introduction")));
+	QTreeWidgetItem *exampleItem = new QTreeWidgetItem(gettingStartedItem,
+																		 QStringList(QString("Exploring the Example Dataset")));
+	QTreeWidgetItem *ownDataItem = new QTreeWidgetItem(gettingStartedItem,
+																		 QStringList(QString("Working with your own Data")));
 	gettingStartedItem->addChild(introductionItem);
 	gettingStartedItem->addChild(exampleItem);
 	gettingStartedItem->addChild(ownDataItem);
-	QTreeWidgetItem *calibrationItem = new QTreeWidgetItem(tableOfContents, QStringList(QString("Calibration")));
-	QTreeWidgetItem *recordingCalibrationItem = new QTreeWidgetItem(calibrationItem, QStringList(QString("Recording Calibration Videos")));
-	QTreeWidgetItem *createCalibrationItem = new QTreeWidgetItem(calibrationItem, QStringList(QString("Create Calibration Files")));
+	QTreeWidgetItem *calibrationItem = new QTreeWidgetItem(tableOfContents,
+																				 QStringList(QString("Calibration")));
+	QTreeWidgetItem *recordingCalibrationItem = new QTreeWidgetItem(calibrationItem,
+																									QStringList(QString("Recording Calibration Videos")));
+	QTreeWidgetItem *createCalibrationItem = new QTreeWidgetItem(calibrationItem,
+																							 QStringList(QString("Create Calibration Files")));
 	calibrationItem->addChild(recordingCalibrationItem);
 	calibrationItem->addChild(createCalibrationItem);
 	gettingStartedItem->setExpanded(true);
@@ -55,20 +64,20 @@ HelpWindow::HelpWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	m_contentMap[recordingCalibrationItem] = "help/recordingcalibration.html";
 	m_contentMap[createCalibrationItem] = "help/createcalibration.html";
 
-
 	mainSplitter->addWidget(tableOfContents);
 	mainSplitter->addWidget(textBrowser);
 
 	setDocument("help/introduction.html");
-
 }
 
 void HelpWindow::itemSlectedSlot(QTreeWidgetItem *item, int column) {
+	Q_UNUSED(column);
 	auto it = m_contentMap.find(item);
 	if (it != m_contentMap.end()) {
 		setDocument(m_contentMap[item]);
 	}
 }
+
 
 void HelpWindow::setDocument(const QString &path) {
 	QTextDocument *doc = new QTextDocument();
@@ -85,5 +94,4 @@ void HelpWindow::setDocument(const QString &path) {
 	QString html = in.readAll();
 	doc->setHtml(html);
 	f.close();
-
 }

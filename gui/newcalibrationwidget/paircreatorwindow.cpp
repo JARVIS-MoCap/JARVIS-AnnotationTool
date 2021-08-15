@@ -1,9 +1,11 @@
 /*****************************************************************
- * File:			paircreatorwindow.cpp
- * Created: 	01. August 2021
- * Author:		Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *****************************************************************/
+	* File:			  paircreatorwindow.cpp
+	* Created: 	  01. August 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "paircreatorwindow.hpp"
 
@@ -16,7 +18,8 @@
 #include <QErrorMessage>
 
 
-PairCreatorWindow::PairCreatorWindow(QList<QString> cameraNames, QWidget *parent) : QDialog(parent) {
+PairCreatorWindow::PairCreatorWindow(QList<QString> cameraNames, QWidget *parent) :
+			QDialog(parent) {
 	this->setWindowTitle("Create Camera Pair");
 	this->setMinimumSize(600,250);
 	QGridLayout *layout = new QGridLayout(this);
@@ -75,6 +78,7 @@ PairCreatorWindow::PairCreatorWindow(QList<QString> cameraNames, QWidget *parent
 	layout->addWidget(addButtom,1,2);
 }
 
+
 void PairCreatorWindow::modeToggledSlot(bool toggle) {
 	if (toggle) {
 		intermediateLabel->hide();
@@ -88,9 +92,11 @@ void PairCreatorWindow::modeToggledSlot(bool toggle) {
 	}
 }
 
+
 void PairCreatorWindow::cancelClickedSlot() {
 	this->close();
 }
+
 
 QList<QString> PairCreatorWindow::getCameraPair() {
 	QList<QString> pair;
@@ -121,6 +127,7 @@ QList<QString> PairCreatorWindow::getCameraPair() {
 	}
 	return pair;
 }
+
 
 void PairCreatorWindow::setCameraPair(QList<QString> cameraPair) {
 	if (cameraPair.size() == 2) {

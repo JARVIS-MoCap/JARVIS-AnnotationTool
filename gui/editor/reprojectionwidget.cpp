@@ -1,13 +1,16 @@
-/*------------------------------------------------------------
- *  reprojectionwidget.cpp
- *  Created:  03. December 2020
- *  Author:   Timo Hüser
- *
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  reprojectionwidget.cpp
+	* Created: 	  03. December 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "reprojectionwidget.hpp"
 
 #include <QFileDialog>
+
 
 ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 	settings = new QSettings();
@@ -136,6 +139,7 @@ void ReprojectionWidget::switchToggledSlot(bool toggle) {
 	emit reprojectionToolToggled(toggle);
 }
 
+
 void ReprojectionWidget::intrinsicsPathClickedSlot() {
 	QString path = QFileDialog::getExistingDirectory(this, "Select Intrinsics Parameter Path", m_parameterDir.path());
 	if (path != "") {
@@ -145,6 +149,7 @@ void ReprojectionWidget::intrinsicsPathClickedSlot() {
 		m_intrinsicsPathValid = true;
 	}
 }
+
 
 void ReprojectionWidget::extrinsicsPathClickedSlot() {
 	QString path = QFileDialog::getExistingDirectory(this, "Select Extrnsics Parameter Path", m_parameterDir.path());
@@ -156,6 +161,7 @@ void ReprojectionWidget::extrinsicsPathClickedSlot() {
 	}
 }
 
+
 bool ReprojectionWidget::checkIntrinsicsPath(QString path) {
 	for (int cam = 0; cam < m_numCameras; cam++) {
 		if (!QFile::exists(path + "/" + "Intrinsics_" + Dataset::dataset->cameraName(cam) + ".yaml")) {
@@ -166,6 +172,7 @@ bool ReprojectionWidget::checkIntrinsicsPath(QString path) {
 	}
 	return true;
 }
+
 
 bool ReprojectionWidget::checkExtrinsicsPath(QString path) {
 	for (int cam = 0; cam < m_numCameras; cam++) {
@@ -202,6 +209,7 @@ void ReprojectionWidget::initReprojectionClickedSlot() {
 	calculateAllReprojections();
 	calculateReprojectionSlot(m_currentImgSetIndex, m_currentFrameIndex);
 }
+
 
 void ReprojectionWidget::savePaths() {
 	settings->beginGroup("CalibrationPaths");
@@ -291,6 +299,7 @@ void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int c
 	}
 }
 
+
 void ReprojectionWidget::calculateAllReprojections() {
 	if (m_reprojectionActive) {
 		for (const auto& imgSet : Dataset::dataset->imgSets()) {
@@ -347,6 +356,7 @@ void ReprojectionWidget::calculateAllReprojections() {
 	}
 }
 
+
 void ReprojectionWidget::undoReprojection() {
 	for (auto& imgSet : Dataset::dataset->imgSets()) {
 		for (auto& frame : imgSet->frames) {
@@ -356,6 +366,7 @@ void ReprojectionWidget::undoReprojection() {
 		}
 	}
 }
+
 
 void ReprojectionWidget::getSettings() {
 	settings->beginGroup("Settings");
@@ -372,11 +383,13 @@ void ReprojectionWidget::getSettings() {
 	settings->endGroup();
 }
 
+
 void ReprojectionWidget::minViewsChangedSlot(int value) {
 	m_minViews = value;
 	calculateAllReprojections();
 	calculateReprojectionSlot(m_currentImgSetIndex, m_currentFrameIndex);
 }
+
 
 void ReprojectionWidget::errorThresholdChangedSlot(double value) {
 	m_errorThreshold = value;

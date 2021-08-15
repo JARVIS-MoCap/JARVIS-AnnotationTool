@@ -1,9 +1,11 @@
 /*****************************************************************
- * File:			calibrationprogressinfowindow.cpp
- * Created: 	24. July 2021
- * Author:		Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *****************************************************************/
+	* File:			  calibrationprogressinfowindow.cpp
+	* Created: 	  24. July 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "calibrationprogressinfowindow.hpp"
 
@@ -11,7 +13,8 @@
 #include <QGroupBox>
 
 
-CalibrationProgressInfoWindow::CalibrationProgressInfoWindow(QList<QString> cameraNames, QList<QList<QString>> cameraPairs, QWidget *parent) : QDialog(parent) {
+CalibrationProgressInfoWindow::CalibrationProgressInfoWindow(QList<QString> cameraNames,
+			QList<QList<QString>> cameraPairs, QWidget *parent) : QDialog(parent) {
 	setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 	setWindowTitle("Calibration Set Creation Progress");
 	QGridLayout *layout = new QGridLayout(this);
@@ -38,7 +41,8 @@ CalibrationProgressInfoWindow::CalibrationProgressInfoWindow(QList<QString> came
 	QWidget *extrinsicsWidget = new QWidget();
 	QGridLayout *extrinsicslayout = new QGridLayout(extrinsicsWidget);
 	for (int i = 0; i < cameraPairs.size(); i++) {
-		QLabel *pairLabel = new QLabel(cameraPairs[i][0] + " --> " + cameraPairs[i][cameraPairs[i].size()-1]);
+		QLabel *pairLabel = new QLabel(cameraPairs[i][0] + " --> " +
+																	 cameraPairs[i][cameraPairs[i].size()-1]);
  		QProgressBar* bar = new QProgressBar(this);
 		bar->setMinimumSize(500, 25);
 		bar->setMaximumSize(9999, 25);
@@ -61,18 +65,20 @@ CalibrationProgressInfoWindow::CalibrationProgressInfoWindow(QList<QString> came
 	layout->addWidget(cancelButton,2,0, Qt::AlignRight);
 }
 
-void CalibrationProgressInfoWindow::updateIntrinsicsProgressSlot(int count, int frameCount, int threadNumber) {
+
+void CalibrationProgressInfoWindow::updateIntrinsicsProgressSlot(int count,
+			int frameCount, int threadNumber) {
 	progressStackWidget->widget(1)->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 	progressStackWidget->widget(0)->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-	//this->resize(700, 100+30*intrinsicsProgressBars.size());
 	this->adjustSize();
 	operationLabel->setText("Calibrating Intrinsics...");
 	intrinsicsProgressBars[threadNumber]->setRange(0,frameCount);
 	intrinsicsProgressBars[threadNumber]->setValue(count);
 }
 
-void CalibrationProgressInfoWindow::updateExtrinsicsProgressSlot(int count, int frameCount, int threadNumber) {
-	//this->resize(700, 100+30*extrinsicsProgressBars.size());
+
+void CalibrationProgressInfoWindow::updateExtrinsicsProgressSlot(int count,
+			int frameCount, int threadNumber) {
 	progressStackWidget->widget(0)->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 	progressStackWidget->widget(1)->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	progressStackWidget->setCurrentIndex(1);
@@ -82,7 +88,8 @@ void CalibrationProgressInfoWindow::updateExtrinsicsProgressSlot(int count, int 
 	extrinsicsProgressBars[threadNumber]->setValue(count);
 }
 
+
 void CalibrationProgressInfoWindow::keyPressEvent(QKeyEvent *e) {
-    if(e->key() != Qt::Key_Escape)
-        QDialog::keyPressEvent(e);
+	if(e->key() != Qt::Key_Escape)
+		QDialog::keyPressEvent(e);
 }

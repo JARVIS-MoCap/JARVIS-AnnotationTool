@@ -1,15 +1,20 @@
-/*------------------------------------------------------------
- *  datasetcontrolview.cpp
- *  Created:  03. December 2020
- *  Author:   Timo Hüser
- *
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  datasetcontrolview.cpp
+	* Created: 	  03. December 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "calibrationchartview.hpp"
 
 #include <random>
 
-CalibrationChartView::CalibrationChartView(QList<QString> names, std::vector<double> reproErrors, QString mode) : m_names(names), m_reproErrors(reproErrors), m_mode(mode) {
+
+CalibrationChartView::CalibrationChartView(QList<QString> names,
+			std::vector<double> reproErrors, QString mode) :
+			m_names(names), m_reproErrors(reproErrors), m_mode(mode) {
 	if (m_mode == "interactive") {
 		update(0);
 	}
@@ -17,6 +22,7 @@ CalibrationChartView::CalibrationChartView(QList<QString> names, std::vector<dou
 		update();
 	}
 }
+
 
 void CalibrationChartView::update(int selectedIndex) {
 	QChart *chart = new QChart();
@@ -71,6 +77,7 @@ void CalibrationChartView::update(int selectedIndex) {
 		count++;
 	}
 }
+
 
 void CalibrationChartView::onHoverSlot() {
 	QHorizontalStackedBarSeries* series = qobject_cast<QHorizontalStackedBarSeries*>(QObject::sender());

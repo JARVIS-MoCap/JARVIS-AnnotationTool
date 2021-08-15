@@ -1,9 +1,11 @@
 /*****************************************************************
- * File:			newcalibrationwidget.cpp
- * Created: 	30. July 2021
- * Author:		Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *****************************************************************/
+	* File:			  newcalibrationwidget.cpp
+	* Created: 	  01. August 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "newcalibrationwidget.hpp"
 
@@ -390,6 +392,7 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	calibrationProgressInfoWindow->exec();
 }
 
+
 void NewCalibrationWidget::calibrationFinishedSlot() {
 	calibrationProgressInfoWindow->accept();
 	delete calibrationProgressInfoWindow;
@@ -399,10 +402,12 @@ void NewCalibrationWidget::calibrationFinishedSlot() {
 	calibrationStatisticsWindow->exec();
 }
 
+
 void NewCalibrationWidget::calibrationCanceledSlot() {
 	calibrationProgressInfoWindow->accept();
 	delete calibrationProgressInfoWindow;
 }
+
 
 void NewCalibrationWidget::calibrationErrorSlot(const QString &errorMsg) {
 	m_errorMsg->showMessage("Calibration unsuccessful! " + errorMsg);
@@ -461,6 +466,7 @@ bool NewCalibrationWidget::checkExtrinsics(const QString& path, QString & errorM
 	return allFilesValid;
 }
 
+
 bool NewCalibrationWidget::checkCheckerboard() {
 	if (m_calibrationConfig->patternWidth%2 + m_calibrationConfig->patternHeight%2 == 1) {
 		return true;
@@ -469,6 +475,7 @@ bool NewCalibrationWidget::checkCheckerboard() {
 		return false;
 	}
 }
+
 
 bool NewCalibrationWidget::checkCalibrationExists(const QString &path) {
 	if (QFile::exists(path)) {
@@ -491,6 +498,7 @@ bool NewCalibrationWidget::checkIsValidRecording(const QString& path, const QStr
 	return validFileFound;
 }
 
+
 void NewCalibrationWidget::sperateRadioStateChangedSlot(bool state) {
 	if (state) {
 		intrinsicsPathWidget->setEnabled(true);
@@ -502,6 +510,7 @@ void NewCalibrationWidget::sperateRadioStateChangedSlot(bool state) {
 		calibrateExtrinsicsRadioWidget->setEnabled(false);
 	}
 }
+
 
 void NewCalibrationWidget::calibrateExtrinsicsRadioStateChangedSlot(bool state) {
 	if (state) {
@@ -530,7 +539,9 @@ QImage NewCalibrationWidget::createCheckerboardPreview() {
 	return checkerBoardImage;
 }
 
+
 void NewCalibrationWidget::checkerBoardPatternChangesSlot(int val) {
+	Q_UNUSED(val);
 	checkerBoardPreview->setPixmap(QPixmap::fromImage(createCheckerboardPreview().scaled((widthEdit->value()+1)*20,(heightEdit->value()+1)*20)));
 	if ((widthEdit->value()+ heightEdit->value()) % 2 == 0) {
 		checkerBoardPreviewBox->setStyleSheet("QGroupBox {  border: 4px solid rgba(164,32,34,255);}");
@@ -541,6 +552,7 @@ void NewCalibrationWidget::checkerBoardPatternChangesSlot(int val) {
 		checkerBoardPreviewLabel->setText("<font color=#64a420>Make sure this matches your Checkerboard!</font>");
 	}
 }
+
 
 void NewCalibrationWidget::intrinsicsPathChangedSlot(const QString &path) {
 	if (extrinsicsPathWidget->path() == "") {

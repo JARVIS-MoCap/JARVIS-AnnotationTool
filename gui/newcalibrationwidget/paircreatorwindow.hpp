@@ -1,9 +1,11 @@
-/*------------------------------------------------------------
- *  paircreatorwindow.hpp
- *  Created: 01. August 2021
- *  Author:   Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  paircreatorwindow.hpp
+	* Created: 	  01. August 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef PAIRCREATORWINDOW_H
 #define PAIRCREATORWINDOW_H
@@ -24,6 +26,7 @@
 
 class PairCreatorWindow : public QDialog {
 	Q_OBJECT
+	
 	public:
 		explicit PairCreatorWindow(QList<QString> cameraNames, QWidget *parent = nullptr);
 		QList<QString> getCameraPair();

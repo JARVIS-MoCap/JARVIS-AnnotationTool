@@ -1,13 +1,16 @@
-/*------------------------------------------------------------
- *  datasetcontrolwidget.cpp
- *  Created:  03. December 2020
- *  Author:   Timo Hüser
- *
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  reprojectionchartwidget.cpp
+	* Created: 	  03. December 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "reprojectionchartwidget.hpp"
 
 #include <random>
+
 
 ReprojectionChartWidget::ReprojectionChartWidget(QWidget *parent) : QWidget(parent) {
 	QGridLayout *layout = new QGridLayout(this);
@@ -22,10 +25,6 @@ ReprojectionChartWidget::ReprojectionChartWidget(QWidget *parent) : QWidget(pare
 
 	layout->addWidget(chartsTabWidget,0,0);
 
-
-
-
-
 	//--- SIGNAL-SLOT Connections ---//
 	//-> Incoming Signals
 
@@ -33,6 +32,7 @@ ReprojectionChartWidget::ReprojectionChartWidget(QWidget *parent) : QWidget(pare
 
 	//<-> Relayed Signals
 }
+
 
 void ReprojectionChartWidget::datasetLoadedSlot() {
 	chartsTabWidget->clear();
@@ -51,6 +51,7 @@ void ReprojectionChartWidget::datasetLoadedSlot() {
 		chartsTabWidget->addTab(chart, entity);
 	}
 }
+
 
 void ReprojectionChartWidget::reprojectionErrorsUpdatedSlot(QMap<QString, std::vector<double> *> reprojectionErrors) {
 	for (const auto& entity : reprojectionErrors.keys()) {

@@ -1,5 +1,5 @@
 /*****************************************************************
-	* File:			  datasetcontrolview.hpp
+	* File:			  reprojectionchartview.hpp
 	* Created: 	  03. December 2020
 	* Author:		  Timo Hueser
 	* Contact: 	  timo.hueser@gmail.com
@@ -21,6 +21,7 @@
 
 class ReprojectionChartView : public QChartView {
 	Q_OBJECT
+	
 	public:
 		explicit ReprojectionChartView();
 

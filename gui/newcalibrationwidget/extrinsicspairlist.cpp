@@ -1,9 +1,11 @@
 /*****************************************************************
- * File:			extrinsicspairlist.cpp
- * Created: 	01. August 2021
- * Author:		Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *****************************************************************/
+	* File:			  extrinsicspairlist.cpp
+	* Created: 	  01. August 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "extrinsicspairlist.hpp"
 #include "paircreatorwindow.hpp"
@@ -18,8 +20,7 @@
 
 
 ExtrinsicsPairList::ExtrinsicsPairList(QString name, QWidget *parent) :
-			m_name(name), QWidget(parent) {
-
+			QWidget(parent), m_name(name) {
 	QGridLayout *labelselectorlayout = new QGridLayout(this);
 	labelselectorlayout->setMargin(3);
 	itemSelectorList = new QListWidget(this);
@@ -50,9 +51,11 @@ ExtrinsicsPairList::ExtrinsicsPairList(QString name, QWidget *parent) :
 	this->setLayout(labelselectorlayout);
 }
 
+
 QList<QList<QString>> ExtrinsicsPairList::getItems() {
 	return m_cameraPairs;
 }
+
 
 void ExtrinsicsPairList::setItems(QList<QList<QString>> items) {
 	m_cameraPairs.clear();
@@ -70,6 +73,7 @@ void ExtrinsicsPairList::setItems(QList<QList<QString>> items) {
 	itemSelectorList->setCurrentRow(0);
 }
 
+
 void ExtrinsicsPairList::moveItemUpSlot() {
 	int row = itemSelectorList->currentRow();
 	std::cout << row << std ::endl;
@@ -81,8 +85,8 @@ void ExtrinsicsPairList::moveItemUpSlot() {
 	itemSelectorList->insertItem(newRow+1,seperatorItem);
 	m_cameraPairs.move(itemSelectorList->currentRow()/2, newRow/2);
 	itemSelectorList->setCurrentRow(newRow);
-
 }
+
 
 void ExtrinsicsPairList::moveItemDownSlot() {
 	int row = itemSelectorList->currentRow();
@@ -117,6 +121,7 @@ void ExtrinsicsPairList::addItemSlot() {
 	}
 }
 
+
 void ExtrinsicsPairList::removeItemSlot() {
 	int row = itemSelectorList->currentRow();
 	delete itemSelectorList->takeItem(row);
@@ -127,6 +132,7 @@ void ExtrinsicsPairList::removeItemSlot() {
 void ExtrinsicsPairList::cameraNamesChangedSlot(QList<QString> cameraNames) {
 	m_cameraNames = cameraNames;
 }
+
 
 void ExtrinsicsPairList::addItem(const QString &text) {
 	QListWidgetItem * item = new QListWidgetItem();
@@ -141,14 +147,17 @@ void ExtrinsicsPairList::addItem(const QString &text) {
 	itemSelectorList->addItem(seperatorItem);
 }
 
-void ExtrinsicsPairList::currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous) {
+
+void ExtrinsicsPairList::currentItemChangedSlot(QListWidgetItem *current,
+			QListWidgetItem *previous) {
 	if (current != nullptr)  {
-		current->setBackgroundColor(QColor(100,164,32));
+		current->setBackground(QColor(100,164,32));
 	}
 	if (previous != nullptr) {
-		previous->setBackgroundColor(QColor(34, 36, 40));
+		previous->setBackground(QColor(34, 36, 40));
 	}
 }
+
 
 void ExtrinsicsPairList::itemDoubleClickedSlot(QListWidgetItem *item) {
 	QList<QString> pair = m_cameraPairs[itemSelectorList->row(item)/2];

@@ -354,6 +354,7 @@ void ImageViewer::toggleEntityVisibleSlot(const QString& entity, bool toggle) {
 
 
 void ImageViewer::toggleReprojectionSlot(bool toggle) {
+	Q_UNUSED(toggle);
 	update();
 }
 

@@ -1,9 +1,11 @@
 /*****************************************************************
- * File:			namesuggestiondialog.cpp
- * Created: 	01. August 2021
- * Author:		Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *****************************************************************/
+	* File:			  namesuggestiondialog.cpp
+	* Created: 	  01. August 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "namesuggestiondialog.hpp"
 
@@ -11,8 +13,9 @@
 #include <QGroupBox>
 
 
-NameSuggestionDialog::NameSuggestionDialog(QString name, QList<QString> cameraNames, QWidget *parent) :
-			m_name(name), m_cameraNames(cameraNames), QDialog(parent) {
+NameSuggestionDialog::NameSuggestionDialog(QString name, QList<QString> cameraNames,
+			QWidget *parent) :
+			QDialog(parent), m_name(name), m_cameraNames(cameraNames) {
 	setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 	this->setWindowTitle("Detected " + name);
 	this->resize(600,400);
@@ -46,8 +49,8 @@ NameSuggestionDialog::NameSuggestionDialog(QString name, QList<QString> cameraNa
 	layout->addWidget(spacer,2,0);
 	layout->addWidget(cancelButton,2,1);
 	layout->addWidget(addButton,2,2);
-
 }
+
 
 void NameSuggestionDialog::addItem(const QString &text) {
 	QListWidgetItem * item = new QListWidgetItem();

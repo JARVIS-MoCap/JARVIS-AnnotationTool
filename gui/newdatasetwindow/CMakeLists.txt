@@ -1,5 +1,6 @@
 project (newdatasetwindow)
 
+
 add_subdirectory(videocutter)
 
 add_library(${PROJECT_NAME}
@@ -25,4 +26,4 @@ target_link_libraries(${PROJECT_NAME}
   datasetcreator
 )
 
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused -Wno-sign-compare)

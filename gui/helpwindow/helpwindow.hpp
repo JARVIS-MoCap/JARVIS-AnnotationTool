@@ -1,9 +1,11 @@
-/*------------------------------------------------------------
- *  helpwindow.hpp
- *  Created: 	08. August 2021
- *  Author:   Timo Hüser
- * Contact: 	timo.hueser@gmail.com
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  helpwindow.hpp
+	* Created: 	  08. August 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef HELPWINDOW_H
 #define HELPWINDOW_H
@@ -24,17 +26,12 @@ class HelpWindow : public QWidget {
 	public:
 		explicit HelpWindow(QWidget *parent = nullptr);
 
-	public slots:
-
-	signals:
-
 	private:
 		void setDocument(const QString &path);
 		QTextBrowser *textBrowser;
 		QTreeWidget *tableOfContents;
 		QMap<QTreeWidgetItem*, QString> m_contentMap;
 		QSplitter *mainSplitter;
-
 
 		private slots:
 			void itemSlectedSlot(QTreeWidgetItem *item, int column);

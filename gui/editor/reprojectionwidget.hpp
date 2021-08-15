@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  reprojectionwidget.hpp
- *  Created: 03. December 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  reprojectionwidget.hpp
+	* Created: 	  03. December 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef REPROJECTIONWIDGET_H
 #define REPROJECTIONWIDGET_H
@@ -29,15 +32,9 @@
 
 class ReprojectionWidget : public QWidget {
 	Q_OBJECT
+
 	public:
 		explicit ReprojectionWidget(QWidget *parent = nullptr);
-
-
-	public slots:
-		void datasetLoadedSlot();
-		void calculateReprojectionSlot(int currentImgSetIndex, int currentFrameIndex);
-		void minViewsChangedSlot(int value);
-		void errorThresholdChangedSlot(double value);
 
 	signals:
 		void reprojectedPoints(ImgSet *imgSet, int frameIndex);
@@ -46,6 +43,11 @@ class ReprojectionWidget : public QWidget {
 		void errorThresholdChanged(double value);
 		void reprojectionErrorsUpdated(QMap<QString, std::vector<double> *>);
 
+	public slots:
+		void datasetLoadedSlot();
+		void calculateReprojectionSlot(int currentImgSetIndex, int currentFrameIndex);
+		void minViewsChangedSlot(int value);
+		void errorThresholdChangedSlot(double value);
 
 	private:
 		bool checkIntrinsicsPath(QString path);
@@ -101,9 +103,6 @@ class ReprojectionWidget : public QWidget {
 		void intrinsicsPathClickedSlot();
 		void extrinsicsPathClickedSlot();
 		void initReprojectionClickedSlot();
-
-
-
 };
 
 #endif

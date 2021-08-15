@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  calibrationchartview.hpp
- *  Created: 03. December 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  datasetcontrolview.hpp
+	* Created: 	  03. December 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef CALIBRATIONCHARTVIEW_H
 #define CALIBRATIONCHARTVIEW_H
@@ -18,16 +21,15 @@
 
 class CalibrationChartView : public QChartView {
 	Q_OBJECT
+
 	public:
 		explicit CalibrationChartView(QList<QString> names, std::vector<double> reproErrors, QString mode = "normal");
 
-	public slots:
-
 	private:
 		void update(int selectedIndex = -1);
-		QString m_mode;
-		std::vector<double> m_reproErrors;
 		QList <QString> m_names;
+		std::vector<double> m_reproErrors;
+		QString m_mode;
 		QList<QHorizontalStackedBarSeries*> m_barSeriesList;
 
 	private slots:

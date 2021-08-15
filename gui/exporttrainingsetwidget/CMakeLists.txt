@@ -1,5 +1,6 @@
 project (exporttrainingset)
 
+
 add_library(${PROJECT_NAME}
   exporttrainingsetwidget.hpp
   exporttrainingsetwidget.cpp
@@ -12,8 +13,6 @@ add_library(${PROJECT_NAME}
   segmentselectorwindow.hpp
   segmentselectorwindow.cpp
 )
-message ("Source ${PROJECT_SOURCE_DIR}")
-
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
@@ -28,4 +27,4 @@ target_link_libraries(${PROJECT_NAME}
   conveniencewidgets
 )
 
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused -Wno-sign-compare)

@@ -34,9 +34,9 @@ class RecordingsTable : public QWidget {
 	signals:
 
 	private:
-		DatasetConfig	*m_datasetConfig;
 		QErrorMessage *m_errorMsg;
 		QString m_name;
+		DatasetConfig	*m_datasetConfig;
 		int m_frameCount = 0;
 		QPushButton *moveItemUpButton;
 		QPushButton *moveItemDownButton;
