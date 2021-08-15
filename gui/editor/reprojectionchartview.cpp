@@ -1,16 +1,20 @@
-/*------------------------------------------------------------
- *  datasetcontrolview.cpp
- *  Created:  03. December 2020
- *  Author:   Timo Hüser
- *
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  datasetcontrolview.cpp
+	* Created: 	  03. December 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "reprojectionchartview.hpp"
 
 #include <random>
 
+
 ReprojectionChartView::ReprojectionChartView() {
 }
+
 
 void ReprojectionChartView::update(std::vector<double> *reproErrors, int selectedIndex) {
 	if (reproErrors != nullptr) {
@@ -63,11 +67,13 @@ void ReprojectionChartView::update(std::vector<double> *reproErrors, int selecte
 	}
 }
 
+
 void ReprojectionChartView::onHoverSlot() {
 	QBarSeries* series = qobject_cast<QBarSeries*>(QObject::sender());
 	int index = m_barSeriesList.indexOf(series);
 	update(nullptr, index);
 }
+
 
 void ReprojectionChartView::errorThresholdChangedSlot(double value) {
 	m_errorThreshold = value;

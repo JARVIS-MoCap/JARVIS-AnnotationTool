@@ -65,6 +65,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	calibrationSetNameEdit = new QLineEdit("New Calibration Set");
 	LabelWithToolTip *calibrationSetPathLabel = new LabelWithToolTip("  Calibration Set Savepath");
 	calibrationSetPathWidget = new DirPathWidget("Select Calibration Set Savepath");
+	calibrationSetPathWidget->setPlaceholderText("Select a Path...");
 	LabelWithToolTip *seperateIntrinsicsLabel = new LabelWithToolTip("  Seperate Recordings for Intrinsics");
 	seperateRadioWidget = new YesNoRadioWidget(generalWidget);
 	seperateRadioWidget->setState(true);
@@ -75,9 +76,11 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	connect(calibrateExtrinsicsRadioWidget, &YesNoRadioWidget::stateChanged, this, &NewCalibrationWidget::calibrateExtrinsicsRadioStateChangedSlot);
 	LabelWithToolTip *intrinsicsPathLabel = new LabelWithToolTip("  Intrinsics Folder Path");
 	intrinsicsPathWidget = new DirPathWidget("Select Intrinsics Path");
+	intrinsicsPathWidget->setPlaceholderText("Select a Path...");
 	connect(intrinsicsPathWidget, &DirPathWidget::pathChanged, this, &NewCalibrationWidget::intrinsicsPathChangedSlot);
 	LabelWithToolTip *extrinsicsPathLabel = new LabelWithToolTip("  Extrinsics Folder Path");
 	extrinsicsPathWidget = new DirPathWidget("Select Extrinsics Path");
+	extrinsicsPathWidget->setPlaceholderText("Select a Path...");
 	updateNamesListButton = new QPushButton("Update Camera Names",this);
 	updateNamesListButton->setMinimumSize(30,30);
 	updateNamesListButton->setIcon(QIcon::fromTheme("update"));
@@ -119,6 +122,9 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	extrinsicsFramesEdit = new QSpinBox(calibParamsWidget);
 	extrinsicsFramesEdit->setRange(0,999);
 	extrinsicsFramesEdit->setValue(100);
+	LabelWithToolTip *saveDebugLabel = new LabelWithToolTip("  Save Debug Images");
+	saveDebugRadioWidget = new YesNoRadioWidget(calibParamsWidget);
+	saveDebugRadioWidget->setState(false);
 	i = 0;
 	calibparamslayout->addWidget(maxSamplingFrameRateLabel,i,0);
 	calibparamslayout->addWidget(maxSamplingFrameRateEdit,i++,1);
@@ -126,6 +132,8 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	calibparamslayout->addWidget(intrinsicsFramesEdit,i++,1);
 	calibparamslayout->addWidget(extrinsicsFramesLabel,i,0);
 	calibparamslayout->addWidget(extrinsicsFramesEdit,i++,1);
+	calibparamslayout->addWidget(saveDebugLabel,i,0);
+	calibparamslayout->addWidget(saveDebugRadioWidget,i++,1);
 	QWidget *calibParamsSpacer = new QWidget(configWidget);
 	calibParamsSpacer->setMinimumSize(0,20);
 
@@ -309,6 +317,9 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	QString extrinsicsPath = extrinsicsPathWidget->path();
 	QList<QString> cameraNames = cameraList->getItems();
 	QList<QList<QString>> cameraPairs = extrinsicsPairList->getItems();
+	for (const auto &pair : cameraPairs) {
+		std::cout << "Size: " << pair.size() << std::endl;
+	}
 	if (calibrationSetPathWidget->path() == "") {
 		m_errorMsg->showMessage("Please enter a savepath!");
 		return;
@@ -355,6 +366,7 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	m_calibrationConfig->maxSamplingFrameRate = maxSamplingFrameRateEdit->value();
 	m_calibrationConfig->framesForIntrinsics = intrinsicsFramesEdit->value();
 	m_calibrationConfig->framesForExtrinsics = extrinsicsFramesEdit->value();
+	m_calibrationConfig->debug = saveDebugRadioWidget->state();
 	m_calibrationConfig->patternWidth = widthEdit->value();
 	m_calibrationConfig->patternHeight = heightEdit->value();
 	m_calibrationConfig->patternSideLength = sideLengthEdit->value();
@@ -570,6 +582,7 @@ void NewCalibrationWidget::savePresetSlot(const QString& preset) {
 	settings->setValue("maxSamplingFrameRate", maxSamplingFrameRateEdit->value());
 	settings->setValue("intrinsicsFrames", intrinsicsFramesEdit->value());
 	settings->setValue("extrinsicsFrames", extrinsicsFramesEdit->value());
+	settings->setValue("saveDebugImages", saveDebugRadioWidget->state());
 	settings->setValue("patternWidth", widthEdit->value());
 	settings->setValue("patternHeight", heightEdit->value());
 	settings->setValue("sideLength", sideLengthEdit->value());
@@ -601,6 +614,7 @@ void NewCalibrationWidget::loadPresetSlot(const QString& preset) {
 	extrinsicsPathWidget->setPath(settings->value("extrinsicsFolder").toString());
 	intrinsicsFramesEdit->setValue(settings->value("intrinsicsFrames").toInt());
 	extrinsicsFramesEdit->setValue(settings->value("extrinsicsFrames").toInt());
+	saveDebugRadioWidget->setState(settings->value("saveDebugImages").toBool());
 	maxSamplingFrameRateEdit->setValue(settings->value("maxSamplingFrameRate").toInt());
 	widthEdit->setValue(settings->value("patternWidth").toInt());
 	heightEdit->setValue(settings->value("patternHeight").toInt());

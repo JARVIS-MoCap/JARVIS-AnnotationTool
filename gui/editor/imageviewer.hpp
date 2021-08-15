@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  imageviewer.hpp
- *  Created: 23. October 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+/*****************************************************************
+ * File:			  imageviewer.hpp
+ * Created: 	  23. October 2020
+ * Author:		  Timo Hueser
+ * Contact: 	  timo.hueser@gmail.com
+ * Copyright:  2021 Timo Hueser
+ * License:    GPL v3.0
+ *****************************************************************/
 
 #ifndef IMAGEVIEWER_H
 #define IMAGEVIEWER_H
@@ -29,6 +32,15 @@ class ImageViewer : public QWidget {
 		void setSize(int w, int h) {m_size = QSize(w,h);}
 		QSize sizeHint() const override {return m_size;}
 
+	signals:
+		void zoomFinished();
+		void panFinished();
+		void keypointAdded(Keypoint *keypoint);
+		void keypointRemoved(Keypoint *keypoint);
+		void keypointCorrected(Keypoint *keypoint);
+		void alreadyAnnotated(bool isSuppressed);
+		void keypointChangedForReprojection(int imgSetIndex, int frameIndex);
+
 	public slots:
 		void setFrame(ImgSet *imgSet, int frameIndex);
 		void updateViewer();
@@ -43,16 +55,6 @@ class ImageViewer : public QWidget {
 		void keypointSizeChangedSlot(int size);
 		void keypointShapeChangedSlot(const QString& entity, KeypointShape shape);
 		void colorMapChangedSlot(const QString& entity, ColorMap::ColorMapType type, QColor color);
-
-
-	signals:
-		void zoomFinished();
-		void panFinished();
-		void keypointAdded(Keypoint *keypoint);
-		void keypointRemoved(Keypoint *keypoint);
-		void keypointCorrected(Keypoint *keypoint);
-		void alreadyAnnotated(bool isSuppressed);
-		void keypointChangedForReprojection(int imgSetIndex, int frameIndex);
 
 	private:
 		QPointF scaleToImageCoordinates(QPointF rectStart);

@@ -1,13 +1,16 @@
-/*------------------------------------------------------------
- *  keypointwidget.cpp
- *  Created:  10. July 2018
- *  Author:   Timo Hüser
- *
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  keypointwidget.cpp
+	* Created: 	  23. October 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "keypointwidget.hpp"
 
 #include <QErrorMessage>
+
 
 KeypointWidget::KeypointWidget(QWidget *parent) : QWidget(parent) {
 	colorMap = new ColorMap(ColorMap::Jet);
@@ -40,6 +43,7 @@ KeypointWidget::KeypointWidget(QWidget *parent) : QWidget(parent) {
 
 	//<-> Relayed Signals
 }
+
 
 void KeypointWidget::init() {
 	entitiesList.clear();
@@ -84,6 +88,7 @@ void KeypointWidget::init() {
 	emit currentBodypartChanged(m_currentBodypart, color);
 }
 
+
 void KeypointWidget::keypointAddedSlot(Keypoint *keypoint) {
 	if (keypoint->state() == Suppressed) return;
 	//m_currentImgSet->frames[m_currentFrameIndex]->keypoints.append(keypoint);
@@ -110,6 +115,7 @@ void KeypointWidget::keypointAddedSlot(Keypoint *keypoint) {
 	}
 }
 
+
 void KeypointWidget::keypointRemovedSlot(Keypoint *keypoint) {
 	m_currentEntity = keypoint->entity();
 	m_currentBodypart = keypoint->bodypart();
@@ -122,9 +128,11 @@ void KeypointWidget::keypointRemovedSlot(Keypoint *keypoint) {
 	emit currentBodypartChanged(m_currentBodypart, color);
 }
 
+
 void KeypointWidget::keypointCorrectedSlot(Keypoint *keypoint) {
 	QListWidget* keypointList = keypointListMap[keypoint->entity()];
-	keypointList->item(Dataset::dataset->bodypartsList().indexOf(keypoint->bodypart()))->setIcon(QIcon::fromTheme("check_blue"));
+	keypointList->item(Dataset::dataset->bodypartsList().indexOf(keypoint->bodypart()))->
+								setIcon(QIcon::fromTheme("check_blue"));
 }
 
 
@@ -133,31 +141,37 @@ void KeypointWidget::removeKeypointSlot(int row) {
 	keypointList->item(row)->setIcon(QIcon::fromTheme("no_check"));
 	QColor color = colorMap->getColor(row, keypointList->count());
 	m_currentBodypart = Dataset::dataset->bodypartsList()[row];
-	Keypoint *keypoint = m_currentImgSet->frames[m_currentFrameIndex]->keypointMap[m_currentEntity + "/" + m_currentBodypart];
+	Keypoint *keypoint = m_currentImgSet->frames[m_currentFrameIndex]->
+											 keypointMap[m_currentEntity + "/" + m_currentBodypart];
 	keypoint->setState(NotAnnotated);
 	emit currentBodypartChanged(m_currentBodypart, color);
 	emit keypointRemoved(m_currentBodypart);
 }
+
 
 void KeypointWidget::suppressKeypointSlot(int row) {
 	QListWidget* keypointList = keypointListMap[m_currentEntity];
 	keypointList->item(row)->setIcon(QIcon::fromTheme("discard"));
 	QColor color = colorMap->getColor(row, keypointList->count());
 	m_currentBodypart = Dataset::dataset->bodypartsList()[row];
-	m_currentImgSet->frames[m_currentFrameIndex]->keypointMap[m_currentEntity + "/" + m_currentBodypart]->setState(Suppressed);
+	m_currentImgSet->frames[m_currentFrameIndex]->keypointMap[m_currentEntity + "/" +
+													m_currentBodypart]->setState(Suppressed);
 	emit currentBodypartChanged(m_currentBodypart, color);
 	emit updateViewer();
 }
+
 
 void KeypointWidget::unsuppressKeypointSlot(int row) {
 	QListWidget* keypointList = keypointListMap[m_currentEntity];
 	keypointList->item(row)->setIcon(QIcon::fromTheme("no_check"));
 	QColor color = colorMap->getColor(row, keypointList->count());
 	m_currentBodypart = Dataset::dataset->bodypartsList()[row];
-	m_currentImgSet->frames[m_currentFrameIndex]->keypointMap[m_currentEntity + "/" + m_currentBodypart]->setState(NotAnnotated);
+	m_currentImgSet->frames[m_currentFrameIndex]->keypointMap[m_currentEntity + "/" +
+													m_currentBodypart]->setState(NotAnnotated);
 	emit currentBodypartChanged(m_currentBodypart, color);
 	emit keypointUnsuppressed(m_currentBodypart);
 }
+
 
 void KeypointWidget::alreadyAnnotatedSlot(bool isSuppressed) {
     QErrorMessage *msg = new QErrorMessage();
@@ -180,13 +194,16 @@ void KeypointWidget::hideEntitySlot(int toggle) {
 	}
 }
 
+
 void KeypointWidget::currentTabChangedSlot(int index) {
 	m_currentEntity = entitiesList[index];
 	m_currentBodypart = Dataset::dataset->bodypartsList()[keypointListMap[m_currentEntity]->currentRow()];
 	emit currentEntityChanged(m_currentEntity);
-	QColor color = colorMap->getColor(keypointListMap[m_currentEntity]->currentRow(), keypointListMap[m_currentEntity]->count());
+	QColor color = colorMap->getColor(keypointListMap[m_currentEntity]->currentRow(),
+																		keypointListMap[m_currentEntity]->count());
 	emit currentBodypartChanged(m_currentBodypart, color);
 }
+
 
 void KeypointWidget::itemChangedSlot(QListWidgetItem *item) {
 	QListWidget *keypointList = qobject_cast<QListWidget*>(QObject::sender());
@@ -196,11 +213,13 @@ void KeypointWidget::itemChangedSlot(QListWidgetItem *item) {
 	emit currentBodypartChanged(m_currentBodypart, color);
 }
 
+
 void KeypointWidget::datasetLoadedSlot() {
 	m_currentImgSet = Dataset::dataset->imgSets()[0];
 	m_currentFrameIndex = 0;
 	setKeypointsFromDatasetSlot();
 }
+
 
 void KeypointWidget::setKeypointsFromDatasetSlot() {
 	for (const auto& list : keypointListMap) {
@@ -212,17 +231,21 @@ void KeypointWidget::setKeypointsFromDatasetSlot() {
 		KeypointListWidget* keypointList = qobject_cast<KeypointListWidget*>(keypointListMap[keypoint->entity()]);
 		keypointList->setCurrentRow(Dataset::dataset->bodypartsList().indexOf(m_currentBodypart));
 		if(keypoint->state() == Reprojected) {
-			keypointList->item(Dataset::dataset->bodypartsList().indexOf(keypoint->bodypart()))->setIcon(QIcon::fromTheme("check_small"));
+			keypointList->item(Dataset::dataset->bodypartsList().indexOf(keypoint->bodypart()))->
+										setIcon(QIcon::fromTheme("check_small"));
 		}
 		else if (keypoint->state() == Annotated) {
-			keypointList->item(Dataset::dataset->bodypartsList().indexOf(keypoint->bodypart()))->setIcon(QIcon::fromTheme("check_blue"));
+			keypointList->item(Dataset::dataset->bodypartsList().indexOf(keypoint->bodypart()))->
+										setIcon(QIcon::fromTheme("check_blue"));
 		}
 		else if (keypoint->state() == Suppressed){
 			keypointList->addSupressed(Dataset::dataset->bodypartsList().indexOf(keypoint->bodypart()));
-			keypointList->item(Dataset::dataset->bodypartsList().indexOf(keypoint->bodypart()))->setIcon(QIcon::fromTheme("discard"));
+			keypointList->item(Dataset::dataset->bodypartsList().indexOf(keypoint->bodypart()))->
+										setIcon(QIcon::fromTheme("discard"));
 		}
 	}
 }
+
 
 void KeypointWidget::frameChangedSlot(int currentImgSetIndex, int currentFrameIndex) {
 	Dataset::dataset->save();

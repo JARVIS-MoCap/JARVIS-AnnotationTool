@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  keypointwidget.hpp
- *  Created: 23. October 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  keypointwidget.hpp
+	* Created: 	  23. October 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef KEYPOINTWIDGET_H
 #define KEYPOINTWIDGET_H
@@ -11,8 +14,6 @@
 #include "colormap.hpp"
 #include "keypoint.hpp"
 #include "dataset.hpp"
-
-
 
 #include <QGridLayout>
 #include <QLabel>
@@ -79,8 +80,16 @@ class KeypointWidget : public QWidget {
 	Q_OBJECT
 	public:
 		explicit KeypointWidget(QWidget *parent = nullptr);
-
 		void init();
+
+	signals:
+		void updateViewer();
+		void currentEntityChanged(const QString& entity);
+		void currentBodypartChanged(const QString& bodypart, QColor color);
+		void toggleEntityVisible(const QString& entity, bool toggle);
+		void keypointRemoved(const QString& keypointName);
+		void keypointSuppressed(const QString& keypointName);
+		void keypointUnsuppressed(const QString& keypointName);
 
 	public slots:
 		void keypointAddedSlot(Keypoint *keypoint);
@@ -93,15 +102,6 @@ class KeypointWidget : public QWidget {
 		void unsuppressKeypointSlot(int row);
 		void frameChangedSlot(int currentImgSetIndex, int currentFrameIndex);
 		void setKeypointsFromDatasetSlot();
-
-	signals:
-		void updateViewer();
-		void currentEntityChanged(const QString& entity);
-		void currentBodypartChanged(const QString& bodypart, QColor color);
-		void toggleEntityVisible(const QString& entity, bool toggle);
-		void keypointRemoved(const QString& keypointName);
-		void keypointSuppressed(const QString& keypointName);
-		void keypointUnsuppressed(const QString& keypointName);
 
 	private:
 		ColorMap *colorMap;
@@ -125,7 +125,6 @@ class KeypointWidget : public QWidget {
 		void hideEntitySlot(int toggle);
 		void currentTabChangedSlot(int index);
 		void itemChangedSlot(QListWidgetItem *item);
-
 
 };
 

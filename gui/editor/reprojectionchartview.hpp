@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  reprojectionchartview.hpp
- *  Created: 03. December 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  datasetcontrolview.hpp
+	* Created: 	  03. December 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef REPROJECTIONCHARTVIEW_H
 #define REPROJECTIONCHARTVIEW_H

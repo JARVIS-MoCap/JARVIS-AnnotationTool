@@ -61,6 +61,7 @@ class IntrinsicsCalibrator : public QObject, public QRunnable {
 		bool boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners,
 					std::vector<cv::Point2f> &corners);
 		QString getFormat(const QString& path, const QString& cameraName);
+		void saveCheckerboard(const cv::Mat &img, const std::vector<cv::Point2f> &corners, int counter);
 };
 
 

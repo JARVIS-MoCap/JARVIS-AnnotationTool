@@ -8,6 +8,8 @@ add_library(${PROJECT_NAME}
   pathwidget.cpp
   configurableitemlist.hpp
   configurableitemlist.cpp
+  checkableitemlist.hpp
+  checkableitemlist.cpp
   presetswindow.hpp
   presetswindow.cpp
   switch.hpp

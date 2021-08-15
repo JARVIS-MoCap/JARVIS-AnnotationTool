@@ -55,30 +55,5 @@ class ExtrinsicsPairList : public QWidget {
 
 };
 
-class PairCreatorWindow : public QDialog {
-	Q_OBJECT
-	public:
-		explicit PairCreatorWindow(QList<QString> cameraNames, QWidget *parent = nullptr);
-		QList<QString> getCameraPair();
-		void setCameraPair(QList<QString> cameraPair);
-
-	private:
-		int m_mode = 0;
-		QRadioButton *twoCamButton;
-		QRadioButton *threeCamButton;
-
-		QComboBox *primaryCombo;
-		QLabel *intermediateLabel;
-		QComboBox *intermediateCombo;
-		QComboBox *secondaryCombo;
-
-		QPushButton *addButtom;
-		QPushButton *cancelButton;
-
-	private slots:
-		void modeToggledSlot(bool toggle);
-		void cancelClickedSlot();
-};
-
 
 #endif

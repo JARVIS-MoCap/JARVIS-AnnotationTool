@@ -2,16 +2,18 @@ project (newcalibrationwidget)
 
 add_library(${PROJECT_NAME}
   newcalibrationwidget.hpp
-  extrinsicspairlist.hpp
-  calibrationprogressinfowindow.hpp
-  calibrationstatisticswindow.hpp
-  calibrationchartview.hpp
-  namesuggestiondialog.hpp
   newcalibrationwidget.cpp
+  extrinsicspairlist.hpp
   extrinsicspairlist.cpp
+  paircreatorwindow.hpp
+  paircreatorwindow.cpp
+  calibrationprogressinfowindow.hpp
   calibrationprogressinfowindow.cpp
+  calibrationstatisticswindow.hpp
   calibrationstatisticswindow.cpp
+  calibrationchartview.hpp
   calibrationchartview.cpp
+  namesuggestiondialog.hpp
   namesuggestiondialog.cpp
 )
 

@@ -16,14 +16,18 @@
 
 class CompositionChartView : public QChartView {
 	Q_OBJECT
+
 	public:
-		explicit CompositionChartView(QList<QString> names, QList<int> frameNumbers);
+		explicit CompositionChartView();
+		void update(QList<DatasetExportItem> *datasetExportItems = nullptr);
+
+		signals:
+			void hoverStarted(int idx);
+			void hoverEnded();
 
 	private:
-		void update();
-		QList<int> m_frameNumbers;
-		QList <QString> m_names;
 		QChart *chart;
+		QPieSeries *m_series;
 
 	private slots:
 		void onHoverSlot(QPieSlice *slice, bool state);

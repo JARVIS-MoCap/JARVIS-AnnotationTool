@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  datasetcontrolwidget.hpp
- *  Created: 03. December 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  datasetconrolwidget.hpp
+	* Created: 	  03. December 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #ifndef DATASETCONTROLWIDGET_H
 #define DATASETCONTROLWIDGET_H
@@ -21,21 +24,23 @@
 
 class DatasetControlWidget : public QWidget {
 	Q_OBJECT
+
 	public:
 		explicit DatasetControlWidget(QWidget *parent = nullptr);
-
-
-	public slots:
-		void datasetLoadedSlot();
-		void frameChangedSlot(int imgSetIndex, int frameIndex);
-		void keypointStateChangedSlot(KeypointState state, KeypointState previousSate, int frameIndex);
 
 	signals:
 		void frameSelectionChanged(int index);
 		void imgSetChanged(int index);
 
+	public slots:
+		void datasetLoadedSlot();
+		void frameChangedSlot(int imgSetIndex, int frameIndex);
+		void keypointStateChangedSlot(KeypointState state,
+					KeypointState previousSate, int frameIndex);
+
 	private:
-		void getAnnotationCounts(int frameIndex, int &annotatedCount, int &totalCount);
+		void getAnnotationCounts(int frameIndex, int &annotatedCount,
+					int &totalCount);
 
 		QTableWidget *framesTable;
 
@@ -47,7 +52,6 @@ class DatasetControlWidget : public QWidget {
 	private slots:
 		void selectionChangedSlot(int row,int);
 		void imgSetChangedSlot();
-
 };
 
 #endif

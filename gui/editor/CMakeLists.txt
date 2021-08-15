@@ -1,19 +1,20 @@
 project (editor)
 
+
 add_library(${PROJECT_NAME}
   editorwidget.hpp
-  keypointwidget.hpp
-  imageviewer.hpp
-  reprojectionwidget.hpp
-  reprojectionchartwidget.hpp
-  reprojectionchartview.hpp
-  datasetcontrolwidget.hpp
   editorwidget.cpp
+  keypointwidget.hpp
   keypointwidget.cpp
+  imageviewer.hpp
   imageviewer.cpp
+  reprojectionwidget.hpp
   reprojectionwidget.cpp
+  reprojectionchartwidget.hpp
   reprojectionchartwidget.cpp
+  reprojectionchartview.hpp
   reprojectionchartview.cpp
+  datasetcontrolwidget.hpp
   datasetcontrolwidget.cpp
 )
 

@@ -1,3 +1,12 @@
+/*****************************************************************
+	* File:			  switch.cpp
+	* Created: 	  23. October 2020
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
+
 #include "switch.hpp"
 
 Switch::Switch(QWidget *parent) : QAbstractButton(parent) {

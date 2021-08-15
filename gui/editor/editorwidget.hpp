@@ -1,8 +1,11 @@
-/*------------------------------------------------------------
- *  editowidget.hpp
- *  Created: 23. October 2020
- *  Author:   Timo Hüser
- *------------------------------------------------------------*/
+ /*****************************************************************
+ 	* File:			  editowidget.hpp
+ 	* Created: 	  23. October 2020
+ 	* Author:		  Timo Hueser
+ 	* Contact: 	  timo.hueser@gmail.com
+ 	* Copyright:  2021 Timo Hueser
+ 	* License:    GPL v3.0
+ 	*****************************************************************/
 
 #ifndef EDITORWIDGET_H
 #define EDITORWIDGET_H
@@ -31,12 +34,6 @@ class EditorWidget : public QWidget {
 	public:
 		explicit EditorWidget(QWidget *parent = nullptr);
 
-	public slots:
-		void splitterMovedSlot(int pos, int index);
-		void datasetLoadedSlot();
-		void frameChangedSlot(int index);
-		void imgSetChangedSlot(int index);
-
 	signals:
 		void zoomToggled(bool toggle);
 		void panToggled(bool toggle);
@@ -50,6 +47,12 @@ class EditorWidget : public QWidget {
 		void colorMapChanged(const QString& entity, ColorMap::ColorMapType type, QColor color);
 		void minViewsChanged(int val);
 		void errorThresholdChanged(float val);
+
+	public slots:
+		void splitterMovedSlot(int pos, int index);
+		void datasetLoadedSlot();
+		void frameChangedSlot(int index);
+		void imgSetChangedSlot(int index);
 
 	private:
 		QSplitter *mainSplitter;

@@ -74,3 +74,7 @@ void DirPathWidget::pathClickedSlot() {
 void DirPathWidget::setDefaultPath(const QString &path) {
 	m_currentPath = path;
 }
+
+void DirPathWidget::setPlaceholderText(const QString &text) {
+	pathEdit->setPlaceholderText(text);
+}

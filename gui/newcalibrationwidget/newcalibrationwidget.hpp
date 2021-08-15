@@ -61,9 +61,12 @@ class NewCalibrationWidget : public QWidget {
 		DirPathWidget *intrinsicsPathWidget;
 		DirPathWidget *extrinsicsPathWidget;
 		QPushButton *updateNamesListButton;
+
 		QSpinBox *maxSamplingFrameRateEdit;
 		QSpinBox *intrinsicsFramesEdit;
 		QSpinBox *extrinsicsFramesEdit;
+		YesNoRadioWidget *saveDebugRadioWidget;
+
 		QSpinBox *widthEdit;
 		QSpinBox *heightEdit;
 		QDoubleSpinBox *sideLengthEdit;

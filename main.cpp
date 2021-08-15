@@ -78,6 +78,10 @@ int main(int argc, char **argv)
   qRegisterMetaTypeStreamOperators<QMap<int,int> >("QMap<int,int>");
 	qRegisterMetaTypeStreamOperators<QList<RecordingItem> >("QList<RecordingItem>");
   qRegisterMetaTypeStreamOperators<QMap<QString, double> >("QMap<QString, double>");
+  qRegisterMetaTypeStreamOperators<QMap<QString,bool> >("QMap<QString,bool>");
+  qRegisterMetaTypeStreamOperators<QList<QList<QPair<QString, bool>>>> ("QList<QList<QPair<QString, bool>>>");
+
+
 
 	QApplication app (argc, argv);
 	app.setStyle(new DarkStyle);

@@ -5,6 +5,12 @@ add_library(${PROJECT_NAME}
   exporttrainingsetwidget.cpp
   compositionchartview.hpp
   compositionchartview.cpp
+  annotationstatisticschartview.hpp
+  annotationstatisticschartview.cpp
+  datasetlist.hpp
+  datasetlist.cpp
+  segmentselectorwindow.hpp
+  segmentselectorwindow.cpp
 )
 message ("Source ${PROJECT_SOURCE_DIR}")
 

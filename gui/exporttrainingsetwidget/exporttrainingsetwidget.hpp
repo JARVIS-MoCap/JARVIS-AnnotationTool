@@ -14,6 +14,10 @@
 #include "pathwidget.hpp"
 #include "yesnoradiowidget.hpp"
 #include "compositionchartview.hpp"
+#include "annotationstatisticschartview.hpp"
+#include "datasetlist.hpp"
+#include "checkableitemlist.hpp"
+
 
 #include <QPushButton>
 #include <QTableWidget>
@@ -32,6 +36,7 @@ class ExportTrainingsetWidget : public QWidget {
 		explicit ExportTrainingsetWidget(QWidget *parent = nullptr);
 
 	signals:
+		void updateCounts();
 
 	public slots:
 
@@ -51,19 +56,40 @@ class ExportTrainingsetWidget : public QWidget {
 		DirPathWidget *extrinsicsPathWidget;
 		QDoubleSpinBox *validationFractionEdit;
 		YesNoRadioWidget *shuffleBeforeSplitWidget;
+		YesNoRadioWidget *randomShuffleSeedWidget;
 		QSpinBox *shuffleSeedEdit;
 		QLineEdit *numberFramesTrainingEdit;
 		QLineEdit *numberFramesValidationEdit;
-		QLineEdit *numberEntitiesEdit;
-		QLineEdit *numberKeypointsEdit;
-		CompositionChartView *compositionChartView;
 
+		CompositionChartView *compositionChartView;
+		QLabel *annotationStatisticsLabel;
+		QGroupBox *annotationStatisticsBox;
+		AnnotationStatisticsChartView *annotationChartView;
+
+		DatasetList *datasetList;
+		CheckableItemList *entitiesList;
+		CheckableItemList *keypointsList;
 
 		QPushButton *saveButton;
 		QPushButton *loadButton;
 		QPushButton *exportButton;
 
-		private slots:
+		QList<DatasetExportItem> m_datasetExportItems;
+		QList<AnnotationCount> m_annotationCounts;
+		QList<QPair<QString,bool>> m_entities;
+		QList<QPair<QString,bool>> m_keypoints;
+
+	private slots:
+		void hoverStartedSlot(int index);
+		void hoverEndedSlot();
+		void trainingsetTypeChangedSlot(bool toggle);
+		void shuffleBeforeSplitStateChangedSlot(bool state);
+		void randomShuffleSeedStateChangedSlot(bool state);
+		void datasetListChangedSlot();
+		void entitiesListChangedSlot(int row, bool state);
+		void keypointsListChangedSlot(int row, bool state);
+
+
 		void savePresetsClickedSlot();
 		void loadPresetsClickedSlot();
 		void savePresetSlot(const QString& preset);

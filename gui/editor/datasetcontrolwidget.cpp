@@ -1,9 +1,11 @@
-/*------------------------------------------------------------
- *  datasetcontrolwidget.cpp
- *  Created:  03. December 2020
- *  Author:   Timo Hüser
- *
- *------------------------------------------------------------*/
+/*****************************************************************
+	* File:			  datasetconrolwidget.cpp
+	* Created: 	  03. December 2021
+	* Author:		  Timo Hueser
+	* Contact: 	  timo.hueser@gmail.com
+	* Copyright:  2021 Timo Hueser
+	* License:    GPL v3.0
+	*****************************************************************/
 
 #include "datasetcontrolwidget.hpp"
 
@@ -42,6 +44,7 @@ DatasetControlWidget::DatasetControlWidget(QWidget *parent) : QWidget(parent) {
 	//<-> Relayed Signals
 }
 
+
 void DatasetControlWidget::datasetLoadedSlot() {
 	framesTable->setRowCount(Dataset::dataset->numCameras());
 	m_annotatedCounts = new int [Dataset::dataset->numCameras()];
@@ -55,7 +58,8 @@ void DatasetControlWidget::datasetLoadedSlot() {
     framesTable->setItem(row,0,frameItem);
 		QTableWidgetItem* annotationItem = new QTableWidgetItem();
 		getAnnotationCounts(row, m_annotatedCounts[row], m_totalCount);
-		annotationItem->setText("("+ QString::number(m_annotatedCounts[row]) +  "/" + QString::number(m_totalCount) + ")");
+		annotationItem->setText("("+ QString::number(m_annotatedCounts[row]) +
+														"/" + QString::number(m_totalCount) + ")");
 		annotationItem->setTextAlignment(Qt::AlignCenter);
 		annotationItem->setFlags(annotationItem->flags() ^ Qt::ItemIsEditable);
 		annotationItem->setFlags(annotationItem->flags() ^ Qt::ItemIsSelectable);
@@ -69,13 +73,18 @@ void DatasetControlWidget::datasetLoadedSlot() {
 	selectionChangedSlot(0,0);
 }
 
-void DatasetControlWidget::getAnnotationCounts(int frameIndex, int &annotatedCount, int &totalCount) {
-	totalCount = Dataset::dataset->imgSets()[m_currentImgSetIndex]->frames[frameIndex]->keypoints.size();
+
+void DatasetControlWidget::getAnnotationCounts(int frameIndex,
+			int &annotatedCount, int &totalCount) {
+	totalCount = Dataset::dataset->imgSets()[m_currentImgSetIndex]->
+							 frames[frameIndex]->keypoints.size();
 	annotatedCount = 0;
-	for (const auto & keypoint : Dataset::dataset->imgSets()[m_currentImgSetIndex]->frames[frameIndex]->keypoints) {
+	for (const auto & keypoint : Dataset::dataset->imgSets()[m_currentImgSetIndex]->
+															 frames[frameIndex]->keypoints) {
 		if (keypoint->state() !=  NotAnnotated) annotatedCount++;
 	}
 }
+
 
 void DatasetControlWidget::selectionChangedSlot(int row,int) {
 	for (int i = 0; i < framesTable->rowCount(); i++) {
@@ -90,6 +99,7 @@ void DatasetControlWidget::selectionChangedSlot(int row,int) {
 	}
 	emit frameSelectionChanged(row);
 }
+
 
 void DatasetControlWidget::frameChangedSlot(int imgSetIndex, int frameIndex) {
 	m_currentImgSetIndex = imgSetIndex;
@@ -106,11 +116,14 @@ void DatasetControlWidget::frameChangedSlot(int imgSetIndex, int frameIndex) {
 			framesTable->item(i,1)->setFont(QFont("Sans Serif", 11));
 		}
 		getAnnotationCounts(i, m_annotatedCounts[i], m_totalCount);
-		framesTable->item(i,1)->setText("("+ QString::number(m_annotatedCounts[i]) +  "/" + QString::number(m_totalCount) + ")");
+		framesTable->item(i,1)->setText("("+ QString::number(m_annotatedCounts[i]) +
+																		"/" + QString::number(m_totalCount) + ")");
 	}
 }
 
-void DatasetControlWidget::keypointStateChangedSlot(KeypointState state, KeypointState previousSate, int frameIndex) {
+
+void DatasetControlWidget::keypointStateChangedSlot(KeypointState state,
+			KeypointState previousSate, int frameIndex) {
 	if (state == NotAnnotated) {
 		m_annotatedCounts[frameIndex]--;
 	}
@@ -119,8 +132,10 @@ void DatasetControlWidget::keypointStateChangedSlot(KeypointState state, Keypoin
 			m_annotatedCounts[frameIndex]++;
 		}
 	}
-	framesTable->item(frameIndex,1)->setText("("+ QString::number(m_annotatedCounts[frameIndex]) +  "/" + QString::number(m_totalCount) + ")");
+	framesTable->item(frameIndex,1)->setText("("+ QString::number(m_annotatedCounts[frameIndex]) +
+																					 "/" + QString::number(m_totalCount) + ")");
 }
+
 
 void DatasetControlWidget::imgSetChangedSlot() {
 	emit imgSetChanged(m_currentImgSetIndex);

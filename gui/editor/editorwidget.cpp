@@ -1,11 +1,14 @@
-/*------------------------------------------------------------
- *  editorwidget.cpp
- *  Created:  10. July 2018
- *  Author:   Timo Hüser
- *
- *------------------------------------------------------------*/
+/*****************************************************************
+ * File:			  editowidget.cpp
+ * Created: 	  23. October 2020
+ * Author:		  Timo Hueser
+ * Contact: 	  timo.hueser@gmail.com
+ * Copyright:  2021 Timo Hueser
+ * License:    GPL v3.0
+ *****************************************************************/
 
 #include "editorwidget.hpp"
+
 
 EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	QGridLayout *layout = new QGridLayout(this);
@@ -159,6 +162,7 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(this, &EditorWidget::errorThresholdChanged, reprojectionWidget, &ReprojectionWidget::errorThresholdChangedSlot);
 }
 
+
 void EditorWidget::splitterMovedSlot(int, int) {
 	int maxWidth = mainSplitter->size().width();
 	int maxHeight = mainSplitter->size().height();
@@ -178,6 +182,7 @@ void EditorWidget::splitterMovedSlot(int, int) {
 	imageViewer->fitToScreen();
 }
 
+
 void EditorWidget::previousClickedSlot() {
 	if(m_currentFrameIndex > 0) {
 		m_currentFrameIndex--;
@@ -192,6 +197,7 @@ void EditorWidget::previousClickedSlot() {
 	emit frameChanged(m_currentImgSetIndex, m_currentFrameIndex);
 }
 
+
 void EditorWidget::nextClickedSlot() {
 	if(m_currentFrameIndex < m_currentImgSet->numCameras-1) {
 		m_currentFrameIndex++;
@@ -205,6 +211,7 @@ void EditorWidget::nextClickedSlot() {
 	}
 	emit frameChanged(m_currentImgSetIndex, m_currentFrameIndex);
 }
+
 
 void EditorWidget::frameChangedSlot(int index) {
 	m_currentFrameIndex = index;
@@ -227,6 +234,7 @@ void EditorWidget::frameChangedSlot(int index) {
 	}
 	emit frameChanged(m_currentImgSetIndex, m_currentFrameIndex);
 }
+
 
 void EditorWidget::previousSetClickedSlot() {
 	if (m_currentImgSetIndex > 0) {
@@ -254,6 +262,7 @@ void EditorWidget::previousSetClickedSlot() {
 	emit frameChanged(m_currentImgSetIndex, m_currentFrameIndex);
 }
 
+
 void EditorWidget::nextSetClickedSlot() {
 	if (m_currentImgSetIndex < Dataset::dataset->imgSets().size()-1) {
 		m_currentImgSetIndex++;
@@ -280,6 +289,7 @@ void EditorWidget::nextSetClickedSlot() {
 	emit frameChanged(m_currentImgSetIndex, m_currentFrameIndex);
 }
 
+
 void EditorWidget::imgSetChangedSlot(int index) {
 	m_currentImgSetIndex = index;
 	m_currentImgSet = Dataset::dataset->imgSets()[m_currentImgSetIndex];
@@ -299,26 +309,32 @@ void EditorWidget::imgSetChangedSlot(int index) {
 	emit frameChanged(m_currentImgSetIndex, m_currentFrameIndex);
 }
 
+
 void EditorWidget::zoomToggledSlot(bool toggle) {
 	if (toggle) panButton->setChecked(false);
 }
 
+
 void EditorWidget::panToggledSlot(bool toggle) {
 	if (toggle) zoomButton->setChecked(false);
 }
+
 
 void EditorWidget::homeClickedSlot() {
 	zoomButton->setChecked(false);
 	panButton->setChecked(false);
 }
 
+
 void EditorWidget::zoomFinishedSlot() {
 	zoomButton->setChecked(false);
 }
 
+
 void EditorWidget::panFinishedSlot() {
 	panButton->setChecked(false);
 }
+
 
 void EditorWidget::datasetLoadedSlot() {
 	keypointWidget->init();
@@ -334,6 +350,7 @@ void EditorWidget::datasetLoadedSlot() {
 	splitterMovedSlot(0,0);
 	connect(Dataset::dataset, &Dataset::keypointStateChanged, datasetControlWidget, &DatasetControlWidget::keypointStateChangedSlot);
 }
+
 
 void EditorWidget::quitClickedSlot() {
 	Dataset::dataset->save();

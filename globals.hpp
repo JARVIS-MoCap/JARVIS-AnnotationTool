@@ -79,6 +79,7 @@ struct RecordingItem {
 };
 
 struct CalibrationConfig {
+	bool debug = false;
 	QString calibrationSetName;
 	QString calibrationSetPath;
 	bool seperateIntrinsics;
@@ -93,6 +94,28 @@ struct CalibrationConfig {
 	double patternSideLength;
 	QList<QString> cameraNames;
 	QList<QList<QString>> cameraPairs;
+};
+
+struct AnnotationCount {
+	int annotated = 0;
+	int reprojected = 0;
+	int notAnnotated = 0;
+
+	friend AnnotationCount operator+ (const AnnotationCount &lhs, const AnnotationCount &rhs){
+			AnnotationCount res;
+			res.annotated = rhs.annotated+lhs.annotated;
+			res.reprojected = rhs.reprojected+lhs.reprojected;
+			res.notAnnotated = rhs.notAnnotated+lhs.notAnnotated;
+			return res;
+	}
+};
+
+struct DatasetExportItem {
+	QString name;
+	QString basePath;
+	QList<QPair<QString, bool>> subSets;
+	AnnotationCount annotationCount;
+	int frameCount = 0;
 };
 
 

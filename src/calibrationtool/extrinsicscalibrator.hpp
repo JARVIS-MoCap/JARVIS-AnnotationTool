@@ -11,6 +11,8 @@
 #define EXTRINSICSCALIBRATOR_H
 
 #include "globals.hpp"
+#include "colormap.hpp"
+
 
 #include "boards_from_corners.h"
 #include "config.h"
@@ -71,6 +73,7 @@ class ExtrinsicsCalibrator : public QObject, public QRunnable {
 		bool boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners, std::vector<cv::Point2f> &corners);
 		bool tryLoadIntrinsics(QList<QString> cameraPair, Intrinsics &i1, Intrinsics &i2);
 		QString getFormat(const QString& path, const QString& cameraName);
+		void saveCheckerboard(QList<QString> cameraPair, const cv::Mat &img1, const cv::Mat &img2, const std::vector<cv::Point2f> &corners1, const std::vector<cv::Point2f> &corners2, int counter);
 
 };
 

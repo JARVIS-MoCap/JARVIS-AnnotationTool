@@ -8,6 +8,8 @@
 	*****************************************************************/
 
 #include "intrinsicscalibrator.hpp"
+#include "colormap.hpp"
+
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -22,6 +24,10 @@ IntrinsicsCalibrator::IntrinsicsCalibrator(CalibrationConfig *calibrationConfig,
   QDir dir;
   dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" +
              m_calibrationConfig->calibrationSetName + "/Intrinsics");
+  if (m_calibrationConfig->debug) {
+    dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" +
+    m_calibrationConfig->calibrationSetName + "/debug/Intrinsics/" + cameraName + "/");
+  }
   m_parametersSavePath = (m_calibrationConfig->calibrationSetPath + "/" +
                           m_calibrationConfig->calibrationSetName).toStdString();
 }
@@ -71,9 +77,12 @@ void IntrinsicsCalibrator::run() {
       if (patternFound) {
         cbdetect::boards_from_corners(img, cbCorners, boards, params);
         patternFound = boardToCorners(boards[0], cbCorners, corners);
-        checkRotation(corners, img);
       }
       if (patternFound) {
+        if (m_calibrationConfig->debug) {
+          saveCheckerboard(img, corners, counter);
+        }
+        checkRotation(corners, img);
         imagePointsAll.push_back(corners);
         objectPointsAll.push_back(checkerBoardPoints);
       }
@@ -154,10 +163,7 @@ bool IntrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corn
     for(int i = 1; i < board.idx.size() - 1; ++i) {
       if (board.idx[i].size()-2 == m_calibrationConfig->patternWidth) {
         for(int j = 1; j < board.idx[i].size() - 1; ++j) {
-          if(board.idx[i][j] < 0) {
-            return false;
-          }
-          if (board.idx[i][j] >= cbCorners.p.size()) {
+          if(board.idx[i][j] < 0 || board.idx[i][j] >= cbCorners.p.size()) {
             return false;
           }
           corners.push_back(static_cast<cv::Point2f>(cbCorners.p[board.idx[i][j]]));
@@ -193,4 +199,16 @@ bool IntrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corn
 
 void IntrinsicsCalibrator::calibrationCanceledSlot() {
   m_interrupt = true;
+}
+
+
+void IntrinsicsCalibrator::saveCheckerboard(const cv::Mat &img, const std::vector<cv::Point2f> &corners, int counter) {
+  ColorMap *colorMap = new ColorMap(ColorMap::Jet);
+  cv::Mat debug_img = img.clone();
+  int index = 0;
+  for (const auto & corner : corners) {
+    QColor c = colorMap->getColor(index++, corners.size());
+    cv::circle(debug_img, corner, 4, cv::Scalar(c.blue(), c.green(), c.red()), cv::FILLED, cv::LINE_8);
+  }
+  cv::imwrite(m_parametersSavePath + "/debug/Intrinsics/" + m_cameraName + "/Frame_" + QString::number(counter).toStdString() + ".jpg", debug_img);
 }

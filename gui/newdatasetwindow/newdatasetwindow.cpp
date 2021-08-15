@@ -50,6 +50,7 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 
 	LabelWithToolTip *datasetPathLabel = new LabelWithToolTip("New Dataset Path");
 	datasetPathWidget = new DirPathWidget("Select new Dataset Path");
+	datasetPathWidget->setPlaceholderText("Select a Path...");
 	LabelWithToolTip *frameSetsRecordingLabel = new LabelWithToolTip("Framesets to extract per Recording", "kdsff");
 	frameSetsRecordingBox = new QSpinBox(configBox);
 	frameSetsRecordingBox->setMinimum(0);
@@ -116,6 +117,8 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	layout->addWidget(entitiesBox,3,0);
 	layout->addWidget(keypointsBox,3,1);
 	layout->addWidget(buttonBarWidget,4,0,1,2);
+	layout->setRowStretch(2,2);
+	layout->setRowStretch(3,3);
 
 	connect(this, &NewDatasetWindow::createDataset, datasetCreator, &DatasetCreator::createDatasetSlot);
 	connect(datasetCreator, &DatasetCreator::datasetCreated, this, &NewDatasetWindow::datasetCreatedSot);

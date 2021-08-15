@@ -24,6 +24,15 @@ ExtrinsicsCalibrator::ExtrinsicsCalibrator(CalibrationConfig *calibrationConfig,
              m_calibrationConfig->calibrationSetName + "/Intrinsics");
   dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" +
              m_calibrationConfig->calibrationSetName + "/Extrinsics");
+  if (m_calibrationConfig->debug) {
+    dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" +
+    m_calibrationConfig->calibrationSetName + "/debug/Extrinsics/" + cameraPair[0] + "_" + cameraPair[1] + "/");
+    if (cameraPair.size() == 3) {
+      dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" +
+      m_calibrationConfig->calibrationSetName + "/debug/Extrinsics/" + cameraPair[1] + "_" + cameraPair[2] + "/");
+    }
+
+  }
   m_parametersSavePath = (m_calibrationConfig->calibrationSetPath + "/" +
                           m_calibrationConfig->calibrationSetName).toStdString();
 }
@@ -135,6 +144,9 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
         if (patternFound1 && patternFound2) {
           checkRotation(corners1, img1);
           checkRotation(corners2, img2);
+          if (m_calibrationConfig->debug) {
+            saveCheckerboard(cameraPair, img1,img2,corners1,corners2,counter);
+          }
           imagePointsAll1.push_back(corners1);
           imagePointsAll2.push_back(corners2);
           objectPointsAll.push_back(checkerBoardPoints);
@@ -339,4 +351,26 @@ bool ExtrinsicsCalibrator::tryLoadIntrinsics(QList<QString> cameraPair, Intrinsi
 
 void ExtrinsicsCalibrator::calibrationCanceledSlot() {
   m_interrupt = true;
+}
+
+void ExtrinsicsCalibrator::saveCheckerboard(QList<QString> cameraPair, const cv::Mat &img1, const cv::Mat &img2, const std::vector<cv::Point2f> &corners1, const std::vector<cv::Point2f> &corners2, int counter) {
+  ColorMap *colorMap = new ColorMap(ColorMap::Jet);
+  cv::Mat debug_img1 = img1.clone();
+  cv::Mat debug_img2 = img2.clone();
+  cv::Mat debug_img;
+  int index = 0;
+  for (const auto & corner : corners1) {
+    QColor c = colorMap->getColor(index++, corners1.size());
+    cv::circle(debug_img1, corner, 4, cv::Scalar(c.blue(), c.green(), c.red()), cv::FILLED, cv::LINE_8);
+  }
+  index = 0;
+  for (const auto & corner : corners2) {
+    QColor c = colorMap->getColor(index++, corners2.size());
+    cv::circle(debug_img2, corner, 4, cv::Scalar(c.blue(), c.green(), c.red()), cv::FILLED, cv::LINE_8);
+  }
+  cv::resize(debug_img2, debug_img2, debug_img1.size());
+  cv::Mat matArray[] = {debug_img1, debug_img2};
+  std::cout << debug_img1.size() << ", " << debug_img2.size() << std::endl;
+  cv::hconcat(matArray, 2, debug_img);
+  cv::imwrite(m_parametersSavePath + "/debug/Extrinsics/" + cameraPair[0].toStdString() + "_" + cameraPair[1].toStdString() + "/Frame_" + QString::number(counter).toStdString() + ".jpg", debug_img);
 }
