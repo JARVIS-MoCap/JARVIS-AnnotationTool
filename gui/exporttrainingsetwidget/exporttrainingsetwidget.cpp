@@ -224,7 +224,7 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	exportButton = new QPushButton("Create Trainingset");
 	exportButton->setIcon(QIcon::fromTheme("start"));
 	exportButton->setMinimumSize(40,40);
-	//connect(exportButton, &QPushButton::clicked, this, &ExportTrainingsetWidget::exportClickedSlot);
+	connect(exportButton, &QPushButton::clicked, this, &ExportTrainingsetWidget::exportClickedSlot);
 	buttonbarlayout->addWidget(saveButton, 0,0);
 	buttonbarlayout->addWidget(loadButton,0,1);
 	buttonbarlayout->addWidget(middleSpacer,0,2);
@@ -373,7 +373,7 @@ void ExportTrainingsetWidget::savePresetSlot(const QString& preset) {
 
 void ExportTrainingsetWidget::loadPresetSlot(const QString& preset) {
 	settings->beginGroup(preset);
-	
+
 	trainingsetNameEdit->setText(settings->value("trainingSetName").toString());
 	trainingsetSavePathWidget->setPath(settings->value("trainingSetPath").toString());
 	if (settings->value("trainingSetType").toBool()) {
@@ -425,4 +425,12 @@ void ExportTrainingsetWidget::loadPresetSlot(const QString& preset) {
 	}
 	settings->endGroup();
 	emit updateCounts();
+}
+
+void ExportTrainingsetWidget::exportClickedSlot() {
+	if (m_datasetExportItems.size() == 0 || m_entities.size() == 0 || m_keypoints.size() == 0) {
+		return;
+	}
+	std::cout << "Exporting" << std::endl;
+	
 }

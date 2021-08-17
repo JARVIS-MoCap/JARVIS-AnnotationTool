@@ -88,6 +88,7 @@ class ExportTrainingsetWidget : public QWidget {
 		void datasetListChangedSlot();
 		void entitiesListChangedSlot(int row, bool state);
 		void keypointsListChangedSlot(int row, bool state);
+		void exportClickedSlot();
 
 
 		void savePresetsClickedSlot();
