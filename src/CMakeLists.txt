@@ -3,6 +3,7 @@ project (src)
 
 add_subdirectory(calibrationtool)
 add_subdirectory(datasetcreator)
+add_subdirectory(trainingsetexporter)
 
 add_library(${PROJECT_NAME}
 	keypoint.hpp

@@ -25,6 +25,7 @@ target_link_libraries(${PROJECT_NAME}
   Qt5::Charts
 	src
   conveniencewidgets
+  trainingsetexporter
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused -Wno-sign-compare)

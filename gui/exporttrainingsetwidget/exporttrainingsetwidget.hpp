@@ -17,6 +17,7 @@
 #include "annotationstatisticschartview.hpp"
 #include "datasetlist.hpp"
 #include "checkableitemlist.hpp"
+#include "trainingsetexporter.hpp"
 
 
 #include <QPushButton>
@@ -37,6 +38,7 @@ class ExportTrainingsetWidget : public QWidget {
 
 	signals:
 		void updateCounts();
+		void exportTrainingset();
 
 	public slots:
 
@@ -47,6 +49,7 @@ class ExportTrainingsetWidget : public QWidget {
 		PresetsWindow *loadPresetsWindow;
 		PresetsWindow *savePresetsWindow;
 		QList<QString> presets;
+		TrainingSetExporter *trainingSetExporter;
 
 		QLineEdit *trainingsetNameEdit;
 		DirPathWidget *trainingsetSavePathWidget;

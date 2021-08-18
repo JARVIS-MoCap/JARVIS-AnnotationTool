@@ -24,6 +24,11 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	layout->setHorizontalSpacing(100);
 	m_errorMsg = new QErrorMessage();
 
+	trainingSetExporter = new TrainingSetExporter(m_datasetExportItems);
+	QThread *thread = new QThread;
+	trainingSetExporter->moveToThread(thread);
+	thread->start();
+
 	loadPresetsWindow = new PresetsWindow(&presets, "load", "Export Dataset Widget/");
 	savePresetsWindow = new PresetsWindow(&presets, "save", "Export Dataset Widget/");
 	connect(loadPresetsWindow, SIGNAL(loadPreset(QString)), this, SLOT(loadPresetSlot(QString)));
@@ -237,6 +242,7 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	layout->addWidget(buttonBarWidget, 3,0,1,2);
 
 	connect(this, &ExportTrainingsetWidget::updateCounts, datasetList, &DatasetList::updateCountsSlot);
+	connect(this, &ExportTrainingsetWidget::exportTrainingset,trainingSetExporter, &TrainingSetExporter::exportTrainingsetSlot);
 
 }
 
@@ -431,6 +437,6 @@ void ExportTrainingsetWidget::exportClickedSlot() {
 	if (m_datasetExportItems.size() == 0 || m_entities.size() == 0 || m_keypoints.size() == 0) {
 		return;
 	}
-	std::cout << "Exporting" << std::endl;
-	
+	emit exportTrainingset();
+
 }
