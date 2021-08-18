@@ -76,7 +76,12 @@ void IntrinsicsCalibrator::run() {
 
       if (patternFound) {
         cbdetect::boards_from_corners(img, cbCorners, boards, params);
-        patternFound = boardToCorners(boards[0], cbCorners, corners);
+        if(boards.size() == 1) {
+          patternFound = boardToCorners(boards[0], cbCorners, corners);
+        }
+        else {
+          patternFound = false;
+        }
       }
       if (patternFound) {
         if (m_calibrationConfig->debug) {
@@ -108,8 +113,9 @@ void IntrinsicsCalibrator::run() {
 
   cv::Mat K, D;
   std::vector< cv::Mat > rvecs, tvecs;
-  double repro_error = calibrateCamera(objectPoints, imagePoints, size, K, D, rvecs, tvecs,
-    cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST, cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 80, 1e-6));
+  cv::Mat newObjectPoints;
+  double repro_error = calibrateCameraRO(objectPoints, imagePoints, size, 1, K, D, rvecs, tvecs, newObjectPoints,
+    cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST, cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 100, 1e-7));
 
   cv::FileStorage fs1(m_parametersSavePath + "/Intrinsics/Intrinsics_" + m_cameraName + ".yaml", cv::FileStorage::WRITE);
   fs1 << "intrinsicMatrix" << K.t();

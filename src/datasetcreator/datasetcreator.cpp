@@ -148,6 +148,7 @@ bool DatasetCreator::checkFrameCounts(const QString& recording, QList<QString> c
   	}
 
 		int newNumFrames = cap.get(cv::CAP_PROP_FRAME_COUNT);
+		std::cout << newNumFrames << std::endl;
 		cap.release();
 		if (numFrames != -1 && newNumFrames != numFrames)  {
 			return false;

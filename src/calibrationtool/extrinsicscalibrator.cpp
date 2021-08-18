@@ -138,9 +138,18 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
       if (patternFound1 && patternFound2) {
         cbdetect::boards_from_corners(img1, cbCorners1, boards1, params);
         cbdetect::boards_from_corners(img2, cbCorners2, boards2, params);
-
-        patternFound1 = boardToCorners(boards1[0], cbCorners1, corners1);
-        patternFound2 = boardToCorners(boards2[0], cbCorners2, corners2);
+        if (boards1.size() == 1) {
+          patternFound1 = boardToCorners(boards1[0], cbCorners1, corners1);
+        }
+        else {
+          patternFound1 = false;
+        }
+        if (boards2.size() == 1) {
+          patternFound2 = boardToCorners(boards2[0], cbCorners2, corners2);
+        }
+        else {
+          patternFound2 = false;
+        }
         if (patternFound1 && patternFound2) {
           checkRotation(corners1, img1);
           checkRotation(corners2, img2);
@@ -181,6 +190,9 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
                                                                 objectPoints, imagePoints1, size, i1);
     intrinsicsErrorMap[cameraPair[1]] = calibrateIntrinsicsStep(cameraPair[1].toStdString(),
                                                                 objectPoints, imagePoints2, size, i2);
+  }
+  else {
+    std::cout << "FOUND INTRINSICS" << std::endl;
   }
 
   double mean_repro_error = stereoCalibrationStep(objectPoints, imagePoints1, imagePoints2, i1,i2,e, size, 1.4);
