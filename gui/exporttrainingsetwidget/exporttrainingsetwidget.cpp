@@ -16,6 +16,7 @@
 #include <QScrollArea>
 
 
+
 ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(parent) {
 	this->setMinimumSize(600,600);
 	settings = new QSettings();
@@ -434,9 +435,42 @@ void ExportTrainingsetWidget::loadPresetSlot(const QString& preset) {
 }
 
 void ExportTrainingsetWidget::exportClickedSlot() {
+	ExportConfig exportConfig;
 	if (m_datasetExportItems.size() == 0 || m_entities.size() == 0 || m_keypoints.size() == 0) {
 		return;
 	}
-	emit exportTrainingset();
+	exportConfig.entitiesList = m_entities;
+	exportConfig.keypointsList = m_keypoints;
+	if (trainingsetNameEdit->text() == "") {
+		return;
+	}
+	exportConfig.trainingSetName = trainingsetNameEdit->text();
+	if (trainingsetSavePathWidget->path() == "") {
+		return;
+	}
+	exportConfig.savePath = trainingsetSavePathWidget->path();
+	if (type3DButton->isChecked()) {
+		exportConfig.trainingSetType = "3D";
+		if (intrinsicsPathWidget->path() == "") {
+			return;
+		}
+		exportConfig.intrinsicsPath = intrinsicsPathWidget->path();
+		if (extrinsicsPathWidget->path() == "") {
+			return;
+		}
+		exportConfig.extrinsicsPath = extrinsicsPathWidget->path();
+	}
+	else {
+		exportConfig.trainingSetType = "2D";
+	}
+	exportConfig.validationFraction = validationFractionEdit->value();
+	exportConfig.shuffleBeforeSplit = shuffleBeforeSplitWidget->state();
+	if (shuffleBeforeSplitWidget->state()) {
+		exportConfig.useRandomShuffleSeed = randomShuffleSeedWidget->state();
+		if (!randomShuffleSeedWidget->state()) {
+			exportConfig.shuffleSeed = shuffleSeedEdit->value();
+		}
+	}
+	emit exportTrainingset(exportConfig);
 
 }

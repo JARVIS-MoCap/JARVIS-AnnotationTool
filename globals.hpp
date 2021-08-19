@@ -118,6 +118,20 @@ struct DatasetExportItem {
 	int frameCount = 0;
 };
 
+struct ExportConfig {
+	QString trainingSetName;
+	QString savePath;
+	QString trainingSetType;
+	QString intrinsicsPath;
+	QString extrinsicsPath;
+	double validationFraction;
+	bool shuffleBeforeSplit;
+	bool useRandomShuffleSeed;
+	int shuffleSeed;
+	QList<QPair<QString,bool>> entitiesList;
+	QList<QPair<QString,bool>> keypointsList;
+};
+
 
 void createToolBarButton(QToolButton * button, QAction* action, QIcon icon, bool enabled = true,
 												 bool checkable = false, QSize minSize = QSize(20,20));

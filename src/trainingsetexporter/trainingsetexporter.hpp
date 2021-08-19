@@ -11,6 +11,8 @@
 #define TRAININGSETEXPORTER_H
 
 #include "globals.hpp"
+#include "json.hpp"
+using json = nlohmann::json;
 
 #include <QRunnable>
 
@@ -23,11 +25,14 @@ class TrainingSetExporter : public QObject {
 	signals:
 
 	public slots:
-		void exportTrainingsetSlot();
+		void exportTrainingsetSlot(ExportConfig exportConfig);
 
 	private:
 		QList<DatasetExportItem> &m_datasetExportItems;
 
+		void addInfo(json &j);
+		void addCategories(json &j, ExportConfig &exportConfig);
+		void addCalibration(json &j, ExportConfig &exportConfig);
 
 	private slots:
 

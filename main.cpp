@@ -25,6 +25,7 @@
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(RecordingItem)
 Q_DECLARE_METATYPE(TimeLineWindow)
+Q_DECLARE_METATYPE(ExportConfig)
 
 
 // QDatastream declarations for Signal/Slot system
@@ -52,6 +53,20 @@ QDataStream& operator>>(QDataStream& in, TimeLineWindow& v) {
     return in;
 }
 
+QDataStream& operator>>(QDataStream& in, ExportConfig& v) {
+    in >> v.trainingSetName;
+    in >> v.savePath;
+		in >> v.trainingSetType;
+    in >> v.intrinsicsPath;
+    in >> v.extrinsicsPath;
+    in >> v.validationFraction;
+    in >> v.shuffleBeforeSplit;
+    in >> v.useRandomShuffleSeed;
+    in >> v.shuffleSeed;
+    in >> v.entitiesList;
+    in >> v.keypointsList;
+    return in;
+}
 
 
 int main(int argc, char **argv)
@@ -80,8 +95,8 @@ int main(int argc, char **argv)
   qRegisterMetaTypeStreamOperators<QMap<QString, double> >("QMap<QString, double>");
   qRegisterMetaTypeStreamOperators<QMap<QString,bool> >("QMap<QString,bool>");
   qRegisterMetaTypeStreamOperators<QList<QList<QPair<QString, bool>>>> ("QList<QList<QPair<QString, bool>>>");
-
-
+  qRegisterMetaTypeStreamOperators<QList<QPair<QString,bool>>> ("QList<QPair<QString,bool>>");
+  qRegisterMetaType<ExportConfig>("ExportConfig");
 
 	QApplication app (argc, argv);
 	app.setStyle(new DarkStyle);

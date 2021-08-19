@@ -31,6 +31,7 @@
 #include <QErrorMessage>
 #include <QRadioButton>
 
+
 class ExportTrainingsetWidget : public QWidget {
 	Q_OBJECT
 	public:
@@ -38,7 +39,7 @@ class ExportTrainingsetWidget : public QWidget {
 
 	signals:
 		void updateCounts();
-		void exportTrainingset();
+		void exportTrainingset(ExportConfig exportConfig);
 
 	public slots:
 
