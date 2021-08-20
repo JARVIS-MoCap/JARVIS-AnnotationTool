@@ -132,6 +132,13 @@ struct ExportConfig {
 	QList<QPair<QString,bool>> keypointsList;
 };
 
+struct ExportFrameSet {
+	QString originalPath;
+	QString basePath;
+	QList<QString> cameras;
+	QList<QString> frameNames;
+	QMap<QString, QPair<QString,QList<QPointF>>> keyPoints;
+};
 
 void createToolBarButton(QToolButton * button, QAction* action, QIcon icon, bool enabled = true,
 												 bool checkable = false, QSize minSize = QSize(20,20));

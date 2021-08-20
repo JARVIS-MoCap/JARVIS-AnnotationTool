@@ -33,7 +33,11 @@ class TrainingSetExporter : public QObject {
 		void addInfo(json &j);
 		void addCategories(json &j, ExportConfig &exportConfig);
 		void addCalibration(json &j, ExportConfig &exportConfig);
-
+		void copyCalibrationParams(ExportConfig &exportConfig);
+		QList<ExportFrameSet> loadAllFrameSets(ExportConfig &exportConfig);
+		void addFrameSetsToJSON(const QList<ExportFrameSet> &frameSets, json & j);
+		QMap<QString, bool> makeMapfromPairs(const QList<QPair<QString, bool>> &pairs);
+		void copyFrames(ExportConfig &exportConfig, const QList<ExportFrameSet> &frameSets, const QString &setName);
 	private slots:
 
 
