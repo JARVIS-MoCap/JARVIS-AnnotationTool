@@ -31,9 +31,13 @@ class KeypointListWidget : public QListWidget {
 		explicit KeypointListWidget() {
 			setContextMenuPolicy(Qt::CustomContextMenu);
 			connect(this, &KeypointListWidget::customContextMenuRequested, this, &KeypointListWidget::showContextMenu);
+			connect(this, &KeypointListWidget::itemDoubleClicked, this, &KeypointListWidget::itemDoubleClickedSlot);
 		}
 		void addSupressed(int row) {
 			m_suppressedList.append(row);
+		}
+		void clearSupressed() {
+			m_suppressedList.clear();
 		}
 
 	signals:
@@ -70,6 +74,20 @@ class KeypointListWidget : public QListWidget {
 				else {
 					m_suppressedList.append(this->currentRow());
 					emit suppressKeypoint(this->currentRow());
+				}
+			}
+		}
+
+		void itemDoubleClickedSlot(QListWidgetItem* item_useless) {
+			bool isSuppressed = m_suppressedList.contains(this->currentRow());
+			for (const auto &item : this->findItems("", Qt::MatchContains)) {
+				if (isSuppressed) {
+					m_suppressedList.removeAll(this->row(item));
+					emit unsuppressKeypoint(this->row(item));
+				}
+				else {
+					m_suppressedList.append(this->row(item));
+					emit suppressKeypoint(this->row(item));
 				}
 			}
 		}
@@ -112,7 +130,7 @@ class KeypointWidget : public QWidget {
 		QList<QString> entitiesList;
 
 		QTabWidget *keypointTabWidget;
-		QMap<QString, QListWidget*> keypointListMap;
+		QMap<QString, KeypointListWidget*> keypointListMap;
 		QList<QString> bodypartsList;
 
 		QString m_currentEntity;

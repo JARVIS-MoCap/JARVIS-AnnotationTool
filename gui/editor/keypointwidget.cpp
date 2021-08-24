@@ -223,12 +223,13 @@ void KeypointWidget::datasetLoadedSlot() {
 
 void KeypointWidget::setKeypointsFromDatasetSlot() {
 	for (const auto& list : keypointListMap) {
+		list->clearSupressed();
 		for (int i = 0; i < Dataset::dataset->bodypartsList().size(); i++) {
 			list->item(i)->setIcon(QIcon::fromTheme("no_check"));
 		}
 	}
 	for (const auto& keypoint : m_currentImgSet->frames[m_currentFrameIndex]->keypoints) {
-		KeypointListWidget* keypointList = qobject_cast<KeypointListWidget*>(keypointListMap[keypoint->entity()]);
+		KeypointListWidget* keypointList = keypointListMap[keypoint->entity()];
 		keypointList->setCurrentRow(Dataset::dataset->bodypartsList().indexOf(m_currentBodypart));
 		if(keypoint->state() == Reprojected) {
 			keypointList->item(Dataset::dataset->bodypartsList().indexOf(keypoint->bodypart()))->

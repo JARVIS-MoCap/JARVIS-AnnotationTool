@@ -11,6 +11,11 @@
 #include <fstream>
 #include <iomanip>
 
+#include <algorithm>
+#include <random>
+#include <chrono>
+
+
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
@@ -48,9 +53,36 @@ void TrainingSetExporter::exportTrainingsetSlot(ExportConfig exportConfig) {
 
 
 	QList<ExportFrameSet> exportFrameSets = loadAllFrameSets(exportConfig);
-	addFrameSetsToJSON(exportFrameSets, trainingSet);
-	copyFrames(exportConfig, exportFrameSets, "train");
 
+	if (exportConfig.shuffleBeforeSplit) {
+		auto rng = std::default_random_engine {};
+		if (!exportConfig.useRandomShuffleSeed)  {
+			rng.seed(exportConfig.shuffleSeed);
+		}
+		else {
+			rng.seed(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+		}
+		std::shuffle(std::begin(exportFrameSets), std::end(exportFrameSets), rng);
+	}
+
+	QList<ExportFrameSet> trainingFrameSets;
+	QList<ExportFrameSet> validationFrameSets;
+
+	for (int i = 0; i < exportFrameSets.size(); i++) {
+		if (i < exportConfig.validationFraction*exportFrameSets.size()) {
+			validationFrameSets.append(exportFrameSets[i]);
+		}
+		else {
+			trainingFrameSets.append(exportFrameSets[i]);
+		}
+	}
+
+
+	addFrameSetsToJSON(trainingFrameSets, trainingSet);
+	copyFrames(exportConfig, trainingFrameSets, "train");
+
+	addFrameSetsToJSON(validationFrameSets, validationSet);
+	copyFrames(exportConfig, validationFrameSets, "val");
 
 	std::ofstream trainStream((exportConfig.savePath + "/" + exportConfig.trainingSetName + "/annotations/instances_train.json").toStdString());
 	trainStream << trainingSet << std::endl;
@@ -144,14 +176,13 @@ QList<ExportFrameSet> TrainingSetExporter::loadAllFrameSets(ExportConfig &export
 	QMap<QString, bool> keypointsSaveMap = makeMapfromPairs(exportConfig.keypointsList);
 	for (const auto &exportItem : m_datasetExportItems) {
 		for (const auto & subSet : exportItem.subSets) {
-			QMap<QString,QList<QPair<QString,QList<QPointF>>>> keypointsMap;
+			QMap<QString,QList<QPair<QString,QList<ExportKeypoint>>>> keypointsMap;
 			if (subSet.second) {
 				QList<QString> cameras = QDir(exportItem.basePath + "/" + subSet.first).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
 				for (const auto & camera : cameras) {
-					QList<QPair<QString,QList<QPointF>>> framesList;
+					QList<QPair<QString,QList<ExportKeypoint>>> framesList;
 					QFile *file = new QFile(exportItem.basePath + "/" + subSet.first + "/" + camera + "/annotations.csv");
 					if (!file->open(QIODevice::ReadOnly)) {
-						std::cout << (exportItem.basePath + "/" + subSet.first + "/" + camera + "/annotations.csv").toStdString() << std::endl;
 						std::cout << "Error reading file!" << std::endl;
 					}
 					else {
@@ -161,11 +192,13 @@ QList<ExportFrameSet> TrainingSetExporter::loadAllFrameSets(ExportConfig &export
 						file->readLine(); //Coords
 						while (!file->atEnd()) {
 							QList<QByteArray> cells = file->readLine().split(',');
-							QPair<QString,QList<QPointF>> keypoints;
+							QPair<QString,QList<ExportKeypoint>> keypoints;
 							keypoints.first = cells[0];
 							for (int i = 1; i < cells.size()-2; i += 3) {
 								if (entitiesSaveMap[entityNames[i]] && keypointsSaveMap[keypointNames[i]]) {
-									QPointF keypoint = QPointF(cells[i].toFloat(), cells[i+1].toFloat());
+									ExportKeypoint keypoint;
+									keypoint.point = QPointF(cells[i].toFloat(), cells[i+1].toFloat());
+									keypoint.state = static_cast<KeypointState>(cells[i+2].toInt());
 									keypoints.second.append(keypoint);
 								}
 							}
@@ -179,11 +212,11 @@ QList<ExportFrameSet> TrainingSetExporter::loadAllFrameSets(ExportConfig &export
 					frameSet.originalPath = exportItem.basePath + "/" + subSet.first;
 					frameSet.basePath = exportItem.basePath.split("/").takeLast() + "/" + subSet.first;
 					frameSet.cameras = cameras;
-					QMap<QString, QPair<QString,QList<QPointF>>> keypoints;
+					QMap<QString, QPair<QString,QList<ExportKeypoint>>> keypoints;
 					for (const auto camera : cameras) {
 						keypoints[camera] = keypointsMap[camera][i];
 					}
-					frameSet.keyPoints = keypoints;
+					frameSet.keypoints = keypoints;
 					frameSets.append(frameSet);
 				}
 			}
@@ -214,39 +247,26 @@ void TrainingSetExporter::addFrameSetsToJSON(const QList<ExportFrameSet> &frameS
 			float y_min = -1;
 			float y_max = -1;
 			std::vector<int> keypoints;
-			for (const auto &keypoint : frameSet.keyPoints[camera].second) {
-				keypoints.push_back(keypoint.x());
-				keypoints.push_back(keypoint.y());
+			for (const auto &keypoint : frameSet.keypoints[camera].second) {
+				keypoints.push_back(keypoint.point.x());
+				keypoints.push_back(keypoint.point.y());
 				keypoints.push_back(1);
 
-				if (x_min == -1) x_min = keypoint.x();
-				else if (keypoint.x() < x_min) x_min = keypoint.x();
-				if (y_min == -1) y_min = keypoint.y();
-				else if (keypoint.y() < y_min) y_min = keypoint.y();
-				if (x_max == -1) x_max = keypoint.x();
-				else if (keypoint.x() > x_max) x_max = keypoint.x();
-				if (y_max == -1) y_max = keypoint.y();
-				else if (keypoint.y() > y_max) y_max = keypoint.y();
+				if (keypoint.state != NotAnnotated && keypoint.state != Suppressed) {
+					if (x_min == -1) x_min = keypoint.point.x();
+					else if (keypoint.point.x() < x_min) x_min = keypoint.point.x();
+					if (y_min == -1) y_min = keypoint.point.y();
+					else if (keypoint.point.y() < y_min) y_min = keypoint.point.y();
+					if (x_max == -1) x_max = keypoint.point.x();
+					else if (keypoint.point.x() > x_max) x_max = keypoint.point.x();
+					if (y_max == -1) y_max = keypoint.point.y();
+					else if (keypoint.point.y() > y_max) y_max = keypoint.point.y();
+				}
 			}
-			float x_size = x_max-x_min;
-			float y_size = y_max-y_min;
-
-
-			j["annotations"].push_back({
-				{"area", 0},
-				{"iscrowd", 0},
-				{"image_id", id},
-				{"segmentation", json::array()},
-				{"bbox", {x_min, y_min, x_size, y_size}},
-				{"num_keypoints", frameSet.keyPoints[camera].second.size()},
-				{"keypoints", keypoints},
-				{"category_id", 1},
-				{"id", id}
-			});
 
 			j["images"].push_back({
-				{"id", id++},
-				{"file_name", (frameSet.basePath + "/" + camera + "/" + frameSet.keyPoints[camera].first).toStdString()},
+				{"id", id},
+				{"file_name", (frameSet.basePath + "/" + camera + "/" + frameSet.keypoints[camera].first).toStdString()},
 				{"width", 1280},
 				{"height", 1024},
 				{"date_captured", ""},
@@ -254,6 +274,25 @@ void TrainingSetExporter::addFrameSetsToJSON(const QList<ExportFrameSet> &frameS
 				{"coco_url", ""},
 				{"flickr_url", ""}
 			});
+
+			if (x_min != -1) {
+				float x_size = x_max-x_min;
+				float y_size = y_max-y_min;
+
+				//TODO: Make this work with multiple entities
+				j["annotations"].push_back({
+					{"area", 0},
+					{"iscrowd", 0},
+					{"image_id", id},
+					{"segmentation", json::array()},
+					{"bbox", {x_min, y_min, x_size, y_size}},
+					{"num_keypoints", frameSet.keypoints[camera].second.size()},
+					{"keypoints", keypoints},
+					{"category_id", 1},
+					{"id", id}
+				});
+			}
+			id++;
 		}
 	}
 }
@@ -263,8 +302,8 @@ void TrainingSetExporter::copyFrames(ExportConfig &exportConfig, const QList<Exp
 	for (const auto &frameSet : frameSets) {
 		for (const auto &camera : frameSet.cameras) {
 			dir.mkpath(exportConfig.savePath + "/" + exportConfig.trainingSetName + "/" + setName + "/" + frameSet.basePath + "/" + camera);
-			QString originalPath = frameSet.originalPath + "/" + camera + "/" + frameSet.keyPoints[camera].first;
-			QString newPath = exportConfig.savePath + "/" + exportConfig.trainingSetName + "/" + setName + "/" + frameSet.basePath + "/" + camera + "/" + frameSet.keyPoints[camera].first;
+			QString originalPath = frameSet.originalPath + "/" + camera + "/" + frameSet.keypoints[camera].first;
+			QString newPath = exportConfig.savePath + "/" + exportConfig.trainingSetName + "/" + setName + "/" + frameSet.basePath + "/" + camera + "/" + frameSet.keypoints[camera].first;
 			QFile::copy(originalPath, newPath);
 		}
 	}
