@@ -29,13 +29,14 @@ class TrainingSetExporter : public QObject {
 
 	private:
 		QList<DatasetExportItem> &m_datasetExportItems;
+		QString m_primaryCamera;
 
 		void addInfo(json &j);
 		void addCategories(json &j, ExportConfig &exportConfig);
 		void addCalibration(json &j, ExportConfig &exportConfig);
 		void copyCalibrationParams(ExportConfig &exportConfig);
 		QList<ExportFrameSet> loadAllFrameSets(ExportConfig &exportConfig);
-		void addFrameSetsToJSON(const QList<ExportFrameSet> &frameSets, json & j);
+		void addFrameSetsToJSON(ExportConfig &exportConfig, const QList<ExportFrameSet> &frameSets, json & j);
 		QMap<QString, bool> makeMapfromPairs(const QList<QPair<QString, bool>> &pairs);
 		void copyFrames(ExportConfig &exportConfig, const QList<ExportFrameSet> &frameSets, const QString &setName);
 	private slots:
