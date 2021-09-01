@@ -296,14 +296,14 @@ void TrainingSetExporter::addFrameSetsToJSON(ExportConfig &exportConfig, const Q
 					{"category_id", 1},
 					{"id", id}
 				});
+			}
 
-				if (exportConfig.trainingSetType == "3D") {
-					if (frameSetIndexMap.contains(frameSet.basePath + "/" + frameSet.keypoints[camera].first.split(".").takeFirst())) {
-						frameSetIndexMap[frameSet.basePath + "/" + frameSet.keypoints[camera].first.split(".").takeFirst()].append(id);
-					}
-					else {
-						frameSetIndexMap[frameSet.basePath + "/" + frameSet.keypoints[camera].first.split(".").takeFirst()] = {id};
-					}
+			if (exportConfig.trainingSetType == "3D") {
+				if (frameSetIndexMap.contains(frameSet.basePath + "/" + frameSet.keypoints[camera].first.split(".").takeFirst())) {
+					frameSetIndexMap[frameSet.basePath + "/" + frameSet.keypoints[camera].first.split(".").takeFirst()].append(id);
+				}
+				else {
+					frameSetIndexMap[frameSet.basePath + "/" + frameSet.keypoints[camera].first.split(".").takeFirst()] = {id};
 				}
 			}
 			id++;
