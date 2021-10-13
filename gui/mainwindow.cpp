@@ -135,11 +135,13 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 
 void MainWindow::openSettingsWindowSlot() {
 	settingsWindow->show();
+	settingsWindow->raise();
 }
 
 
 void MainWindow::openHelpWindowSlot() {
 	helpWindow->show();
+	helpWindow->raise();
 }
 
 

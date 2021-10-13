@@ -1,5 +1,0 @@
-Package: AnnotationTool
-Version: 0.3
-Architecture: amd64
-Maintainer: Timo Hueser <timo.hueser@gmail.com>
-Description: Annotation Tool for the JARVIS 3D tracking toolbox.

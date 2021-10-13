@@ -92,7 +92,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	QGridLayout *annotationsettingslayout = new QGridLayout(annotationSettingsBox);
 	QLabel *keypointSizeLabel = new QLabel("Keypoint Label Size");
 	keypointSizeEdit = new QSpinBox(annotationSettingsBox);
-	keypointSizeEdit->setRange(0,100);
+	keypointSizeEdit->setRange(1,200);
 	keypointSizeEdit->setValue(8);
 	connect(keypointSizeEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsWindow::keypointSizeChanged);
 	entitySettingsWidget = new QWidget(annotationSettingsBox);

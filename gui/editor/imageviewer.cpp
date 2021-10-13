@@ -192,7 +192,7 @@ void ImageViewer::mousePressEvent(QMouseEvent *event) {
 	else if (event->button() == Qt::MiddleButton) {
 		if (hiddenEntityList.contains(m_currentEntity)) return;
 		for (auto& pt : m_currentImgSet->frames[m_currentFrameIndex]->keypoints) {
-			if ((position-pt->coordinates()).manhattanLength() < 2) {
+			if ((position-pt->coordinates()).manhattanLength() < m_keypointSize/2) {
 				if (pt->state() == Annotated || pt->state() == Reprojected) {
 					pt->setState(NotAnnotated);
 					emit keypointRemoved(pt);
@@ -207,7 +207,7 @@ void ImageViewer::mousePressEvent(QMouseEvent *event) {
 	else if (event->button() == Qt::LeftButton) {
 		if (hiddenEntityList.contains(m_currentEntity)) return;
 		for (auto& pt : m_currentImgSet->frames[m_currentFrameIndex]->keypoints) {
-			if ((position-pt->coordinates()).manhattanLength() < 2 && (pt->state() == Annotated ||
+			if ((position-pt->coordinates()).manhattanLength() < m_keypointSize/2 && (pt->state() == Annotated ||
 					pt->state() == Reprojected)) {
 				m_draggedPoint = pt;
 				pt->setState(Annotated);
@@ -248,14 +248,14 @@ void ImageViewer::mouseMoveEvent(QMouseEvent *event) {
 		position = QPointF(m_crop.topLeft().rx()+position.rx()-m_widthOffset,
 											 m_crop.topLeft().ry()+position.ry()-m_heightOffset);
 		for (auto& pt : m_currentImgSet->frames[m_currentFrameIndex]->keypoints) {
-			if ((position-pt->coordinates()).manhattanLength() < 2 &&
-					(m_previousPosition-pt->coordinates()).manhattanLength() > 2) {
+			if ((position-pt->coordinates()).manhattanLength() < m_keypointSize/2 &&
+					(m_previousPosition-pt->coordinates()).manhattanLength() > m_keypointSize/2) {
 				pt->setShowName(true);
 				update();
 				break;
 			}
-			else if ((position-pt->coordinates()).manhattanLength() > 12 &&
-							 (m_previousPosition-pt->coordinates()).manhattanLength() < 12) {
+			else if ((position-pt->coordinates()).manhattanLength() > m_keypointSize*2 &&
+							 (m_previousPosition-pt->coordinates()).manhattanLength() < m_keypointSize*2) {
 				pt->setShowName(false);
 				update();
 				break;
