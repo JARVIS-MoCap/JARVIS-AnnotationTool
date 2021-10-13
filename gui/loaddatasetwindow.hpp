@@ -1,11 +1,11 @@
-/*****************************************************************
-	* File:			  loaddatasetwindow.hpp
-	* Created: 	  23. October 2020
-	* Author:		  Timo Hueser
-	* Contact: 	  timo.hueser@gmail.com
-	* Copyright:  2021 Timo Hueser
-	* License:    GPL v3.0
-	*****************************************************************/
+/******************************************************************************
+ * File:		loaddatasetwindow.hpp
+ * Created:		23. October 2020
+ * Author:		Timo Hueser
+ * Contact: 	timo.hueser@gmail.com
+ * Copyright:	2021 Timo Hueser
+ * License:		GPL v3.0
+ *****************************************************************************/
 
 #ifndef LOADDATASETWINDOW_H
 #define LOADDATASETWINDOW_H
@@ -60,7 +60,8 @@ class LoadDatasetWindow : public QDialog {
 		void moveLabelUpSlot();
 		void moveLabelDownSlot();
 		void updateCameraOrderList(const QString& dir);
-		void currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous);
+		void currentItemChangedSlot(QListWidgetItem *current, 
+									QListWidgetItem *previous);
 };
 
 #endif

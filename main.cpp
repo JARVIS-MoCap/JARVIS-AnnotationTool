@@ -101,7 +101,7 @@ int main(int argc, char **argv)
 	QApplication app (argc, argv);
 	app.setStyle(new DarkStyle);
 
-	QStringList themeSearchPaths = {"/home/trackingsetup/Documents/AnnotationToolbox/IconThemes", "IconThemes", "../IconThemes"};
+	QStringList themeSearchPaths = {"/usr/local/share/AnnotationTool/icons", "/home/trackingsetup/Documents/AnnotationToolbox/IconThemes", "IconThemes", "../IconThemes"};
 	QIcon::setThemeSearchPaths(themeSearchPaths);
 	QIcon::setThemeName("DarkIconTheme");
 

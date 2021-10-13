@@ -1,11 +1,11 @@
-/*****************************************************************
-	* File:			  loaddatasetwindow.cpp
-	* Created: 	  23. October 2020
-	* Author:		  Timo Hueser
-	* Contact: 	  timo.hueser@gmail.com
-	* Copyright:  2021 Timo Hueser
-	* License:    GPL v3.0
-	*****************************************************************/
+/*****************************************************************************
+ * File:		loaddatasetwindow.cpp
+ * Created:		23. October 2020
+ * Author:		Timo Hueser
+ * Contact:		timo.hueser@gmail.com
+ * Copyright:	2021 Timo Hueser
+ * License:		GPL v3.0
+ *****************************************************************************/
 
 #include "loaddatasetwindow.hpp"
 
@@ -29,11 +29,13 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
 	settings->beginGroup("DatasetLoader");
 	datasetFolderEdit->setText(settings->value("datasetFolder").toString());
 	settings->endGroup();
-	connect(datasetFolderEdit, &QLineEdit::textEdited, this, &LoadDatasetWindow::updateCameraOrderList);
+	connect(datasetFolderEdit, &QLineEdit::textEdited, 
+			this, &LoadDatasetWindow::updateCameraOrderList);
 	datasetFolderButton = new QPushButton();
 	datasetFolderButton->setMinimumSize(40,40);
 	datasetFolderButton->setIcon(QIcon::fromTheme("folder"));
-	connect(datasetFolderButton, &QPushButton::clicked, this, &LoadDatasetWindow::datasetFolderClickedSlot);
+	connect(datasetFolderButton, &QPushButton::clicked,
+			this, &LoadDatasetWindow::datasetFolderClickedSlot);
 	datasetfolderlayout->addWidget(datasetFolderEdit,0,0);
 	datasetfolderlayout->addWidget(datasetFolderButton,0,1);
 	QWidget *buttonWidget = new QWidget(this);
@@ -44,11 +46,13 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
 	loadDatasetButton = new QPushButton("Load Dataset");
 	loadDatasetButton->setMinimumSize(40,40);
 	loadDatasetButton->setIcon(QIcon::fromTheme("download"));
-	connect(loadDatasetButton, &QPushButton::clicked, this, &LoadDatasetWindow::loadDatasetClickedSlot);
+	connect(loadDatasetButton, &QPushButton::clicked, 
+			this, &LoadDatasetWindow::loadDatasetClickedSlot);
 	cancelButton = new QPushButton("Cancel");
 	cancelButton->setMinimumSize(40,40);
 	cancelButton->setIcon(QIcon::fromTheme("discard"));
-	connect(cancelButton, &QPushButton::clicked, this, &LoadDatasetWindow::reject);
+	connect(cancelButton, &QPushButton::clicked, 
+			this, &LoadDatasetWindow::reject);
 	buttonlayout->addWidget(spacer,0,0);
 	buttonlayout->addWidget(cancelButton,0,1);
 	buttonlayout->addWidget(loadDatasetButton,0,2);
@@ -57,16 +61,19 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
 	cameraOrderBox = new QGroupBox("Camera Order");
 	QGridLayout *cameraorderlayout = new QGridLayout(cameraOrderBox);
 	cameraOrderList = new QListWidget(cameraOrderBox);
-	connect(cameraOrderList, &QListWidget::currentItemChanged, this, &LoadDatasetWindow::currentItemChangedSlot);
+	connect(cameraOrderList, &QListWidget::currentItemChanged, 
+			this, &LoadDatasetWindow::currentItemChangedSlot);
 	initCameraListFromSettings();
 	upButton = new QPushButton();
 	upButton->setMinimumSize(30,30);
 	upButton->setIcon(QIcon::fromTheme("up"));
-	connect(upButton, &QPushButton::clicked, this, &LoadDatasetWindow::moveLabelUpSlot);
+	connect(upButton, &QPushButton::clicked, 
+			this, &LoadDatasetWindow::moveLabelUpSlot);
 	downButton = new QPushButton();
 	downButton->setMinimumSize(30,30);
 	downButton->setIcon(QIcon::fromTheme("down"));
-	connect(downButton, &QPushButton::clicked, this, &LoadDatasetWindow::moveLabelDownSlot);
+	connect(downButton, &QPushButton::clicked, 
+			this, &LoadDatasetWindow::moveLabelDownSlot);
 	cameraorderlayout->addWidget(cameraOrderList,0,0,1,2);
 	cameraorderlayout->addWidget(upButton, 1,0);
 	cameraorderlayout->addWidget(downButton,1,1);
@@ -76,6 +83,7 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
 	loaddatasetlayout->addWidget(buttonWidget,2,0);
 
 }
+
 
 void LoadDatasetWindow::datasetFolderClickedSlot() {
 	QString currentPath;
@@ -87,23 +95,29 @@ void LoadDatasetWindow::datasetFolderClickedSlot() {
 	else {
 		currentPath = QDir::homePath();
 	}
-	QString dir = QFileDialog::getExistingDirectory(this,"Dataset Folder", currentPath,
-				QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	QString dir = QFileDialog::getExistingDirectory(
+				      this, "Dataset Folder", currentPath,
+					  QFileDialog::ShowDirsOnly | 
+					  QFileDialog::DontResolveSymlinks);
+	
 	if (dir != "") {
 		datasetFolderEdit->setText(dir);
 		updateCameraOrderList(dir);
 	}
 }
 
+
 void LoadDatasetWindow::loadDatasetClickedSlot() {
 	if (datasetFolderEdit->text() != "") {
-		Dataset::dataset = new Dataset(datasetFolderEdit->text(), m_cameraNames);
+		Dataset::dataset = new Dataset(datasetFolderEdit->text(), 
+									   m_cameraNames);
 		if (Dataset::dataset->loadSuccessfull()) {
 			settings->beginGroup("DatasetLoader");
 			settings->setValue("datasetFolder", datasetFolderEdit->text());
 			settings->endGroup();
 			settings->beginGroup(datasetFolderEdit->text());
-			settings->setValue("cameraNames", QVariant::fromValue(m_cameraNames));
+			settings->setValue("cameraNames", 
+							   QVariant::fromValue(m_cameraNames));
 			settings->endGroup();
 			emit datasetLoaded();
 			this->close();
@@ -115,10 +129,14 @@ void LoadDatasetWindow::loadDatasetClickedSlot() {
  }
 }
 
+
 void LoadDatasetWindow::initCameraListFromSettings() {
-	m_cameraNames = QDir(datasetFolderEdit->text()).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+	m_cameraNames = QDir(datasetFolderEdit->text()).entryList(
+													    QDir::AllDirs | 
+														QDir::NoDotAndDotDot);
 	settings->beginGroup(datasetFolderEdit->text());
-	QList<QString> cameraNames = settings->value("cameraNames").value<QList<QString>>();
+	QList<QString> cameraNames = settings->value(
+								     "cameraNames").value<QList<QString>>();
 	settings->endGroup();
 	if (cameraNames.size() == m_cameraNames.size()) {
 		for (const auto cam : cameraNames) {
@@ -134,6 +152,7 @@ void LoadDatasetWindow::initCameraListFromSettings() {
 	}
 }
 
+
 void LoadDatasetWindow::updateCameraOrderList(const QString& dir) {
 	cameraOrderList->clear();
 	m_cameraNames = QDir(dir).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
@@ -144,6 +163,7 @@ void LoadDatasetWindow::updateCameraOrderList(const QString& dir) {
 
 	}
 }
+
 
 void LoadDatasetWindow::moveLabelUpSlot() {
 	int row = cameraOrderList->currentRow();
@@ -158,6 +178,7 @@ void LoadDatasetWindow::moveLabelUpSlot() {
 	cameraOrderList->setCurrentRow(newRow);
 }
 
+
 void LoadDatasetWindow::moveLabelDownSlot() {
 	int row = cameraOrderList->currentRow();
 	if (row == -1) return;
@@ -170,6 +191,7 @@ void LoadDatasetWindow::moveLabelDownSlot() {
 	m_cameraNames.move(row/2, newRow/2);
 	cameraOrderList->setCurrentRow(newRow);
 }
+
 
 void LoadDatasetWindow::addItem(const QString &text) {
 	QListWidgetItem * item = new QListWidgetItem();
@@ -184,7 +206,9 @@ void LoadDatasetWindow::addItem(const QString &text) {
 	cameraOrderList->addItem(seperatorItem);
 }
 
-void LoadDatasetWindow::currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous) {
+
+void LoadDatasetWindow::currentItemChangedSlot(QListWidgetItem *current, 
+											   QListWidgetItem *previous) {
 	if (current != nullptr)  {
 		current->setBackground(QColor(100,164,32));
 	}

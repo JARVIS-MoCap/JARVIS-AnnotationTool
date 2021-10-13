@@ -7,6 +7,8 @@
 	* License:    GPL v3.0
 	*****************************************************************/
 
+#include <filesystem>
+
 #include "helpwindow.hpp"
 
 #include <QGridLayout>
@@ -16,6 +18,7 @@
 #include <QDirIterator>
 #include <QThread>
 #include <QTextStream>
+
 
 
 HelpWindow::HelpWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
@@ -58,16 +61,26 @@ HelpWindow::HelpWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	tableOfContents->addTopLevelItem(gettingStartedItem);
 	tableOfContents->addTopLevelItem(calibrationItem);
 
-	m_contentMap[introductionItem] = "help/introduction.html";
-	m_contentMap[exampleItem] = "help/example.html";
-	m_contentMap[ownDataItem] = "help/owndata.html";
-	m_contentMap[recordingCalibrationItem] = "help/recordingcalibration.html";
-	m_contentMap[createCalibrationItem] = "help/createcalibration.html";
+
+	if(std::filesystem::exists("help/introduction.html")) {
+		m_contentMap[introductionItem] = "help/introduction.html";
+		m_contentMap[exampleItem] = "help/example.html";
+		m_contentMap[ownDataItem] = "help/owndata.html";
+		m_contentMap[recordingCalibrationItem] = "help/recordingcalibration.html";
+		m_contentMap[createCalibrationItem] = "help/createcalibration.html";
+	}
+	else {
+		m_contentMap[introductionItem] = "/usr/local/share/AnnotationTool/help/introduction.html";
+		m_contentMap[exampleItem] = "/usr/local/share/AnnotationTool/help/example.html";
+		m_contentMap[ownDataItem] = "/usr/local/share/AnnotationTool/help/owndata.html";
+		m_contentMap[recordingCalibrationItem] = "/usr/local/share/AnnotationTool/help/recordingcalibration.html";
+		m_contentMap[createCalibrationItem] = "/usr/local/share/AnnotationTool/help/createcalibration.html";
+	}
 
 	mainSplitter->addWidget(tableOfContents);
 	mainSplitter->addWidget(textBrowser);
 
-	setDocument("help/introduction.html");
+	setDocument(m_contentMap[introductionItem]);
 }
 
 void HelpWindow::itemSlectedSlot(QTreeWidgetItem *item, int column) {
@@ -81,7 +94,14 @@ void HelpWindow::itemSlectedSlot(QTreeWidgetItem *item, int column) {
 
 void HelpWindow::setDocument(const QString &path) {
 	QTextDocument *doc = new QTextDocument();
-	QFile f1("help/github-markdown.css");
+	QString markdownFileName;
+	if (std::filesystem::exists("help/github-markdown.css")) {
+		markdownFileName = "help/github-markdown.css";
+	}
+	else {
+		markdownFileName = "/usr/local/share/AnnotationTool/help/github-markdown.css";
+	}
+	QFile f1(markdownFileName);
 	f1.open(QFile::ReadOnly | QFile::Text);
 	QTextStream in1(&f1);
 	doc->setDefaultStyleSheet(in1.readAll());
