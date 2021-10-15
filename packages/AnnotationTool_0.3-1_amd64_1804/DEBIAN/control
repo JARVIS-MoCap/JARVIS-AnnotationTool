@@ -3,4 +3,4 @@ Version: 0.3
 Architecture: amd64
 Maintainer: Timo Hueser <timo.hueser@gmail.com>
 Description: Annotation Tool for the JARVIS 3D tracking toolbox.
-Depends: libilmbase-dev, libopenexr-dev, libtbb2, libdc1394-22, ffmpeg, libxcb-xinerama0, libxcb-xinput0, libdouble-conversion-dev
+Depends: libxcb-xinerama0, libdouble-conversion-dev, gstreamer1.0-libav, ffmpeg
