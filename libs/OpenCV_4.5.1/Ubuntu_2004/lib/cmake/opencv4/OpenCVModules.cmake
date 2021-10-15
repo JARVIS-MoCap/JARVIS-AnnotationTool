@@ -16,7 +16,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_targetsDefined)
 set(_targetsNotDefined)
 set(_expectedTargets)
-foreach(_expectedTarget libwebp libopenjp2 ippiw libprotobuf quirc ittnotify ade ocv.3rdparty.ffmpeg ocv.3rdparty.gstreamer ocv.3rdparty.v4l ocv.3rdparty.dc1394_2 opencv_core opencv_flann opencv_imgproc opencv_features2d opencv_imgcodecs opencv_videoio opencv_calib3d)
+foreach(_expectedTarget zlib libwebp ippiw ittnotify ade ocv.3rdparty.ffmpeg ocv.3rdparty.gstreamer opencv_core opencv_flann opencv_imgproc opencv_features2d opencv_imgcodecs opencv_videoio opencv_calib3d)
   list(APPEND _expectedTargets ${_expectedTarget})
   if(NOT TARGET ${_expectedTarget})
     list(APPEND _targetsNotDefined ${_expectedTarget})
@@ -50,25 +50,14 @@ if(_IMPORT_PREFIX STREQUAL "/")
   set(_IMPORT_PREFIX "")
 endif()
 
+# Create imported target zlib
+add_library(zlib STATIC IMPORTED)
+
 # Create imported target libwebp
 add_library(libwebp STATIC IMPORTED)
 
-# Create imported target libopenjp2
-add_library(libopenjp2 STATIC IMPORTED)
-
-set_target_properties(libopenjp2 PROPERTIES
-  INTERFACE_COMPILE_DEFINITIONS "OPJ_STATIC"
-  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:m>"
-)
-
 # Create imported target ippiw
 add_library(ippiw STATIC IMPORTED)
-
-# Create imported target libprotobuf
-add_library(libprotobuf STATIC IMPORTED)
-
-# Create imported target quirc
-add_library(quirc STATIC IMPORTED)
 
 # Create imported target ittnotify
 add_library(ittnotify STATIC IMPORTED)
@@ -85,9 +74,9 @@ add_library(ocv.3rdparty.ffmpeg INTERFACE IMPORTED)
 
 set_target_properties(ocv.3rdparty.ffmpeg PROPERTIES
   INTERFACE_COMPILE_DEFINITIONS "HAVE_FFMPEG"
-  INTERFACE_INCLUDE_DIRECTORIES "/usr/include/x86_64-linux-gnu"
-  INTERFACE_LINK_LIBRARIES "/usr/lib/x86_64-linux-gnu/libavcodec.so;/usr/lib/x86_64-linux-gnu/libavformat.so;/usr/lib/x86_64-linux-gnu/libavutil.so;/usr/lib/x86_64-linux-gnu/libswscale.so;/usr/lib/x86_64-linux-gnu/libavresample.so"
-  INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "/usr/include/x86_64-linux-gnu"
+  INTERFACE_INCLUDE_DIRECTORIES "/home/timo/ffmpeg_static/ffmpeg-static/target/include"
+  INTERFACE_LINK_LIBRARIES "/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libavformat.a;/usr/lib/x86_64-linux-gnu/libm.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libz.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/librtmp.a;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libz.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libssl.a;/usr/lib/x86_64-linux-gnu/libdl.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libcrypto.a;/usr/lib/x86_64-linux-gnu/libdl.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libavcodec.a;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libvpx.a;/usr/lib/x86_64-linux-gnu/libm.so;/usr/lib/x86_64-linux-gnu/libpthread.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libvpx.a;/usr/lib/x86_64-linux-gnu/libm.so;/usr/lib/x86_64-linux-gnu/libpthread.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libvpx.a;/usr/lib/x86_64-linux-gnu/libm.so;/usr/lib/x86_64-linux-gnu/libpthread.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libvpx.a;/usr/lib/x86_64-linux-gnu/libm.so;/usr/lib/x86_64-linux-gnu/libpthread.so;/usr/lib/x86_64-linux-gnu/libwebpmux.so;/usr/lib/x86_64-linux-gnu/libm.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libwebp.a;/usr/lib/x86_64-linux-gnu/libm.so;/usr/lib/x86_64-linux-gnu/libm.so;/usr/lib/x86_64-linux-gnu/liblzma.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libz.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libmp3lame.a;/usr/lib/x86_64-linux-gnu/libm.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libopenjp2.a;/usr/lib/x86_64-linux-gnu/libm.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libopus.a;/usr/lib/x86_64-linux-gnu/libm.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libspeex.a;/usr/lib/x86_64-linux-gnu/libm.so;/usr/lib/x86_64-linux-gnu/libtheoraenc.so;/usr/lib/x86_64-linux-gnu/libtheoradec.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libogg.a;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libvorbis.a;/usr/lib/x86_64-linux-gnu/libm.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libogg.a;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libvorbisenc.a;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libvorbis.a;/usr/lib/x86_64-linux-gnu/libm.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libogg.a;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libwebp.a;/usr/lib/x86_64-linux-gnu/libm.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libx264.a;/usr/lib/x86_64-linux-gnu/libpthread.so;/usr/lib/x86_64-linux-gnu/libm.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libx265.a;stdc++;/usr/lib/x86_64-linux-gnu/libm.so;gcc_eh;gcc;gcc_eh;gcc;/usr/lib/x86_64-linux-gnu/librt.so;/usr/lib/x86_64-linux-gnu/libdl.so;/usr/lib/x86_64-linux-gnu/libnuma.so;/usr/lib/x86_64-linux-gnu/libxvidcore.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libswresample.a;/usr/lib/x86_64-linux-gnu/libm.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libsoxr.a;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libswscale.a;/usr/lib/x86_64-linux-gnu/libm.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libavutil.a;/usr/lib/x86_64-linux-gnu/libm.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libavresample.a;/usr/lib/x86_64-linux-gnu/libm.so;/home/timo/ffmpeg_static/ffmpeg-static/target/lib/libavutil.a;/usr/lib/x86_64-linux-gnu/libm.so"
+  INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "/home/timo/ffmpeg_static/ffmpeg-static/target/include"
 )
 
 # Create imported target ocv.3rdparty.gstreamer
@@ -100,30 +89,11 @@ set_target_properties(ocv.3rdparty.gstreamer PROPERTIES
   INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "/usr/include/gstreamer-1.0;/usr/include/glib-2.0;/usr/lib/x86_64-linux-gnu/glib-2.0/include;/usr/include/gstreamer-1.0;/usr/include/glib-2.0;/usr/lib/x86_64-linux-gnu/glib-2.0/include;/usr/include/gstreamer-1.0;/usr/include/glib-2.0;/usr/lib/x86_64-linux-gnu/glib-2.0/include;/usr/include/gstreamer-1.0;/usr/include/orc-0.4;/usr/include/gstreamer-1.0;/usr/include/glib-2.0;/usr/lib/x86_64-linux-gnu/glib-2.0/include;/usr/include/gstreamer-1.0;/usr/include/orc-0.4;/usr/include/gstreamer-1.0;/usr/include/glib-2.0;/usr/lib/x86_64-linux-gnu/glib-2.0/include"
 )
 
-# Create imported target ocv.3rdparty.v4l
-add_library(ocv.3rdparty.v4l INTERFACE IMPORTED)
-
-set_target_properties(ocv.3rdparty.v4l PROPERTIES
-  INTERFACE_COMPILE_DEFINITIONS "HAVE_CAMV4L2"
-  INTERFACE_INCLUDE_DIRECTORIES ""
-  INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ""
-)
-
-# Create imported target ocv.3rdparty.dc1394_2
-add_library(ocv.3rdparty.dc1394_2 INTERFACE IMPORTED)
-
-set_target_properties(ocv.3rdparty.dc1394_2 PROPERTIES
-  INTERFACE_COMPILE_DEFINITIONS "HAVE_DC1394_2"
-  INTERFACE_INCLUDE_DIRECTORIES ""
-  INTERFACE_LINK_LIBRARIES "/usr/lib/x86_64-linux-gnu/libdc1394.so"
-  INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ""
-)
-
 # Create imported target opencv_core
 add_library(opencv_core STATIC IMPORTED)
 
 set_target_properties(opencv_core PROPERTIES
-  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>;/usr/lib/x86_64-linux-gnu/libz.so;\$<LINK_ONLY:ittnotify>"
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>;\$<LINK_ONLY:zlib>;\$<LINK_ONLY:va>;\$<LINK_ONLY:va-drm>;\$<LINK_ONLY:ittnotify>"
 )
 
 # Create imported target opencv_flann
@@ -151,14 +121,14 @@ set_target_properties(opencv_features2d PROPERTIES
 add_library(opencv_imgcodecs STATIC IMPORTED)
 
 set_target_properties(opencv_imgcodecs PROPERTIES
-  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:opencv_core>;\$<LINK_ONLY:opencv_imgproc>;opencv_core;opencv_imgproc;\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>;/usr/lib/x86_64-linux-gnu/libjpeg.so;\$<LINK_ONLY:libwebp>;/usr/lib/x86_64-linux-gnu/libpng.so;/usr/lib/x86_64-linux-gnu/libz.so;/usr/lib/x86_64-linux-gnu/libtiff.so;\$<LINK_ONLY:libopenjp2>;/usr/lib/x86_64-linux-gnu/libImath.so;/usr/lib/x86_64-linux-gnu/libIlmImf.so;/usr/lib/x86_64-linux-gnu/libIex.so;/usr/lib/x86_64-linux-gnu/libHalf.so;/usr/lib/x86_64-linux-gnu/libIlmThread.so;/usr/lib/x86_64-linux-gnu/libz.so"
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:opencv_core>;\$<LINK_ONLY:opencv_imgproc>;opencv_core;opencv_imgproc;\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>;/usr/lib/x86_64-linux-gnu/libjpeg.so;\$<LINK_ONLY:libwebp>;/usr/lib/x86_64-linux-gnu/libpng.so;\$<LINK_ONLY:zlib>;\$<LINK_ONLY:zlib>"
 )
 
 # Create imported target opencv_videoio
 add_library(opencv_videoio STATIC IMPORTED)
 
 set_target_properties(opencv_videoio PROPERTIES
-  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:opencv_core>;\$<LINK_ONLY:opencv_imgproc>;\$<LINK_ONLY:opencv_imgcodecs>;opencv_core;opencv_imgproc;opencv_imgcodecs;\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>;\$<LINK_ONLY:ocv.3rdparty.dc1394_2>;\$<LINK_ONLY:ocv.3rdparty.gstreamer>;\$<LINK_ONLY:ocv.3rdparty.v4l>;\$<LINK_ONLY:ocv.3rdparty.ffmpeg>"
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:opencv_core>;\$<LINK_ONLY:opencv_imgproc>;\$<LINK_ONLY:opencv_imgcodecs>;opencv_core;opencv_imgproc;opencv_imgcodecs;\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>;\$<LINK_ONLY:ocv.3rdparty.gstreamer>;\$<LINK_ONLY:ocv.3rdparty.ffmpeg>"
 )
 
 # Create imported target opencv_calib3d

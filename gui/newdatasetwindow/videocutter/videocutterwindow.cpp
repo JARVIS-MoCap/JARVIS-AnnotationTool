@@ -271,19 +271,17 @@ bool VideoCutterWindow::openVideos(QList<QString> videoPaths) {
 		}
 		player->setPlaylist(m_playlist);
 		m_playlist->setCurrentIndex(1);
-		//player->setMedia(QUrl::fromLocalFile(QFileInfo(path).absoluteFilePath()));
 		player->play();
 		player->pause();
     updateTimeLabels();
     updateTimeWindowTable();
 		updateCameraListSlot();
 
-		QTimer::singleShot(10, [this]{
-			timeLine->createTimeLineImage(rangeSlider->width());
-			rangeOverview->setFrameCount(m_frameCount);
-			rangeOverview->updateRange(rangeSlider->minimum(), rangeSlider->maximum(), videoWidget->width());
-		});
-
+		// QTimer::singleShot(10, [this]{
+		// 	timeLine->createTimeLineImage(rangeSlider->width());
+		// 	rangeOverview->setFrameCount(m_frameCount);
+		// 	rangeOverview->updateRange(rangeSlider->minimum(), rangeSlider->maximum(), videoWidget->width());
+		// });
 		return true;
 }
 

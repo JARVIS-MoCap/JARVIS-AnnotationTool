@@ -57,10 +57,10 @@
 /* #undef HAVE_GDAL */
 
 /* GTK+ 2.0 Thread support */
-#define HAVE_GTHREAD
+/* #undef HAVE_GTHREAD */
 
 /* GTK+ 2.x toolkit */
-#define HAVE_GTK
+/* #undef HAVE_GTK */
 
 /* Halide support */
 /* #undef HAVE_HALIDE */
@@ -78,7 +78,7 @@
 #define HAVE_IPP_IW_LL
 
 /* JPEG-2000 codec */
-#define HAVE_OPENJPEG
+/* #undef HAVE_OPENJPEG */
 /* #undef HAVE_JASPER */
 
 /* IJG JPEG codec */
@@ -107,7 +107,7 @@
 /* #undef HAVE_OPENCL_D3D11_NV */
 
 /* OpenEXR codec */
-#define HAVE_OPENEXR
+/* #undef HAVE_OPENEXR */
 
 /* OpenGL support*/
 /* #undef HAVE_OPENGL */
@@ -134,7 +134,7 @@
 /* #undef HAVE_HPX */
 
 /* TIFF codec */
-#define HAVE_TIFF
+/* #undef HAVE_TIFF */
 
 /* Win32 UI */
 /* #undef HAVE_WIN32UI */
@@ -144,10 +144,10 @@
 /* #undef WORDS_BIGENDIAN */
 
 /* VA library (libva) */
-/* #undef HAVE_VA */
+#define HAVE_VA
 
 /* Intel VA-API/OpenCL */
-/* #undef HAVE_VA_INTEL */
+#define HAVE_VA_INTEL
 
 /* Lapack */
 /* #undef HAVE_LAPACK */
@@ -162,6 +162,6 @@
 #define OPENCV_TRACE
 
 /* Library QR-code decoding */
-#define HAVE_QUIRC
+/* #undef HAVE_QUIRC */
 
 #endif // OPENCV_CVCONFIG_H_INCLUDED
