@@ -23,92 +23,6 @@ but not all the files it references.
     endif()
 endmacro()
 
-function(_qt5_Network_process_prl_file prl_file_location Configuration lib_deps link_flags)
-    set(_lib_deps)
-    set(_link_flags)
-
-    set(_qt5_install_libs "${_qt5Network_install_prefix}/lib/")
-
-    if(EXISTS "${prl_file_location}")
-        file(STRINGS "${prl_file_location}" _prl_strings REGEX "QMAKE_PRL_LIBS_FOR_CMAKE[ \t]*=")
-
-        # file(STRINGS) replaces all semicolons read from the file with backslash semicolons.
-        # We need to do a reverse transformation in CMake. For that we replace all backslash
-        # semicolons with just semicolons, but due to the qmake substitution feature
-        # creating this file, we need to double the amount of backslashes, so the final file
-        # should have three backslashes and one semicolon.
-        string(REGEX REPLACE "\\\;" ";" _prl_strings "${_prl_strings}")
-
-        string(REGEX REPLACE "QMAKE_PRL_LIBS_FOR_CMAKE[ \t]*=[ \t]*([^\n]*)" "\\1" _static_depends "${_prl_strings}")
-        string(REGEX REPLACE "[ \t]+" ";" _standard_libraries "${CMAKE_CXX_STANDARD_LIBRARIES}")
-        set(_search_paths)
-        set(_fw_search_paths)
-        set(_framework_flag)
-        string(REPLACE "\$\$[QT_INSTALL_LIBS]" "${_qt5_install_libs}" _static_depends "${_static_depends}")
-        foreach(_flag ${_static_depends})
-            string(REPLACE "\"" "" _flag ${_flag})
-            if(_flag MATCHES "^-framework$")
-                # Handle the next flag as framework name
-                set(_framework_flag 1)
-            elseif(_flag MATCHES "^-F(.*)$")
-                # Handle -F/foo/bar flags by recording the framework search paths to be used
-                # by find_library.
-                list(APPEND _fw_search_paths "${CMAKE_MATCH_1}")
-            elseif(_framework_flag OR _flag MATCHES "^-l(.*)$")
-                if(_framework_flag)
-                    # Handle Darwin framework bundles passed as -framework Foo
-                    set(_lib ${_flag})
-                else()
-                    # Handle normal libraries passed as -lfoo
-                    set(_lib "${CMAKE_MATCH_1}")
-                    foreach(_standard_library ${_standard_libraries})
-                        if(_standard_library MATCHES "^${_lib}(\\.lib)?$")
-                            set(_lib_is_default_linked TRUE)
-                            break()
-                        endif()
-                    endforeach()
-                endif()
-                if (_lib_is_default_linked)
-                    unset(_lib_is_default_linked)
-                elseif(_lib MATCHES "^pthread$")
-                    find_package(Threads REQUIRED)
-                    list(APPEND _lib_deps Threads::Threads)
-                else()
-                    set(current_search_paths "${_search_paths}")
-                    if(_framework_flag)
-                        set(current_search_paths "${_fw_search_paths}")
-                    endif()
-                    if(current_search_paths)
-                        find_library(_Qt5Network_${Configuration}_${_lib}_PATH ${_lib} HINTS ${current_search_paths} NO_DEFAULT_PATH)
-                    endif()
-                    find_library(_Qt5Network_${Configuration}_${_lib}_PATH ${_lib} HINTS ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
-                    mark_as_advanced(_Qt5Network_${Configuration}_${_lib}_PATH)
-                    if(_Qt5Network_${Configuration}_${_lib}_PATH)
-                        list(APPEND _lib_deps
-                            ${_Qt5Network_${Configuration}_${_lib}_PATH}
-                        )
-                    else()
-                        message(FATAL_ERROR "Library not found: ${_lib}")
-                    endif()
-                    unset(_framework_flag)
-                endif()
-            elseif(EXISTS "${_flag}")
-                # The flag is an absolute path to an existing library
-                list(APPEND _lib_deps "${_flag}")
-            elseif(_flag MATCHES "^-L(.*)$")
-                # Handle -Lfoo flags by putting their paths in the search path used by find_library above
-                list(APPEND _search_paths "${CMAKE_MATCH_1}")
-            else()
-                # Handle all remaining flags by simply passing them to the linker
-                list(APPEND _link_flags ${_flag})
-            endif()
-        endforeach()
-    endif()
-
-    string(REPLACE ";" " " _link_flags "${_link_flags}")
-    set(${lib_deps} ${_lib_deps} PARENT_SCOPE)
-    set(${link_flags} "SHELL:${_link_flags}" PARENT_SCOPE)
-endfunction()
 
 macro(_populate_Network_target_properties Configuration LIB_LOCATION IMPLIB_LOCATION
       IsDebugAndRelease)
@@ -120,11 +34,11 @@ macro(_populate_Network_target_properties Configuration LIB_LOCATION IMPLIB_LOCA
         ${_Qt5Network_LIB_DEPENDENCIES}
     )
     set(_static_deps
-        ${_Qt5Network_STATIC_${Configuration}_LIB_DEPENDENCIES}
     )
 
     set_target_properties(Qt5::Network PROPERTIES
         "IMPORTED_LOCATION_${Configuration}" ${imported_location}
+        "IMPORTED_SONAME_${Configuration}" "libQt5Network.so.5"
         # For backward compatibility with CMake < 2.8.12
         "IMPORTED_LINK_INTERFACE_LIBRARIES_${Configuration}" "${_deps};${_static_deps}"
     )
@@ -132,39 +46,6 @@ macro(_populate_Network_target_properties Configuration LIB_LOCATION IMPLIB_LOCA
                  "${_deps}"
     )
 
-    if(NOT ${IsDebugAndRelease})
-        set(_genex_condition "1")
-    else()
-        if(${Configuration} STREQUAL DEBUG)
-            set(_genex_condition "$<CONFIG:Debug>")
-        else()
-            set(_genex_condition "$<NOT:$<CONFIG:Debug>>")
-        endif()
-    endif()
-
-    if(_static_deps)
-        set(_static_deps_genex "$<${_genex_condition}:${_static_deps}>")
-        set_property(TARGET Qt5::Network APPEND PROPERTY INTERFACE_LINK_LIBRARIES
-                     "${_static_deps_genex}"
-        )
-    endif()
-
-    set(_static_link_flags "${_Qt5Network_STATIC_${Configuration}_LINK_FLAGS}")
-    if(_static_link_flags)
-        set(_static_link_flags_genex "$<${_genex_condition}:${_static_link_flags}>")
-        if(NOT CMAKE_VERSION VERSION_LESS "3.13")
-            set_property(TARGET Qt5::Network APPEND PROPERTY INTERFACE_LINK_OPTIONS
-                "${_static_link_flags_genex}"
-            )
-        else()
-            # Abuse INTERFACE_LINK_LIBRARIES to add link flags when CMake version is too low.
-            # Strip out SHELL:, because it is not supported in this property. And hope for the best.
-            string(REPLACE "SHELL:" "" _static_link_flags_genex "${_static_link_flags_genex}")
-            set_property(TARGET Qt5::Network APPEND PROPERTY INTERFACE_LINK_LIBRARIES
-                "${_static_link_flags_genex}"
-            )
-        endif()
-    endif()
 
 endmacro()
 
@@ -259,17 +140,7 @@ if (NOT TARGET Qt5::Network)
     set(_Qt5Network_LIB_DEPENDENCIES "Qt5::Core")
 
 
-    if(NOT Qt5_EXCLUDE_STATIC_DEPENDENCIES)
-
-        _qt5_Network_process_prl_file(
-            "${_qt5Network_install_prefix}/lib/libQt5Network.prl" RELEASE
-            _Qt5Network_STATIC_RELEASE_LIB_DEPENDENCIES
-            _Qt5Network_STATIC_RELEASE_LINK_FLAGS
-        )
-    endif()
-
-    add_library(Qt5::Network STATIC IMPORTED)
-    set_property(TARGET Qt5::Network PROPERTY IMPORTED_LINK_INTERFACE_LANGUAGES CXX)
+    add_library(Qt5::Network SHARED IMPORTED)
 
 
     set_property(TARGET Qt5::Network PROPERTY
@@ -277,22 +148,22 @@ if (NOT TARGET Qt5::Network)
     set_property(TARGET Qt5::Network PROPERTY
       INTERFACE_COMPILE_DEFINITIONS QT_NETWORK_LIB)
 
-    set_property(TARGET Qt5::Network PROPERTY INTERFACE_QT_ENABLED_FEATURES networkinterface;bearermanagement;dnslookup;udpsocket;dtls;ftp;http;localserver;networkdiskcache;networkproxy;opensslv11;ocsp;socks5;ssl)
-    set_property(TARGET Qt5::Network PROPERTY INTERFACE_QT_DISABLED_FEATURES securetransport;schannel;gssapi;sctp;sspi)
+    set_property(TARGET Qt5::Network PROPERTY INTERFACE_QT_ENABLED_FEATURES networkinterface;bearermanagement;dnslookup;ftp;gssapi;http;localserver;networkdiskcache;networkproxy;socks5;udpsocket)
+    set_property(TARGET Qt5::Network PROPERTY INTERFACE_QT_DISABLED_FEATURES dtls;opensslv11;ocsp;schannel;sctp;securetransport;ssl;sspi)
 
     # Qt 6 forward compatible properties.
     set_property(TARGET Qt5::Network
                  PROPERTY QT_ENABLED_PUBLIC_FEATURES
-                 networkinterface;bearermanagement;dnslookup;udpsocket;dtls;ftp;http;localserver;networkdiskcache;networkproxy;opensslv11;ocsp;socks5;ssl)
+                 networkinterface;bearermanagement;dnslookup;ftp;gssapi;http;localserver;networkdiskcache;networkproxy;socks5;udpsocket)
     set_property(TARGET Qt5::Network
                  PROPERTY QT_DISABLED_PUBLIC_FEATURES
-                 securetransport;schannel;gssapi;sctp;sspi)
+                 dtls;opensslv11;ocsp;schannel;sctp;securetransport;ssl;sspi)
     set_property(TARGET Qt5::Network
                  PROPERTY QT_ENABLED_PRIVATE_FEATURES
-                 openssl;linux-netlink;system-proxies)
+                 linux-netlink;system-proxies)
     set_property(TARGET Qt5::Network
                  PROPERTY QT_DISABLED_PRIVATE_FEATURES
-                 openssl-linked;libproxy;netlistmgr)
+                 openssl;openssl-linked;libproxy;netlistmgr)
 
     set_property(TARGET Qt5::Network PROPERTY INTERFACE_QT_PLUGIN_TYPES "bearer")
 
@@ -327,7 +198,7 @@ if (NOT TARGET Qt5::Network)
         endif()
     endif()
 
-    _populate_Network_target_properties(RELEASE "libQt5Network.a" "" FALSE)
+    _populate_Network_target_properties(RELEASE "libQt5Network.so.5.15.2" "" FALSE)
 
 
 
@@ -350,42 +221,6 @@ if (NOT TARGET Qt5::Network)
             "IMPORTED_LOCATION_${Configuration}" ${imported_location}
         )
 
-        set(_static_deps
-            ${_Qt5${Plugin}_STATIC_${Configuration}_LIB_DEPENDENCIES}
-        )
-
-        if(NOT ${IsDebugAndRelease})
-            set(_genex_condition "1")
-        else()
-            if(${Configuration} STREQUAL DEBUG)
-                set(_genex_condition "$<CONFIG:Debug>")
-            else()
-                set(_genex_condition "$<NOT:$<CONFIG:Debug>>")
-            endif()
-        endif()
-        if(_static_deps)
-            set(_static_deps_genex "$<${_genex_condition}:${_static_deps}>")
-            set_property(TARGET Qt5::${Plugin} APPEND PROPERTY INTERFACE_LINK_LIBRARIES
-                         "${_static_deps_genex}"
-            )
-        endif()
-
-        set(_static_link_flags "${_Qt5${Plugin}_STATIC_${Configuration}_LINK_FLAGS}")
-        if(_static_link_flags)
-            set(_static_link_flags_genex "$<${_genex_condition}:${_static_link_flags}>")
-            if(NOT CMAKE_VERSION VERSION_LESS "3.13")
-                set_property(TARGET Qt5::${Plugin} APPEND PROPERTY INTERFACE_LINK_OPTIONS
-                    "${_static_link_flags_genex}"
-                )
-            else()
-                # Abuse INTERFACE_LINK_LIBRARIES to add link flags when CMake version is too low.
-                # Strip out SHELL:, because it is not supported in this property. And hope for the best.
-                string(REPLACE "SHELL:" "" _static_link_flags_genex "${_static_link_flags_genex}")
-                set_property(TARGET Qt5::${Plugin} APPEND PROPERTY INTERFACE_LINK_LIBRARIES
-                    "${_static_link_flags_genex}"
-                )
-            endif()
-        endif()
     endmacro()
 
     if (pluginTargets)

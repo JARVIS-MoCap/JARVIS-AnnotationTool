@@ -25,4 +25,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/timo/Qt_build/qt-5.15.2-static/lib'
+libdir='/home/timo/Qt_build/Qt5dynamic_v5.15.2/lib'

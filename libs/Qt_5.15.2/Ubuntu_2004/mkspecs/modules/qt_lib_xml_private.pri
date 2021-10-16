@@ -6,6 +6,6 @@ QT.xml_private.includes = $$QT_MODULE_INCLUDE_BASE/QtXml/5.15.2 $$QT_MODULE_INCL
 QT.xml_private.frameworks =
 QT.xml_private.depends = core_private xml
 QT.xml_private.uses =
-QT.xml_private.module_config = v2 staticlib internal_module
+QT.xml_private.module_config = v2 internal_module
 QT.xml_private.enabled_features =
 QT.xml_private.disabled_features =

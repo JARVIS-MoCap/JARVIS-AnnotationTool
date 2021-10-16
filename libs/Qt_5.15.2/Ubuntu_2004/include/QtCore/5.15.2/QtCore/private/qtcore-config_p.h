@@ -22,7 +22,7 @@
 #define QT_FEATURE_poll_poll -1
 #define QT_FEATURE_poll_pollts -1
 #define QT_FEATURE_poll_select -1
-#define QT_FEATURE_system_pcre2 -1
+#define QT_FEATURE_system_pcre2 1
 #define QT_FEATURE_renameat2 1
 #define QT_FEATURE_sha3_fast 1
 #define QT_FEATURE_slog2 -1

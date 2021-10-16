@@ -64,13 +64,10 @@ macro(_qt5gui_find_extra_libs Name Libs LibDir IncDirs)
 endmacro()
 
 
-_qt5gui_find_extra_libs(EGL "EGL" "" "")
-
-_qt5gui_find_extra_libs(OPENGL "GL" "" "")
 
 
 
-set(Qt5Gui_OPENGL_IMPLEMENTATION GL)
+set(Qt5Gui_OPENGL_IMPLEMENTATION )
 
 get_target_property(_configs Qt5::Gui IMPORTED_CONFIGURATIONS)
 foreach(_config ${_configs})

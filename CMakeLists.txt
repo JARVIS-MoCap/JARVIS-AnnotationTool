@@ -40,7 +40,6 @@ if(NOT WIN32)
 else()
 	set(OpenCV_DIR "libs/OpenCV_4.5.1/${OS_LIB_DIR}")
 endif()
-set(OpenCV_STATIC ON)
 find_package(OpenCV REQUIRED)
 message(STATUS "OPENCV_DIR ${OpenCV_DIR}")
 
@@ -85,13 +84,13 @@ elseif(WIN32)
   )
 
 elseif (UNIX)
+  set(CMAKE_INSTALL_RPATH /usr/local/lib/AnnotationTool;/usr/local/lib/AnnotationTool/OpenCV;/usr/local/lib/AnnotationTool/Qt5/lib)
   add_executable(${PROJECT_NAME}
       main.cpp
       globals.hpp
       gui/Qt-DarkStyle/darkstyle.qrc
   )
-  install(TARGETS ${PROJECT_NAME})
-  install(DIRECTORY ${PROJECT_SOURCE_DIR}/icons DESTINATION ${CMAKE_INSTALL_PREFIX})
+  install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/AnnotationTool_0.3-1_amd64_2004/usr/local/bin)
 endif()
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused)
@@ -100,6 +99,8 @@ target_include_directories( ${PROJECT_NAME}
     PUBLIC
     ${PROJECT_SOURCE_DIR}
 )
+
+
 
 target_link_libraries(${PROJECT_NAME}
   Qt5::Widgets

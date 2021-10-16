@@ -1,4 +1,4 @@
-prefix=/home/timo/Qt_build/qt-5.15.2-static
+prefix=/home/timo/Qt_build/Qt5dynamic_v5.15.2
 exec_prefix=${prefix}
 libdir=${prefix}/lib
 includedir=${prefix}/include

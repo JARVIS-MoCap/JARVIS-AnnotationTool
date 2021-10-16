@@ -6,6 +6,6 @@ QT.multimediawidgets_private.includes = $$QT_MODULE_INCLUDE_BASE/QtMultimediaWid
 QT.multimediawidgets_private.frameworks =
 QT.multimediawidgets_private.depends = widgets_private multimediawidgets
 QT.multimediawidgets_private.uses =
-QT.multimediawidgets_private.module_config = v2 staticlib internal_module
+QT.multimediawidgets_private.module_config = v2 internal_module
 QT.multimediawidgets_private.enabled_features =
 QT.multimediawidgets_private.disabled_features =

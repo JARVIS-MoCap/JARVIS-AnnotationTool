@@ -10,7 +10,7 @@ library_names='  '
 old_library='libQt5LinuxAccessibilitySupport.a'
 
 # Libraries that this one depends upon.
-dependency_libs='-L=/home/timo/Qt_build/qt-5.15.2-static/lib -lQt5AccessibilitySupport -lQt5DBus -ldbus-1 -lQt5Gui -lGL -lqtlibpng -lqtharfbuzz -lQt5Core -lm -ldouble-conversion -licui18n -licuuc -licudata -ldl -lqtpcre2 -lgthread-2.0 -lglib-2.0 -lpthread'
+dependency_libs='-L=/home/timo/Qt_build/Qt5dynamic_v5.15.2/lib -lQt5AccessibilitySupport -lQt5DBus -lQt5Gui -lQt5Core -lpthread'
 
 # Version information for libQt5LinuxAccessibilitySupport.la
 current=65
@@ -25,4 +25,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='=/home/timo/Qt_build/qt-5.15.2-static/lib'
+libdir='=/home/timo/Qt_build/Qt5dynamic_v5.15.2/lib'

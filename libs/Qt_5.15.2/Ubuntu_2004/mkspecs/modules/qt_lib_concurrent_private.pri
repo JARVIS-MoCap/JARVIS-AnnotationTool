@@ -6,6 +6,6 @@ QT.concurrent_private.includes = $$QT_MODULE_INCLUDE_BASE/QtConcurrent/5.15.2 $$
 QT.concurrent_private.frameworks =
 QT.concurrent_private.depends = core_private concurrent
 QT.concurrent_private.uses =
-QT.concurrent_private.module_config = v2 staticlib internal_module
+QT.concurrent_private.module_config = v2 internal_module
 QT.concurrent_private.enabled_features =
 QT.concurrent_private.disabled_features =

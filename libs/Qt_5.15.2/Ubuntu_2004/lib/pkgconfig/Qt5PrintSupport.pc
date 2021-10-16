@@ -1,4 +1,4 @@
-prefix=/home/timo/Qt_build/qt-5.15.2-static
+prefix=/home/timo/Qt_build/Qt5dynamic_v5.15.2
 exec_prefix=${prefix}
 libdir=${prefix}/lib
 includedir=${prefix}/include
@@ -8,7 +8,6 @@ Name: Qt5 PrintSupport
 Description: Qt PrintSupport module
 Version: 5.15.2
 Libs: -L${libdir} -lQt5PrintSupport 
-Libs.private: /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Widgets.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Gui.a -lGL /home/timo/Qt_build/qt-5.15.2-static/lib/libqtlibpng.a /home/timo/Qt_build/qt-5.15.2-static/lib/libqtharfbuzz.a /home/timo/Qt_build/qt-5.15.2-static/lib/libQt5Core.a -lm -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/timo/Qt_build/qt-5.15.2-static/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -lpthread -lGL   
 Cflags: -DQT_PRINTSUPPORT_LIB -I${includedir}/QtPrintSupport -I${includedir}
 Requires: Qt5Core Qt5Gui Qt5Widgets
 
