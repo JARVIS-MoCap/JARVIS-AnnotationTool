@@ -1,11 +1,11 @@
 /*****************************************************************
-	* File:			  reprojectiontool.cpp
-	* Created: 	  02. December 2020
-	* Author:		  Timo Hueser
-	* Contact: 	  timo.hueser@gmail.com
-	* Copyright:  2021 Timo Hueser
-	* License:    GPL v3.0
-	*****************************************************************/
+ * File:			  reprojectiontool.cpp
+ * Created: 	  02. December 2020
+ * Author:		  Timo Hueser
+ * Contact: 	  timo.hueser@gmail.com
+ * Copyright:  2021 Timo Hueser
+ * License:    GPL v3.0
+ *****************************************************************/
 
 #include "reprojectiontool.hpp"
 
@@ -27,32 +27,37 @@ ReprojectionTool::ReprojectionTool(QList<QString> intrinsicsPaths,
 			cameraExtrinsics.rotationMatrix = cv::Mat::eye(3, 3, CV_64F);
 			cameraExtrinsics.translationVector = cv::Mat::zeros(3,1, CV_64F);
 			cv::vconcat(cameraExtrinsics.rotationMatrix,
-									cameraExtrinsics.translationVector.t(),cameraExtrinsics.locationMatrix);
+									cameraExtrinsics.translationVector.t(),
+									cameraExtrinsics.locationMatrix);
 		}
 		m_cameraExtrinsicsList.append(cameraExtrinsics);
 	}
 }
 
 
-void ReprojectionTool::readIntrinsics(const QString& path, CameraIntrinics& cameraIntrinics) {
+void ReprojectionTool::readIntrinsics(const QString& path,
+			CameraIntrinics& cameraIntrinics) {
 	cv::FileStorage fs(path.toStdString(), cv::FileStorage::READ);
 	fs["intrinsicMatrix"] >> cameraIntrinics.intrinsicMatrix;
 	fs["distortionCoefficients"] >> cameraIntrinics.distortionCoefficients;
 }
 
 
-void ReprojectionTool::readExtrinsincs(const QString& path, CameraExtrinsics& cameraExtrinsics) {
+void ReprojectionTool::readExtrinsincs(const QString& path,
+			CameraExtrinsics& cameraExtrinsics) {
 	cv::FileStorage fs(path.toStdString(), cv::FileStorage::READ);
 	fs["R"] >> cameraExtrinsics.rotationMatrix;
 	fs["T"] >> cameraExtrinsics.translationVector;
 	fs["E"] >> cameraExtrinsics.essentialMatrix;
 	fs["F"] >> cameraExtrinsics.fundamentalMatrix;
-	cv::vconcat(cameraExtrinsics.rotationMatrix, cameraExtrinsics.translationVector.t(),
+	cv::vconcat(cameraExtrinsics.rotationMatrix,
+							cameraExtrinsics.translationVector.t(),
 							cameraExtrinsics.locationMatrix);
 }
 
 
-cv::Mat ReprojectionTool::reconstructPoint3D(QList<QPointF> points, QList<int> camerasToUse) {
+cv::Mat ReprojectionTool::reconstructPoint3D(QList<QPointF> points,
+			QList<int> camerasToUse) {
 	QList<cv::Mat> camMats;
 	QList<cv::Mat> intrinsicMats;
 	QList<cv::Mat> distCoefficients;
@@ -69,15 +74,21 @@ cv::Mat ReprojectionTool::reconstructPoint3D(QList<QPointF> points, QList<int> c
 	for (int i = 0; i < points.size(); i++) {
 		cv::Mat point = cv::Mat({points[i].x(),points[i].y()});
 		cv::Mat undistPoint;
-		cv::undistortPoints(point, undistPoint, intrinsicMats[i].t(), distCoefficients[i]);
-		undistPoint.at<double>(0) = undistPoint.at<double>(0) * intrinsicMats[i].at<double>(0,0) +
+		cv::undistortPoints(point, undistPoint, intrinsicMats[i].t(),
+					distCoefficients[i]);
+		undistPoint.at<double>(0) = undistPoint.at<double>(0) *
+																intrinsicMats[i].at<double>(0,0) +
 																intrinsicMats[i].at<double>(2,0);
-		undistPoint.at<double>(1) = undistPoint.at<double>(1) * intrinsicMats[i].at<double>(1,1) +
+		undistPoint.at<double>(1) = undistPoint.at<double>(1) *
+																intrinsicMats[i].at<double>(1,1) +
 																intrinsicMats[i].at<double>(2,1);
-		undistPoint = cv::Mat({undistPoint.at<double>(0),undistPoint.at<double>(1)});
+		undistPoint = cv::Mat({undistPoint.at<double>(0),
+													 undistPoint.at<double>(1)});
 
-		A(cv::Range(2*i, 2*i+2), cv::Range::all()) = undistPoint * camMats[i](cv::Range(2,3),
-																								 cv::Range::all()) - camMats[i](cv::Range(0, 2),
+		A(cv::Range(2*i, 2*i+2), cv::Range::all()) = undistPoint *
+																								 camMats[i](cv::Range(2,3),
+																								 cv::Range::all()) -
+																								 camMats[i](cv::Range(0, 2),
 																								 cv::Range::all());
 	}
 
@@ -96,9 +107,11 @@ QList<QPointF> ReprojectionTool::reprojectPoint(cv::Mat point3D) {
 	for (int cam = 0; cam < m_cameraIntrinsicsList.size(); cam ++) {
 		cv::Rodrigues(m_cameraExtrinsicsList[cam].rotationMatrix.t(), R);
 		cv::Mat test;
-		cv::projectPoints(point3D, R, m_cameraExtrinsicsList[cam].translationVector,
-			m_cameraIntrinsicsList[cam].intrinsicMatrix.t(), m_cameraIntrinsicsList[cam].distortionCoefficients, res);
-	reprojectedPoints.append(QPointF(res.at<double>(0,0), res.at<double>(0,1)));
+		cv::projectPoints(point3D, R,
+					m_cameraExtrinsicsList[cam].translationVector,
+					m_cameraIntrinsicsList[cam].intrinsicMatrix.t(),
+					m_cameraIntrinsicsList[cam].distortionCoefficients, res);
+		reprojectedPoints.append(QPointF(res.at<double>(0,0), res.at<double>(0,1)));
 	}
 	return reprojectedPoints;
 }

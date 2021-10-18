@@ -6,6 +6,6 @@ QT.remoteobjects_private.includes = $$QT_MODULE_INCLUDE_BASE/QtRemoteObjects/5.1
 QT.remoteobjects_private.frameworks =
 QT.remoteobjects_private.depends = core_private remoteobjects
 QT.remoteobjects_private.uses =
-QT.remoteobjects_private.module_config = v2 staticlib internal_module
+QT.remoteobjects_private.module_config = v2 internal_module
 QT.remoteobjects_private.enabled_features =
 QT.remoteobjects_private.disabled_features =

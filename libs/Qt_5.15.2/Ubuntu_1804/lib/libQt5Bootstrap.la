@@ -25,4 +25,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/trackingsetup/Documents/Qt5static_v5.15.2/lib'
+libdir='/home/trackingsetup/qt/Qt5shared_v5.15.2/lib'

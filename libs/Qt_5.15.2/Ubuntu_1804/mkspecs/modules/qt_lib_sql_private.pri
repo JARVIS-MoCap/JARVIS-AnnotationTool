@@ -6,6 +6,6 @@ QT.sql_private.includes = $$QT_MODULE_INCLUDE_BASE/QtSql/5.15.2 $$QT_MODULE_INCL
 QT.sql_private.frameworks =
 QT.sql_private.depends = core_private sql
 QT.sql_private.uses =
-QT.sql_private.module_config = v2 staticlib internal_module
+QT.sql_private.module_config = v2 internal_module
 QT.sql_private.enabled_features =
 QT.sql_private.disabled_features =

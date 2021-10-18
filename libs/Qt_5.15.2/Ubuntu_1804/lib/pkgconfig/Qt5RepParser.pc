@@ -1,4 +1,4 @@
-prefix=/home/trackingsetup/Documents/Qt5static_v5.15.2
+prefix=/home/trackingsetup/qt/Qt5shared_v5.15.2
 exec_prefix=${prefix}
 libdir=${prefix}/lib
 includedir=${prefix}/include

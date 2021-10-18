@@ -10,7 +10,7 @@ library_names='  '
 old_library='libQt5ServiceSupport.a'
 
 # Libraries that this one depends upon.
-dependency_libs='-L=/home/trackingsetup/Documents/Qt5static_v5.15.2/lib -lQt5Gui -lGL -lpng16 -lharfbuzz -lQt5DBus -ldbus-1 -lQt5Core -lm -lz -ldouble-conversion -licui18n -licuuc -licudata -ldl -lqtpcre2 -lgthread-2.0 -lglib-2.0 -lpthread'
+dependency_libs='-L=/home/trackingsetup/qt/Qt5shared_v5.15.2/lib -lQt5Gui -lQt5DBus -lQt5Core -lpthread'
 
 # Version information for libQt5ServiceSupport.la
 current=65
@@ -25,4 +25,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='=/home/trackingsetup/Documents/Qt5static_v5.15.2/lib'
+libdir='=/home/trackingsetup/qt/Qt5shared_v5.15.2/lib'

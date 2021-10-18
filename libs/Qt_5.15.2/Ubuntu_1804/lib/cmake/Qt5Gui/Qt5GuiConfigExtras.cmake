@@ -1,24 +1,6 @@
 
 
 
-set(_GL_INCDIRS "/usr/include/libdrm")
-find_path(_qt5gui_OPENGL_INCLUDE_DIR GL/gl.h
-    PATHS ${_GL_INCDIRS}
-)
-if (NOT _qt5gui_OPENGL_INCLUDE_DIR)
-    message(FATAL_ERROR "Failed to find \"GL/gl.h\" in \"${_GL_INCDIRS}\".")
-endif()
-unset(_GL_INCDIRS)
-
-# Don't check for existence of the _qt5gui_OPENGL_INCLUDE_DIR because it is
-# optional.
-
-list(APPEND Qt5Gui_INCLUDE_DIRS ${_qt5gui_OPENGL_INCLUDE_DIR})
-set_property(TARGET Qt5::Gui APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${_qt5gui_OPENGL_INCLUDE_DIR})
-
-unset(_qt5gui_OPENGL_INCLUDE_DIR CACHE)
-
-
 macro(_qt5gui_find_extra_libs Name Libs LibDir IncDirs)
     set(Qt5Gui_${Name}_LIBRARIES)
     set(Qt5Gui_${Name}_INCLUDE_DIRS ${IncDirs})
@@ -82,13 +64,10 @@ macro(_qt5gui_find_extra_libs Name Libs LibDir IncDirs)
 endmacro()
 
 
-_qt5gui_find_extra_libs(EGL "EGL" "" "/usr/include/libdrm")
-
-_qt5gui_find_extra_libs(OPENGL "GL" "" "/usr/include/libdrm")
 
 
 
-set(Qt5Gui_OPENGL_IMPLEMENTATION GL)
+set(Qt5Gui_OPENGL_IMPLEMENTATION )
 
 get_target_property(_configs Qt5::Gui IMPORTED_CONFIGURATIONS)
 foreach(_config ${_configs})

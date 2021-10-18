@@ -17,10 +17,12 @@
 
 Dataset * Dataset::dataset = nullptr;
 
-Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames) : m_datasetFolder(datasetFolder) {
+Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames) :
+			m_datasetFolder(datasetFolder) {
 	m_colorMap = new ColorMap(ColorMap::Jet);
 	if (cameraNames.size() == 0) {
-		m_cameraNames = QDir(datasetFolder).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+		m_cameraNames = QDir(datasetFolder).entryList(QDir::AllDirs |
+																									QDir::NoDotAndDotDot);
 	}
 	else {
 		m_cameraNames = cameraNames;
@@ -31,7 +33,8 @@ Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames) : m_d
 	}
 	QList<QFile*> saveFiles;
 	for (int i = 0; i < m_numCameras; i++) {
-		QFile *file = new QFile(datasetFolder + "/" + m_cameraNames[i] +"/annotations.csv");
+		QFile *file = new QFile(datasetFolder + "/" + m_cameraNames[i] +
+														"/annotations.csv");
 		saveFiles.append(file);
 		if (!file->open(QIODevice::ReadOnly)) {
 			return;
@@ -62,14 +65,22 @@ Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames) : m_d
 		for (int cam = 0; cam < m_numCameras; cam++) {
 			cells = saveFiles[cam]->readLine().split(',');
 			Frame *frame = new Frame();
-			frame->imagePath = datasetFolder + "/" + m_cameraNames[cam] + "/" + cells[0];
+			frame->imagePath = datasetFolder + "/" + m_cameraNames[cam] + "/" +
+												 cells[0];
 			int x,y;
 			GetImageSizeEx(frame->imagePath, &x,&y);
 			frame->imageDimensions = QSize(x,y);
 			frame->numKeypoints = m_keypointNameList.size();
+
 			for (int i = 0; i < m_keypointNameList.size(); i++) {
-				QColor color = m_colorMap->getColor(i%m_bodypartsList.size(), m_bodypartsList.size());
-				Keypoint *keypoint = new Keypoint(m_entityNameList[i], m_keypointNameList[i], color, QPointF(cells[3*i+1].toFloat(), cells[3*i+2].toFloat()));
+				QColor color = m_colorMap->getColor(i%m_bodypartsList.size(),
+																						m_bodypartsList.size());
+
+				Keypoint *keypoint = new Keypoint(m_entityNameList[i],
+																					m_keypointNameList[i],
+																					color,
+																					QPointF(cells[3*i+1].toFloat(),
+																					cells[3*i+2].toFloat()));
 				keypoint->setFrameIndex(cam);
 				if (cells[3*i+3].toInt() == 0) {
 					keypoint->setState(NotAnnotated);
@@ -84,7 +95,10 @@ Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames) : m_d
 				else if (cells[3*i+3].toInt() == 3) {
 					keypoint->setState(Suppressed);
 				}
-				connect(keypoint, &Keypoint::stateChanged, this, &Dataset::keypointStateChanged);
+
+				connect(keypoint, &Keypoint::stateChanged,
+								this, &Dataset::keypointStateChanged);
+
 				frame->keypoints.append(keypoint);
 				frame->keypointMap[keypoint->ID()] = keypoint;
 			}
@@ -99,18 +113,21 @@ Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames) : m_d
 	m_loadSuccessfull = true;
 }
 
+
 void Dataset::save(const QString& datasetFolder) {
 	QString dataFolder = datasetFolder;
 	if (datasetFolder == "") dataFolder = m_datasetFolder;
 	QList<QFile*> saveFiles;
 
 	for (int i = 0; i < m_numCameras; i++) {
-		QFile *file = new QFile(dataFolder + "/" + m_cameraNames[i] +"/annotations.csv");
+		QFile *file = new QFile(dataFolder + "/" + m_cameraNames[i] +
+														"/annotations.csv");
 		saveFiles.append(file);
 		if (!file->open(QIODevice::WriteOnly)) {
 			std::cout << "Can't open File" << std::endl;
 			QErrorMessage *msg = new QErrorMessage();
-			msg->showMessage("Error writing savefile. Make sure you have the right permissions...");
+			msg->showMessage("Error writing savefile." 
+											 "Make sure you have the right permissions...");
 			return;
 		}
 		 QTextStream stream(file);
@@ -141,9 +158,11 @@ void Dataset::save(const QString& datasetFolder) {
 	for (auto& imgSet : m_imgSets) {
 		for (int cam = 0; cam < m_numCameras; cam++) {
 			QTextStream stream(saveFiles[cam]);
-			stream << imgSet->frames[cam]->imagePath.split("/").last() << ",";	//decide on what should be in this path (look at DLC2.2)
+			stream << imgSet->frames[cam]->imagePath.split("/").last() << ",";
 			for (int i = 0; i < m_keypointNameList.size(); i++) {
-				Keypoint *keypoint =  imgSet->frames[cam]->keypointMap[m_entityNameList[i] + "/" + m_keypointNameList[i]];
+				Keypoint *keypoint = imgSet->frames[cam]->keypointMap[
+														 m_entityNameList[i] + "/" + m_keypointNameList[i]];
+
 				if (keypoint->state() == NotAnnotated) {
 					stream << ",," << 0 << ",";
 				}
@@ -162,7 +181,7 @@ void Dataset::save(const QString& datasetFolder) {
 			stream << "\n";
 		}
 	}
-	
+
 	for (int i = 0; i < m_numCameras; i++) {
 		saveFiles[i]->close();
 	}
@@ -181,10 +200,12 @@ bool Dataset::GetImageSizeEx(QString fn, int *x,int *y) {
     }
     unsigned char buf[24]; fread(buf,1,24,f);
 
-    if (buf[0]==0xFF && buf[1]==0xD8 && buf[2]==0xFF && buf[3]==0xE0 && buf[6]=='J' && buf[7]=='F' && buf[8]=='I' && buf[9]=='F') {
+    if (buf[0]==0xFF && buf[1]==0xD8 && buf[2]==0xFF && buf[3]==0xE0 &&
+				buf[6]=='J' && buf[7]=='F' && buf[8]=='I' && buf[9]=='F') {
         long pos=2;
         while (buf[2]==0xFF) {
-            if (buf[3]==0xC0 || buf[3]==0xC1 || buf[3]==0xC2 || buf[3]==0xC3 || buf[3]==0xC9 || buf[3]==0xCA || buf[3]==0xCB)
+            if (buf[3]==0xC0 || buf[3]==0xC1 || buf[3]==0xC2 || buf[3]==0xC3 ||
+								buf[3]==0xC9 || buf[3]==0xCA || buf[3]==0xCB)
                 break;
             pos += 2+(buf[4]<<8)+buf[5];
             if (pos+12>len) break;
@@ -209,7 +230,9 @@ bool Dataset::GetImageSizeEx(QString fn, int *x,int *y) {
     }
 
   // PNG: the first frame is by definition an IHDR frame, which gives dimensions
-    if ( buf[0]==0x89 && buf[1]=='P' && buf[2]=='N' && buf[3]=='G' && buf[4]==0x0D && buf[5]==0x0A && buf[6]==0x1A && buf[7]==0x0A && buf[12]=='I' && buf[13]=='H' && buf[14]=='D' && buf[15]=='R') {
+    if (buf[0]==0x89 && buf[1]=='P' && buf[2]=='N' && buf[3]=='G' &&
+				buf[4]==0x0D && buf[5]==0x0A && buf[6]==0x1A && buf[7]==0x0A &&
+				buf[12]=='I' && buf[13]=='H' && buf[14]=='D' && buf[15]=='R') {
         *x = (buf[16]<<24) + (buf[17]<<16) + (buf[18]<<8) + (buf[19]<<0);
         *y = (buf[20]<<24) + (buf[21]<<16) + (buf[22]<<8) + (buf[23]<<0);
         return true;

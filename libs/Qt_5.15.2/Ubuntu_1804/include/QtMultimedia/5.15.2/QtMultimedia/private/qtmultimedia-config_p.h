@@ -7,7 +7,7 @@
 #define QT_FEATURE_gstreamer_0_10 -1
 #define QT_FEATURE_gstreamer_app 1
 #define QT_FEATURE_gstreamer_encodingprofiles 1
-#define QT_FEATURE_gstreamer_gl 1
+#define QT_FEATURE_gstreamer_gl -1
 #define QT_FEATURE_gstreamer_photography -1
 #define QT_FEATURE_linux_v4l 1
 #define QT_FEATURE_openal -1

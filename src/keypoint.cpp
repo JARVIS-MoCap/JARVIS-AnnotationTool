@@ -10,8 +10,9 @@
 #include "keypoint.hpp"
 
 
-Keypoint::Keypoint(QString entity,QString bodypart, QColor color, QPointF coordinates)
-			: m_entity(entity), m_bodypart(bodypart), m_color(color), m_coordinates(coordinates) {
+Keypoint::Keypoint(QString entity,QString bodypart, QColor color,
+			QPointF coordinates) : m_entity(entity), m_bodypart(bodypart),
+			m_color(color), m_coordinates(coordinates) {
 	m_ID = m_entity + "/" + m_bodypart;
 }
 

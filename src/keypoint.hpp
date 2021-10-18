@@ -1,11 +1,11 @@
- /*****************************************************************
-	* File:			  keypoint.hpp
-	* Created: 	  23. October 2020
-	* Author:		  Timo Hueser
-	* Contact: 	  timo.hueser@gmail.com
-	* Copyright:  2021 Timo Hueser
-	* License:    GPL v3.0
-	*****************************************************************/
+/*****************************************************************
+ * File:			  keypoint.hpp
+ * Created: 	  23. October 2020
+ * Author:		  Timo Hueser
+ * Contact: 	  timo.hueser@gmail.com
+ * Copyright:  2021 Timo Hueser
+ * License:    GPL v3.0
+ *****************************************************************/
 
 #ifndef KEYPOINT_H
 #define KEYPOINT_H
@@ -15,9 +15,12 @@
 
 class Keypoint : public QObject {
 	Q_OBJECT
-	
+
 	public:
-		explicit Keypoint(QString entity, QString bopdypart, QColor color = QColor(255,255,255), QPointF coordinates = QPointF(0,0));
+		explicit Keypoint(QString entity,
+											QString bopdypart,
+											QColor color = QColor(255,255,255),
+											QPointF coordinates = QPointF(0,0));
 		~Keypoint();
 
 		void setCoordinates(QPointF coords);
@@ -39,7 +42,8 @@ class Keypoint : public QObject {
 
 
 	signals:
-		void stateChanged(KeypointState state, KeypointState previousState, int frameIndex);
+		void stateChanged(KeypointState state, KeypointState previousState,
+					int frameIndex);
 
 	private:
 		KeypointState m_state = NotAnnotated;

@@ -1,6 +1,7 @@
 Build static QT5:
 	-> Get QT from git with: git clone git://code.qt.io/qt/qt5.git
 	-> checkout desired version with: git checkout 5.15.2 (this Version works, others had problems)
+	-> inside qt5 run./init-repository
 	-> configure with:
 	../qt5/configure -release -no-pch -prefix /home/timo/Qt_build/Qt5shared_v5.15.2 -opensource -confirm-license -nomake tools -nomake tests -nomake examples -no-opengl -skip webengine -skip qt3d -skip qtandroidextras -skip qtcanvas3d -skip qtconnectivity -skip qtdatavis3d -skip qtdeclarative -skip qtdoc -skip qtgamepad -skip qtgraphicaleffects -skip qtlocation -skip qtmacextras -skip qtnetworkauth -skip qtpurchasing -skip qtquickcontrols -skip qtquickcontrols2 -skip qtscript -skip qtscxml -skip qtsensors -skip qtserialbus -skip qtquick3d -skip qtspeech -skip qttools -skip qtsensors -skip qttranslations -skip qtvirtualkeyboard -skip qtwayland -skip qtwebchannel -skip qtwebengine -skip qtwebsockets -skip qtwebview -skip qtwinextras -skip qtxmlpatterns  -skip qtwebglplugin -no-openssl -no-vulkan
 

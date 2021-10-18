@@ -1,4 +1,4 @@
-prefix=/home/trackingsetup/Documents/Qt5static_v5.15.2
+prefix=/home/trackingsetup/qt/Qt5shared_v5.15.2
 exec_prefix=${prefix}
 libdir=${prefix}/lib
 includedir=${prefix}/include
@@ -8,7 +8,6 @@ Name: Qt5 MultimediaWidgets
 Description: Qt MultimediaWidgets module
 Version: 5.15.2
 Libs: -L${libdir} -lQt5MultimediaWidgets 
-Libs.private: /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Multimedia.a -lpulse-mainloop-glib -lpulse /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Widgets.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Gui.a -lGL -lpng16 -lharfbuzz /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Network.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Core.a -lm -lz -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libqtpcre2.a -lgthread-2.0 -lglib-2.0 -lpthread /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Multimedia.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5OpenGL.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Widgets.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Gui.a -lpng16 -lharfbuzz /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Network.a /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libQt5Core.a -lpthread -lm -lz -ldouble-conversion -licui18n -licuuc -licudata -ldl /home/trackingsetup/Documents/Qt5static_v5.15.2/lib/libqtpcre2.a -lgthread-2.0 -lGL -lpulse-mainloop-glib -lpulse -lglib-2.0   
 Cflags: -DQT_MULTIMEDIAWIDGETS_LIB -I${includedir}/QtMultimediaWidgets -I${includedir}
 Requires: Qt5Core Qt5Gui Qt5Multimedia Qt5Widgets
 

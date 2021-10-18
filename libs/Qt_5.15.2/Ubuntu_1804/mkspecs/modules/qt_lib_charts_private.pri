@@ -6,6 +6,6 @@ QT.charts_private.includes = $$QT_MODULE_INCLUDE_BASE/QtCharts/5.15.2 $$QT_MODUL
 QT.charts_private.frameworks =
 QT.charts_private.depends = charts
 QT.charts_private.uses =
-QT.charts_private.module_config = v2 staticlib internal_module
+QT.charts_private.module_config = v2 internal_module
 QT.charts_private.enabled_features =
 QT.charts_private.disabled_features =

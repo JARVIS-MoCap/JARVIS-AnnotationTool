@@ -6,6 +6,6 @@ QT.x11extras_private.includes = $$QT_MODULE_INCLUDE_BASE/QtX11Extras/5.15.2 $$QT
 QT.x11extras_private.frameworks =
 QT.x11extras_private.depends = x11extras
 QT.x11extras_private.uses =
-QT.x11extras_private.module_config = v2 staticlib internal_module
+QT.x11extras_private.module_config = v2 internal_module
 QT.x11extras_private.enabled_features =
 QT.x11extras_private.disabled_features =
