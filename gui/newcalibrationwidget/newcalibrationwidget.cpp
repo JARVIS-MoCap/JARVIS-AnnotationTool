@@ -381,7 +381,7 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 
 	if (!checkCheckerboard()) {
 		m_errorMsg->showMessage("Your Checkerboard is symmetric, make sure you use an asymmetric checkerboard (see calibration guide).");
-		return;
+		//return;
 	}
 
 	calibrationProgressInfoWindow = new CalibrationProgressInfoWindow(m_calibrationConfig->cameraNames, m_calibrationConfig->cameraPairs, this);
