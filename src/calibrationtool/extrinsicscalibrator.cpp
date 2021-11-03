@@ -35,6 +35,19 @@ ExtrinsicsCalibrator::ExtrinsicsCalibrator(CalibrationConfig *calibrationConfig,
   }
   m_parametersSavePath = (m_calibrationConfig->calibrationSetPath + "/" +
                           m_calibrationConfig->calibrationSetName).toStdString();
+
+  m_charucoPattern = cv::Mat(cv::Size( m_calibrationConfig->patternWidth+1,  m_calibrationConfig->patternHeight+1), CV_32SC1);
+  m_detectedPattern = cv::Mat(cv::Size( m_calibrationConfig->patternWidth+1,  m_calibrationConfig->patternHeight+1), CV_32SC1);
+  m_charucoPattern = -1;
+  int id_count = 0;
+  for (int i = 0; i < m_calibrationConfig->patternWidth+1; i++) {
+    for (int j = 0; j <  m_calibrationConfig->patternHeight+1; j++) {
+      if ((i+j)%2 != 0) {
+        m_charucoPattern.at<int>(j,i) = id_count;
+        id_count++;
+      }
+    }
+  }
 }
 
 
@@ -150,9 +163,7 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
         else {
           patternFound2 = false;
         }
-        if (patternFound1 && patternFound2) {
-          checkRotation(corners1, img1);
-          checkRotation(corners2, img2);
+        if (patternFound1 && patternFound2 && checkRotation(corners1, img1) && checkRotation(corners2, img2)) {
           if (m_calibrationConfig->debug) {
             saveCheckerboard(cameraPair, img1,img2,corners1,corners2,counter);
           }
@@ -167,10 +178,9 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
   }
   if (m_interrupt) return false;
 
-  if(objectPointsAll.size() < m_calibrationConfig->framesForExtrinsics) {
-    emit calibrationError("Found " + QString::number(objectPointsAll.size()) +
-                          " valid checkerboard pairs. Make sure your checkerboard " +
-                          "parameters are set correctly or specify a lower number of frames to use.");
+  if(objectPointsAll.size() < 15) {
+    emit calibrationError("Found only " + QString::number(objectPointsAll.size()) +
+                          " valid checkerboards, aborting calibration. Make sure your checkerboard parameters are set correctly.");
     return false;
   }
 
@@ -269,33 +279,122 @@ QString ExtrinsicsCalibrator::getFormat(const QString& path, const QString& came
 }
 
 
-void ExtrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1) {
+
+bool ExtrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1) {
+  if (m_calibrationConfig->boardType == "Standard") {
+    int width = m_calibrationConfig->patternWidth;
+    int height = m_calibrationConfig->patternHeight;
+    cv::Point2i ctestd;
+    cv::Point2f p1 = corners1[width*height-1];
+    cv::Point2f p2 = corners1[width*height-2];
+    cv::Point2f p3 = corners1[width*(height-1)-1];
+    cv::Point2f p4 = corners1[width*(height-1)-2];
+    ctestd.x = (p1.x + p2.x + p3.x + p4.x) / 4;
+    ctestd.y = (p1.y + p2.y + p3.y + p4.y) / 4;
+
+    cv::Point2i ctestl;
+    p1 = corners1[0];
+    p2 = corners1[1];
+    p3 = corners1[width];
+    p4 = corners1[width+1];
+    ctestl.x = (p1.x + p2.x + p3.x + p4.x) / 4;
+    ctestl.y = (p1.y + p2.y + p3.y + p4.y) / 4;
+
+    cv::Vec3b colord = img1.at<cv::Vec3b>(ctestd.y,ctestd.x);
+    int color_sum_d = colord[0]+colord[1]+colord[2];
+    cv::Vec3b colorl = img1.at<cv::Vec3b>(ctestl.y,ctestl.x);
+    int color_sum_l = colorl[0]+colorl[1]+colorl[2];
+
+    if (color_sum_d > color_sum_l) {
+      std::reverse(corners1.begin(),corners1.end());
+    }
+    return true;
+  }
+  else {
+    cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_50);
+    cv::Ptr<cv::aruco::CharucoBoard> board = cv::aruco::CharucoBoard::create(7, 5, 0.04f, 0.02f, dictionary);
+    cv::Ptr<cv::aruco::DetectorParameters> params = cv::aruco::DetectorParameters::create();
+
+    params->cornerRefinementMethod = cv::aruco::CORNER_REFINE_CONTOUR;
+    cv::Mat  imageCopy;
+    img1.copyTo(imageCopy);
+    std::vector<int> markerIds;
+    std::vector<std::vector<cv::Point2f> > markerCorners;
+    cv::aruco::detectMarkers(img1, board->dictionary, markerCorners, markerIds, params);
+    if (markerIds.size() == 0) return false;
+    cv::aruco::drawDetectedMarkers(imageCopy, markerCorners, markerIds);
+    cv::imwrite(m_parametersSavePath  + "test.jpg", imageCopy);
+
+    m_detectedPattern = -1;
+    for (int i = 0; i < markerCorners.size(); i++) {
+      cv::Point2i markerPosition = getPositionOfMarkerOnBoard(corners1, markerCorners[i]);
+      if (markerPosition.x != -1) {
+        m_detectedPattern.at<int>(markerPosition.y+1,markerPosition.x+1) = markerIds[i];
+      }
+    }
+    std::cout << m_detectedPattern << std::endl;
+    int match = matchPattern();
+    if (match == 0) {
+      return false;
+    }
+    else if (match == 2) {
+      std::reverse(corners1.begin(),corners1.end());
+    }
+
+    return true;
+  }
+}
+
+int ExtrinsicsCalibrator::matchPattern() {
+  int unrotCount = 0;
+  int rotCount = 0;
+  for (int i = 0; i < m_calibrationConfig->patternWidth+1; i++) {
+    for (int j = 0; j <  m_calibrationConfig->patternHeight+1; j++) {
+      if (m_charucoPattern.at<int>(j,i) != -1) {
+        if (m_charucoPattern.at<int>(j,i) == m_detectedPattern.at<int>(j,i) || m_charucoPattern.at<int>(j,i) == m_detectedPattern.at<int>(j,i)) {
+          unrotCount++;
+        }
+        if ((m_charucoPattern.at<int>(j,i) == m_detectedPattern.at<int>(m_calibrationConfig->patternHeight-j,m_calibrationConfig->patternWidth-i))) {
+          rotCount++;
+        }
+      }
+    }
+  }
+  if (unrotCount == rotCount) {
+    return 0;
+  }
+  else if (unrotCount > rotCount) {
+    return 1;
+  }
+  else if (unrotCount < rotCount) {
+    return 2;
+  }
+}
+
+
+
+cv::Point2i ExtrinsicsCalibrator::getPositionOfMarkerOnBoard(std::vector< cv::Point2f>&cornersBoard, std::vector<cv::Point2f>&markerCorners) {
   int width = m_calibrationConfig->patternWidth;
   int height = m_calibrationConfig->patternHeight;
-	cv::Point2i ctestd;
-	cv::Point2f p1 = corners1[width*height-1];
-	cv::Point2f p2 = corners1[width*height-2];
-	cv::Point2f p3 = corners1[width*(height-1)-1];
-	cv::Point2f p4 = corners1[width*(height-1)-2];
-	ctestd.x = (p1.x + p2.x + p3.x + p4.x) / 4;
-	ctestd.y = (p1.y + p2.y + p3.y + p4.y) / 4;
+  cv::Point2i position;
+  position.x = -1;
+  position.y = -1;
+  for (int i = 0; i < width-1; i++) {
+    for (int j = 0; j < height-1; j++) {
+      cv::Point2f markerCenter;
+      markerCenter.x = (markerCorners[0].x+markerCorners[2].x)/2;
+      markerCenter.y = (markerCorners[0].y+markerCorners[2].y)/2;
+      cv::Point2f p1 = cornersBoard[j*width+i];
+      cv::Point2f p2 = cornersBoard[(j+1)*width+(i+1)];
 
-	cv::Point2i ctestl;
-	p1 = corners1[0];
-	p2 = corners1[1];
-	p3 = corners1[width];
-	p4 = corners1[width+1];
-	ctestl.x = (p1.x + p2.x + p3.x + p4.x) / 4;
-	ctestl.y = (p1.y + p2.y + p3.y + p4.y) / 4;
-
-	cv::Vec3b colord = img1.at<cv::Vec3b>(ctestd.y,ctestd.x);
-	int color_sum_d = colord[0]+colord[1]+colord[2];
-	cv::Vec3b colorl = img1.at<cv::Vec3b>(ctestl.y,ctestl.x);
-	int color_sum_l = colorl[0]+colorl[1]+colorl[2];
-
-	if (color_sum_d > color_sum_l) {
-		std::reverse(corners1.begin(),corners1.end());
-	}
+      if (((p1.x < p2.x && markerCenter.x > p1.x && markerCenter.x < p2.x) || (p1.x > p2.x && markerCenter.x < p1.x && markerCenter.x > p2.x))  &&
+          ((p1.y < p2.y && markerCenter.y > p1.y && markerCenter.y < p2.y) || (p1.y > p2.y && markerCenter.y < p1.y && markerCenter.y > p2.y))) {
+        position.x = i;
+        position.y = m_calibrationConfig->patternHeight-2-j;
+      }
+    }
+  }
+  return position;
 }
 
 

@@ -68,6 +68,7 @@ class NewCalibrationWidget : public QWidget {
 		QSpinBox *extrinsicsFramesEdit;
 		YesNoRadioWidget *saveDebugRadioWidget;
 
+		QComboBox *boardTypeCombo;
 		QSpinBox *widthEdit;
 		QSpinBox *heightEdit;
 		QDoubleSpinBox *sideLengthEdit;

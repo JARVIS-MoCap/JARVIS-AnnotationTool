@@ -115,15 +115,15 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	LabelWithToolTip *maxSamplingFrameRateLabel = new LabelWithToolTip("  Max. Sampling Framerate");
 	maxSamplingFrameRateEdit = new QSpinBox();
 	maxSamplingFrameRateEdit->setRange(1,100);
-	maxSamplingFrameRateEdit->setValue(20);
-	LabelWithToolTip *intrinsicsFramesLabel = new LabelWithToolTip("  Frames for Intrinsics Calibration");
+	maxSamplingFrameRateEdit->setValue(5);
+	LabelWithToolTip *intrinsicsFramesLabel = new LabelWithToolTip("  Max. Number of Frames for Intrinsics Calibration");
 	intrinsicsFramesEdit = new QSpinBox(calibParamsWidget);
 	intrinsicsFramesEdit->setRange(0,999);
-	intrinsicsFramesEdit->setValue(100);
-	LabelWithToolTip *extrinsicsFramesLabel = new LabelWithToolTip("  Frames for Extrinsics Calibration");
+	intrinsicsFramesEdit->setValue(20);
+	LabelWithToolTip *extrinsicsFramesLabel = new LabelWithToolTip("  Max. Number of  Frames for Extrinsics Calibration");
 	extrinsicsFramesEdit = new QSpinBox(calibParamsWidget);
 	extrinsicsFramesEdit->setRange(0,999);
-	extrinsicsFramesEdit->setValue(100);
+	extrinsicsFramesEdit->setValue(20);
 	LabelWithToolTip *saveDebugLabel = new LabelWithToolTip("  Save Debug Images");
 	saveDebugRadioWidget = new YesNoRadioWidget(calibParamsWidget);
 	saveDebugRadioWidget->setState(false);
@@ -142,6 +142,11 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	QWidget *checkerboardWiget = new QWidget(configWidget);
 	QGridLayout *checkerboardwidgetlayout = new QGridLayout(checkerboardWiget);
 	checkerboardwidgetlayout->setMargin(0);
+	LabelWithToolTip *boardTypeLabel = new LabelWithToolTip("  Board Type");
+	boardTypeCombo = new QComboBox(checkerboardWiget);
+	boardTypeCombo->addItem("Standard");
+	boardTypeCombo->addItem("ChAruco");
+	connect(boardTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NewCalibrationWidget::checkerBoardPatternChangesSlot);
 	LabelWithToolTip *widthLabel = new LabelWithToolTip("  Pattern Width");
 	widthEdit = new QSpinBox();
 	widthEdit->setRange(0,20);
@@ -170,6 +175,8 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 
 
 	i = 0;
+	checkerboardwidgetlayout->addWidget(boardTypeLabel,i,0);
+	checkerboardwidgetlayout->addWidget(boardTypeCombo,i++,1);
 	checkerboardwidgetlayout->addWidget(widthLabel,i,0);
 	checkerboardwidgetlayout->addWidget(widthEdit,i++,1);
 	checkerboardwidgetlayout->addWidget(heightLabel,i,0);
@@ -369,6 +376,7 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	m_calibrationConfig->framesForIntrinsics = intrinsicsFramesEdit->value();
 	m_calibrationConfig->framesForExtrinsics = extrinsicsFramesEdit->value();
 	m_calibrationConfig->debug = saveDebugRadioWidget->state();
+	m_calibrationConfig->boardType = boardTypeCombo->currentText();
 	m_calibrationConfig->patternWidth = widthEdit->value();
 	m_calibrationConfig->patternHeight = heightEdit->value();
 	m_calibrationConfig->patternSideLength = sideLengthEdit->value();
@@ -381,7 +389,7 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 
 	if (!checkCheckerboard()) {
 		m_errorMsg->showMessage("Your Checkerboard is symmetric, make sure you use an asymmetric checkerboard (see calibration guide).");
-		//return;
+		return;
 	}
 
 	calibrationProgressInfoWindow = new CalibrationProgressInfoWindow(m_calibrationConfig->cameraNames, m_calibrationConfig->cameraPairs, this);
@@ -468,7 +476,7 @@ bool NewCalibrationWidget::checkExtrinsics(const QString& path, QString & errorM
 
 
 bool NewCalibrationWidget::checkCheckerboard() {
-	if (m_calibrationConfig->patternWidth%2 + m_calibrationConfig->patternHeight%2 == 1) {
+	if (if m_calibrationConfig->boardType == "ChAruco" || m_calibrationConfig->patternWidth%2 + m_calibrationConfig->patternHeight%2 == 1) {
 		return true;
 	}
 	else {
@@ -543,7 +551,7 @@ QImage NewCalibrationWidget::createCheckerboardPreview() {
 void NewCalibrationWidget::checkerBoardPatternChangesSlot(int val) {
 	Q_UNUSED(val);
 	checkerBoardPreview->setPixmap(QPixmap::fromImage(createCheckerboardPreview().scaled((widthEdit->value()+1)*20,(heightEdit->value()+1)*20)));
-	if ((widthEdit->value()+ heightEdit->value()) % 2 == 0) {
+	if (boardTypeCombo->currentText() != "ChAruco" && (widthEdit->value()+ heightEdit->value()) % 2 == 0) {
 		checkerBoardPreviewBox->setStyleSheet("QGroupBox {  border: 4px solid rgba(164,32,34,255);}");
 		checkerBoardPreviewLabel->setText("<font color=#a42022>Use an assymetric Checkerboard!</font>");
 	}

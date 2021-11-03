@@ -89,6 +89,7 @@ struct CalibrationConfig {
 	int maxSamplingFrameRate;
 	int framesForIntrinsics;
 	int framesForExtrinsics;
+	QString boardType;
 	int patternWidth;
 	int patternHeight;
 	double patternSideLength;

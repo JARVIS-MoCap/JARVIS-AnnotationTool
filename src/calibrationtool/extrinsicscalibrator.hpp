@@ -22,6 +22,7 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/calib3d.hpp"
+#include <opencv2/aruco/charuco.hpp>
 #include <string>
 #include <vector>
 
@@ -56,6 +57,9 @@ class ExtrinsicsCalibrator : public QObject, public QRunnable {
       cv::Mat F;
     };
 
+		cv::Mat m_charucoPattern;
+		cv::Mat m_detectedPattern;
+
     std::vector<cv::Point3f> m_checkerBoardPoints;
     CalibrationConfig *m_calibrationConfig;
 		std::string m_parametersSavePath;
@@ -69,7 +73,9 @@ class ExtrinsicsCalibrator : public QObject, public QRunnable {
 		      std::vector<std::vector<cv::Point2f>> &imagePoints2, Intrinsics &i1, Intrinsics &i2, Extrinsics &e, cv::Size size, double thresholdFactor);
 		double calibrateIntrinsicsStep(std::string cameraName, std::vector<std::vector<cv::Point3f>> objectPoints, std::vector<std::vector<cv::Point2f>> imagePoints,
 		        cv::Size size, Intrinsics &intrinsics);
-		void checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1);
+		bool checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1);
+		cv::Point2i getPositionOfMarkerOnBoard(std::vector< cv::Point2f>&cornersBoard, std::vector<cv::Point2f>&markerCorners);
+		int matchPattern();
 		bool boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners, std::vector<cv::Point2f> &corners);
 		bool tryLoadIntrinsics(QList<QString> cameraPair, Intrinsics &i1, Intrinsics &i2);
 		QString getFormat(const QString& path, const QString& cameraName);

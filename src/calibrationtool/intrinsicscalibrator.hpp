@@ -20,6 +20,9 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/calib3d.hpp"
+#include <opencv2/aruco/charuco.hpp>
+
+
 #include <string>
 #include <vector>
 
@@ -48,6 +51,9 @@ class IntrinsicsCalibrator : public QObject, public QRunnable {
       cv::Mat D;
     };
 
+		cv::Mat m_charucoPattern;
+		cv::Mat m_detectedPattern;
+
     std::vector<cv::Point3f> m_checkerBoardPoints;
     CalibrationConfig *m_calibrationConfig;
 		std::string m_parametersSavePath;
@@ -57,7 +63,9 @@ class IntrinsicsCalibrator : public QObject, public QRunnable {
 		QList<QString> m_validRecordingFormats = {"avi", "mp4", "mov", "wmv",
 																							"AVI", "MP4", "WMV"};
 
-		void checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1);
+		bool checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1);
+		cv::Point2i getPositionOfMarkerOnBoard(std::vector< cv::Point2f>&cornersBoard, std::vector<cv::Point2f>&markerCorners);
+		int matchPattern();
 		bool boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners,
 					std::vector<cv::Point2f> &corners);
 		QString getFormat(const QString& path, const QString& cameraName);
