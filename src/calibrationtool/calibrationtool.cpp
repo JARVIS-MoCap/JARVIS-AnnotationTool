@@ -25,21 +25,22 @@ void CalibrationTool::makeCalibrationSet()  {
   m_calibrationCanceled = false;
   m_intrinsicsReproErrors.clear();
   m_extrinsicsReproErrors.clear();
-  if (m_calibrationConfig->seperateIntrinsics) {
-    QThreadPool *threadPool = QThreadPool::globalInstance();
-    int thread = 0;
-		for (const auto& cam : m_calibrationConfig->cameraNames) {
-			IntrinsicsCalibrator *intrinsicsCalibrator = new IntrinsicsCalibrator(m_calibrationConfig, cam, thread++);
-      connect(intrinsicsCalibrator, &IntrinsicsCalibrator::intrinsicsProgress, this, &CalibrationTool::intrinsicsProgress);
-      connect(intrinsicsCalibrator, &IntrinsicsCalibrator::finishedIntrinsics, this, &CalibrationTool::finishedIntrinsicsSlot);
-      connect(intrinsicsCalibrator, &IntrinsicsCalibrator::calibrationError, this, &CalibrationTool::calibrationErrorSlot);
-      connect(this, &CalibrationTool::calibrationCanceled, intrinsicsCalibrator, &IntrinsicsCalibrator::calibrationCanceledSlot);
+  if (!m_calibrationConfig->seperateIntrinsics) {
+    m_calibrationConfig->intrinsicsPath = m_calibrationConfig->extrinsicsPath;
+  }
+  QThreadPool *threadPool = QThreadPool::globalInstance();
+  int thread = 0;
+	for (const auto& cam : m_calibrationConfig->cameraNames) {
+		IntrinsicsCalibrator *intrinsicsCalibrator = new IntrinsicsCalibrator(m_calibrationConfig, cam, thread++);
+    connect(intrinsicsCalibrator, &IntrinsicsCalibrator::intrinsicsProgress, this, &CalibrationTool::intrinsicsProgress);
+    connect(intrinsicsCalibrator, &IntrinsicsCalibrator::finishedIntrinsics, this, &CalibrationTool::finishedIntrinsicsSlot);
+    connect(intrinsicsCalibrator, &IntrinsicsCalibrator::calibrationError, this, &CalibrationTool::calibrationErrorSlot);
+    connect(this, &CalibrationTool::calibrationCanceled, intrinsicsCalibrator, &IntrinsicsCalibrator::calibrationCanceledSlot);
 
- 			threadPool->start(intrinsicsCalibrator);
-		}
-    while (!threadPool->waitForDone(10)) {
-      QCoreApplication::instance()->processEvents();
-    }
+			threadPool->start(intrinsicsCalibrator);
+	}
+  while (!threadPool->waitForDone(10)) {
+    QCoreApplication::instance()->processEvents();
   }
   if (m_calibrationCanceled) return;
   if (!m_calibrationConfig->seperateIntrinsics || m_calibrationConfig->calibrateExtrinsics) {

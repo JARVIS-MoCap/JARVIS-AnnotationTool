@@ -99,15 +99,28 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair, Ex
     for (int j = 0; j < m_calibrationConfig->patternWidth; j++)
       checkerBoardPoints.push_back(cv::Point3f((float)j * m_calibrationConfig->patternSideLength,
                                    (float)i * m_calibrationConfig->patternSideLength, 0));
-  QString format1 = getFormat(m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] +
-                              "-" + cameraPair[1], cameraPair[0]);
-  QString format2 = getFormat(m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" +
-                              cameraPair[1], cameraPair[1]);
 
-  cv::VideoCapture cap1((m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" +
-                         cameraPair[1] + "/" + cameraPair[0] + "." + format1).toStdString());
-  cv::VideoCapture cap2((m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" +
-                         cameraPair[1] + "/" + cameraPair[1] + "." + format2).toStdString());
+  std::string cap1Path;
+  std::string cap2Path;
+  if (m_calibrationConfig->single_primary == false) {
+    QString format1 = getFormat(m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] +
+                                "-" + cameraPair[1], cameraPair[0]);
+    QString format2 = getFormat(m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" +
+                                cameraPair[1], cameraPair[1]);
+    cap1Path = (m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" +
+                           cameraPair[1] + "/" + cameraPair[0] + "." + format1).toStdString();
+    cap2Path = (m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "-" +
+                          cameraPair[1] + "/" + cameraPair[1] + "." + format1).toStdString();
+  }
+  else {
+    QString format1 = getFormat(m_calibrationConfig->extrinsicsPath, cameraPair[0]);
+    QString format2 = getFormat(m_calibrationConfig->extrinsicsPath, cameraPair[1]);
+    cap1Path = (m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] + "." + format1).toStdString();
+    cap2Path = (m_calibrationConfig->extrinsicsPath + "/" + cameraPair[1] + "." + format2).toStdString();
+    std::cout << "PATH: " << cap2Path << std::endl;
+  }
+  cv::VideoCapture cap1(cap1Path);
+  cv::VideoCapture cap2(cap2Path);
 
   int frameCount = cap1.get(cv::CAP_PROP_FRAME_COUNT);
   int frameRate = cap1.get(cv::CAP_PROP_FPS);

@@ -26,7 +26,6 @@ target_link_libraries(${PROJECT_NAME}
   opencv_calib3d
   opencv_videoio
   opencv_imgproc
-  opencv_highgui
   opencv_aruco
 )
 

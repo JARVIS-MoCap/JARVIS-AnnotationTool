@@ -271,6 +271,10 @@ void NewCalibrationWidget::updateNamesListSlot() {
 		QString extrinsicsPath = extrinsicsPathWidget->path();
 		for (QDirIterator it(extrinsicsPath); it.hasNext();) {
 			QString subpath = it.next();
+			if (m_validRecordingFormats.contains(subpath.split('.').takeLast())) {
+				m_calibrationConfig->single_primary = true;
+				break;
+			}
 			QString suffix = subpath.split('/').takeLast();
 			if (suffix != "." && suffix != "..") {
 				for (QDirIterator subit(extrinsicsPath + "/" + suffix); subit.hasNext();) {
@@ -279,6 +283,17 @@ void NewCalibrationWidget::updateNamesListSlot() {
 						if (detectedCams.count(subsubpath.split(".").takeFirst()) == 0) {
 							detectedCams.append(subsubpath.split(".").takeFirst());
 						}
+					}
+				}
+			}
+		}
+		if (m_calibrationConfig->single_primary == true) {
+			for (QDirIterator it(extrinsicsPath); it.hasNext();) {
+				QString subpath = it.next();
+				QString suffix = subpath.split('/').takeLast();
+				if (suffix != "." && suffix != "..") {
+					if (checkIsValidRecording(extrinsicsPath, suffix.split(".").takeFirst())) {
+						detectedCams.append(suffix.split(".").takeFirst());
 					}
 				}
 			}
@@ -297,15 +312,27 @@ void NewCalibrationWidget::updateNamesListSlot() {
 	}
 	QList<QList<QString>> detectedPairs;
 	QString extrinsicsPath = extrinsicsPathWidget->path();
-	for (QDirIterator it(extrinsicsPath); it.hasNext();) {
-		QString subpath = it.next();
-		QString suffix = subpath.split('/').takeLast();
-		if (suffix != "." && suffix != "..") {
-			QString cam1 = suffix.split("-").takeFirst();
-			QString cam2 = suffix.split("-").takeLast();
-			QList<QString> cameraPair = {cam1, cam2};
-			detectedPairs.append(cameraPair);
+	if (m_calibrationConfig->single_primary == false) {
+		for (QDirIterator it(extrinsicsPath); it.hasNext();) {
+			QString subpath = it.next();
+			QString suffix = subpath.split('/').takeLast();
+			if (suffix != "." && suffix != "..") {
+				QString cam1 = suffix.split("-").takeFirst();
+				QString cam2 = suffix.split("-").takeLast();
+				QList<QString> cameraPair = {cam1, cam2};
+				detectedPairs.append(cameraPair);
+			}
 		}
+	}
+	else {
+		QString primary  = QInputDialog::getItem(this, "Select Primary Camera", "Primary:", detectedCams, 0, false);
+		for (const auto& cam :  detectedCams) {
+			if (cam != primary) {
+				QList<QString> cameraPair = {primary, cam};
+				detectedPairs.append(cameraPair);
+			}
+		}
+
 	}
 	if (detectedPairs.size() != 0) {
 		QList<QString> pairNames;
@@ -441,15 +468,28 @@ bool NewCalibrationWidget::checkIntrinsics(const QString& path, QString &errorMs
 bool NewCalibrationWidget::checkExtrinsics(const QString& path, QString & errorMsg) {
 	QList<QList<QString>> cameraPairs = extrinsicsPairList->getItems();
 	bool allFilesValid = true;
+
 	for (const auto & pair : cameraPairs) {
 		if (pair.size() == 2) {
-			if (!checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[0])) {
-				errorMsg = "Recording for primary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
-				allFilesValid = false;
+			if (m_calibrationConfig->single_primary == true) {
+				if (!checkIsValidRecording(path, pair[0])) {
+					errorMsg = "Recording for primary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
+					allFilesValid = false;
+				}
+				if (!checkIsValidRecording(path, pair[1])) {
+					errorMsg = "Recording for secondary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
+					allFilesValid = false;
+				}
 			}
-			if (!checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[1])) {
-				errorMsg = "Recording for secondary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
-				allFilesValid = false;
+			else {
+				if (!checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[0])) {
+					errorMsg = "Recording for primary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
+					allFilesValid = false;
+				}
+				if (!checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[1])) {
+					errorMsg = "Recording for secondary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
+					allFilesValid = false;
+				}
 			}
 		}
 		else if (pair.size() == 3) {
@@ -476,7 +516,7 @@ bool NewCalibrationWidget::checkExtrinsics(const QString& path, QString & errorM
 
 
 bool NewCalibrationWidget::checkCheckerboard() {
-	if (if m_calibrationConfig->boardType == "ChAruco" || m_calibrationConfig->patternWidth%2 + m_calibrationConfig->patternHeight%2 == 1) {
+	if (m_calibrationConfig->boardType == "ChAruco" || m_calibrationConfig->patternWidth%2 + m_calibrationConfig->patternHeight%2 == 1) {
 		return true;
 	}
 	else {

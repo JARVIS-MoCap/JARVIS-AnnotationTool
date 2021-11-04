@@ -121,6 +121,7 @@ void PresetsWindow::loadClickedSlot() {
 	close();
 }
 
+
 void PresetsWindow::discardClickedSlot() {
   QMessageBox::StandardButton reply;
 	reply = QMessageBox::question(this, "", "Delete this Preset?",
@@ -133,7 +134,9 @@ void PresetsWindow::discardClickedSlot() {
 	QList<QString>::iterator it = m_presets->begin();
 	it += presetsList->currentRow()/2;
 	m_presets->erase(it);
-	delete presetsList->takeItem(m_selectedRow);
+	int row = presetsList->currentRow();
+	delete presetsList->takeItem(row);
+	delete presetsList->takeItem(row);
 	settings->setValue(m_name + "/Presets", QVariant::fromValue(*m_presets));
 	m_selectedRow = -1;
 }

@@ -51,7 +51,6 @@ struct DatasetConfig {
 	int frameSetsRecording = 10;
 	QString samplingMethod = "kmeans";
 	QList<QString> validRecordingFormats = {"avi", "mp4", "mov", "wmv", "AVI", "MP4", "WMV"};
-
 };
 
 struct TimeLineWindow {
@@ -95,6 +94,8 @@ struct CalibrationConfig {
 	double patternSideLength;
 	QList<QString> cameraNames;
 	QList<QList<QString>> cameraPairs;
+	bool single_primary = false;
+
 };
 
 struct AnnotationCount {
