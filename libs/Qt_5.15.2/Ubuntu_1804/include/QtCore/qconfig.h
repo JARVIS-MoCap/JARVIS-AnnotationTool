@@ -38,7 +38,6 @@
 #define QT_FEATURE_force_asserts -1
 #define QT_LARGEFILE_SUPPORT 64
 #define QT_COMPILER_SUPPORTS_RDRND 1
-#define QT_COMPILER_SUPPORTS_RDSEED 1
 #define QT_VISIBILITY_AVAILABLE true
 #define QT_REDUCE_RELOCATIONS true
 #define QT_FEATURE_separate_debug_info -1

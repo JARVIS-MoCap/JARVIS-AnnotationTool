@@ -9,6 +9,6 @@ QMAKE_LIBS_LIBUDEV = -ludev
 QT_COORD_TYPE = double
 QMAKE_LIBS_ZLIB = -lz
 CONFIG -= precompile_header
-CONFIG += sse2 aesni sse3 ssse3 sse4_1 sse4_2 avx avx2 avx512f avx512bw avx512cd avx512dq avx512er avx512ifma avx512pf avx512vbmi avx512vl compile_examples enable_new_dtags f16c largefile rdrnd rdseed shani x86SimdAlways
+CONFIG += sse2 aesni sse3 ssse3 sse4_1 sse4_2 avx avx2 avx512f avx512bw avx512cd avx512dq avx512er avx512ifma avx512pf avx512vbmi avx512vl compile_examples enable_new_dtags f16c largefile rdrnd shani x86SimdAlways
 QT_BUILD_PARTS += libs
 QT_HOST_CFLAGS_DBUS += -I/usr/include/dbus-1.0 -I/usr/lib/x86_64-linux-gnu/dbus-1.0/include
