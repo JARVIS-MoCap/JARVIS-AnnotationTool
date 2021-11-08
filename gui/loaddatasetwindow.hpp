@@ -19,10 +19,12 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QSettings>
-#include <QToolBar>
 #include <QGroupBox>
-#include <QListWidget>
+#include <QTreeWidget>
 #include <QDialog>
+#include <QListWidget>
+
+#include "yaml-cpp/yaml.h"
 
 
 class LoadDatasetWindow : public QDialog {
@@ -35,33 +37,40 @@ class LoadDatasetWindow : public QDialog {
 		void datasetLoaded();
 
 	private:
-		void initCameraListFromSettings();
-
 		QSettings *settings;
 
-		QGroupBox *datasetFolderBox;
-		QLineEdit *datasetFolderEdit;
-		QPushButton *datasetFolderButton;
+		QLineEdit *datasetFileEdit;
+		QPushButton *datasetFileButton;
+		QLineEdit *selectedSegmentEdit;
 		QPushButton *loadDatasetButton;
 		QPushButton *cancelButton;
 
-		QGroupBox *cameraOrderBox;
+		QTreeWidget *datasetSegmentsTree;
+
 		QListWidget *cameraOrderList;
 		QPushButton *upButton;
 		QPushButton *downButton;
 
 		QList<QString> m_cameraNames;
 
+		YAML::Node m_datasetYaml;
+		QString m_datasetFolder;
+		QList<QString> m_segments;
+
 		void addItem(const QString &text);
+		void updateCameraOrderList();
+		void updateDatasetSegmentTree();
+
 
 	private slots:
-		void datasetFolderClickedSlot();
+		void datasetFileClickedSlot();
+		void datasetFileEditedSlot();
 		void loadDatasetClickedSlot();
 		void moveLabelUpSlot();
 		void moveLabelDownSlot();
-		void updateCameraOrderList(const QString& dir);
-		void currentItemChangedSlot(QListWidgetItem *current, 
+		void currentItemChangedSlot(QListWidgetItem *current,
 									QListWidgetItem *previous);
+		void datasetSegmentChangedSlot(QTreeWidgetItem *current, QTreeWidgetItem *previous);
 };
 
 #endif

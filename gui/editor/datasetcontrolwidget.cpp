@@ -17,6 +17,30 @@ DatasetControlWidget::DatasetControlWidget(QWidget *parent) : QWidget(parent) {
 	QLabel *datasetControlLabel = new QLabel("Dataset Control");
 	datasetControlLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
 
+	QLabel *segmentLabel = new QLabel("Segment");
+	segmentCombo = new QComboBox(this);
+	segmentCombo->setMinimumSize(200,25);
+	connect(segmentCombo, &QComboBox::currentTextChanged, this, &DatasetControlWidget::segmentChangedSlot);
+
+	QLabel *frameSetLabel = new QLabel("Frame Set");
+	QWidget *frameSetWidget = new QWidget(this);
+	QGridLayout *framesetwidgetlayout = new QGridLayout(frameSetWidget);
+	framesetwidgetlayout->setMargin(0);
+	frameSetEdit = new QLineEdit(frameSetWidget);
+	frameSetEdit->setMinimumSize(40,25);
+	frameSetEdit->setMaximumSize(50,25);
+	frameSetEdit->setReadOnly(true);
+	QLabel *seperatorLabel = new QLabel("/");
+	QWidget *frameSetSpacer = new QWidget(frameSetWidget);
+	frameSetSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	totalFrameSetLabel = new QLabel("");
+	totalFrameSetLabel->setMinimumSize(40,25);
+	totalFrameSetLabel->setMaximumSize(50,25);
+	framesetwidgetlayout->addWidget(frameSetSpacer,0,0);
+	framesetwidgetlayout->addWidget(frameSetEdit,0,1);
+	framesetwidgetlayout->addWidget(seperatorLabel,0,2);
+	framesetwidgetlayout->addWidget(totalFrameSetLabel,0,3);
+
 	framesTable = new QTableWidget(0, 2);
 	framesTable->setAlternatingRowColors(true);
 	framesTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -31,10 +55,15 @@ DatasetControlWidget::DatasetControlWidget(QWidget *parent) : QWidget(parent) {
 	connect(framesTable, &QTableWidget::cellDoubleClicked, this, &DatasetControlWidget::selectionChangedSlot);
 
 	QWidget *spacer = new QWidget(this);
+	spacer->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-	layout->addWidget(datasetControlLabel,0,0);
-	layout->addWidget(framesTable,1,0);
-	layout->addWidget(spacer,3,0);
+	layout->addWidget(datasetControlLabel,0,0,1,2);
+	layout->addWidget(segmentLabel, 1,0);
+	layout->addWidget(segmentCombo, 1,1);
+	layout->addWidget(frameSetLabel,2,0);
+	layout->addWidget(frameSetWidget,2,1);
+	layout->addWidget(framesTable,3,0,1,2);
+	layout->addWidget(spacer,4,0,1,2);
 
 	//--- SIGNAL-SLOT Connections ---//
 	//-> Incoming Signals
@@ -46,13 +75,29 @@ DatasetControlWidget::DatasetControlWidget(QWidget *parent) : QWidget(parent) {
 
 
 void DatasetControlWidget::datasetLoadedSlot() {
+	int currentIndex = 0;
+	int segmentIndex;
+	segmentCombo->blockSignals(true);
+	segmentCombo->clear();
+	segmentCombo->setEnabled(Dataset::dataset->segmentNames().length() != 1);
+	for (const auto &segment : Dataset::dataset->segmentNames()) {
+		segmentCombo->addItem(segment);
+		if (segment.split("/").takeLast() == Dataset::dataset->datasetFolder().split("/").takeLast()) {
+			segmentIndex = currentIndex;
+			m_currentSegment = segment;
+		}
+		currentIndex++;
+	}
+	segmentCombo->setCurrentIndex(segmentIndex);
+	segmentCombo->blockSignals(false);
+
+
 	framesTable->setRowCount(Dataset::dataset->numCameras());
 	m_annotatedCounts = new int [Dataset::dataset->numCameras()];
 	int row = 0;
 	for (const auto& cameraName : Dataset::dataset->cameraNames()) {
     QTableWidgetItem* frameItem = new QTableWidgetItem();
     frameItem->setText(cameraName);
-		frameItem->setFlags(frameItem->flags() ^ Qt::ItemIsEditable);
 		frameItem->setFlags(frameItem->flags() ^ Qt::ItemIsSelectable);
 		frameItem->setIcon(QIcon::fromTheme("no_check"));
     framesTable->setItem(row,0,frameItem);
@@ -71,6 +116,9 @@ void DatasetControlWidget::datasetLoadedSlot() {
 		 h += framesTable->rowHeight(i);
 	framesTable->setMaximumSize(10000,h);
 	selectionChangedSlot(0,0);
+	m_currentImgSetIndex = 0;
+	frameSetEdit->setText(QString::number(m_currentImgSetIndex+1));
+	totalFrameSetLabel->setText(QString::number(Dataset::dataset->imgSets().length()));
 }
 
 
@@ -119,6 +167,8 @@ void DatasetControlWidget::frameChangedSlot(int imgSetIndex, int frameIndex) {
 		framesTable->item(i,1)->setText("("+ QString::number(m_annotatedCounts[i]) +
 																		"/" + QString::number(m_totalCount) + ")");
 	}
+	frameSetEdit->setText(QString::number(m_currentImgSetIndex+1));
+	totalFrameSetLabel->setText(QString::number(Dataset::dataset->imgSets().length()));
 }
 
 
@@ -139,4 +189,21 @@ void DatasetControlWidget::keypointStateChangedSlot(KeypointState state,
 
 void DatasetControlWidget::imgSetChangedSlot() {
 	emit imgSetChanged(m_currentImgSetIndex);
+}
+
+void DatasetControlWidget::segmentChangedSlot(const QString& segment) {
+	Dataset::dataset->save();
+	QList<QString> segmentNames = Dataset::dataset->segmentNames();
+	QList<QString> cameraNames = Dataset::dataset->cameraNames();
+	QString datasetFolder = Dataset::dataset->datasetFolder();
+	QString datasetFolder2 = Dataset::dataset->datasetFolder();
+	datasetFolder = datasetFolder.remove(m_currentSegment);
+	datasetFolder = datasetFolder + segment;
+	Dataset::dataset = new Dataset(datasetFolder,
+	 								 		cameraNames, segmentNames);
+	m_currentSegment = segment;
+	m_currentImgSetIndex = 0;
+	frameSetEdit->setText(QString::number(m_currentImgSetIndex+1));
+	totalFrameSetLabel->setText(QString::number(Dataset::dataset->imgSets().length()));
+	emit datasetLoaded();
 }

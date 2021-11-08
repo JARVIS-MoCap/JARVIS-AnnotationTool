@@ -147,6 +147,8 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(this, &EditorWidget::frameChanged, datasetControlWidget, &DatasetControlWidget::frameChangedSlot);
 
 	//<-> Relayed Signals
+	connect(datasetControlWidget, &DatasetControlWidget::datasetLoaded, this, &EditorWidget::newSegmentLoaded);
+	connect(datasetControlWidget, &DatasetControlWidget::datasetLoaded, this, &EditorWidget::datasetLoadedSlot);
 	connect(keypointWidget, &KeypointWidget::currentEntityChanged, imageViewer, &ImageViewer::currentEntityChangedSlot);
 	connect(keypointWidget, &KeypointWidget::currentBodypartChanged, imageViewer, &ImageViewer::currentBodypartChangedSlot);
 	connect(keypointWidget, &KeypointWidget::toggleEntityVisible, imageViewer, &ImageViewer::toggleEntityVisibleSlot);
@@ -347,6 +349,8 @@ void EditorWidget::datasetLoadedSlot() {
 	imageViewer->setFrame(m_currentImgSet, m_currentFrameIndex);
 	nextButton->setEnabled(true);
 	nextSetButton->setEnabled(true);
+	previousButton->setEnabled(false);
+	previousSetButton->setEnabled(false);
 	splitterMovedSlot(0,0);
 	connect(Dataset::dataset, &Dataset::keypointStateChanged, datasetControlWidget, &DatasetControlWidget::keypointStateChangedSlot);
 }

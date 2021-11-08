@@ -15,6 +15,7 @@
 #include <QDirIterator>
 #include <QThreadPool>
 
+#include <fstream>
 #include <chrono>
 using namespace std::chrono;
 
@@ -27,16 +28,16 @@ DatasetCreator::DatasetCreator(DatasetConfig *datasetConfig) :
 
 
 void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings,
-			QList<QString> entities, QList<QString> keypoints) {
+			QList<QString> entities, QList<QString> keypoints, QList<SkeletonComponent> skeleton) {
 	delayl(100); 	//Give the gui Thread time to pop up the progressWindow
 	m_creationCanceled = false;
 	m_recordingItems = recordings;
 	m_entitiesList = entities;
 	m_keypointsList = keypoints;
-
+	m_skeleton = skeleton;
 	for (const auto & recording : m_recordingItems) {
 		m_dctMap.clear();
-		QList<QString> cameras = getCameraNames(recording.path);
+		QList<QString> cameras = getCameraNames(recording.path);	//TODO: Check if all recordings in one Dataset have the same cameras!
 		m_datasetConfig->numCameras = cameras.size();
 		emit recordingBeingProcessedChanged(recording.name, cameras);
 		m_datasetConfig->videoFormat = getVideoFormat(recording.path);
@@ -98,8 +99,43 @@ void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings,
 	if (!m_creationCanceled) {
 		emit datasetCreated();
 	}
+	createDatasetConfigFile(m_datasetConfig->datasetPath);
 }
 
+void DatasetCreator::createDatasetConfigFile(const QString& path) {
+	YAML::Node config;  // starts out as null
+
+	config["Name"] = m_datasetConfig->datasetName.toStdString();
+	config["Date of creation"] = QDate::currentDate().toString(Qt::ISODate).toStdString();
+	for (const auto & recording : m_recordingItems) {
+		config["Recordings"][recording.name.toStdString()] = YAML::Node();
+		for (const auto &segment : recording.timeLineList) {
+			config["Recordings"][recording.name.toStdString()].push_back(segment.name.toStdString());
+		}
+	}
+
+	for (const auto& camera : getCameraNames(m_recordingItems[0].path)) {
+		config["Cameras"].push_back(camera.toStdString());
+	}
+
+	for (const auto & entity : m_entitiesList) {
+		config["Entities"].push_back(entity.toStdString());
+	}
+
+	for (const auto & keypoint : m_keypointsList) {
+		config["Keypoints"].push_back(keypoint.toStdString());
+	}
+
+	for (const auto & bone : m_skeleton) {
+		//config["Skeleton"].push_back(bone[0].toStdString());
+		config["Skeleton"][bone.name.toStdString()]["Keypoints"].push_back(bone.keypointA.toStdString());
+		config["Skeleton"][bone.name.toStdString()]["Keypoints"].push_back(bone.keypointB.toStdString());
+		config["Skeleton"][bone.name.toStdString()]["Length"].push_back(bone.length);
+	}
+
+	std::ofstream configStream((path + "/" + m_datasetConfig->datasetName + "/" + m_datasetConfig->datasetName +  ".yaml").toStdString());
+	configStream << config;
+}
 
 QList<QString> DatasetCreator::getCameraNames(const QString& path) {
 	QList<QString> cameraNames;

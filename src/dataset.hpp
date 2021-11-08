@@ -20,11 +20,13 @@ class Dataset : public QObject {
 
 	public:
 		explicit Dataset(const QString& datasetFolder,
-					QList<QString> cameraNames = {});
+					QList<QString> cameraNames = {}, QList<QString> segmentNames = {});
 		static Dataset *dataset;
 		QList<ImgSet*> imgSets() {return m_imgSets;}
+		const QString& datasetFolder() {return m_datasetFolder;}
 		const QString& cameraName(int i) {return m_cameraNames[i];}
 		QList <QString> cameraNames() {return m_cameraNames;}
+		QList <QString> segmentNames() {return m_segmentNames;}
 		void save(const QString& datasetFolder = "");
 		int numCameras() const {return m_numCameras;}
 		QList<QString> entitiesList() const {return m_entitiesList;}
@@ -43,6 +45,7 @@ class Dataset : public QObject {
 		int m_numCameras;
 		int m_numEntities;
 		QList <QString> m_cameraNames;
+		QList <QString> m_segmentNames;
 		QList<ImgSet*> m_imgSets;
 		QString m_scorer;
 		QList<QString> m_keypointNameList;

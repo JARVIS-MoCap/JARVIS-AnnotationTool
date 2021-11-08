@@ -17,6 +17,7 @@
 #include "opencv2/videoio/videoio.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
+#include "yaml-cpp/yaml.h"
 
 #include <QRunnable>
 
@@ -25,7 +26,7 @@ Q_DECLARE_METATYPE(QList<cv::Mat>)
 
 class DatasetCreator : public QObject {
 	Q_OBJECT
-	
+
 	public:
 		explicit DatasetCreator(DatasetConfig *datasetConfig);
 
@@ -42,7 +43,7 @@ class DatasetCreator : public QObject {
 		void creationCanceled();
 
 	public slots:
-		void createDatasetSlot(QList<RecordingItem> recordings, QList<QString> entities, QList<QString> keypoints);
+		void createDatasetSlot(QList<RecordingItem> recordings, QList<QString> entities, QList<QString> keypoints, QList<SkeletonComponent> skeleton);
 		void cancelCreationSlot();
 
 	private:
@@ -50,10 +51,12 @@ class DatasetCreator : public QObject {
 		QList<RecordingItem> m_recordingItems;
 		QList<QString> m_entitiesList;
 		QList<QString> m_keypointsList;
+		QList<SkeletonComponent> m_skeleton;
 		QMap<int,QList<cv::Mat>> m_dctMap;
 		QMap<int,int> m_frameNumberMap;
 		bool m_creationCanceled = false;
 
+		void createDatasetConfigFile(const QString& path);
 		QList<QString> getCameraNames(const QString & path);
 		QString getVideoFormat(const QString& recording);
 		bool checkFrameCounts(const QString& recording, QList<QString> cameras);

@@ -115,6 +115,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	connect(mainBar, &MainBar::openSettingsWindow, this, &MainWindow::openSettingsWindowSlot);
 	connect(mainBar, &MainBar::openHelpWindow, this, &MainWindow::openHelpWindowSlot);
 	connect(editorWidget, &EditorWidget::quitClicked, this, &MainWindow::quitClickedSlot);
+	connect(editorWidget, &EditorWidget::newSegmentLoaded, this, &MainWindow::datasetLoadedSlot);
 	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded, this, &MainWindow::datasetLoadedSlot);
 	connect(mainBar, &MainBar::exitToMainPage, this, &MainWindow::exitToMainPageSlot);
 

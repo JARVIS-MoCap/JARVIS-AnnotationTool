@@ -43,6 +43,10 @@ endif()
 find_package(OpenCV REQUIRED)
 message(STATUS "OPENCV_DIR ${OpenCV_DIR}")
 
+set(yaml-cpp_DIR "libs/libyaml-cpp/${OS_LIB_DIR}/share/cmake/yaml-cpp")
+message (STATUS "${yaml-cpp_DIR}")
+find_package(yaml-cpp REQUIRED)
+
 if(NOT WIN32)
 	set(Eigen3_DIR "libs/eigen-3.3.8/MacOS/build")
 	message("${EIGEN3_DIR}")

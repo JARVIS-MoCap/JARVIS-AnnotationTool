@@ -17,7 +17,7 @@
 #include "datasetprogressinfowindow.hpp"
 #include "labelwithtooltip.hpp"
 #include "pathwidget.hpp"
-
+#include "skeletontablewidget.hpp"
 
 
 #include <QPushButton>
@@ -40,7 +40,10 @@ class NewDatasetWindow : public QWidget {
 	public slots:
 
 	signals:
-		void createDataset(QList<RecordingItem> recordings, QList<QString> entities, QList<QString> keypoints);
+		void createDataset(QList<RecordingItem> recordings,
+						QList<QString> entities,
+						QList<QString> keypoints,
+						QList<SkeletonComponent> skeleton);
 
 	private:
 		DatasetConfig	*m_datasetConfig;
@@ -61,6 +64,7 @@ class NewDatasetWindow : public QWidget {
 		RecordingsTable *recordingsTable;
 		ConfigurableItemList *entitiesItemList;
 		ConfigurableItemList *keypointsItemList;
+		SkeletonTableWidget *skeletonTable;
 
 
 		QPushButton *loadButton;

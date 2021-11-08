@@ -35,11 +35,12 @@ class EditorWidget : public QWidget {
 		explicit EditorWidget(QWidget *parent = nullptr);
 
 	signals:
+		void datasetLoaded();
 		void zoomToggled(bool toggle);
 		void panToggled(bool toggle);
 		void homeClicked();
 		void quitClicked();
-		void datasetLoaded();
+		void newSegmentLoaded();
 		void frameChanged(int currentImgSetIndex, int currentFrameIndex);
 		void imageTranformationChanged(int hueFactor, int saturationFactor, int brightnessFactor);
 		void keypointSizeChanged(int value);

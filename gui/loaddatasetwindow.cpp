@@ -23,21 +23,55 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
 	settings = new QSettings();
 	QGridLayout *loaddatasetlayout = new QGridLayout(this);
 
-	datasetFolderBox = new QGroupBox("Select Dataset Folder");
-	QGridLayout *datasetfolderlayout = new QGridLayout(datasetFolderBox);
-	datasetFolderEdit = new QLineEdit();
+	QGroupBox *datasetFileBox = new QGroupBox("Select Dataset");
+	QGridLayout *datasetfilelayout = new QGridLayout(datasetFileBox);
+	datasetFileEdit = new QLineEdit();
 	settings->beginGroup("DatasetLoader");
-	datasetFolderEdit->setText(settings->value("datasetFolder").toString());
-	settings->endGroup();
-	connect(datasetFolderEdit, &QLineEdit::textEdited, 
-			this, &LoadDatasetWindow::updateCameraOrderList);
-	datasetFolderButton = new QPushButton();
-	datasetFolderButton->setMinimumSize(40,40);
-	datasetFolderButton->setIcon(QIcon::fromTheme("folder"));
-	connect(datasetFolderButton, &QPushButton::clicked,
-			this, &LoadDatasetWindow::datasetFolderClickedSlot);
-	datasetfolderlayout->addWidget(datasetFolderEdit,0,0);
-	datasetfolderlayout->addWidget(datasetFolderButton,0,1);
+	connect(datasetFileEdit, &QLineEdit::textEdited,
+			this, &LoadDatasetWindow::datasetFileEditedSlot);
+	datasetFileButton = new QPushButton();
+	datasetFileButton->setMinimumSize(40,40);
+	datasetFileButton->setIcon(QIcon::fromTheme("folder"));
+	connect(datasetFileButton, &QPushButton::clicked,
+			this, &LoadDatasetWindow::datasetFileClickedSlot);
+	datasetfilelayout->addWidget(datasetFileEdit,0,0);
+	datasetfilelayout->addWidget(datasetFileButton,0,1);
+
+
+	QGroupBox *datasetSegmentBox = new QGroupBox("Select Segment");
+	QGridLayout *datasetsegmentboxlayout = new QGridLayout(datasetSegmentBox);
+	datasetSegmentsTree = new QTreeWidget(this);
+	datasetSegmentsTree->setColumnCount(1);
+	datasetSegmentsTree->setExpandsOnDoubleClick(false);
+	connect(datasetSegmentsTree, &QTreeWidget::currentItemChanged, this, &LoadDatasetWindow::datasetSegmentChangedSlot);
+	QLabel *selectedSegmentLabel = new QLabel("Selected Segment");
+	selectedSegmentEdit = new QLineEdit(datasetSegmentBox);
+	selectedSegmentEdit->setPlaceholderText("select a Segment above...");
+	selectedSegmentEdit->setReadOnly(true);
+	datasetsegmentboxlayout->addWidget(datasetSegmentsTree,0,0,1,2);
+	datasetsegmentboxlayout->addWidget(selectedSegmentLabel,1,0);
+	datasetsegmentboxlayout->addWidget(selectedSegmentEdit,1,1);
+
+
+	QGroupBox *cameraOrderBox = new QGroupBox("Camera Order");
+	QGridLayout *cameraorderlayout = new QGridLayout(cameraOrderBox);
+	cameraOrderList = new QListWidget(cameraOrderBox);
+	connect(cameraOrderList, &QListWidget::currentItemChanged,
+			this, &LoadDatasetWindow::currentItemChangedSlot);
+	upButton = new QPushButton();
+	upButton->setMinimumSize(30,30);
+	upButton->setIcon(QIcon::fromTheme("up"));
+	connect(upButton, &QPushButton::clicked,
+			this, &LoadDatasetWindow::moveLabelUpSlot);
+	downButton = new QPushButton();
+	downButton->setMinimumSize(30,30);
+	downButton->setIcon(QIcon::fromTheme("down"));
+	connect(downButton, &QPushButton::clicked,
+			this, &LoadDatasetWindow::moveLabelDownSlot);
+	cameraorderlayout->addWidget(cameraOrderList,0,0,1,2);
+	cameraorderlayout->addWidget(upButton, 1,0);
+	cameraorderlayout->addWidget(downButton,1,1);
+
 	QWidget *buttonWidget = new QWidget(this);
 	buttonWidget->setMaximumSize(10000,50);
 	QGridLayout *buttonlayout = new QGridLayout(buttonWidget);
@@ -46,79 +80,59 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
 	loadDatasetButton = new QPushButton("Load Dataset");
 	loadDatasetButton->setMinimumSize(40,40);
 	loadDatasetButton->setIcon(QIcon::fromTheme("download"));
-	connect(loadDatasetButton, &QPushButton::clicked, 
+	connect(loadDatasetButton, &QPushButton::clicked,
 			this, &LoadDatasetWindow::loadDatasetClickedSlot);
 	cancelButton = new QPushButton("Cancel");
 	cancelButton->setMinimumSize(40,40);
 	cancelButton->setIcon(QIcon::fromTheme("discard"));
-	connect(cancelButton, &QPushButton::clicked, 
+	connect(cancelButton, &QPushButton::clicked,
 			this, &LoadDatasetWindow::reject);
+
 	buttonlayout->addWidget(spacer,0,0);
 	buttonlayout->addWidget(cancelButton,0,1);
 	buttonlayout->addWidget(loadDatasetButton,0,2);
 
-
-	cameraOrderBox = new QGroupBox("Camera Order");
-	QGridLayout *cameraorderlayout = new QGridLayout(cameraOrderBox);
-	cameraOrderList = new QListWidget(cameraOrderBox);
-	connect(cameraOrderList, &QListWidget::currentItemChanged, 
-			this, &LoadDatasetWindow::currentItemChangedSlot);
-	initCameraListFromSettings();
-	upButton = new QPushButton();
-	upButton->setMinimumSize(30,30);
-	upButton->setIcon(QIcon::fromTheme("up"));
-	connect(upButton, &QPushButton::clicked, 
-			this, &LoadDatasetWindow::moveLabelUpSlot);
-	downButton = new QPushButton();
-	downButton->setMinimumSize(30,30);
-	downButton->setIcon(QIcon::fromTheme("down"));
-	connect(downButton, &QPushButton::clicked, 
-			this, &LoadDatasetWindow::moveLabelDownSlot);
-	cameraorderlayout->addWidget(cameraOrderList,0,0,1,2);
-	cameraorderlayout->addWidget(upButton, 1,0);
-	cameraorderlayout->addWidget(downButton,1,1);
-
-	loaddatasetlayout->addWidget(datasetFolderBox,0,0);
-	loaddatasetlayout->addWidget(cameraOrderBox,1,0);
-	loaddatasetlayout->addWidget(buttonWidget,2,0);
+	loaddatasetlayout->addWidget(datasetFileBox,0,0,1,2);
+	loaddatasetlayout->addWidget(datasetSegmentBox,1,0);
+	loaddatasetlayout->addWidget(cameraOrderBox,1,1);
+	loaddatasetlayout->addWidget(buttonWidget,2,0,1,2);
 
 }
 
 
-void LoadDatasetWindow::datasetFolderClickedSlot() {
+void LoadDatasetWindow::datasetFileClickedSlot() {
 	QString currentPath;
-	if (datasetFolderEdit->text() != "") {
-		QDir curDir = QDir(datasetFolderEdit->text());
+	if (datasetFileEdit->text() != "") {
+		QDir curDir = QDir(datasetFileEdit->text());
 		curDir.cdUp();
 		currentPath = curDir.path();
 	}
 	else {
 		currentPath = QDir::homePath();
 	}
-	QString dir = QFileDialog::getExistingDirectory(
-				      this, "Dataset Folder", currentPath,
-					  QFileDialog::ShowDirsOnly | 
-					  QFileDialog::DontResolveSymlinks);
-	
-	if (dir != "") {
-		datasetFolderEdit->setText(dir);
-		updateCameraOrderList(dir);
+
+	QString path = QFileDialog::getOpenFileName(
+				      this, "Load Dataset YAML File", currentPath, "YAML Files (*.yaml)");
+
+	if (path != "") {
+		m_datasetYaml = YAML::LoadFile(path.toStdString());
+		datasetFileEdit->setText(path);
+		updateCameraOrderList();
+		updateDatasetSegmentTree();
 	}
 }
 
 
+void LoadDatasetWindow::datasetFileEditedSlot() {
+
+}
+
 void LoadDatasetWindow::loadDatasetClickedSlot() {
-	if (datasetFolderEdit->text() != "") {
-		Dataset::dataset = new Dataset(datasetFolderEdit->text(), 
-									   m_cameraNames);
+	std::cout << m_datasetFolder.toStdString() << std::endl;
+	if (m_datasetFolder != "") {
+		Dataset::dataset = new Dataset(m_datasetFolder,
+									   m_cameraNames, m_segments);
 		if (Dataset::dataset->loadSuccessfull()) {
-			settings->beginGroup("DatasetLoader");
-			settings->setValue("datasetFolder", datasetFolderEdit->text());
-			settings->endGroup();
-			settings->beginGroup(datasetFolderEdit->text());
-			settings->setValue("cameraNames", 
-							   QVariant::fromValue(m_cameraNames));
-			settings->endGroup();
 			emit datasetLoaded();
 			this->close();
 		}
@@ -126,44 +140,69 @@ void LoadDatasetWindow::loadDatasetClickedSlot() {
 			QErrorMessage *msg = new QErrorMessage(this);
 			msg->showMessage("Folder is not a valid Dataset Folder.");
 		}
- }
+	}
+	else {
+		QErrorMessage *msg = new QErrorMessage(this);
+		msg->showMessage("Plase select a segment to load first.");
+	}
 }
 
 
-void LoadDatasetWindow::initCameraListFromSettings() {
-	m_cameraNames = QDir(datasetFolderEdit->text()).entryList(
-													    QDir::AllDirs | 
-														QDir::NoDotAndDotDot);
-	settings->beginGroup(datasetFolderEdit->text());
-	QList<QString> cameraNames = settings->value(
-								     "cameraNames").value<QList<QString>>();
-	settings->endGroup();
-	if (cameraNames.size() == m_cameraNames.size()) {
-		for (const auto cam : cameraNames) {
-			if (!m_cameraNames.contains(cam)) {
-				updateCameraOrderList(datasetFolderEdit->text());
-				return;
+void LoadDatasetWindow::updateCameraOrderList() {
+	cameraOrderList->clear();
+	for (const auto& camera : m_datasetYaml["Cameras"]) {
+		addItem(QString::fromStdString(camera.as<std::string>()));
+	}
+}
+
+void LoadDatasetWindow::updateDatasetSegmentTree() {
+	m_segments.clear();
+	selectedSegmentEdit->setText("");
+	datasetSegmentsTree->blockSignals(true);
+	datasetSegmentsTree->clear();
+	m_datasetFolder = "";
+	for (const auto& recording : m_datasetYaml["Recordings"]) {
+		QTreeWidgetItem *recordingItem = new QTreeWidgetItem(static_cast<QTreeWidget *>(nullptr), QStringList(QString::fromStdString(recording.first.as<std::string>())));
+		if (recording.second.size() != 0) {
+			recordingItem->setFlags(recordingItem->flags() & ~Qt::ItemIsSelectable);
+		}
+		else {
+			m_segments.append(QString::fromStdString(recording.first.as<std::string>()));
+		}
+		for (const auto& segment : recording.second) {
+			QTreeWidgetItem *segmentItem = new QTreeWidgetItem(recordingItem, QStringList(QString::fromStdString(segment.as<std::string>())));
+			recordingItem->addChild(segmentItem);
+			m_segments.append(recordingItem->text(0) + "/" + QString::fromStdString(segment.as<std::string>()));
+
+		}
+		datasetSegmentsTree->addTopLevelItem(recordingItem);
+		recordingItem->setExpanded(true);
+	}
+	datasetSegmentsTree->blockSignals(false);
+}
+
+void LoadDatasetWindow::datasetSegmentChangedSlot(QTreeWidgetItem *current, QTreeWidgetItem *previous) {
+	if (current->flags() & Qt::ItemIsSelectable) {
+		if (current->parent() != nullptr) {
+			selectedSegmentEdit->setText(current->parent()->text(0) + "/" + current->text(0));
+			QFileInfo a(datasetFileEdit->text());
+			m_datasetFolder = a.absolutePath() + "/" + current->parent()->text(0) + "/" + current->text(0);
+		}
+		else {
+			std::cout << datasetSegmentsTree->topLevelItemCount() << std::endl;
+			if(datasetSegmentsTree->topLevelItemCount() != 1) {
+				selectedSegmentEdit->setText(current->text(0));
+				QFileInfo a(datasetFileEdit->text());
+				m_datasetFolder = a.absolutePath() + "/" + current->text(0);
+			}
+			else {
+				selectedSegmentEdit->setText(current->text(0));
+				QFileInfo a(datasetFileEdit->text());
+				m_datasetFolder = a.absolutePath();
 			}
 		}
-		m_cameraNames = cameraNames;
-		for (const auto& cam : m_cameraNames) {
-			addItem(cam);
-		}
 	}
 }
-
-
-void LoadDatasetWindow::updateCameraOrderList(const QString& dir) {
-	cameraOrderList->clear();
-	m_cameraNames = QDir(dir).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
-	for (const auto& cam : m_cameraNames) {
-		if (QFile::exists(dir + "/" + cam + "/annotations.csv")) {
-			addItem(cam);
-		}
-
-	}
-}
-
 
 void LoadDatasetWindow::moveLabelUpSlot() {
 	int row = cameraOrderList->currentRow();
@@ -207,7 +246,7 @@ void LoadDatasetWindow::addItem(const QString &text) {
 }
 
 
-void LoadDatasetWindow::currentItemChangedSlot(QListWidgetItem *current, 
+void LoadDatasetWindow::currentItemChangedSlot(QListWidgetItem *current,
 											   QListWidgetItem *previous) {
 	if (current != nullptr)  {
 		current->setBackground(QColor(100,164,32));

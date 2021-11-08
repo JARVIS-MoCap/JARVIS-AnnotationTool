@@ -5,11 +5,13 @@ add_subdirectory(videocutter)
 
 add_library(${PROJECT_NAME}
   newdatasetwindow.hpp
-  recordingstable.hpp
-  datasetprogressinfowindow.hpp
   newdatasetwindow.cpp
+  recordingstable.hpp
   recordingstable.cpp
+  datasetprogressinfowindow.hpp
   datasetprogressinfowindow.cpp
+  skeletontablewidget.hpp
+  skeletontablewidget.cpp
 )
 
 target_include_directories(${PROJECT_NAME}

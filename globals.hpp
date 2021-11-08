@@ -43,6 +43,15 @@ struct ImgSet {
 	QList<Frame*> frames;
 };
 
+struct SkeletonComponent {
+	QString name;
+	QString keypointA;
+	QString keypointB;
+	float length;
+};
+Q_DECLARE_METATYPE(SkeletonComponent)
+
+
 struct DatasetConfig {
 	QString datasetName = "New Dataset";
 	QString datasetPath = ".";

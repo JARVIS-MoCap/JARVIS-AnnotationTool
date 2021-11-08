@@ -138,6 +138,7 @@ void ConfigurableItemList::addItem(const QString &text) {
 	seperatorItem->setFlags(Qt::NoItemFlags);
 	seperatorItem->setBackground(QColor(46, 50, 60));
 	itemSelectorList->addItem(seperatorItem);
+	emit itemsChanged(getItems());
 }
 
 

@@ -20,6 +20,7 @@
 #include <QLabel>
 #include <QTableWidget>
 #include <QLineEdit>
+#include <QComboBox>
 
 
 class DatasetControlWidget : public QWidget {
@@ -31,6 +32,7 @@ class DatasetControlWidget : public QWidget {
 	signals:
 		void frameSelectionChanged(int index);
 		void imgSetChanged(int index);
+		void datasetLoaded();
 
 	public slots:
 		void datasetLoadedSlot();
@@ -42,16 +44,21 @@ class DatasetControlWidget : public QWidget {
 		void getAnnotationCounts(int frameIndex, int &annotatedCount,
 					int &totalCount);
 
+		QComboBox *segmentCombo;
+		QLineEdit *frameSetEdit;
+		QLabel *totalFrameSetLabel;
 		QTableWidget *framesTable;
 
 		int m_currentFrameIndex = 0;
 		int m_currentImgSetIndex = 0;
 		int *m_annotatedCounts;
 		int m_totalCount;
+		QString m_currentSegment;
 
 	private slots:
 		void selectionChangedSlot(int row,int);
 		void imgSetChangedSlot();
+		void segmentChangedSlot(const QString &segment);
 };
 
 #endif

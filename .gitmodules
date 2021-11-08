@@ -1,3 +1,6 @@
 [submodule "libs/libcbdetect"]
 	path = libs/libcbdetect
 	url = https://github.com/mocapsetup/libcbdetect.git
+[submodule "libs/yaml-cpp"]
+	path = libs/yaml-cpp
+	url = git@github.com:jbeder/yaml-cpp.git

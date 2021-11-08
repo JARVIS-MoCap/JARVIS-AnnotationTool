@@ -21,11 +21,12 @@
 #include "CoreFoundation/CoreFoundation.h"
 #endif
 
-
+//TODO: Maybe move these to glabels, seems to be the intended way
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(RecordingItem)
 Q_DECLARE_METATYPE(TimeLineWindow)
 Q_DECLARE_METATYPE(ExportConfig)
+
 
 
 // QDatastream declarations for Signal/Slot system
@@ -68,6 +69,19 @@ QDataStream& operator>>(QDataStream& in, ExportConfig& v) {
     return in;
 }
 
+QDataStream& operator<<(QDataStream& out, const SkeletonComponent& v) {
+    out << v.name << v.keypointA << v.keypointB << v.length;
+    return out;
+}
+
+QDataStream& operator>>(QDataStream& in, SkeletonComponent& v) {
+    in >> v.name;
+    in >> v.keypointA;
+		in >> v.keypointB;
+    in >> v.length;
+    return in;
+}
+
 
 int main(int argc, char **argv)
 {
@@ -97,6 +111,8 @@ int main(int argc, char **argv)
   qRegisterMetaTypeStreamOperators<QList<QList<QPair<QString, bool>>>> ("QList<QList<QPair<QString, bool>>>");
   qRegisterMetaTypeStreamOperators<QList<QPair<QString,bool>>> ("QList<QPair<QString,bool>>");
   qRegisterMetaType<ExportConfig>("ExportConfig");
+  //qRegisterMetaType<SkeletonComponent>("SkeletonComponent");
+  qRegisterMetaTypeStreamOperators<QList<SkeletonComponent> >("QList<SkeletonComponent>");
 
 	QApplication app (argc, argv);
 	app.setStyle(new DarkStyle);

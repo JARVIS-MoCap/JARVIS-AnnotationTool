@@ -23,7 +23,7 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	setWindowTitle("New Dataset");
 	QGridLayout *layout = new QGridLayout(this);
 	layout->setVerticalSpacing(20);
-	layout->setHorizontalSpacing(100);
+	layout->setHorizontalSpacing(50);
 
 
 	m_datasetConfig = new DatasetConfig;
@@ -74,9 +74,16 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	entitieslayout->addWidget(entitiesItemList,0,0);
 	entitieslayout->setMargin(0);
 
+	QGroupBox *skeletonBox = new QGroupBox("Skeleton");
+	QGridLayout *skeletonlayout = new QGridLayout(skeletonBox);
+	skeletonTable = new SkeletonTableWidget("Skeleton");
+	skeletonlayout->addWidget(skeletonTable,0,0);
+	skeletonlayout->setMargin(0);
+
 	QGroupBox *keypointsBox = new QGroupBox("Keypoints");
 	QGridLayout *keypointslayout = new QGridLayout(keypointsBox);
 	keypointsItemList = new ConfigurableItemList("Keypoints");
+	connect(keypointsItemList, &ConfigurableItemList::itemsChanged, skeletonTable, &SkeletonTableWidget::setKeypointsListSlot);
 	keypointslayout->addWidget(keypointsItemList,0,0);
 	keypointslayout->setMargin(0);
 
@@ -111,12 +118,13 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	configlayout->addWidget(samplingMethodLabel,3,0);
 	configlayout->addWidget(samplingMethodCombo,3,1,1,2);
 
-	layout->addWidget(newDatasetLabel,0,0,1,2);
-	layout->addWidget(configBox,1,0,1,2);
-	layout->addWidget(recordingsBox,2,0,1,2);
+	layout->addWidget(newDatasetLabel,0,0,1,3);
+	layout->addWidget(configBox,1,0,1,3);
+	layout->addWidget(recordingsBox,2,0,1,3);
 	layout->addWidget(entitiesBox,3,0);
 	layout->addWidget(keypointsBox,3,1);
-	layout->addWidget(buttonBarWidget,4,0,1,2);
+	layout->addWidget(skeletonBox,3,2);
+	layout->addWidget(buttonBarWidget,4,0,1,3);
 	layout->setRowStretch(2,2);
 	layout->setRowStretch(3,3);
 
@@ -168,7 +176,7 @@ void NewDatasetWindow::createDatasetClickedSlot() {
 		return;
 	}
 
-	emit createDataset(recordingsTable->getItems(), entitiesItemList->getItems(), keypointsItemList->getItems());
+	emit createDataset(recordingsTable->getItems(), entitiesItemList->getItems(), keypointsItemList->getItems(), skeletonTable->getItems());
 	datasetProgressInfoWindow = new DatasetProgressInfoWindow(this);
 	connect(datasetProgressInfoWindow, &DatasetProgressInfoWindow::rejected, datasetCreator, &DatasetCreator::cancelCreationSlot);
 	connect(datasetCreator, &DatasetCreator::dctProgress, datasetProgressInfoWindow, &DatasetProgressInfoWindow::dctProgressSlot);
@@ -214,6 +222,10 @@ void NewDatasetWindow::savePresetSlot(const QString& preset) {
 	QList<QString> keyItemsList = keypointsItemList->getItems();
 	settings->setValue("itemsList", QVariant::fromValue(keyItemsList));
 	settings->endGroup();
+	settings->beginGroup("skeletonItemList");
+	QList<SkeletonComponent> skeletonItemsList = skeletonTable->getItems();
+	settings->setValue("itemsList", QVariant::fromValue(skeletonItemsList));
+	settings->endGroup();
 	settings->endGroup();
 }
 
@@ -233,6 +245,10 @@ void NewDatasetWindow::loadPresetSlot(const QString& preset) {
 	for (const auto& item : keyItemsList) {
 		keypointsItemList->addItem(item);
 	}
+	settings->endGroup();
+	settings->beginGroup("skeletonItemList");
+	QList<SkeletonComponent> skeletonItemsList = settings->value("itemsList").value<QList<SkeletonComponent>>();
+	skeletonTable->setItems(skeletonItemsList);
 	settings->endGroup();
 	settings->endGroup();
 }
