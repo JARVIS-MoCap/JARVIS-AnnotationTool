@@ -47,10 +47,10 @@ set(yaml-cpp_DIR "libs/libyaml-cpp/${OS_LIB_DIR}/share/cmake/yaml-cpp")
 message (STATUS "${yaml-cpp_DIR}")
 find_package(yaml-cpp REQUIRED)
 
-if(NOT WIN32)
+if(APPLE)
 	set(Eigen3_DIR "libs/eigen-3.3.8/MacOS/build")
 	message("${EIGEN3_DIR}")
-	find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+	find_package(3 3.3 REQUIRED NO_MODULE)
 endif()
 
 
