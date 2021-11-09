@@ -98,6 +98,10 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	loadButton->setIcon(QIcon::fromTheme("download"));
 	loadButton->setMinimumSize(40,40);
 	connect(loadButton, &QPushButton::clicked, this, &NewDatasetWindow::loadPresetsClickedSlot);
+	importButton = new QPushButton("Import from Dataset");
+	importButton->setMinimumSize(40,40);
+	importButton->setIcon(QIcon::fromTheme("download"));
+	connect(importButton, &QPushButton::clicked, this, &NewDatasetWindow::importPresetsClickedSlot);
 	QWidget *middleSpacer = new QWidget();
 	middleSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	createButton = new QPushButton("Create");
@@ -106,8 +110,9 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	connect(createButton, &QPushButton::clicked, this, &NewDatasetWindow::createDatasetClickedSlot);
 	buttonbarlayout->addWidget(saveButton, 0,0);
 	buttonbarlayout->addWidget(loadButton,0,1);
-	buttonbarlayout->addWidget(middleSpacer,0,2);
-	buttonbarlayout->addWidget(createButton,0,3);
+	buttonbarlayout->addWidget(importButton,0,2);
+	buttonbarlayout->addWidget(middleSpacer,0,3);
+	buttonbarlayout->addWidget(createButton,0,4);
 
 	configlayout->addWidget(datasetNameLabel,0,0);
 	configlayout->addWidget(datasetNameEdit,0,1,1,2);
@@ -209,6 +214,32 @@ void NewDatasetWindow::savePresetsClickedSlot() {
 void NewDatasetWindow::loadPresetsClickedSlot() {
 	loadPresetsWindow->updateListSlot();
 	loadPresetsWindow->show();
+}
+
+void NewDatasetWindow::importPresetsClickedSlot() {
+	QString path = QFileDialog::getOpenFileName(
+							this, "Select dataset YAML File to import", QDir::homePath(), "YAML Files (*.yaml)");
+	if (path != "") {
+		YAML::Node datasetYaml = YAML::LoadFile(path.toStdString());
+		entitiesItemList->clear();
+		for (const auto& entity : datasetYaml["Entities"]) {
+			entitiesItemList->addItem(QString::fromStdString(entity.as<std::string>()));
+		}
+		keypointsItemList->clear();
+		for (const auto& keypoint : datasetYaml["Keypoints"]) {
+			keypointsItemList->addItem(QString::fromStdString(keypoint.as<std::string>()));
+		}
+		QList<SkeletonComponent> skeleton;
+		for (const auto& joint : datasetYaml["Skeleton"]) {
+			SkeletonComponent comp;
+			comp.name = QString::fromStdString(joint.first.as<std::string>());
+			comp.keypointA = QString::fromStdString(joint.second["Keypoints"][0].as<std::string>());
+			comp.keypointB = QString::fromStdString(joint.second["Keypoints"][1].as<std::string>());
+			comp.length = joint.second["Length"][0].as<float>();
+			skeleton.append(comp);
+		}
+		skeletonTable->setItems(skeleton);
+	}
 }
 
 

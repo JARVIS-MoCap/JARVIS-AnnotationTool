@@ -24,6 +24,7 @@ SkeletonTableWidget::SkeletonTableWidget(QString name, QWidget *parent) :
 	QGridLayout *layout = new QGridLayout(this);
 	layout->setMargin(3);
 	skeletonTable = new QTableWidget(0, 4);
+	skeletonTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	skeletonTable->setFont(QFont("Sans Serif", 12));
 	QStringList labels;
 	labels << "Name" << "Keypoint A" << "Keypoint B" << "Length [mm]";
@@ -94,13 +95,14 @@ void SkeletonTableWidget::setItems(QList<SkeletonComponent> items) {
 		keypointBCombo->setCurrentText(items[row].keypointB);
 		lengthBox->setValue(items[row].length);
 	}
+	m_itemCounter = items.length() + 1;
 }
 
 
 
 void SkeletonTableWidget::addItemSlot() {
 	skeletonTable->setRowCount(skeletonTable->rowCount()+1);
-	skeletonTable->setCellWidget (skeletonTable->rowCount()-1,0, new QLabel("Example Name"));
+	skeletonTable->setCellWidget (skeletonTable->rowCount()-1,0, new QLabel("Joint " + QString::number(m_itemCounter++)));
 	QComboBox *keypointACombo = new QComboBox();
 	QComboBox *keypointBCombo = new QComboBox();
 	QDoubleSpinBox *lengthBox = new QDoubleSpinBox(skeletonTable);
@@ -108,22 +110,19 @@ void SkeletonTableWidget::addItemSlot() {
 	skeletonTable->setCellWidget(skeletonTable->rowCount()-1,1, keypointACombo);
 	skeletonTable->setCellWidget(skeletonTable->rowCount()-1,2, keypointBCombo);
 	skeletonTable->setCellWidget(skeletonTable->rowCount()-1,3, lengthBox);
-	int idx = 0;
 	for (const auto& keypoint : m_keypointList) {
 		keypointACombo->addItem(keypoint);
-		if (idx != 0) {
-			keypointBCombo->addItem(keypoint);
-		}
-		idx++;
+		keypointBCombo->addItem(keypoint);
 	}
 	keypointACombo->setCurrentIndex(0);
-	keypointBCombo->setCurrentIndex(0);
+	keypointBCombo->setCurrentIndex(1);
 }
 
 
 
 void SkeletonTableWidget::removeItemSlot() {
 	skeletonTable->removeRow(skeletonTable->currentRow());
+	skeletonTable->setCurrentCell(skeletonTable->currentRow(),0);
 }
 
 
@@ -150,13 +149,9 @@ void SkeletonTableWidget::updateComboBoxes() {
 		QString oldKeypointB = keypointBCombo->currentText();
 		keypointACombo->clear();
 		keypointBCombo->clear();
-		int idx = 0;
 		for (const auto& keypoint : m_keypointList) {
 			keypointACombo->addItem(keypoint);
-			if (idx != 0) {
-				keypointBCombo->addItem(keypoint);
-			}
-			idx++;
+			keypointBCombo->addItem(keypoint);
 		}
 		if (m_keypointList.contains(oldKeypointA)) {
 			keypointACombo->setCurrentText(oldKeypointA);
@@ -168,7 +163,7 @@ void SkeletonTableWidget::updateComboBoxes() {
 			keypointBCombo->setCurrentText(oldKeypointB);
 		}
 		else  {
-			keypointBCombo->setCurrentIndex(0);
+			keypointBCombo->setCurrentIndex(1);
 			//keypointBCombo->setStyleSheet("color: rgb(164,100,32); ");
 		}
 	}

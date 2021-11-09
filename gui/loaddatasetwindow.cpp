@@ -46,7 +46,7 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
 	connect(datasetSegmentsTree, &QTreeWidget::currentItemChanged, this, &LoadDatasetWindow::datasetSegmentChangedSlot);
 	QLabel *selectedSegmentLabel = new QLabel("Selected Segment");
 	selectedSegmentEdit = new QLineEdit(datasetSegmentBox);
-	selectedSegmentEdit->setPlaceholderText("select a Segment above...");
+	selectedSegmentEdit->setPlaceholderText("Select a Segment above...");
 	selectedSegmentEdit->setReadOnly(true);
 	datasetsegmentboxlayout->addWidget(datasetSegmentsTree,0,0,1,2);
 	datasetsegmentboxlayout->addWidget(selectedSegmentLabel,1,0);
@@ -80,6 +80,8 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
 	loadDatasetButton = new QPushButton("Load Dataset");
 	loadDatasetButton->setMinimumSize(40,40);
 	loadDatasetButton->setIcon(QIcon::fromTheme("download"));
+	loadDatasetButton->setEnabled(false);
+	loadDatasetButton->setToolTip("Load a dataset and select a segment to annotate first!");
 	connect(loadDatasetButton, &QPushButton::clicked,
 			this, &LoadDatasetWindow::loadDatasetClickedSlot);
 	cancelButton = new QPushButton("Cancel");
@@ -158,6 +160,8 @@ void LoadDatasetWindow::updateCameraOrderList() {
 void LoadDatasetWindow::updateDatasetSegmentTree() {
 	m_segments.clear();
 	selectedSegmentEdit->setText("");
+	loadDatasetButton->setEnabled(false);
+	loadDatasetButton->setToolTip("Load a dataset and select a segment to annotate first!");
 	datasetSegmentsTree->blockSignals(true);
 	datasetSegmentsTree->clear();
 	m_datasetFolder = "";
@@ -182,6 +186,8 @@ void LoadDatasetWindow::updateDatasetSegmentTree() {
 }
 
 void LoadDatasetWindow::datasetSegmentChangedSlot(QTreeWidgetItem *current, QTreeWidgetItem *previous) {
+	loadDatasetButton->setEnabled(true);
+	loadDatasetButton->setToolTip("");
 	if (current->flags() & Qt::ItemIsSelectable) {
 		if (current->parent() != nullptr) {
 			selectedSegmentEdit->setText(current->parent()->text(0) + "/" + current->text(0));
@@ -202,6 +208,7 @@ void LoadDatasetWindow::datasetSegmentChangedSlot(QTreeWidgetItem *current, QTre
 			}
 		}
 	}
+
 }
 
 void LoadDatasetWindow::moveLabelUpSlot() {

@@ -41,7 +41,7 @@ class SkeletonTableWidget : public QWidget {
 
 		QString m_name;
 		QList<QString> m_keypointList;
-
+		int m_itemCounter = 1;
 		void updateComboBoxes();
 
 	private slots:

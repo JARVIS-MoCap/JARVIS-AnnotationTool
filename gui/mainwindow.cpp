@@ -55,13 +55,6 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	datasetLabel->setFont(QFont("Sans Serif", 22, QFont::Bold));
 	datasetLabel->setStyleSheet("QLabel {color: rgb(32,100,164)}");
 
-	loadDatasetButton = new QPushButton("Annotate Dataset");
-	loadDatasetButton->setMinimumSize(450,80);
-	loadDatasetButton->setFont(QFont("Sans Serif", 18, QFont::Bold));
-	loadDatasetButton->setStyleSheet("QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
-													 				 "QPushButton:hover { background-color: rgb(68,74,89); }"
-													 				 "QPushButton { color: rgb(100,164,32);}");
-
 	newDatasetButton = new QPushButton("Create new Dataset");
 	newDatasetButton->setMinimumSize(450,80);
 	newDatasetButton->setFont(QFont("Sans Serif", 18, QFont::Bold));
@@ -75,6 +68,13 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	newCalibrationButton->setStyleSheet("QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
 																			"QPushButton:hover { background-color: rgb(68,74,89); }"
 																			"QPushButton { color: rgb(100,164,32);}");
+
+	loadDatasetButton = new QPushButton("Annotate Dataset");
+	loadDatasetButton->setMinimumSize(450,80);
+	loadDatasetButton->setFont(QFont("Sans Serif", 18, QFont::Bold));
+	loadDatasetButton->setStyleSheet("QPushButton { border-radius: 10px; border: 4px solid rgb(100,164,32); }"
+													 				 "QPushButton:hover { background-color: rgb(68,74,89); }"
+													 				 "QPushButton { color: rgb(100,164,32);}");
 
 	exportTrainigsetButton = new QPushButton("Export Trainingset");
 	exportTrainigsetButton->setMinimumSize(450,80);
@@ -90,9 +90,9 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 
 	datasetlayout->addItem(datasetTopSpacer,0,0);
 	datasetlayout->addWidget(datasetLabel,1,0,Qt::AlignCenter);
-	datasetlayout->addWidget(loadDatasetButton,2,0,Qt::AlignCenter);
-	datasetlayout->addWidget(newDatasetButton,3,0,Qt::AlignCenter);
-	datasetlayout->addWidget(newCalibrationButton,4,0,Qt::AlignCenter);
+	datasetlayout->addWidget(newDatasetButton,2,0,Qt::AlignCenter);
+	datasetlayout->addWidget(newCalibrationButton,3,0,Qt::AlignCenter);
+	datasetlayout->addWidget(loadDatasetButton,4,0,Qt::AlignCenter);
 	datasetlayout->addWidget(exportTrainigsetButton,5,0,Qt::AlignCenter);
 	datasetlayout->addItem(datasetBottomSpacer,6,0);
 

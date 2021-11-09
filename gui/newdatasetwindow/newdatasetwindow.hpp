@@ -69,6 +69,7 @@ class NewDatasetWindow : public QWidget {
 
 		QPushButton *loadButton;
 		QPushButton *saveButton;
+		QPushButton *importButton;
 		QPushButton *createButton;
 
 		QErrorMessage *m_errorMsg;
@@ -84,6 +85,7 @@ class NewDatasetWindow : public QWidget {
 
 			void savePresetsClickedSlot();
 			void loadPresetsClickedSlot();
+			void importPresetsClickedSlot();
 			void savePresetSlot(const QString& preset);
 			void loadPresetSlot(const QString& preset);
 
