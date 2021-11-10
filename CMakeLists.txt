@@ -88,7 +88,7 @@ elseif(WIN32)
   )
 
 elseif (UNIX)
-  set(CMAKE_INSTALL_RPATH /usr/local/lib/AnnotationTool;/usr/local/lib/AnnotationTool/OpenCV;/usr/local/lib/AnnotationTool/Qt5/lib)
+  set(CMAKE_INSTALL_RPATH /usr/local/lib/JARVIS-AnnotationTool;/usr/local/lib/JARVIS-AnnotationTool/OpenCV;/usr/local/lib/JARVIS-AnnotationTool/Qt5/lib)
   add_executable(${PROJECT_NAME}
       main.cpp
       globals.hpp

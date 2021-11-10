@@ -1,0 +1,13 @@
+prefix=/home/timo/qt/Qt5shared_v5.15.2
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 Gui
+Description: Qt Gui module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5Gui 
+Cflags: -DQT_GUI_LIB -I${includedir}/QtGui -I${includedir}
+Requires: Qt5Core
+
