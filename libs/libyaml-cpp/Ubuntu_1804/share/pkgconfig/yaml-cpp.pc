@@ -1,11 +1,11 @@
-prefix=/home/trackingsetup/Documents/yaml-cpp/libyaml
+prefix=/home/timo/Documents/AnnotationTool/libs/yaml-cpp/libyaml
 exec_prefix=${prefix}
-includedir=/home/trackingsetup/Documents/yaml-cpp/libyaml/include
-libdir=/home/trackingsetup/Documents/yaml-cpp/libyaml/lib
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib
 
 Name: Yaml-cpp
 Description: A YAML parser and emitter for C++
-Version: 0.7.0
+Version: 0.6.3
 Requires:
 Libs: -L${libdir} -lyaml-cpp
 Cflags: -I${includedir}
