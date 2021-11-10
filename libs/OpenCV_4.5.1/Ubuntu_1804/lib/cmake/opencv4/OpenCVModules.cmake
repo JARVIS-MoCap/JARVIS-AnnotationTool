@@ -16,7 +16,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_targetsDefined)
 set(_targetsNotDefined)
 set(_expectedTargets)
-foreach(_expectedTarget opencv_core opencv_flann opencv_imgproc opencv_features2d opencv_imgcodecs opencv_videoio opencv_calib3d opencv_aruco)
+foreach(_expectedTarget opencv_core opencv_flann opencv_imgproc opencv_features2d opencv_imgcodecs opencv_videoio opencv_calib3d opencv_highgui opencv_aruco)
   list(APPEND _expectedTargets ${_expectedTarget})
   if(NOT TARGET ${_expectedTarget})
     list(APPEND _targetsNotDefined ${_expectedTarget})
@@ -93,6 +93,13 @@ add_library(opencv_calib3d SHARED IMPORTED)
 
 set_target_properties(opencv_calib3d PROPERTIES
   INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc;opencv_features2d"
+)
+
+# Create imported target opencv_highgui
+add_library(opencv_highgui SHARED IMPORTED)
+
+set_target_properties(opencv_highgui PROPERTIES
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_imgproc;opencv_imgcodecs;opencv_videoio"
 )
 
 # Create imported target opencv_aruco

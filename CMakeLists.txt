@@ -94,7 +94,7 @@ elseif (UNIX)
       globals.hpp
       gui/Qt-DarkStyle/darkstyle.qrc
   )
-  install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/AnnotationTool_0.3-1_amd64_2004/usr/local/bin)
+  install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_0.3-1_amd64_1804/usr/local/bin)
 endif()
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused)
@@ -103,7 +103,6 @@ target_include_directories( ${PROJECT_NAME}
     PUBLIC
     ${PROJECT_SOURCE_DIR}
 )
-
 
 
 target_link_libraries(${PROJECT_NAME}

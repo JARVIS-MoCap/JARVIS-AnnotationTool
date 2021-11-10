@@ -1,6 +1,3 @@
-project (gui)
-
-
 add_subdirectory(Qt-DarkStyle)
 add_subdirectory(newdatasetwindow)
 add_subdirectory(newcalibrationwidget)
@@ -9,7 +6,7 @@ add_subdirectory(editor)
 add_subdirectory(conveniencewidgets)
 add_subdirectory(helpwindow)
 
-add_library(${PROJECT_NAME}
+add_library(gui
     mainwindow.hpp
     mainwindow.cpp
     mainbar.hpp
@@ -20,13 +17,12 @@ add_library(${PROJECT_NAME}
     loaddatasetwindow.cpp
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(gui
     PUBLIC
     ${PROJECT_SOURCE_DIR}
-    ../
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(gui
   Qt5::Widgets
   src
   editor
@@ -36,5 +32,3 @@ target_link_libraries(${PROJECT_NAME}
   conveniencewidgets
   helpwindow
 )
-
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused -Wno-sign-compare)
