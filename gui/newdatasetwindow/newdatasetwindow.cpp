@@ -132,6 +132,9 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	layout->addWidget(buttonBarWidget,4,0,1,3);
 	layout->setRowStretch(2,2);
 	layout->setRowStretch(3,3);
+	layout->setColumnStretch(0,2);
+	layout->setColumnStretch(1,2);
+	layout->setColumnStretch(2,3);
 
 	connect(this, &NewDatasetWindow::createDataset, datasetCreator, &DatasetCreator::createDatasetSlot);
 	connect(datasetCreator, &DatasetCreator::datasetCreated, this, &NewDatasetWindow::datasetCreatedSot);

@@ -52,6 +52,7 @@ class LoadDatasetWindow : public QDialog {
 		QPushButton *downButton;
 
 		QList<QString> m_cameraNames;
+		QList<SkeletonComponent> m_skeleton;
 
 		YAML::Node m_datasetYaml;
 		QString m_datasetFolder;

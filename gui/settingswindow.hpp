@@ -38,6 +38,7 @@ class SettingsWindow : public QWidget {
 		void colorMapChanged(const QString& entity, ColorMap::ColorMapType type, QColor color);
 		void minViewsChanged(int val);
 		void errorThresholdChanged(float val);
+		void boneLengthErrorThresholdChanged(float val);
 
 	public slots:
 		void datasetLoadedSlot();
@@ -73,6 +74,7 @@ class SettingsWindow : public QWidget {
 		QGroupBox *reprojectionSettingsBox;
 		QSpinBox *minViewsEdit;
 		QDoubleSpinBox *errorThresholdEdit;
+		QDoubleSpinBox *boneLengthErrorThresholdEdit;
 
 	private slots:
 		void imageTranformationChangedSlot();
@@ -85,6 +87,7 @@ class SettingsWindow : public QWidget {
 		void colorChooserClickedSlot();
 		void minViewsChangedSlot(int val);
 		void errorThresholdChangedSlot(double val);
+		void boneLengthErrorThresholdChangedSlot(double val);
 
 };
 

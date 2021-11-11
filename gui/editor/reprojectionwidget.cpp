@@ -20,9 +20,18 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 	QLabel *reprojectionLabel = new QLabel("Reprojection Tool");
 	reprojectionLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
 	toggleSwitch = new Switch(this);
+	toggleSwitch->setMinimumSize(55,25);
 	toggleSwitch->setMaximumSize(55,25);
 	toggleSwitch->setEnabled(false);
 	connect(toggleSwitch, &Switch::toggled, this, &ReprojectionWidget::switchToggledSlot);
+
+	modeLabel = new QLabel("Mode");
+	modeLabel->hide();
+	modeCombo = new QComboBox(this);
+	modeCombo->addItem("Reprojection");
+	modeCombo->addItem("Bone Length");
+	connect(modeCombo, &QComboBox::currentTextChanged, this, &ReprojectionWidget::modeComboChangedSlot);
+	modeCombo->hide();
 
 	stackedWidget = new QStackedWidget(this);
 
@@ -72,29 +81,32 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 	connect(initReprojectionButton, &QPushButton::clicked, this, &ReprojectionWidget::initReprojectionClickedSlot);
 
 	calibrationsetuplayout->addWidget(intrinsicsBox,0,0);
-	calibrationsetuplayout->addWidget(spacer,1,0);
-	calibrationsetuplayout->addWidget(extrinsicsBox,2,0);
-	calibrationsetuplayout->addWidget(initReprojectionButton,3,0,Qt::AlignRight);
+	calibrationsetuplayout->addWidget(extrinsicsBox,1,0);
+	calibrationsetuplayout->addWidget(initReprojectionButton,2,0,Qt::AlignRight);
+	calibrationsetuplayout->addWidget(spacer,3,0);
 
-	reprojectionController = new QWidget(stackedWidget);
-	reprojectioncontrollerlayout = new QGridLayout(reprojectionController);
 	reprojectionChartWidget = new ReprojectionChartWidget(this);
-	reprojectioncontrollerlayout->addWidget(reprojectionChartWidget,0,0);
+	boneLengthChartWidget = new BoneLengthChartWidget(this);
 
 	stackedWidget->addWidget(loadDatasetFirstLabel);
 	stackedWidget->addWidget(calibrationSetup);
-	stackedWidget->addWidget(reprojectionController);
+	stackedWidget->addWidget(reprojectionChartWidget);
+	stackedWidget->addWidget(boneLengthChartWidget);
 
 	reprojectionlayout->addWidget(reprojectionLabel,0,0);
-	reprojectionlayout->addWidget(toggleSwitch,0,1);
-	reprojectionlayout->addWidget(stackedWidget,1,0,1,2);
+	reprojectionlayout->addWidget(toggleSwitch,0,1, Qt::AlignRight);
+	reprojectionlayout->addWidget(modeLabel,1,0);
+	reprojectionlayout->addWidget(modeCombo,1,1);
+	reprojectionlayout->addWidget(stackedWidget,2,0,1,2);
 
 	//--- SIGNAL-SLOT Connections ---//
 	//-> Incoming Signals
 
 	//<- Outgoing Signals
 	connect(this, &ReprojectionWidget::datasetLoaded, reprojectionChartWidget, &ReprojectionChartWidget::datasetLoadedSlot);
+	connect(this, &ReprojectionWidget::datasetLoaded, boneLengthChartWidget, &BoneLengthChartWidget::datasetLoadedSlot);
 	connect(this, &ReprojectionWidget::errorThresholdChanged, reprojectionChartWidget, &ReprojectionChartWidget::errorThresholdChanged);
+	connect(this, &ReprojectionWidget::boneLengthErrorThresholdChanged, boneLengthChartWidget, &BoneLengthChartWidget::boneLengthErrorThresholdChanged);
 	//<-> Relayed Signals
 }
 
@@ -113,6 +125,7 @@ void ReprojectionWidget::datasetLoadedSlot() {
 	stackedWidget->setCurrentWidget(calibrationSetup);
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		m_reprojectionErrors[entity] = new std::vector<double>(Dataset::dataset->bodypartsList().size());
+		m_boneLengthErrors[entity] = new std::vector<double>(Dataset::dataset->skeleton().size());
 	}
 
 	switchToggledSlot(false);
@@ -205,7 +218,9 @@ void ReprojectionWidget::initReprojectionClickedSlot() {
 			extrinsicsList.append(extrinsicsPathEdit->text() + "/" + "Extrinsics_" + primaryCombo->currentText() +"_" + Dataset::dataset->cameraName(cam) + ".yaml");
 	}
 	reprojectionTool = new ReprojectionTool(intrinsicsList, extrinsicsList,primaryCombo->currentIndex());
-	stackedWidget->setCurrentWidget(reprojectionController);
+	stackedWidget->setCurrentWidget(reprojectionChartWidget);
+	modeLabel->show();
+	modeCombo->show();
 	calculateAllReprojections();
 	calculateReprojectionSlot(m_currentImgSetIndex, m_currentFrameIndex);
 }
@@ -243,6 +258,7 @@ void ReprojectionWidget::loadPaths() {
 void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int currentFrameIndex) {
 	m_currentImgSetIndex = currentImgSetIndex;
 	m_currentFrameIndex = currentFrameIndex;
+	QMap<QString, cv::Mat> reconPointsMap;
 	if (m_reprojectionActive) {
 		for (const auto& entity : m_entitiesList) {
 			for (const auto& bodypart : m_bodypartsList) {
@@ -262,6 +278,7 @@ void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int c
 				}
 				if (camsToUse.size() >= m_minViews) {
 					cv::Mat X =  reprojectionTool->reconstructPoint3D(points, camsToUse);
+					reconPointsMap[entity + "/" + bodypart] = X;
 					QList<QPointF> reprojectedPoints = reprojectionTool->reprojectPoint(X);
 					double reprojectionError = 0;
 					for (int cam = 0; cam < reprojectedPoints.size(); cam ++) {
@@ -293,9 +310,22 @@ void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int c
 				}
 			}
 		}
+		for (const auto& entity : m_entitiesList) {
+			int idx = 0;
+			for (const auto& comp : Dataset::dataset->skeleton()) {
+				if (reconPointsMap.contains(entity + "/" + comp.keypointA) && reconPointsMap.contains(entity + "/" + comp.keypointB)) {
+					double dist = cv::norm(reconPointsMap[entity + "/" + comp.keypointA] - reconPointsMap[entity + "/" +  comp.keypointB]);
+					(*m_boneLengthErrors[entity])[idx++] = dist - comp.length;
+				}
+				else {
+					(*m_boneLengthErrors[entity])[idx++] = 0.0;
+				}
+			}
+		}
 		emit reprojectedPoints(Dataset::dataset->imgSets()[currentImgSetIndex], currentFrameIndex);
 		emit reprojectionToolToggled(true);
 		reprojectionChartWidget->reprojectionErrorsUpdatedSlot(m_reprojectionErrors);
+		boneLengthChartWidget->boneLengthErrorsUpdatedSlot(m_boneLengthErrors);
 	}
 }
 
@@ -375,10 +405,10 @@ void ReprojectionWidget::getSettings() {
 		m_minViews = settings->value("MinViews").toInt();
 	}
 	minViewsChangedSlot(m_minViews);
-	if (settings->contains("errorThreshold")) {
-		m_errorThreshold = settings->value("errorThreshold").toDouble();
-	}
-	errorThresholdChangedSlot(m_errorThreshold);
+	// if (settings->contains("errorThreshold")) {
+	// 	m_errorThreshold = settings->value("errorThreshold").toDouble();
+	// }
+	// errorThresholdChangedSlot(m_errorThreshold);
 	settings->endGroup();
 	settings->endGroup();
 }
@@ -391,7 +421,17 @@ void ReprojectionWidget::minViewsChangedSlot(int value) {
 }
 
 
-void ReprojectionWidget::errorThresholdChangedSlot(double value) {
-	m_errorThreshold = value;
-	emit errorThresholdChanged(value);
+// void ReprojectionWidget::errorThresholdChangedSlot(double value) {
+// 	m_errorThreshold = value;
+// 	emit errorThresholdChanged(value);
+// }
+
+void ReprojectionWidget::modeComboChangedSlot(const QString& mode) {
+	if (mode == "Reprojection") {
+		stackedWidget->setCurrentWidget(reprojectionChartWidget);
+	}
+	else {
+		stackedWidget->setCurrentWidget(boneLengthChartWidget);
+
+	}
 }

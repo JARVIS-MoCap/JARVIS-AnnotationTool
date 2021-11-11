@@ -122,6 +122,15 @@ void LoadDatasetWindow::datasetFileClickedSlot() {
 		updateCameraOrderList();
 		updateDatasetSegmentTree();
 	}
+	m_skeleton.clear();
+	for (const auto& compYaml : m_datasetYaml["Skeleton"]) {
+		SkeletonComponent comp;
+		comp.name = QString::fromStdString(compYaml.first.as<std::string>());
+		comp.keypointA = QString::fromStdString(compYaml.second["Keypoints"][0].as<std::string>());
+		comp.keypointB = QString::fromStdString(compYaml.second["Keypoints"][1].as<std::string>());
+		comp.length = compYaml.second["Length"][0].as<float>();
+		m_skeleton.append(comp);
+	}
 }
 
 
@@ -130,10 +139,9 @@ void LoadDatasetWindow::datasetFileEditedSlot() {
 }
 
 void LoadDatasetWindow::loadDatasetClickedSlot() {
-	std::cout << m_datasetFolder.toStdString() << std::endl;
 	if (m_datasetFolder != "") {
 		Dataset::dataset = new Dataset(m_datasetFolder,
-									   m_cameraNames, m_segments);
+									   m_cameraNames, m_skeleton, m_segments);
 		if (Dataset::dataset->loadSuccessfull()) {
 			emit datasetLoaded();
 			this->close();
@@ -152,8 +160,10 @@ void LoadDatasetWindow::loadDatasetClickedSlot() {
 
 void LoadDatasetWindow::updateCameraOrderList() {
 	cameraOrderList->clear();
+	m_cameraNames.clear();
 	for (const auto& camera : m_datasetYaml["Cameras"]) {
 		addItem(QString::fromStdString(camera.as<std::string>()));
+		m_cameraNames.append(QString::fromStdString(camera.as<std::string>()));
 	}
 }
 

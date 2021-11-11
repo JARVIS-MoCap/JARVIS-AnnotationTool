@@ -14,6 +14,10 @@ add_library(${PROJECT_NAME}
   reprojectionchartwidget.cpp
   reprojectionchartview.hpp
   reprojectionchartview.cpp
+  bonelengthchartwidget.hpp
+  bonelengthchartwidget.cpp
+  bonelengthchartview.hpp
+  bonelengthchartview.cpp
   datasetcontrolwidget.hpp
   datasetcontrolwidget.cpp
 )

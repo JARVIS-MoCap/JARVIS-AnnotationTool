@@ -112,10 +112,16 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	errorThresholdEdit = new QDoubleSpinBox();
 	errorThresholdEdit->setValue(10.0);
 	connect(errorThresholdEdit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SettingsWindow::errorThresholdChangedSlot);
+	QLabel *boneLengthErrorThresholdLabel = new QLabel("Bone Length Error Threshold");
+	boneLengthErrorThresholdEdit = new QDoubleSpinBox();
+	boneLengthErrorThresholdEdit->setValue(10.0);
+	connect(boneLengthErrorThresholdEdit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SettingsWindow::boneLengthErrorThresholdChangedSlot);
 	reprojectionsettingslayout->addWidget(minViewsLabel,0,0);
 	reprojectionsettingslayout->addWidget(minViewsEdit,0,1);
 	reprojectionsettingslayout->addWidget(errorThresholdLabel,1,0);
 	reprojectionsettingslayout->addWidget(errorThresholdEdit,1,1);
+	reprojectionsettingslayout->addWidget(boneLengthErrorThresholdLabel,2,0);
+	reprojectionsettingslayout->addWidget(boneLengthErrorThresholdEdit,2,1);
 
 
 	settingslayout->addWidget(imageSettingsBox,0,0);
@@ -191,6 +197,12 @@ void SettingsWindow::loadSettings() {
 	}
 	errorThresholdEdit->setValue(errorThreshold);
 	errorThresholdChangedSlot(errorThreshold);
+	double boneLengthErrorThreshold = 10.0;
+	if (settings->contains("boneLengthErrorThreshold")) {
+		boneLengthErrorThreshold = settings->value("boneLengthErrorThreshold").toDouble();
+	}
+	boneLengthErrorThresholdEdit->setValue(boneLengthErrorThreshold);
+	boneLengthErrorThresholdChanged(boneLengthErrorThreshold);
 	settings->endGroup();
 	settings->endGroup();
 }
@@ -293,4 +305,14 @@ void SettingsWindow::errorThresholdChangedSlot(double val) {
 	settings->endGroup();
 	settings->endGroup();
 	emit errorThresholdChanged(val);
+}
+
+
+void SettingsWindow::boneLengthErrorThresholdChangedSlot(double val) {
+	settings->beginGroup("Settings");
+	settings->beginGroup("ReprojectionSettings");
+	settings->setValue("boneLengthErrorThreshold", val);
+	settings->endGroup();
+	settings->endGroup();
+	emit boneLengthErrorThresholdChanged(val);
 }

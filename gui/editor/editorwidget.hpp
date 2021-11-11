@@ -48,6 +48,7 @@ class EditorWidget : public QWidget {
 		void colorMapChanged(const QString& entity, ColorMap::ColorMapType type, QColor color);
 		void minViewsChanged(int val);
 		void errorThresholdChanged(float val);
+		void boneLengthErrorThresholdChanged(float val);
 
 	public slots:
 		void splitterMovedSlot(int pos, int index);

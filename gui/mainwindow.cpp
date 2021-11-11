@@ -128,6 +128,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	connect(settingsWindow, &SettingsWindow::colorMapChanged, editorWidget, &EditorWidget::colorMapChanged);
 	connect(settingsWindow, &SettingsWindow::minViewsChanged, editorWidget, &EditorWidget::minViewsChanged);
 	connect(settingsWindow, &SettingsWindow::errorThresholdChanged, editorWidget, &EditorWidget::errorThresholdChanged);
+	connect(settingsWindow, &SettingsWindow::boneLengthErrorThresholdChanged, editorWidget, &EditorWidget::boneLengthErrorThresholdChanged);
 	connect(editorWidget, &EditorWidget::datasetLoaded, settingsWindow, &SettingsWindow::datasetLoadedSlot);
 	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded, editorWidget, &EditorWidget::datasetLoadedSlot);
 	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded, editorWidget, &EditorWidget::datasetLoaded);

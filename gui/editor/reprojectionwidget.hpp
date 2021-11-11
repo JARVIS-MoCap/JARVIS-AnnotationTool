@@ -16,6 +16,7 @@
 #include "switch.hpp"
 #include "colormap.hpp"
 #include "reprojectionchartwidget.hpp"
+#include "bonelengthchartwidget.hpp"
 
 
 #include <QGridLayout>
@@ -41,13 +42,15 @@ class ReprojectionWidget : public QWidget {
 		void reprojectionToolToggled(bool toggle);
 		void datasetLoaded();
 		void errorThresholdChanged(double value);
+		void boneLengthErrorThresholdChanged(double value);
 		void reprojectionErrorsUpdated(QMap<QString, std::vector<double> *>);
 
 	public slots:
 		void datasetLoadedSlot();
 		void calculateReprojectionSlot(int currentImgSetIndex, int currentFrameIndex);
 		void minViewsChangedSlot(int value);
-		void errorThresholdChangedSlot(double value);
+		// void errorThresholdChangedSlot(double value);
+		// void boneLengthErrorThresholdChangedSlot(double value);
 
 	private:
 		bool checkIntrinsicsPath(QString path);
@@ -59,12 +62,15 @@ class ReprojectionWidget : public QWidget {
 		void getSettings();
 
 		ReprojectionChartWidget *reprojectionChartWidget;
+		BoneLengthChartWidget *boneLengthChartWidget;
 
 		QSettings *settings;
 		ColorMap *m_colorMap;
 		ReprojectionTool *reprojectionTool = nullptr;
 
 		Switch *toggleSwitch;
+		QLabel *modeLabel;
+		QComboBox *modeCombo;
 		QStackedWidget *stackedWidget;
 
 		QWidget *calibrationSetup;
@@ -83,7 +89,6 @@ class ReprojectionWidget : public QWidget {
 		QGridLayout *reprojectioncontrollerlayout;
 
 		QList< QLineEdit* > intrinsicsPathEdits;
-		//QList< QPushButton* > intrinsicsPathButtons;
 		QList< QLineEdit* > extrinsicsPathEdits;
 		bool m_reprojectionActive = false;
 		int m_numCameras = 0;
@@ -95,6 +100,8 @@ class ReprojectionWidget : public QWidget {
 		int m_currentImgSetIndex  = 0;
 		int m_currentFrameIndex = 0;
 		QMap<QString, std::vector<double> *> m_reprojectionErrors;
+		QMap<QString, std::vector<double> *> m_boneLengthErrors;
+
 
 		QDir m_parameterDir;
 
@@ -103,6 +110,7 @@ class ReprojectionWidget : public QWidget {
 		void intrinsicsPathClickedSlot();
 		void extrinsicsPathClickedSlot();
 		void initReprojectionClickedSlot();
+		void modeComboChangedSlot(const QString& mode);
 };
 
 #endif

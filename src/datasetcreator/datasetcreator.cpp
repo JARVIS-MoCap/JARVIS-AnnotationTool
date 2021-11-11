@@ -184,7 +184,6 @@ bool DatasetCreator::checkFrameCounts(const QString& recording, QList<QString> c
   	}
 
 		int newNumFrames = cap.get(cv::CAP_PROP_FRAME_COUNT);
-		std::cout << newNumFrames << std::endl;
 		cap.release();
 		if (numFrames != -1 && newNumFrames != numFrames)  {
 			return false;
@@ -346,7 +345,7 @@ void DatasetCreator::createSavefile(const QString& recording, QList<QString> cam
 		 stream << "\n";
 		 stream << "bodyparts";
 		 for (int i = 0; i < num_columns; i++) {
-			 stream << "," << m_keypointsList[i/(m_entitiesList.size()*3)];
+			 stream << "," << m_keypointsList[(i/3)%m_keypointsList.size()];
 		 }
 		 stream << "\n";
 		 stream << "coords";
