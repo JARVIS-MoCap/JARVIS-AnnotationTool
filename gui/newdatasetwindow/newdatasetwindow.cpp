@@ -51,12 +51,12 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	LabelWithToolTip *datasetPathLabel = new LabelWithToolTip("New Dataset Path");
 	datasetPathWidget = new DirPathWidget("Select new Dataset Path");
 	datasetPathWidget->setPlaceholderText("Select a Path...");
-	LabelWithToolTip *frameSetsRecordingLabel = new LabelWithToolTip("Framesets to extract per Recording", "kdsff");
+	LabelWithToolTip *frameSetsRecordingLabel = new LabelWithToolTip("Framesets to extract per Segment", "Select how many framesets will be created per recording or per segment if you defined any.");
 	frameSetsRecordingBox = new QSpinBox(configBox);
 	frameSetsRecordingBox->setMinimum(0);
 	frameSetsRecordingBox->setMaximum(9999999);
 	frameSetsRecordingBox->setValue(m_datasetConfig->frameSetsRecording);
-	LabelWithToolTip *samplingMethodLabel = new LabelWithToolTip("Sampling Method", "kdsff");
+	LabelWithToolTip *samplingMethodLabel = new LabelWithToolTip("Sampling Method", "Kmeans picks framessets that are as visually distinct from one another as possible. Uniform should only be used for testing purposes");
 	samplingMethodCombo = new QComboBox(configBox);
 	samplingMethodCombo->addItem("uniform");
 	samplingMethodCombo->addItem("kmeans");

@@ -43,6 +43,7 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
 	datasetSegmentsTree = new QTreeWidget(this);
 	datasetSegmentsTree->setColumnCount(1);
 	datasetSegmentsTree->setExpandsOnDoubleClick(false);
+	datasetSegmentsTree->setHeaderLabels({""});
 	connect(datasetSegmentsTree, &QTreeWidget::currentItemChanged, this, &LoadDatasetWindow::datasetSegmentChangedSlot);
 	QLabel *selectedSegmentLabel = new QLabel("Selected Segment");
 	selectedSegmentEdit = new QLineEdit(datasetSegmentBox);

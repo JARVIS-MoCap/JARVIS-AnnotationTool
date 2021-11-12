@@ -19,7 +19,6 @@ void BoneLengthChartView::update(std::vector<double> *boneLengthErrors, int sele
 		m_boneLengthErrors = boneLengthErrors;
 	}
 	if (m_boneLengthErrors == nullptr) {
-		std::cout << "WHYYY" << std::endl;
 		return;
 	}
 	QChart *chart = new QChart();
@@ -32,43 +31,42 @@ void BoneLengthChartView::update(std::vector<double> *boneLengthErrors, int sele
 	else {
 		chart->setTitle(" ");
 	}
-	std::cout << "Size: "<< m_boneLengthErrors->size() << std::endl;
-	float maxValue = *std::max_element(m_boneLengthErrors->begin(), m_boneLengthErrors->end());
-	float minValue = *std::min_element(m_boneLengthErrors->begin(), m_boneLengthErrors->end());
-	float range = std::max(-minValue, maxValue);
-
-	QValueAxis *axisY = new QValueAxis();
-	axisY->setRange(0,range);
-	chart->addAxis(axisY, Qt::AlignLeft);
-
 	this->setChart(chart);
-	int count = 0;
-	m_barSeriesList.clear();
-	for (const auto& error : *m_boneLengthErrors) {
-		double error_abs = std::abs(error);
-		QBarSeries *series = new QBarSeries();
-		m_barSeriesList.append(series);
-		connect(series, &QBarSeries::hovered, this, &BoneLengthChartView::onHoverSlot);
-		QBarSet * set = new QBarSet("Test");
-		if (error_abs >= m_errorThreshold && count != selectedIndex) {
-			set->setColor(QColor(100,32,164));
-			set->setBorderColor(QColor(100,32,164));
-		}
-		else if (count != selectedIndex) {
-			set->setColor(QColor(100,164,32));
-			set->setBorderColor(QColor(100,164,32));
-		}
-		else {
-			set->setColor(QColor(32,100,164));
-			set->setBorderColor(QColor(32,100,164));
-		}
-		*set << error_abs;
-		series->append(set);
-		chart->addSeries(series);
-		series->attachAxis(axisY);
-		count++;
-	}
+	if (m_boneLengthErrors->size() != 0) {
+		float maxValue = *std::max_element(m_boneLengthErrors->begin(), m_boneLengthErrors->end());
+		float minValue = *std::min_element(m_boneLengthErrors->begin(), m_boneLengthErrors->end());
+		float range = std::max(-minValue, maxValue);
+		QValueAxis *axisY = new QValueAxis();
+		axisY->setRange(0,range);
+		chart->addAxis(axisY, Qt::AlignLeft);
 
+		int count = 0;
+		m_barSeriesList.clear();
+		for (const auto& error : *m_boneLengthErrors) {
+			double error_abs = std::abs(error);
+			QBarSeries *series = new QBarSeries();
+			m_barSeriesList.append(series);
+			connect(series, &QBarSeries::hovered, this, &BoneLengthChartView::onHoverSlot);
+			QBarSet * set = new QBarSet("Test");
+			if (error_abs >= m_errorThreshold && count != selectedIndex) {
+				set->setColor(QColor(100,32,164));
+				set->setBorderColor(QColor(100,32,164));
+			}
+			else if (count != selectedIndex) {
+				set->setColor(QColor(100,164,32));
+				set->setBorderColor(QColor(100,164,32));
+			}
+			else {
+				set->setColor(QColor(32,100,164));
+				set->setBorderColor(QColor(32,100,164));
+			}
+			*set << error_abs;
+			series->append(set);
+			chart->addSeries(series);
+			series->attachAxis(axisY);
+			count++;
+		}
+	}
 }
 
 

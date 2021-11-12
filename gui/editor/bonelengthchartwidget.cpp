@@ -48,7 +48,6 @@ void BoneLengthChartWidget::datasetLoadedSlot() {
 
 void BoneLengthChartWidget::boneLengthErrorsUpdatedSlot(QMap<QString, std::vector<double>*> boneLengthErrors) {
 	for (const auto& entity : boneLengthErrors.keys()) {
-		std::cout << entity.toStdString() << std::endl;
-	boneLengthChartViews[entity]->update(boneLengthErrors[entity]);
+		boneLengthChartViews[entity]->update(boneLengthErrors[entity]);
 	}
 }
