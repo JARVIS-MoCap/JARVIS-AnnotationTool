@@ -1,11 +1,11 @@
-/*****************************************************************
-* File:			  videostreamer.cpp
-* Created: 	  09. August 2021
-* Author:		  Timo Hueser
-* Contact: 	  timo.hueser@gmail.com
-* Copyright:  2021 Timo Hueser
-* License:    GPL v3.0
-*****************************************************************/
+/*******************************************************************************
+ * File:			  videostreamer.cpp
+ * Created: 	  09. August 2021
+ * Author:		  Timo Hueser
+ * Contact: 	  timo.hueser@gmail.com
+ * Copyright:   2021 Timo Hueser
+ * License:     LGPL v3.0
+ ******************************************************************************/
 
 #include "videostreamer.hpp"
 
@@ -17,8 +17,9 @@
 #include <QThreadPool>
 
 
-VideoStreamer::VideoStreamer(const QString &videoPath, QList<TimeLineWindow> timeLineWindows,
-			int numFramesToExtract, int threadNumber) {
+VideoStreamer::VideoStreamer(const QString &videoPath,
+			QList<TimeLineWindow> timeLineWindows, int numFramesToExtract,
+			int threadNumber) {
 	m_cap = new cv::VideoCapture(videoPath.toStdString());
 	m_threadNumber = threadNumber;
 	m_timeLineWindows = timeLineWindows;
@@ -37,10 +38,13 @@ void VideoStreamer::run() {
 	for (const auto & window : m_timeLineWindows) {
 		int windowSize = window.end-window.start;
 		totalFrames += windowSize;
-		if (minFrameCount == 0 || windowSize < minFrameCount) minFrameCount = windowSize;
+		if (minFrameCount == 0 || windowSize < minFrameCount) {
+			minFrameCount = windowSize;
+		}
 	}
 	bool zeroReached = false;
-	while (m_numFramesToExtract*4 > minFrameCount/subSamplingRate && !zeroReached) {
+	while (m_numFramesToExtract * 4 > minFrameCount / subSamplingRate &&
+				!zeroReached) {
 		subSamplingRate = subSamplingRate/2;
 		if (subSamplingRate == 0) {
 			zeroReached = true;

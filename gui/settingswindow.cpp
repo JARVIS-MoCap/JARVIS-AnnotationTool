@@ -1,11 +1,11 @@
-/*****************************************************************
-	* File:			  settingswindow.cpp
-	* Created: 	  23. October 2020
-	* Author:		  Timo Hueser
-	* Contact: 	  timo.hueser@gmail.com
-	* Copyright:  2021 Timo Hueser
-	* License:    GPL v3.0
-	*****************************************************************/
+/*******************************************************************************
+ * File:			  settingswindow.hpp
+ * Created: 	  23. October 2020
+ * Author:		  Timo Hueser
+ * Contact: 	  timo.hueser@gmail.com
+ * Copyright:   2021 Timo Hueser
+ * License:     LGPL v3.0
+ ******************************************************************************/
 
 #include "settingswindow.hpp"
 
@@ -25,7 +25,8 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	QLabel *grayScaleLabel = new QLabel("Display as Grayscale");
 	grayScaleToggle = new QCheckBox();
 	grayScaleToggle->setMinimumSize(30,30);
-	connect(grayScaleToggle, &QCheckBox::stateChanged, this, &SettingsWindow::grayScaleToggledSlot);
+	connect(grayScaleToggle, &QCheckBox::stateChanged,
+					this, &SettingsWindow::grayScaleToggledSlot);
 	QLabel *hueLabel = new QLabel("Hue");
 	hueSlider = new QSlider(Qt::Horizontal,this);
 	hueSlider->setRange(0,359);
@@ -37,10 +38,14 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	hueResetButton = new QPushButton(this);
 	hueResetButton->setMinimumSize(30,30);
 	hueResetButton->setIcon(QIcon::fromTheme("reset"));
-	connect(hueSlider, &QSlider::valueChanged, hueBox, &QSpinBox::setValue);
-	connect(hueBox, QOverload<int>::of(&QSpinBox::valueChanged), hueSlider, &QSlider::setValue);
-	connect(hueBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsWindow::imageTranformationChangedSlot);
-	connect(hueResetButton, &QPushButton::clicked, this, &SettingsWindow::hueResetClickedSlot);
+	connect(hueSlider, &QSlider::valueChanged,
+					hueBox, &QSpinBox::setValue);
+	connect(hueBox, QOverload<int>::of(&QSpinBox::valueChanged),
+					hueSlider, &QSlider::setValue);
+	connect(hueBox, QOverload<int>::of(&QSpinBox::valueChanged),
+					this, &SettingsWindow::imageTranformationChangedSlot);
+	connect(hueResetButton, &QPushButton::clicked,
+					this, &SettingsWindow::hueResetClickedSlot);
 	QLabel *saturationLabel = new QLabel("Saturation");
 	saturationSlider = new QSlider(Qt::Horizontal,this);
 	saturationSlider->setRange(0,200);
@@ -52,10 +57,14 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	saturationResetButton = new QPushButton(this);
 	saturationResetButton->setMinimumSize(30,30);
 	saturationResetButton->setIcon(QIcon::fromTheme("reset"));
-	connect(saturationSlider, &QSlider::valueChanged, saturationBox, &QSpinBox::setValue);
-	connect(saturationBox, QOverload<int>::of(&QSpinBox::valueChanged), saturationSlider, &QSlider::setValue);
-	connect(saturationBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsWindow::imageTranformationChangedSlot);
-	connect(saturationResetButton, &QPushButton::clicked, this, &SettingsWindow::saturationResetClickedSlot);
+	connect(saturationSlider, &QSlider::valueChanged,
+					saturationBox, &QSpinBox::setValue);
+	connect(saturationBox, QOverload<int>::of(&QSpinBox::valueChanged),
+					saturationSlider, &QSlider::setValue);
+	connect(saturationBox, QOverload<int>::of(&QSpinBox::valueChanged),
+					this, &SettingsWindow::imageTranformationChangedSlot);
+	connect(saturationResetButton, &QPushButton::clicked,
+					this, &SettingsWindow::saturationResetClickedSlot);
 	QLabel *brightnessLabel = new QLabel("Brightness");
 	brightnessSlider = new QSlider(Qt::Horizontal,this);
 	brightnessSlider->setRange(0,200);
@@ -67,10 +76,14 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	brightnessResetButton = new QPushButton(this);
 	brightnessResetButton->setMinimumSize(30,30);
 	brightnessResetButton->setIcon(QIcon::fromTheme("reset"));
-	connect(brightnessSlider, &QSlider::valueChanged, brightnessBox, &QSpinBox::setValue);
-	connect(brightnessBox, QOverload<int>::of(&QSpinBox::valueChanged), brightnessSlider, &QSlider::setValue);
-	connect(brightnessBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsWindow::imageTranformationChangedSlot);
-	connect(brightnessResetButton, &QPushButton::clicked, this, &SettingsWindow::brightnessResetClickedSlot);
+	connect(brightnessSlider, &QSlider::valueChanged,
+					brightnessBox, &QSpinBox::setValue);
+	connect(brightnessBox, QOverload<int>::of(&QSpinBox::valueChanged),
+					brightnessSlider, &QSlider::setValue);
+	connect(brightnessBox, QOverload<int>::of(&QSpinBox::valueChanged),
+					this, &SettingsWindow::imageTranformationChangedSlot);
+	connect(brightnessResetButton, &QPushButton::clicked,
+					this, &SettingsWindow::brightnessResetClickedSlot);
 
 	imagesettingslayout->addWidget(grayScaleLabel, 0,0);
 	imagesettingslayout->addWidget(grayScaleToggle,0,1,1,3);
@@ -89,12 +102,14 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 
 
 	annotationSettingsBox = new QGroupBox("Keypoint Label Settings");
-	QGridLayout *annotationsettingslayout = new QGridLayout(annotationSettingsBox);
+	QGridLayout *annotationsettingslayout =
+				new QGridLayout(annotationSettingsBox);
 	QLabel *keypointSizeLabel = new QLabel("Keypoint Label Size");
 	keypointSizeEdit = new QSpinBox(annotationSettingsBox);
 	keypointSizeEdit->setRange(1,200);
 	keypointSizeEdit->setValue(8);
-	connect(keypointSizeEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsWindow::keypointSizeChanged);
+	connect(keypointSizeEdit, QOverload<int>::of(&QSpinBox::valueChanged),
+					this, &SettingsWindow::keypointSizeChanged);
 	entitySettingsWidget = new QWidget(annotationSettingsBox);
 	entitysettingslayout = new QGridLayout(entitySettingsWidget);
 	annotationsettingslayout->addWidget(keypointSizeLabel,0,0);
@@ -102,20 +117,27 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	annotationsettingslayout->addWidget(entitySettingsWidget,1,0,1,2);
 
 	reprojectionSettingsBox = new QGroupBox("Reprojection Settings");
-	QGridLayout *reprojectionsettingslayout = new QGridLayout(reprojectionSettingsBox);
+	QGridLayout *reprojectionsettingslayout =
+				new QGridLayout(reprojectionSettingsBox);
 	QLabel *minViewsLabel = new QLabel("Min Annotated Views");
 	minViewsEdit = new QSpinBox(reprojectionSettingsBox);
 	minViewsEdit->setRange(2,12);
 	minViewsEdit->setValue(2);
-	connect(minViewsEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsWindow::minViewsChangedSlot);
+	connect(minViewsEdit, QOverload<int>::of(&QSpinBox::valueChanged),
+					this, &SettingsWindow::minViewsChangedSlot);
 	QLabel *errorThresholdLabel = new QLabel("Repro Error Threshold");
 	errorThresholdEdit = new QDoubleSpinBox();
 	errorThresholdEdit->setValue(10.0);
-	connect(errorThresholdEdit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SettingsWindow::errorThresholdChangedSlot);
-	QLabel *boneLengthErrorThresholdLabel = new QLabel("Bone Length Error Threshold");
+	connect(errorThresholdEdit,
+					QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+					this, &SettingsWindow::errorThresholdChangedSlot);
+	QLabel *boneLengthErrorThresholdLabel =
+				new QLabel("Bone Length Error Threshold");
 	boneLengthErrorThresholdEdit = new QDoubleSpinBox();
 	boneLengthErrorThresholdEdit->setValue(10.0);
-	connect(boneLengthErrorThresholdEdit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SettingsWindow::boneLengthErrorThresholdChangedSlot);
+	connect(boneLengthErrorThresholdEdit,
+					QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+					this, &SettingsWindow::boneLengthErrorThresholdChangedSlot);
 	reprojectionsettingslayout->addWidget(minViewsLabel,0,0);
 	reprojectionsettingslayout->addWidget(minViewsEdit,0,1);
 	reprojectionsettingslayout->addWidget(errorThresholdLabel,1,0);
@@ -144,29 +166,33 @@ void SettingsWindow::datasetLoadedSlot() {
 		QComboBox * keypointShapeCombo = new QComboBox();
 		keypointShapeCombo->addItem("Circle");
 		keypointShapeCombo->addItem("Rectangle");
-		connect(keypointShapeCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+		connect(keypointShapeCombo, static_cast<void (QComboBox::*)(int)>
+						(&QComboBox::currentIndexChanged),
 						this, &SettingsWindow::keypointShapeChangedSlot);
 		keypointShapeCombosList.append(keypointShapeCombo);
-		QLabel *colorMapLabel = new QLabel(" Colormap"); //Make preview thingy here??
+		QLabel *colorMapLabel = new QLabel(" Colormap");
 		QComboBox *colorMapCombo = new QComboBox();
 		colorMapCombosList.append(colorMapCombo);
 		colorMapTypeList.append(ColorMap::Jet);
 		colorMapCombo->addItem("Jet");
 		colorMapCombo->addItem("Fixed");
 		colorMapCombo->addItem("Single");
-		connect(colorMapCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+		connect(colorMapCombo, static_cast<void (QComboBox::*)(int)>
+						(&QComboBox::currentIndexChanged),
 						this, &SettingsWindow::colorMapChangedSlot);
 		QLabel *colormapPreviewLabel = new QLabel();
 		colormapPreviewsList.append(colormapPreviewLabel);
 		colormapPreviewLabel->setMinimumSize(200,20);
 		QImage colormapPreview = createColorMapPreview(ColorMap::Jet);
-		colormapPreviewLabel->setPixmap(QPixmap::fromImage(colormapPreview).scaled(200,20));
+		colormapPreviewLabel->setPixmap(
+					QPixmap::fromImage(colormapPreview).scaled(200,20));
 		QPushButton *colorChooserButton = new QPushButton();
 		colorChooserButton->setMinimumSize(30,30);
 		colorChooserButton->setMaximumSize(30,30);
 		colorChooserButton->setIcon(QIcon::fromTheme("paint"));
 		colorChooserButton->setEnabled(false);
-		connect(colorChooserButton, &QPushButton::clicked, this, &SettingsWindow::colorChooserClickedSlot);
+		connect(colorChooserButton, &QPushButton::clicked,
+						this, &SettingsWindow::colorChooserClickedSlot);
 		colorChooserButtonsList.append(colorChooserButton);
 		colorsList.append(QColor(0,0,255));
 		singleentitylayout->addWidget(entityLabel,0,0,1,3);
@@ -199,7 +225,8 @@ void SettingsWindow::loadSettings() {
 	errorThresholdChangedSlot(errorThreshold);
 	double boneLengthErrorThreshold = 10.0;
 	if (settings->contains("boneLengthErrorThreshold")) {
-		boneLengthErrorThreshold = settings->value("boneLengthErrorThreshold").toDouble();
+		boneLengthErrorThreshold =
+					settings->value("boneLengthErrorThreshold").toDouble();
 	}
 	boneLengthErrorThresholdEdit->setValue(boneLengthErrorThreshold);
 	boneLengthErrorThresholdChanged(boneLengthErrorThreshold);
@@ -209,7 +236,8 @@ void SettingsWindow::loadSettings() {
 
 
 void SettingsWindow::imageTranformationChangedSlot() {
-	emit imageTranformationChanged(hueBox->value(), saturationBox->value(), brightnessBox->value());
+	emit imageTranformationChanged(hueBox->value(), saturationBox->value(),
+				brightnessBox->value());
 }
 
 
@@ -252,37 +280,49 @@ void SettingsWindow::brightnessResetClickedSlot() {
 
 
 void SettingsWindow::keypointShapeChangedSlot(int index) {
-	int entityIndex = keypointShapeCombosList.indexOf(qobject_cast<QComboBox*>(sender()));
-	emit keypointShapeChanged(Dataset::dataset->entitiesList()[entityIndex], static_cast<KeypointShape>(index));
+	int entityIndex = keypointShapeCombosList.indexOf(
+				qobject_cast<QComboBox*>(sender()));
+	emit keypointShapeChanged(Dataset::dataset->entitiesList()[entityIndex],
+				static_cast<KeypointShape>(index));
 }
 
 
-QImage SettingsWindow::createColorMapPreview(ColorMap::ColorMapType type, QColor color) {
-	QImage colormapPreview(Dataset::dataset->bodypartsList().size(), 1, QImage::Format_RGB888);
+QImage SettingsWindow::createColorMapPreview(ColorMap::ColorMapType type,
+			QColor color) {
+	QImage colormapPreview(Dataset::dataset->bodypartsList().size(), 1,
+				QImage::Format_RGB888);
 	for (int i = 0; i < Dataset::dataset->bodypartsList().size(); i++) {
 		ColorMap *colorMap = new ColorMap(type, color);
-		colormapPreview.setPixelColor(i,0,colorMap->getColor(i, Dataset::dataset->bodypartsList().size()));
+		colormapPreview.setPixelColor(i,0,colorMap->getColor(i,
+					Dataset::dataset->bodypartsList().size()));
 	}
 	return colormapPreview;
 }
 
 
 void SettingsWindow::colorMapChangedSlot(int index) {
-	int entityIndex = colorMapCombosList.indexOf(qobject_cast<QComboBox*>(sender()));
+	int entityIndex = colorMapCombosList.indexOf(
+				qobject_cast<QComboBox*>(sender()));
 	colorMapTypeList[entityIndex] = static_cast<ColorMap::ColorMapType>(index);
 	colorChooserButtonsList[entityIndex]->setEnabled(index != 0);
-	QImage colormapPreview = createColorMapPreview(colorMapTypeList[entityIndex], colorsList[entityIndex]);
-	colormapPreviewsList[entityIndex]->setPixmap(QPixmap::fromImage(colormapPreview).scaled(200,20));
+	QImage colormapPreview = createColorMapPreview(colorMapTypeList[entityIndex],
+				colorsList[entityIndex]);
+	colormapPreviewsList[entityIndex]->setPixmap(
+				QPixmap::fromImage(colormapPreview).scaled(200,20));
 	emit colorMapChanged(Dataset::dataset->entitiesList()[entityIndex],
 											 colorMapTypeList[entityIndex], colorsList[entityIndex]);
 }
 
 
 void SettingsWindow::colorChooserClickedSlot() {
-	int entityIndex = colorChooserButtonsList.indexOf(qobject_cast<QPushButton*>(sender()));
-	colorsList[entityIndex] = QColorDialog::getColor(colorsList[entityIndex], this);
-	QImage colormapPreview = createColorMapPreview(colorMapTypeList[entityIndex], colorsList[entityIndex]);
-	colormapPreviewsList[entityIndex]->setPixmap(QPixmap::fromImage(colormapPreview).scaled(200,20));
+	int entityIndex = colorChooserButtonsList.indexOf(
+				qobject_cast<QPushButton*>(sender()));
+	colorsList[entityIndex] = QColorDialog::getColor(
+				colorsList[entityIndex], this);
+	QImage colormapPreview = createColorMapPreview(colorMapTypeList[entityIndex],
+				colorsList[entityIndex]);
+	colormapPreviewsList[entityIndex]->setPixmap(
+				QPixmap::fromImage(colormapPreview).scaled(200,20));
 	emit colorMapChanged(Dataset::dataset->entitiesList()[entityIndex],
 											 colorMapTypeList[entityIndex], colorsList[entityIndex]);
 }

@@ -1,7 +1,4 @@
-project (datasetcreator)
-
-
-add_library(${PROJECT_NAME}
+add_library(datasetcreator
   datasetcreator.hpp
   datasetcreator.cpp
   imagewriter.hpp
@@ -10,7 +7,7 @@ add_library(${PROJECT_NAME}
   videostreamer.cpp
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(datasetcreator
     PUBLIC
     ${PROJECT_SOURCE_DIR}
     ../
@@ -19,7 +16,7 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(datasetcreator
   Qt5::Widgets
   opencv_core
   opencv_calib3d
@@ -27,5 +24,3 @@ target_link_libraries(${PROJECT_NAME}
   opencv_imgproc
   yaml-cpp
 )
-
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wno-sign-compare -Wunused)

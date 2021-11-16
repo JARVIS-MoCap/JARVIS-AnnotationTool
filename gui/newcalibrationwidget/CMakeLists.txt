@@ -1,7 +1,4 @@
-project (newcalibrationwidget)
-
-
-add_library(${PROJECT_NAME}
+add_library(newcalibrationwidget
   newcalibrationwidget.hpp
   newcalibrationwidget.cpp
   extrinsicspairlist.hpp
@@ -18,17 +15,16 @@ add_library(${PROJECT_NAME}
   namesuggestiondialog.cpp
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(newcalibrationwidget
     PUBLIC
     ${PROJECT_SOURCE_DIR}
     ../
+    ${PROJECT_SOURCE_DIR}/src/calibrationtool
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(newcalibrationwidget
   Qt5::Widgets
 	src
   gui
   calibrationtool
 )
-
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused -Wno-sign-compare)

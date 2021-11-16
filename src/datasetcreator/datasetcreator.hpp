@@ -1,11 +1,11 @@
-/*****************************************************************
-	* File:			  datasetcreator.hpp
-	* Created: 	  10. July 2021
-	* Author:		  Timo Hueser
-	* Contact: 	  timo.hueser@gmail.com
-	* Copyright:  2021 Timo Hueser
-	* License:    GPL v3.0
-	*****************************************************************/
+/*******************************************************************************
+ * File:			  datasetcreator.hpp
+ * Created: 	  10. July 2021
+ * Author:		  Timo Hueser
+ * Contact: 	  timo.hueser@gmail.com
+ * Copyright:   2021 Timo Hueser
+ * License:     LGPL v3.0
+ ******************************************************************************/
 
 #ifndef DATASETCREATOR_H
 #define DATASETCREATOR_H
@@ -34,7 +34,8 @@ class DatasetCreator : public QObject {
 		void gotAllDCTs();
 		void datasetCreated();
 		void datasetCreationFailed(QString errorMsg);
-		void recordingBeingProcessedChanged(QString recording, QList<QString> cameras);
+		void recordingBeingProcessedChanged(QString recording,
+					QList<QString> cameras);
 		void currentSegmentChanged(QString segmentName);
 		void dctProgress(int index, int windowSizeint, int threadNumber);
 		void startedClustering();
@@ -43,7 +44,9 @@ class DatasetCreator : public QObject {
 		void creationCanceled();
 
 	public slots:
-		void createDatasetSlot(QList<RecordingItem> recordings, QList<QString> entities, QList<QString> keypoints, QList<SkeletonComponent> skeleton);
+		void createDatasetSlot(QList<RecordingItem> recordings,
+					QList<QString> entities, QList<QString> keypoints,
+					QList<SkeletonComponent> skeleton);
 		void cancelCreationSlot();
 
 	private:
@@ -60,13 +63,19 @@ class DatasetCreator : public QObject {
 		QList<QString> getCameraNames(const QString & path);
 		QString getVideoFormat(const QString& recording);
 		bool checkFrameCounts(const QString& recording, QList<QString> cameras);
-		QList<int> extractFrames(const QString &path, QList<TimeLineWindow> timeLineWindows, QList<QString> cameras);
-		QList<QString> getAndCopyFrames(const QString& recording, QList<QString> cameras, const QString& dataFolder, QList<int> frameNumbers);
-		void createSavefile(const QString& recording, QList<QString> cameraNames, const QString& dataFolder, QList<int> frameNumbers);
-		QMap<QString, QList<TimeLineWindow>> getRecordingSubsets(QList<TimeLineWindow> timeLineWindows);
+		QList<int> extractFrames(const QString &path,
+					QList<TimeLineWindow> timeLineWindows, QList<QString> cameras);
+		QList<QString> getAndCopyFrames(const QString& recording,
+					QList<QString> cameras, const QString& dataFolder,
+					QList<int> frameNumbers);
+		void createSavefile(const QString& recording, QList<QString> cameraNames,
+					const QString& dataFolder, QList<int> frameNumbers);
+		QMap<QString, QList<TimeLineWindow>> getRecordingSubsets(
+					QList<TimeLineWindow> timeLineWindows);
 
 	private slots:
-		void computedDCTsSlot(QList<cv::Mat> dctImages, QMap<int,int> frameNumberMap, int threadNumber);
+		void computedDCTsSlot(QList<cv::Mat> dctImages,
+					QMap<int,int> frameNumberMap, int threadNumber);
 
 };
 

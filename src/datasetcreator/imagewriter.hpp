@@ -1,11 +1,11 @@
-/*****************************************************************
+/*******************************************************************************
  * File:			  imagewriter.hpp
  * Created: 	  09. August 2021
  * Author:		  Timo Hueser
  * Contact: 	  timo.hueser@gmail.com
- * Copyright:  2021 Timo Hueser
- * License:    GPL v3.0
- *****************************************************************/
+ * Copyright:   2021 Timo Hueser
+ * License:     LGPL v3.0
+ ******************************************************************************/
 
 #ifndef IMAGEWRITER_H
 #define IMAGEWRITER_H
@@ -22,8 +22,9 @@ class ImageWriter : public QObject, public QRunnable {
 	Q_OBJECT
 
 	public:
-		explicit ImageWriter(const QString &videoPath, const QString &destinationPath,
-					QList<int> frameNumbers, int threadNumber);
+		explicit ImageWriter(const QString &videoPath,
+					const QString &destinationPath, QList<int> frameNumbers,
+					int threadNumber);
 		void run();
 
 	signals:

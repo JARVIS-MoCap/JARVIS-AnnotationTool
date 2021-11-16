@@ -1,21 +1,15 @@
-project (helpwindow)
-
-add_library(${PROJECT_NAME}
+add_library(helpwindow
   helpwindow.hpp
   helpwindow.cpp
 )
-message ("Source ${PROJECT_SOURCE_DIR}")
 
-
-target_include_directories(${PROJECT_NAME}
+target_include_directories(helpwindow
     PUBLIC
     ${PROJECT_SOURCE_DIR}
     ../
     ../../
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(helpwindow
   Qt5::Widgets
 )
-
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused -Wno-sign-compare)

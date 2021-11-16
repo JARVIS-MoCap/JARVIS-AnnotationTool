@@ -1,11 +1,8 @@
-project (src)
-
-
 add_subdirectory(calibrationtool)
 add_subdirectory(datasetcreator)
 add_subdirectory(trainingsetexporter)
 
-add_library(${PROJECT_NAME}
+add_library(src
 	keypoint.hpp
 	keypoint.cpp
 	colormap.hpp
@@ -16,19 +13,17 @@ add_library(${PROJECT_NAME}
 	reprojectiontool.cpp
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(src
     PUBLIC
     ${PROJECT_SOURCE_DIR}
     ../
 )
 
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(src
   Qt5::Widgets
 	opencv_core
 	opencv_calib3d
 	opencv_videoio
 	opencv_imgproc
 )
-
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wno-sign-compare -Wunused)

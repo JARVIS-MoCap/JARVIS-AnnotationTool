@@ -1,11 +1,11 @@
-/*****************************************************************
+/*******************************************************************************
  * File:			  reprojectiontool.hpp
  * Created: 	  02. December 2020
  * Author:		  Timo Hueser
  * Contact: 	  timo.hueser@gmail.com
- * Copyright:  2021 Timo Hueser
- * License:    GPL v3.0
- *****************************************************************/
+ * Copyright:   2021 Timo Hueser
+ * License:     LGPL v3.0
+ ******************************************************************************/
 
 #ifndef REPROJECTIONTOOL_H
 #define REPROJECTIONTOOL_H
@@ -33,7 +33,8 @@ class ReprojectionTool : public QObject {
 		typedef struct CameraExtrinsics {
 			cv::Mat rotationMatrix;
 			cv::Mat translationVector;
-			cv::Mat locationMatrix;	//combination of rotation and Translation of secondary
+			cv::Mat locationMatrix;	//combination of rotation
+															// and Translation of secondary
 			cv::Mat essentialMatrix;
 			cv::Mat fundamentalMatrix;
 		} CameraExtrinsics;

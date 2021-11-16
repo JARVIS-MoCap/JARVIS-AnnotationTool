@@ -1,7 +1,4 @@
-project (calibrationtool)
-
-
-add_library(${PROJECT_NAME}
+add_library(calibrationtool
   calibrationtool.hpp
   intrinsicscalibrator.hpp
   extrinsicscalibrator.hpp
@@ -10,7 +7,7 @@ add_library(${PROJECT_NAME}
   extrinsicscalibrator.cpp
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(calibrationtool
     PUBLIC
     ${PROJECT_SOURCE_DIR}
     ../../libs/libcbdetect/src
@@ -19,7 +16,7 @@ target_include_directories(${PROJECT_NAME}
 )
 
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(calibrationtool
   Qt5::Widgets
   cbdetect
   opencv_core
@@ -28,5 +25,3 @@ target_link_libraries(${PROJECT_NAME}
   opencv_imgproc
   opencv_aruco
 )
-
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused -Wno-sign-compare)

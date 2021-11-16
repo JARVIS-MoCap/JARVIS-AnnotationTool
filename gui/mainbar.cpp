@@ -1,11 +1,11 @@
-/*****************************************************************
-	* File:			  mainbar.cpp
-	* Created: 	  23. October 2020
-	* Author:		  Timo Hueser
-	* Contact: 	  timo.hueser@gmail.com
-	* Copyright:  2021 Timo Hueser
-	* License:    GPL v3.0
-	*****************************************************************/
+/*******************************************************************************
+ * File:			  mainbar.cpp
+ * Created: 	  23. October 2020
+ * Author:		  Timo Hueser
+ * Contact: 	  timo.hueser@gmail.com
+ * Copyright:   2021 Timo Hueser
+ * License:     LGPL v3.0
+ ******************************************************************************/
 
 #include "mainbar.hpp"
 
@@ -20,24 +20,28 @@ MainBar::MainBar(QWidget *parent) : QToolBar(parent) {
 	nameSpacer->setMinimumSize(5,5);
 	QLabel *nameLabel = new QLabel(this);
 	nameLabel->setFont(QFont("Sans Serif", 20, QFont::Bold));
-	nameLabel->setText("<font color=#2664a3>Annotation</font><font color=#64a420>Tool</font>");
+	nameLabel->setText("<font color=#2664a3>Annotation</font><font "
+				"color=#64a420>Tool</font>");
 	QWidget *spacer1 = new QWidget();
 	spacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	settingsButton = new QToolButton(this);
 	settingsAction = new QAction(this);
-	createToolBarButton(settingsButton, settingsAction, QIcon::fromTheme("settings"),
-				true, false, QSize(50,50));
-	connect(settingsAction, &QAction::triggered, this, &MainBar::openSettingsWindow);
+	createToolBarButton(settingsButton, settingsAction,
+				QIcon::fromTheme("settings"), true, false, QSize(50,50));
+	connect(settingsAction, &QAction::triggered,
+					this, &MainBar::openSettingsWindow);
 	helpButton = new QToolButton(this);
 	helpAction = new QAction(this);
 	createToolBarButton(helpButton, helpAction, QIcon::fromTheme("help"),
 				true, false, QSize(50,50));
-	connect(helpAction, &QAction::triggered, this, &MainBar::openHelpWindow);
+	connect(helpAction, &QAction::triggered,
+					this, &MainBar::openHelpWindow);
 	exitButton = new QToolButton(this);
 	exitAction = new QAction(this);
 	createToolBarButton(exitButton, exitAction, QIcon::fromTheme("home"),
 				true, false, QSize(50,50));
-	connect(exitAction, &QAction::triggered, this, &MainBar::exitToMainPage);
+	connect(exitAction, &QAction::triggered,
+					this, &MainBar::exitToMainPage);
 	QWidget *endSpacer = new QWidget(this);
 	endSpacer->setMinimumSize(5,5);
 

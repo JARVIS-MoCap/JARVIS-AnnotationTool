@@ -1,11 +1,11 @@
-/*****************************************************************
+/*******************************************************************************
  * File:			  keypoint.hpp
  * Created: 	  23. October 2020
  * Author:		  Timo Hueser
  * Contact: 	  timo.hueser@gmail.com
- * Copyright:  2021 Timo Hueser
- * License:    GPL v3.0
- *****************************************************************/
+ * Copyright:   2021 Timo Hueser
+ * License:     LGPL v3.0
+ ******************************************************************************/
 
 #ifndef KEYPOINT_H
 #define KEYPOINT_H
@@ -39,7 +39,6 @@ class Keypoint : public QObject {
 		bool showName() const {return m_showName;}
 		void setFrameIndex(int frameIndex) {m_frameIndex = frameIndex;}
 		int frameIndex() const {return m_frameIndex;}
-
 
 	signals:
 		void stateChanged(KeypointState state, KeypointState previousState,

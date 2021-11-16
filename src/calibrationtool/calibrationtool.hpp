@@ -1,11 +1,11 @@
-/*****************************************************************
-	* File:			  calibrationtool.hpp
-	* Created: 	  30. July 2021
-	* Author:		  Timo Hueser
-	* Contact: 	  timo.hueser@gmail.com
-	* Copyright:  2021 Timo Hueser
-	* License:    GPL v3.0
-	*****************************************************************/
+/*******************************************************************************
+ * File:			  calibrationtool.hpp
+ * Created: 	  30. July 2021
+ * Author:		  Timo Hueser
+ * Contact: 	  timo.hueser@gmail.com
+ * Copyright:   2021 Timo Hueser
+ * License:     LGPL v3.0
+ ******************************************************************************/
 
 #ifndef CALIBRATIONTOOL_H
 #define CALIBRATIONTOOL_H
@@ -28,8 +28,12 @@ class CalibrationTool : public QObject {
 
   public:
     explicit CalibrationTool(CalibrationConfig *calibrationConfig);
-		QMap<int, double> getIntrinsicsReproErrors() {return m_intrinsicsReproErrors;};
-		QMap<int, double> getExtrinsicsReproErrors() {return m_extrinsicsReproErrors;};
+		QMap<int, double> getIntrinsicsReproErrors() {
+			return m_intrinsicsReproErrors;
+		};
+		QMap<int, double> getExtrinsicsReproErrors() {
+			return m_extrinsicsReproErrors;
+		};
 
 	signals:
     void intrinsicsProgress(int counter, int frameCount, int threadNumber);
@@ -50,7 +54,8 @@ class CalibrationTool : public QObject {
 
 	private slots:
 		void finishedIntrinsicsSlot(double reproError, int threadNumber);
-		void finishedExtrinsicsSlot(double reproError, QMap<QString, double> intrinsicsErrorMap, int threadNumber);
+		void finishedExtrinsicsSlot(double reproError,
+					QMap<QString, double> intrinsicsErrorMap, int threadNumber);
 		void calibrationErrorSlot(const QString &errorMsg);
 };
 

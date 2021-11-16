@@ -1,11 +1,11 @@
-/*****************************************************************
- * File:			 datasetcreator.cpp
- * Created: 	 10. July 2021
- * Author:		 Timo Hueser
- * Contact: 	 timo.hueser@gmail.com
- * Copyright:  2021 Timo Hueser
- * License:    GPL v3.0
- *****************************************************************/
+/*******************************************************************************
+ * File:			  datasetcreator.cpp
+ * Created: 	  10. July 2021
+ * Author:		  Timo Hueser
+ * Contact: 	  timo.hueser@gmail.com
+ * Copyright:   2021 Timo Hueser
+ * License:     LGPL v3.0
+ ******************************************************************************/
 
 #include "datasetcreator.hpp"
 
@@ -28,7 +28,8 @@ DatasetCreator::DatasetCreator(DatasetConfig *datasetConfig) :
 
 
 void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings,
-			QList<QString> entities, QList<QString> keypoints, QList<SkeletonComponent> skeleton) {
+			QList<QString> entities, QList<QString> keypoints,
+			QList<SkeletonComponent> skeleton) {
 	delayl(100); 	//Give the gui Thread time to pop up the progressWindow
 	m_creationCanceled = false;
 	m_recordingItems = recordings;
@@ -60,11 +61,13 @@ void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings,
 			cap.release();
 			timeLineWindows.append(fullWindow);
 			emit currentSegmentChanged("");
-			QList<int> frameNumbers = extractFrames(recording.path, timeLineWindows, cameras);
+			QList<int> frameNumbers = extractFrames(recording.path, timeLineWindows,
+						cameras);
 			if (!m_creationCanceled) {
 				QString savepath;
 				if (m_recordingItems.size() == 1) {
-					savepath =  m_datasetConfig->datasetPath + "/" + m_datasetConfig->datasetName;
+					savepath =  m_datasetConfig->datasetPath + "/" +
+					m_datasetConfig->datasetName;
 				}
 				else {
 					savepath = m_datasetConfig->datasetPath + "/" +
@@ -73,11 +76,13 @@ void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings,
 				createSavefile(recording.path, cameras, savepath, frameNumbers);
 			}
 		}
-		QMap<QString, QList<TimeLineWindow>> recordingSubsets = getRecordingSubsets(recording.timeLineList);
+		QMap<QString, QList<TimeLineWindow>> recordingSubsets =
+					getRecordingSubsets(recording.timeLineList);
 
 		for (const auto &subsetName : recordingSubsets.keys()) {
 			emit currentSegmentChanged(subsetName);
-			QList<int> frameNumbers = extractFrames(recording.path, recordingSubsets[subsetName], cameras);
+			QList<int> frameNumbers = extractFrames(recording.path,
+						recordingSubsets[subsetName], cameras);
 			if (!m_creationCanceled) {
 				QString savepath;
 				if (m_recordingItems.size() == 1) {
@@ -86,7 +91,8 @@ void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings,
 				}
 				else {
 					savepath = m_datasetConfig->datasetPath + "/" +
-										 m_datasetConfig->datasetName + "/" + recording.name + "/" + subsetName;
+										 m_datasetConfig->datasetName + "/" +
+										 recording.name + "/" + subsetName;
 				}
 				createSavefile(recording.path, cameras, savepath, frameNumbers);
 			}
@@ -102,15 +108,18 @@ void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings,
 	createDatasetConfigFile(m_datasetConfig->datasetPath);
 }
 
+
 void DatasetCreator::createDatasetConfigFile(const QString& path) {
 	YAML::Node config;  // starts out as null
 
 	config["Name"] = m_datasetConfig->datasetName.toStdString();
-	config["Date of creation"] = QDate::currentDate().toString(Qt::ISODate).toStdString();
+	config["Date of creation"] =
+				QDate::currentDate().toString(Qt::ISODate).toStdString();
 	for (const auto & recording : m_recordingItems) {
 		config["Recordings"][recording.name.toStdString()] = YAML::Node();
 		for (const auto &segment : recording.timeLineList) {
-			config["Recordings"][recording.name.toStdString()].push_back(segment.name.toStdString());
+			config["Recordings"][recording.name.toStdString()].push_back(
+						segment.name.toStdString());
 		}
 	}
 
@@ -128,14 +137,19 @@ void DatasetCreator::createDatasetConfigFile(const QString& path) {
 
 	for (const auto & bone : m_skeleton) {
 		//config["Skeleton"].push_back(bone[0].toStdString());
-		config["Skeleton"][bone.name.toStdString()]["Keypoints"].push_back(bone.keypointA.toStdString());
-		config["Skeleton"][bone.name.toStdString()]["Keypoints"].push_back(bone.keypointB.toStdString());
-		config["Skeleton"][bone.name.toStdString()]["Length"].push_back(bone.length);
+		config["Skeleton"][bone.name.toStdString()]["Keypoints"].push_back(
+					bone.keypointA.toStdString());
+		config["Skeleton"][bone.name.toStdString()]["Keypoints"].push_back(
+					bone.keypointB.toStdString());
+		config["Skeleton"][bone.name.toStdString()]["Length"].push_back(
+					bone.length);
 	}
 
-	std::ofstream configStream((path + "/" + m_datasetConfig->datasetName + "/" + m_datasetConfig->datasetName +  ".yaml").toStdString());
+	std::ofstream configStream((path + "/" + m_datasetConfig->datasetName + "/" +
+				m_datasetConfig->datasetName +  ".yaml").toStdString());
 	configStream << config;
 }
+
 
 QList<QString> DatasetCreator::getCameraNames(const QString& path) {
 	QList<QString> cameraNames;
@@ -143,7 +157,8 @@ QList<QString> DatasetCreator::getCameraNames(const QString& path) {
 		QString subpath = it.next();
 		QString suffix = subpath.split('/').takeLast();
 		if (suffix != "." && suffix != "..") {
-			if (m_datasetConfig->validRecordingFormats.contains(suffix.split(".").takeLast())) {
+			if (m_datasetConfig->validRecordingFormats.contains(
+						suffix.split(".").takeLast())) {
 				suffix = suffix.split(".").takeFirst();
 				cameraNames.append(suffix);
 			}
@@ -174,10 +189,12 @@ QString DatasetCreator::getVideoFormat(const QString& recording) {
 }
 
 
-bool DatasetCreator::checkFrameCounts(const QString& recording, QList<QString> cameras) {
+bool DatasetCreator::checkFrameCounts(const QString& recording,
+			QList<QString> cameras) {
 	int numFrames = -1;
 	for (const auto & camera : cameras) {
-		cv::VideoCapture cap((recording + "/" + camera + "." + m_datasetConfig->videoFormat).toStdString());
+		cv::VideoCapture cap((recording + "/" + camera + "." +
+					m_datasetConfig->videoFormat).toStdString());
 		if(!cap.isOpened()){
 			emit datasetCreationFailed("Error opening video stream or file");
     	return false;
@@ -219,7 +236,8 @@ QList<int> DatasetCreator::extractFrames(const QString &path,
 		float spacing = totalNumFrames / (m_datasetConfig->frameSetsRecording+1);
 		int  remainder = 0;
 		for (const auto& window : timeLineWindows) {
-			for (float num = window.start+spacing-remainder; num < window.end; num += spacing) {
+			for (float num = window.start+spacing-remainder; num < window.end;
+						num += spacing) {
 				frameNumbers.append(static_cast<int>(num));
 				remainder = window.end - num;
 			}
@@ -230,12 +248,15 @@ QList<int> DatasetCreator::extractFrames(const QString &path,
 		QList <VideoStreamer*> streamers;
 		QThreadPool *threadPool = QThreadPool::globalInstance();
 		for (int i = 0; i < m_datasetConfig->numCameras; i++) {
-			VideoStreamer *streamer = new VideoStreamer(path + "/" + cameras[i] + "." +
-																								  m_datasetConfig->videoFormat, timeLineWindows,
-																									m_datasetConfig->frameSetsRecording, i);
-			connect(streamer, &VideoStreamer::computedDCTs, this, &DatasetCreator::computedDCTsSlot);
-			connect(this, &DatasetCreator::creationCanceled, streamer, &VideoStreamer::creationCanceledSlot);
-			connect(streamer, &VideoStreamer::dctProgress, this, &DatasetCreator::dctProgress);
+			VideoStreamer *streamer = new VideoStreamer(path + "/" + cameras[i] +
+						"." + m_datasetConfig->videoFormat, timeLineWindows,
+						m_datasetConfig->frameSetsRecording, i);
+			connect(streamer, &VideoStreamer::computedDCTs,
+							this, &DatasetCreator::computedDCTsSlot);
+			connect(this, &DatasetCreator::creationCanceled,
+							streamer, &VideoStreamer::creationCanceledSlot);
+			connect(streamer, &VideoStreamer::dctProgress,
+							this, &DatasetCreator::dctProgress);
 			streamers.append(streamer);
  			threadPool->start(streamer);
 		}
@@ -270,8 +291,8 @@ QList<int> DatasetCreator::extractFrames(const QString &path,
 
 		cv::Mat labels, centers;
 		cv::kmeans(dctImagesList, m_datasetConfig->frameSetsRecording, labels,
-					cv::TermCriteria(cv::TermCriteria::EPS+cv::TermCriteria::COUNT, 1000, 1e-4),
-					25, cv::KMEANS_PP_CENTERS, centers);
+					cv::TermCriteria(cv::TermCriteria::EPS+cv::TermCriteria::COUNT,
+					1000, 1e-4), 25, cv::KMEANS_PP_CENTERS, centers);
 
 		for (int i = 0; i < m_datasetConfig->frameSetsRecording; i++) {
 			std::vector< float > sums;
@@ -280,7 +301,8 @@ QList<int> DatasetCreator::extractFrames(const QString &path,
 				clusterDists = dctImagesList.row(j)-centers.row(i);
 				sums.push_back(cv::sum(clusterDists.mul(clusterDists))[0]);
 			}
-			int minElementIndex = std::min_element(sums.begin(),sums.end()) - sums.begin();
+			int minElementIndex = std::min_element(sums.begin(),
+																						 sums.end()) - sums.begin();
 			frameNumbers.append(m_frameNumberMap[minElementIndex]);
 		}
 		emit finishedClustering();
@@ -291,17 +313,22 @@ QList<int> DatasetCreator::extractFrames(const QString &path,
 
 
 QList<QString> DatasetCreator::getAndCopyFrames(const QString& recording,
-				QList<QString> cameras, const QString& dataFolder, QList<int> frameNumbers) {
+				QList<QString> cameras, const QString& dataFolder,
+				QList<int> frameNumbers) {
 	QList<QString> frameNames;
 	QList <ImageWriter*> writers;
 	QThreadPool *threadPool = QThreadPool::globalInstance();
 	int threadNumber = 0;
 	for (const auto & camera : cameras) {
-		QString videoPath = recording + "/" + camera + "." + m_datasetConfig->videoFormat;
+		QString videoPath = recording + "/" + camera + "." +
+					m_datasetConfig->videoFormat;
 		QString destinationPath = dataFolder + "/" + camera;
-		ImageWriter *writer = new ImageWriter(videoPath, destinationPath, frameNumbers, threadNumber);
-		connect(this, &DatasetCreator::creationCanceled, writer, &ImageWriter::creationCanceledSlot);
-		connect(writer, &ImageWriter::copyImagesStatus, this, &DatasetCreator::copyImagesStatus);
+		ImageWriter *writer = new ImageWriter(videoPath, destinationPath,
+					frameNumbers, threadNumber);
+		connect(this, &DatasetCreator::creationCanceled,
+						writer, &ImageWriter::creationCanceledSlot);
+		connect(writer, &ImageWriter::copyImagesStatus,
+						this, &DatasetCreator::copyImagesStatus);
 		threadNumber++;
 		writers.append(writer);
 		threadPool->start(writer);
@@ -316,19 +343,21 @@ QList<QString> DatasetCreator::getAndCopyFrames(const QString& recording,
 }
 
 
-void DatasetCreator::createSavefile(const QString& recording, QList<QString> cameras,
-			const QString& dataFolder, QList<int> frameNumbers) {
+void DatasetCreator::createSavefile(const QString& recording,
+			QList<QString> cameras, const QString& dataFolder,
+			QList<int> frameNumbers) {
 	for (const auto & camera : cameras) {
 		QDir dir;
 		dir.mkpath(dataFolder + "/" + camera);
 	}
-	QList<QString> frameNames = getAndCopyFrames(recording, cameras, dataFolder, frameNumbers);
+	QList<QString> frameNames = getAndCopyFrames(recording, cameras, dataFolder,
+				frameNumbers);
 
 	for (const auto & camera : cameras) {
 		QFile file = QFile(dataFolder + "/" + camera + "/annotations.csv");
 		if (!file.open(QIODevice::WriteOnly)) {
-			emit datasetCreationFailed("Can't open file " + dataFolder + "/" + camera +
-																 "/annotations.csv" + " !");;
+			emit datasetCreationFailed("Can't open file " + dataFolder + "/" +
+						camera + "/annotations.csv" + " !");;
 			return;
 		}
 		 QTextStream stream(&file);

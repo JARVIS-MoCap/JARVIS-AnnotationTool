@@ -1,7 +1,4 @@
-project (exporttrainingset)
-
-
-add_library(${PROJECT_NAME}
+add_library(exporttrainingset
   exporttrainingsetwidget.hpp
   exporttrainingsetwidget.cpp
   compositionchartview.hpp
@@ -14,18 +11,17 @@ add_library(${PROJECT_NAME}
   segmentselectorwindow.cpp
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(exporttrainingset
     PUBLIC
     ${PROJECT_SOURCE_DIR}
+    ../conveniencewidgets
     ../
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(exporttrainingset
   Qt5::Widgets
   Qt5::Charts
 	src
   conveniencewidgets
   trainingsetexporter
 )
-
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused -Wno-sign-compare)

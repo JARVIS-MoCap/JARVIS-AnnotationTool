@@ -1,7 +1,4 @@
-project (conveniencewidgets)
-
-
-add_library(${PROJECT_NAME}
+add_library(conveniencewidgets
   labelwithtooltip.hpp
   labelwithtooltip.cpp
   pathwidget.hpp
@@ -18,15 +15,13 @@ add_library(${PROJECT_NAME}
   yesnoradiowidget.cpp
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(conveniencewidgets
     PUBLIC
     ${PROJECT_SOURCE_DIR}
     ../
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(conveniencewidgets
   Qt5::Widgets
 	src
 )
-
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused -Wno-sign-compare)

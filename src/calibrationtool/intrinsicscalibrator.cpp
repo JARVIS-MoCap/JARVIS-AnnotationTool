@@ -1,11 +1,11 @@
-/*****************************************************************
-	* File:			 intrinsicscalibrator.cpp
-	* Created: 	 30. July 2021
-	* Author:		 Timo Hueser
-	* Contact: 	 timo.hueser@gmail.com
-	* Copyright:  2021 Timo Hueser
-	* License:    GPL v3.0
-	*****************************************************************/
+/*******************************************************************************
+ * File:			  intrinsicscalibrator.cpp
+ * Created: 	  30. July 2021
+ * Author:		  Timo Hueser
+ * Contact: 	  timo.hueser@gmail.com
+ * Copyright:   2021 Timo Hueser
+ * License:     LGPL v3.0
+ ******************************************************************************/
 
 #include "intrinsicscalibrator.hpp"
 #include "colormap.hpp"
@@ -20,19 +20,23 @@
 
 IntrinsicsCalibrator::IntrinsicsCalibrator(CalibrationConfig *calibrationConfig,
       const QString& cameraName, int threadNumber) :
-      m_calibrationConfig(calibrationConfig), m_cameraName(cameraName.toStdString()), m_threadNumber(threadNumber){
+      m_calibrationConfig(calibrationConfig),
+      m_cameraName(cameraName.toStdString()), m_threadNumber(threadNumber){
   QDir dir;
   dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" +
              m_calibrationConfig->calibrationSetName + "/Intrinsics");
   if (m_calibrationConfig->debug) {
     dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" +
-    m_calibrationConfig->calibrationSetName + "/debug/Intrinsics/" + cameraName + "/");
+    m_calibrationConfig->calibrationSetName + "/debug/Intrinsics/" +
+          cameraName + "/");
   }
   m_parametersSavePath = (m_calibrationConfig->calibrationSetPath + "/" +
-                          m_calibrationConfig->calibrationSetName).toStdString();
+        m_calibrationConfig->calibrationSetName).toStdString();
 
-  m_charucoPattern = cv::Mat(cv::Size( m_calibrationConfig->patternWidth+1,  m_calibrationConfig->patternHeight+1), CV_32SC1);
-  m_detectedPattern = cv::Mat(cv::Size( m_calibrationConfig->patternWidth+1,  m_calibrationConfig->patternHeight+1), CV_32SC1);
+  m_charucoPattern = cv::Mat(cv::Size( m_calibrationConfig->patternWidth+1,
+        m_calibrationConfig->patternHeight+1), CV_32SC1);
+  m_detectedPattern = cv::Mat(cv::Size( m_calibrationConfig->patternWidth+1,
+        m_calibrationConfig->patternHeight+1), CV_32SC1);
   m_charucoPattern = -1;
   int id_count = 0;
   for (int i = 0; i < m_calibrationConfig->patternWidth+1; i++) {
@@ -50,8 +54,9 @@ void IntrinsicsCalibrator::run() {
   std::vector<cv::Point3f> checkerBoardPoints;
   for (int i = 0; i < m_calibrationConfig->patternHeight; i++)
     for (int j = 0; j < m_calibrationConfig->patternWidth; j++)
-      checkerBoardPoints.push_back(cv::Point3f((float)j * m_calibrationConfig->patternSideLength,
-                                   (float)i * m_calibrationConfig->patternSideLength, 0));
+      checkerBoardPoints.push_back(cv::Point3f((float)j *
+            m_calibrationConfig->patternSideLength, (float)i *
+            m_calibrationConfig->patternSideLength, 0));
   std::vector<std::string> fileNames;
   QString format = getFormat(m_calibrationConfig->intrinsicsPath,
                              QString::fromStdString(m_cameraName));
@@ -59,7 +64,8 @@ void IntrinsicsCalibrator::run() {
                        m_cameraName + "." + format.toStdString());
   int frameCount = cap.get(cv::CAP_PROP_FRAME_COUNT);
   int frameRate = cap.get(cv::CAP_PROP_FPS);
-  int skipIndex = std::max(frameRate/m_calibrationConfig->maxSamplingFrameRate-1,0);
+  int skipIndex = std::max(frameRate /
+        m_calibrationConfig->maxSamplingFrameRate-1,0);
 
   std::vector< std::vector< cv::Point3f > > objectPointsAll, objectPoints;
   std::vector< std::vector< cv::Point2f > > imagePointsAll, imagePoints;
@@ -84,8 +90,9 @@ void IntrinsicsCalibrator::run() {
       cap.set(cv::CAP_PROP_POS_FRAMES, frameIndex+skipIndex);
       if (frameIndex > frameCount) read_success = false;
       cbdetect::find_corners(img, cbCorners, params);
-      bool patternFound = (cbCorners.p.size() >= m_calibrationConfig->patternHeight *
-                           m_calibrationConfig->patternWidth);
+      bool patternFound = (cbCorners.p.size() >=
+            m_calibrationConfig->patternHeight *
+            m_calibrationConfig->patternWidth);
 
       if (patternFound) {
         cbdetect::boards_from_corners(img, cbCorners, boards, params);
@@ -103,19 +110,24 @@ void IntrinsicsCalibrator::run() {
         imagePointsAll.push_back(corners);
         objectPointsAll.push_back(checkerBoardPoints);
       }
-      emit intrinsicsProgress(counter*(skipIndex+1), frameCount, m_threadNumber);
+      emit intrinsicsProgress(counter * (skipIndex + 1), frameCount,
+            m_threadNumber);
       counter++;
     }
   }
   if (m_interrupt) return;
 
   if (objectPointsAll.size() < 15) {
-      emit calibrationError("Camera" + QString::fromStdString(m_cameraName) + ": Found only" + QString::number(objectPointsAll.size()) +
-                            " valid checkerboards, aborting calibration. Make sure your checkerboard parameters are set correctly.");
+      emit calibrationError("Camera" + QString::fromStdString(m_cameraName) +
+      ": Found only" + QString::number(objectPointsAll.size()) +
+      " valid checkerboards, aborting calibration. Make sure your checkerboard "
+      "parameters are set correctly.");
       return;
   }
 
-  double keep_ratio = imagePointsAll.size() / (double)std::min(m_calibrationConfig->framesForIntrinsics, (int)imagePointsAll.size());
+  double keep_ratio = imagePointsAll.size() /
+        (double)std::min(m_calibrationConfig->framesForIntrinsics,
+        (int)imagePointsAll.size());
 
   for (double k = 0; k < imagePointsAll.size(); k += keep_ratio) {
     imagePoints.push_back(imagePointsAll[(int)k]);
@@ -125,26 +137,34 @@ void IntrinsicsCalibrator::run() {
   cv::Mat K, D;
   std::vector< cv::Mat > rvecs, tvecs;
   cv::Mat newObjectPoints;
-  double repro_error = calibrateCameraRO(objectPoints, imagePoints, size, 1, K, D, rvecs, tvecs, newObjectPoints,
-    cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST, cv::TermCriteria(cv::TermCriteria::MAX_ITER | cv::TermCriteria::EPS, 100, 1e-7));
+  double repro_error = calibrateCameraRO(objectPoints, imagePoints, size,
+        1, K, D, rvecs, tvecs, newObjectPoints,
+        cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST,
+        cv::TermCriteria(cv::TermCriteria::MAX_ITER |
+          cv::TermCriteria::EPS, 100, 1e-7));
 
-  cv::FileStorage fs1(m_parametersSavePath + "/Intrinsics/Intrinsics_" + m_cameraName + ".yaml", cv::FileStorage::WRITE);
+  cv::FileStorage fs1(m_parametersSavePath + "/Intrinsics/Intrinsics_" +
+        m_cameraName + ".yaml", cv::FileStorage::WRITE);
   fs1 << "intrinsicMatrix" << K.t();
   fs1 << "distortionCoefficients" << D;
   emit finishedIntrinsics(repro_error, m_threadNumber);
 }
 
 
-QString IntrinsicsCalibrator::getFormat(const QString& path, const QString& cameraName) {
+QString IntrinsicsCalibrator::getFormat(const QString& path,
+        const QString& cameraName) {
   QString usedFormat;
 	for (const auto& format : m_validRecordingFormats) {
-		if (QFile::exists(path + "/" + cameraName  + "." + format)) usedFormat = format;
+		if (QFile::exists(path + "/" + cameraName  + "." + format)) {
+      usedFormat = format;
+    }
 	}
 	return usedFormat;
 }
 
 
-bool IntrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1) {
+bool IntrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1,
+      cv::Mat &img1) {
   if (m_calibrationConfig->boardType == "Standard") {
     int width = m_calibrationConfig->patternWidth;
     int height = m_calibrationConfig->patternHeight;
@@ -175,25 +195,31 @@ bool IntrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1, cv
     return true;
   }
   else {
-    cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_50);
-    cv::Ptr<cv::aruco::CharucoBoard> board = cv::aruco::CharucoBoard::create(7, 5, 0.04f, 0.02f, dictionary);
-    cv::Ptr<cv::aruco::DetectorParameters> params = cv::aruco::DetectorParameters::create();
+    cv::Ptr<cv::aruco::Dictionary> dictionary =
+          cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_50);
+    cv::Ptr<cv::aruco::CharucoBoard> board =
+          cv::aruco::CharucoBoard::create(7, 5, 0.04f, 0.02f, dictionary);
+    cv::Ptr<cv::aruco::DetectorParameters> params =
+          cv::aruco::DetectorParameters::create();
 
     params->cornerRefinementMethod = cv::aruco::CORNER_REFINE_CONTOUR;
     cv::Mat  imageCopy;
     img1.copyTo(imageCopy);
     std::vector<int> markerIds;
     std::vector<std::vector<cv::Point2f> > markerCorners;
-    cv::aruco::detectMarkers(img1, board->dictionary, markerCorners, markerIds, params);
+    cv::aruco::detectMarkers(img1, board->dictionary, markerCorners, markerIds,
+          params);
     if (markerIds.size() == 0) return false;
     cv::aruco::drawDetectedMarkers(imageCopy, markerCorners, markerIds);
     cv::imwrite(m_parametersSavePath  + "test.jpg", imageCopy);
 
     m_detectedPattern = -1;
     for (int i = 0; i < markerCorners.size(); i++) {
-      cv::Point2i markerPosition = getPositionOfMarkerOnBoard(corners1, markerCorners[i]);
+      cv::Point2i markerPosition = getPositionOfMarkerOnBoard(corners1,
+            markerCorners[i]);
       if (markerPosition.x != -1) {
-        m_detectedPattern.at<int>(markerPosition.y+1,markerPosition.x+1) = markerIds[i];
+        m_detectedPattern.at<int>(markerPosition.y+1,markerPosition.x+1) =
+              markerIds[i];
       }
     }
     std::cout << m_detectedPattern << std::endl;
@@ -215,10 +241,13 @@ int IntrinsicsCalibrator::matchPattern() {
   for (int i = 0; i < m_calibrationConfig->patternWidth+1; i++) {
     for (int j = 0; j <  m_calibrationConfig->patternHeight+1; j++) {
       if (m_charucoPattern.at<int>(j,i) != -1) {
-        if (m_charucoPattern.at<int>(j,i) == m_detectedPattern.at<int>(j,i) || m_charucoPattern.at<int>(j,i) == m_detectedPattern.at<int>(j,i)) {
+        if (m_charucoPattern.at<int>(j,i) == m_detectedPattern.at<int>(j,i) ||
+              m_charucoPattern.at<int>(j,i) == m_detectedPattern.at<int>(j,i)) {
           unrotCount++;
         }
-        if ((m_charucoPattern.at<int>(j,i) == m_detectedPattern.at<int>(m_calibrationConfig->patternHeight-j,m_calibrationConfig->patternWidth-i))) {
+        if ((m_charucoPattern.at<int>(j,i) ==
+              m_detectedPattern.at<int>(m_calibrationConfig->patternHeight-j,
+              m_calibrationConfig->patternWidth-i))) {
           rotCount++;
         }
       }
@@ -237,7 +266,9 @@ int IntrinsicsCalibrator::matchPattern() {
 
 
 
-cv::Point2i IntrinsicsCalibrator::getPositionOfMarkerOnBoard(std::vector< cv::Point2f>&cornersBoard, std::vector<cv::Point2f>&markerCorners) {
+cv::Point2i IntrinsicsCalibrator::getPositionOfMarkerOnBoard(
+      std::vector< cv::Point2f>&cornersBoard,
+      std::vector<cv::Point2f>&markerCorners) {
   int width = m_calibrationConfig->patternWidth;
   int height = m_calibrationConfig->patternHeight;
   cv::Point2i position;
@@ -251,8 +282,10 @@ cv::Point2i IntrinsicsCalibrator::getPositionOfMarkerOnBoard(std::vector< cv::Po
       cv::Point2f p1 = cornersBoard[j*width+i];
       cv::Point2f p2 = cornersBoard[(j+1)*width+(i+1)];
 
-      if (((p1.x < p2.x && markerCenter.x > p1.x && markerCenter.x < p2.x) || (p1.x > p2.x && markerCenter.x < p1.x && markerCenter.x > p2.x))  &&
-          ((p1.y < p2.y && markerCenter.y > p1.y && markerCenter.y < p2.y) || (p1.y > p2.y && markerCenter.y < p1.y && markerCenter.y > p2.y))) {
+      if (((p1.x < p2.x && markerCenter.x > p1.x && markerCenter.x < p2.x) ||
+            (p1.x > p2.x && markerCenter.x < p1.x && markerCenter.x > p2.x))  &&
+            ((p1.y < p2.y && markerCenter.y > p1.y && markerCenter.y < p2.y) ||
+            (p1.y > p2.y && markerCenter.y < p1.y && markerCenter.y > p2.y))) {
         position.x = i;
         position.y = m_calibrationConfig->patternHeight-2-j;
       }
@@ -262,8 +295,8 @@ cv::Point2i IntrinsicsCalibrator::getPositionOfMarkerOnBoard(std::vector< cv::Po
 }
 
 
-bool IntrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners,
-      std::vector<cv::Point2f> &corners) {
+bool IntrinsicsCalibrator::boardToCorners(cbdetect::Board &board,
+      cbdetect::Corner &cbCorners, std::vector<cv::Point2f> &corners) {
   if (board.idx.size()-2 == m_calibrationConfig->patternHeight) {
     for(int i = 1; i < board.idx.size() - 1; ++i) {
       if (board.idx[i].size()-2 == m_calibrationConfig->patternWidth) {
@@ -271,7 +304,8 @@ bool IntrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corn
           if(board.idx[i][j] < 0 || board.idx[i][j] >= cbCorners.p.size()) {
             return false;
           }
-          corners.push_back(static_cast<cv::Point2f>(cbCorners.p[board.idx[i][j]]));
+          corners.push_back(static_cast<cv::Point2f>(
+                cbCorners.p[board.idx[i][j]]));
         }
       }
       else {
@@ -290,7 +324,8 @@ bool IntrinsicsCalibrator::boardToCorners(cbdetect::Board &board, cbdetect::Corn
           if (board.idx[board.idx.size() - 1 -i][j] >= cbCorners.p.size()) {
             return false;
           }
-          corners.push_back(static_cast<cv::Point2f>(cbCorners.p[board.idx[board.idx.size() - 1 -i][j]]));
+          corners.push_back(static_cast<cv::Point2f>(
+                cbCorners.p[board.idx[board.idx.size() - 1 -i][j]]));
         }
         else {
           return false;
@@ -307,13 +342,16 @@ void IntrinsicsCalibrator::calibrationCanceledSlot() {
 }
 
 
-void IntrinsicsCalibrator::saveCheckerboard(const cv::Mat &img, const std::vector<cv::Point2f> &corners, int counter) {
+void IntrinsicsCalibrator::saveCheckerboard(const cv::Mat &img,
+      const std::vector<cv::Point2f> &corners, int counter) {
   ColorMap *colorMap = new ColorMap(ColorMap::Jet);
   cv::Mat debug_img = img.clone();
   int index = 0;
   for (const auto & corner : corners) {
     QColor c = colorMap->getColor(index++, corners.size());
-    cv::circle(debug_img, corner, 4, cv::Scalar(c.blue(), c.green(), c.red()), cv::FILLED, cv::LINE_8);
+    cv::circle(debug_img, corner, 4, cv::Scalar(c.blue(), c.green(), c.red()),
+          cv::FILLED, cv::LINE_8);
   }
-  cv::imwrite(m_parametersSavePath + "/debug/Intrinsics/" + m_cameraName + "/Frame_" + QString::number(counter).toStdString() + ".jpg", debug_img);
+  cv::imwrite(m_parametersSavePath + "/debug/Intrinsics/" + m_cameraName +
+        "/Frame_" + QString::number(counter).toStdString() + ".jpg", debug_img);
 }

@@ -1,11 +1,11 @@
-/*****************************************************************
+/*******************************************************************************
  * File:			  reprojectiontool.cpp
  * Created: 	  02. December 2020
  * Author:		  Timo Hueser
  * Contact: 	  timo.hueser@gmail.com
- * Copyright:  2021 Timo Hueser
- * License:    GPL v3.0
- *****************************************************************/
+ * Copyright:   2021 Timo Hueser
+ * License:     LGPL v3.0
+ ******************************************************************************/
 
 #include "reprojectiontool.hpp"
 

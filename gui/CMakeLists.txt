@@ -13,13 +13,16 @@ add_library(gui
     mainbar.cpp
     settingswindow.hpp
     settingswindow.cpp
-    loaddatasetwindow.hpp
-    loaddatasetwindow.cpp
 )
 
 target_include_directories(gui
     PUBLIC
     ${PROJECT_SOURCE_DIR}
+    editor
+    exporttrainingsetwidget
+    helpwindow
+    newcalibrationwidget
+    newdatasetwindow
 )
 
 target_link_libraries(gui

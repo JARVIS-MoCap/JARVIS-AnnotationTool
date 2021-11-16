@@ -1,12 +1,12 @@
 project (trainingsetexporter)
 
 
-add_library(${PROJECT_NAME}
+add_library(trainingsetexporter
   trainingsetexporter.hpp
   trainingsetexporter.cpp
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(trainingsetexporter
     PUBLIC
     ${PROJECT_SOURCE_DIR}
     ../../
@@ -14,8 +14,6 @@ target_include_directories(${PROJECT_NAME}
     ../../libs/json_cpp
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(trainingsetexporter
   Qt5::Widgets
 )
-
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wno-sign-compare -Wunused)

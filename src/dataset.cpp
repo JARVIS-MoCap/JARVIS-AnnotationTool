@@ -1,11 +1,11 @@
-/*****************************************************************
+/*******************************************************************************
  * File:			  dataset.cpp
  * Created: 	  23. October 2020
  * Author:		  Timo Hueser
  * Contact: 	  timo.hueser@gmail.com
- * Copyright:  2021 Timo Hueser
- * License:    GPL v3.0
- *****************************************************************/
+ * Copyright:   2021 Timo Hueser
+ * License:     LGPL v3.0
+ ******************************************************************************/
 
 #include "dataset.hpp"
 
@@ -17,8 +17,10 @@
 
 Dataset * Dataset::dataset = nullptr;
 
-Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames, QList<SkeletonComponent> skeleton, QList<QString> segmentNames) :
-			m_datasetFolder(datasetFolder), m_skeleton(skeleton), m_segmentNames(segmentNames) {
+Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames,
+			QList<SkeletonComponent> skeleton, QList<QString> segmentNames) :
+			m_datasetFolder(datasetFolder), m_skeleton(skeleton),
+			m_segmentNames(segmentNames) {
 	m_colorMap = new ColorMap(ColorMap::Jet);
 	if (cameraNames.size() == 0) {
 		m_cameraNames = QDir(datasetFolder).entryList(QDir::AllDirs |
@@ -215,14 +217,16 @@ bool Dataset::GetImageSizeEx(QString fn, int *x,int *y) {
     }
     fclose(f);
 
-  // JPEG: (first two bytes of buf are first two bytes of the jpeg file; rest of buf is the DCT frame
+  // JPEG: (first two bytes of buf are first two bytes of the jpeg file;
+	// rest of buf is the DCT frame
     if (buf[0]==0xFF && buf[1]==0xD8 && buf[2]==0xFF) {
         *y = (buf[7]<<8) + buf[8];
         *x = (buf[9]<<8) + buf[10];
         return true;
     }
 
-  // GIF: first three bytes say "GIF", next three give version number. Then dimensions
+  // GIF: first three bytes say "GIF", next three give version number.
+	// Then dimensions
     if (buf[0]=='G' && buf[1]=='I' && buf[2]=='F') {
         *x = buf[6] + (buf[7]<<8);
         *y = buf[8] + (buf[9]<<8);

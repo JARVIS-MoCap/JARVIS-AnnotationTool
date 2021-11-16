@@ -1,11 +1,11 @@
-/*****************************************************************
+/*******************************************************************************
  * File:			  dataset.hpp
  * Created: 	  23. October 2020
  * Author:		  Timo Hueser
  * Contact: 	  timo.hueser@gmail.com
- * Copyright:  2021 Timo Hueser
- * License:    GPL v3.0
- *****************************************************************/
+ * Copyright:   2021 Timo Hueser
+ * License:     LGPL v3.0
+ ******************************************************************************/
 
 #ifndef DATASET_H
 #define DATASET_H
@@ -20,7 +20,9 @@ class Dataset : public QObject {
 
 	public:
 		explicit Dataset(const QString& datasetFolder,
-					QList<QString> cameraNames = {}, QList<SkeletonComponent> skeleton = {}, QList<QString> segmentNames = {});
+					QList<QString> cameraNames = {},
+					QList<SkeletonComponent> skeleton = {},
+					QList<QString> segmentNames = {});
 		static Dataset *dataset;
 		QList<ImgSet*> imgSets() {return m_imgSets;}
 		const QString& datasetFolder() {return m_datasetFolder;}

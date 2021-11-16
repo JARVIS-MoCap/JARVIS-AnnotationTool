@@ -1,9 +1,6 @@
-project (newdatasetwindow)
-
-
 add_subdirectory(videocutter)
 
-add_library(${PROJECT_NAME}
+add_library(newdatasetwindow
   newdatasetwindow.hpp
   newdatasetwindow.cpp
   recordingstable.hpp
@@ -14,18 +11,18 @@ add_library(${PROJECT_NAME}
   skeletontablewidget.cpp
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(newdatasetwindow
     PUBLIC
     ${PROJECT_SOURCE_DIR}
     ../
+    videocutter
+    ${PROJECT_SOURCE_DIR}/src/datasetcreator
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(newdatasetwindow
   Qt5::Widgets
 	src
   gui
   videocutter
   datasetcreator
 )
-
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused -Wno-sign-compare)

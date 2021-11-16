@@ -1,6 +1,4 @@
-project (videocutter)
-
-add_library(${PROJECT_NAME}
+add_library(videocutter
     videocutterwindow.hpp
     rangeslider.hpp
     timeline.hpp
@@ -9,17 +7,16 @@ add_library(${PROJECT_NAME}
     timeline.cpp
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(videocutter
     PUBLIC
     ${PROJECT_SOURCE_DIR}
     ../
+    ${PROJECT_SOURCE_DIR}/src
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(videocutter
   Qt5::Widgets
   Qt5::Multimedia
   Qt5::MultimediaWidgets
 	src
 )
-
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused)
