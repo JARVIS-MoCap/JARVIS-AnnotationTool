@@ -50,7 +50,7 @@ find_package(yaml-cpp REQUIRED)
 if(APPLE)
 	set(Eigen3_DIR "libs/eigen-3.3.8/MacOS/build")
 	message("${EIGEN3_DIR}")
-	find_package(3 3.3 REQUIRED NO_MODULE)
+	find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 endif()
 
 

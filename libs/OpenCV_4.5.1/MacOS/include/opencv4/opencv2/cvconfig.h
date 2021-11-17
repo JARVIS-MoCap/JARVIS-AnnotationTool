@@ -2,7 +2,7 @@
 #define OPENCV_CVCONFIG_H_INCLUDED
 
 /* OpenCV compiled as static or dynamic libs */
-/* #undef BUILD_SHARED_LIBS */
+#define BUILD_SHARED_LIBS
 
 /* OpenCV intrinsics optimized code */
 #define CV_ENABLE_INTRINSICS
@@ -51,7 +51,7 @@
 /* #undef HAVE_D3D9 */
 
 /* Eigen Matrix & Linear Algebra Library */
-#define HAVE_EIGEN
+/* #undef HAVE_EIGEN */
 
 /* Geospatial Data Abstraction Library */
 /* #undef HAVE_GDAL */
@@ -69,7 +69,7 @@
 /* #undef HAVE_VULKAN */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#define HAVE_INTTYPES_H 1
+/* #undef HAVE_INTTYPES_H */
 
 /* Intel Integrated Performance Primitives */
 #define HAVE_IPP
@@ -134,7 +134,7 @@
 /* #undef HAVE_HPX */
 
 /* TIFF codec */
-#define HAVE_TIFF
+/* #undef HAVE_TIFF */
 
 /* Win32 UI */
 /* #undef HAVE_WIN32UI */
