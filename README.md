@@ -9,11 +9,11 @@ Installing our prebuild packages is easy! Just go to [our downloads page](https:
 ## Building from source
 If you want to build the tool yourself here's a step by step guide on how to do it.
 
-# Building the dependencies (OpenCV, QT5 and yaml-cpp) yourself
+## Building the dependencies (OpenCV, QT5 and yaml-cpp) yourself
 
-## Linux
+### Linux
 
-### Build QT5:
+#### Build QT5:
 - Get QT from git with: 
 
       git clone git://code.qt.io/qt/qt5.git
@@ -48,7 +48,7 @@ If you want to build the tool yourself here's a step by step guide on how to do 
         ${AnnotationTool_Directory}/libs/Qt_5.15.2/Ubuntu_xx04
  
 
-### Building OpenCV:
+#### Building OpenCV:
 - Get opencv from git with: 
   
       git clone https://github.com/opencv/opencv.git
@@ -74,7 +74,7 @@ If you want to build the tool yourself here's a step by step guide on how to do 
         ${AnnotationTool_Directory}/libs/OpenCV_4.5.1/Ubuntu_xx04
   
   
-### Building yaml-cpp
+#### Building yaml-cpp
  - Get yaml-cpp from git with:
  
         git clone https://github.com/jbeder/yaml-cpp.git
