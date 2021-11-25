@@ -1,4 +1,4 @@
-# Building OpenCV, QT5 and yaml-cpp yourself
+# Building the dependencies (OpenCV, QT5 and yaml-cpp) yourself
 
 ## Linux
 
