@@ -1,15 +1,48 @@
 This is the official Github Repository for the JARVIS Annotation Tool. To find out more about our 3D markerless motion capture toolbox have a look at 
 [our website](https://jarvis-mocap.github.io/jarvis-docs/).
 
-# Installation
-
-## Using our Installers
 Installing our prebuild packages is easy! Just go to [our downloads page](https://jarvis-mocap.github.io/jarvis-docs/) and grab the installer for your operating system. We currently support Windows, MacOS and Debian based Linux distributions.
 
-## Building from source
-If you want to build the tool yourself here's a step by step guide on how to do it.
+If you want to build the tool yourself here's a step by step guide on how to do it. If the prebuild OpenCV, Qt and yaml-cpp libraries we ship it with don't work for you there's a guide on how to [build the dependencies](#building-opencv-qt5-and-yaml-cpp-yourself) at the bottom of this page.
 
-## Building the dependencies (OpenCV, QT5 and yaml-cpp) yourself
+# Linux 
+
+### Installing the dependencies
+To be able to build the tool install all the dependencies with
+
+      sudo apt get install libxcb-xinerama0, libdouble-conversion-dev, gstreamer1.0-libav, ffmpeg, libxcb-xinput0, libpcre2-dev, build-essential
+      
+### Cloning the repository
+Next clone our repository with 
+
+     git clone --recursive https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool.git
+     
+Go into the repository and create a build directory
+
+    cd JARVIS-AnnotationTool && mkdir build && cd build
+    
+Run cmake (replace XX04 by either 2004 or 1804) depending on your Ubuntu Version.
+
+	cmake -DUBUNTU_VERSION=xx04 ..
+	
+Run make to build the tool (replace x by the number of available cores on your CPU)
+
+     make -jx
+     
+If you want to create a debian package go to the deployment folder and run (replace XX04 by your Ubuntu Version)
+
+     sh deploy_Ubuntu_XX04.sh
+
+And finally install with (replacing the Xs with the numbers in the package you created)
+
+     sudo apt install ./JARVIS-AnnotationTool_X.X-X_amd64_XX04.deb
+     
+If you want to remove it run
+
+     sudo dpkg -r AnnotationTool
+
+# Building OpenCV QT5 and yaml-cpp yourself
+We try to provide prebuild versions of all the libraries you will need to compile the tool. You only need to build them yourself incase they don't work for your OS or you want to use different versions than the ones we ship it with.
 
 ### Linux
 
