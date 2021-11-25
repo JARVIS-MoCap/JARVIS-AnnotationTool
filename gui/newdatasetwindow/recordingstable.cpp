@@ -20,7 +20,7 @@ RecordingsTable::RecordingsTable(QString name, DatasetConfig *datasetConfig, QWi
 			QWidget(parent), m_name(name), m_datasetConfig(datasetConfig) {
 	QGridLayout *layout = new QGridLayout(this);
 	layout->setMargin(3);
-	m_errorMsg = new QErrorMessage();
+	m_errorMsg = new QErrorMessage(this);
 
 	m_currentDir = QDir(QDir::homePath());
 
@@ -127,7 +127,6 @@ void RecordingsTable::deleteRecordingClickedSlot() {
 	for(int row=0; row < recordingsTable->rowCount(); row++){
     if(sender() == recordingsTable->cellWidget(row,4)) {
 			if (row < m_editingIndex) m_editingIndex--;
-			std::cout << "Row " << row << std::endl;
       m_recordingItems.removeAt(row);
     }
   }
@@ -138,25 +137,40 @@ void RecordingsTable::editRecordingClickedSlot() {
 	for(int row=0; row < recordingsTable->rowCount(); row++){
 		if(sender() == recordingsTable->cellWidget(row,3)) {
 			if (!m_editingActive) {
-				m_editingActive = true;
 				m_editingIndex = row;
-				recordingsTable->cellWidget(row,4)->setEnabled(false);
-				editVideo(m_recordingItems[row].path);
+				if (editVideo(m_recordingItems[row].path)) {
+					m_editingActive = true;
+					recordingsTable->cellWidget(row,4)->setEnabled(false);
+				}
+				else {
+					return;
+				}
 			}
 		}
 	}
 }
 
-void RecordingsTable::editVideo(QString path) {
-	VideoCutterWindow * videoCutterWindow = new VideoCutterWindow(m_recordingItems[m_editingIndex].timeLineList);
+bool RecordingsTable::editVideo(QString path) {
+	if (videoCutterWindow != nullptr) {
+		delete videoCutterWindow;
+		videoCutterWindow = nullptr;
+	}
+
+	videoCutterWindow = new VideoCutterWindow(m_recordingItems[m_editingIndex].timeLineList);
 	QList<QString> videoPaths = getVideoPaths(path);
-	videoCutterWindow->openVideos(videoPaths);
-	connect(videoCutterWindow, &VideoCutterWindow::editingFinished, this, &RecordingsTable::editingFinishedSlot);
-	videoCutterWindow->show();
+	if (videoCutterWindow->openVideos(videoPaths)) {
+		connect(videoCutterWindow, &VideoCutterWindow::editingFinished, this, &RecordingsTable::editingFinishedSlot);
+		videoCutterWindow->show();
+		return true;
+	}
+	else {
+		m_errorMsg->showMessage("Frame count mismatch between videos! Make sure your "
+					"recordings are synchronised properly!");
+		return false;
+	}
 }
 
 void RecordingsTable::editingFinishedSlot(QList<TimeLineWindow> timeLineWindows, int frameCount) {
-	std::cout << m_editingIndex << std::endl;
 	m_frameCount = frameCount;
 	m_recordingItems[m_editingIndex].timeLineList = timeLineWindows;
 	m_recordingItems[m_editingIndex].frameCount = frameCount;

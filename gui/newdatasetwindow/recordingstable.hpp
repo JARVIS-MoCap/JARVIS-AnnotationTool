@@ -48,9 +48,11 @@ class RecordingsTable : public QWidget {
 		bool m_editingActive = false;
 		QDir m_currentDir;
 
+		VideoCutterWindow *videoCutterWindow = nullptr;
+
 		int getNumberSubfolders(QString path);
 		void updateTable();
-		void editVideo(QString path);
+		bool editVideo(QString path);
 		QList<QString> getVideoPaths(const QString& path);
 
 	public slots:

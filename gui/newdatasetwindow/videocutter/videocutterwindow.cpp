@@ -107,6 +107,7 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
 	fasterButton->setIcon(QIcon::fromTheme("playback_toend"));
 	connect(fasterButton, &QPushButton::clicked, this, &VideoCutterWindow::fasterClickedSlot);
 
+
   QWidget *buttonSpacer = new QWidget();
   buttonSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   addTimeLineElementButton = new QPushButton("Add Segment");
@@ -209,6 +210,7 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
 	layout->addWidget(bottomButtonWidget,1,0);
 
 	mainSplitter->setStretchFactor(0,2);
+
 }
 
 void VideoCutterWindow::openVideo(const QString &path) {
