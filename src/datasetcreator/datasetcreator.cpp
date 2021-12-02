@@ -65,14 +65,8 @@ void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings,
 						cameras);
 			if (!m_creationCanceled) {
 				QString savepath;
-				if (m_recordingItems.size() == 1) {
-					savepath =  m_datasetConfig->datasetPath + "/" +
-					m_datasetConfig->datasetName;
-				}
-				else {
 					savepath = m_datasetConfig->datasetPath + "/" +
 									   m_datasetConfig->datasetName + "/" + recording.name;
-				}
 				createSavefile(recording.path, cameras, savepath, frameNumbers);
 			}
 		}
@@ -85,15 +79,9 @@ void DatasetCreator::createDatasetSlot(QList<RecordingItem> recordings,
 						recordingSubsets[subsetName], cameras);
 			if (!m_creationCanceled) {
 				QString savepath;
-				if (m_recordingItems.size() == 1) {
-					savepath =  m_datasetConfig->datasetPath + "/" +
-						  				m_datasetConfig->datasetName + "/" + subsetName;
-				}
-				else {
-					savepath = m_datasetConfig->datasetPath + "/" +
-										 m_datasetConfig->datasetName + "/" +
-										 recording.name + "/" + subsetName;
-				}
+				savepath = m_datasetConfig->datasetPath + "/" +
+									 m_datasetConfig->datasetName + "/" +
+									 recording.name + "/" + subsetName;
 				createSavefile(recording.path, cameras, savepath, frameNumbers);
 			}
 			else {

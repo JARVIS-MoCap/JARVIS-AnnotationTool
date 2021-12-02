@@ -206,17 +206,9 @@ void LoadDatasetWindow::datasetSegmentChangedSlot(QTreeWidgetItem *current, QTre
 			m_datasetFolder = a.absolutePath() + "/" + current->parent()->text(0) + "/" + current->text(0);
 		}
 		else {
-			std::cout << datasetSegmentsTree->topLevelItemCount() << std::endl;
-			if(datasetSegmentsTree->topLevelItemCount() != 1) {
 				selectedSegmentEdit->setText(current->text(0));
 				QFileInfo a(datasetFileEdit->text());
 				m_datasetFolder = a.absolutePath() + "/" + current->text(0);
-			}
-			else {
-				selectedSegmentEdit->setText(current->text(0));
-				QFileInfo a(datasetFileEdit->text());
-				m_datasetFolder = a.absolutePath();
-			}
 		}
 	}
 

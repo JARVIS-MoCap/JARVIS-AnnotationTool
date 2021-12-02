@@ -42,7 +42,7 @@ class EditorWidget : public QWidget {
 		void quitClicked();
 		void newSegmentLoaded();
 		void frameChanged(int currentImgSetIndex, int currentFrameIndex);
-		void imageTranformationChanged(int hueFactor, int saturationFactor, int brightnessFactor);
+		void imageTranformationChanged(int hueFactor, int saturationFactor, int brightnessFactor, int contrastFactor);
 		void keypointSizeChanged(int value);
 		void keypointShapeChanged(const QString& entity, KeypointShape shape);
 		void colorMapChanged(const QString& entity, ColorMap::ColorMapType type, QColor color);

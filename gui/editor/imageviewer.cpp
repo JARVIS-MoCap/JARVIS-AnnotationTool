@@ -27,8 +27,8 @@ void ImageViewer::setFrame(ImgSet *imgSet, int frameIndex) {
 	m_currentFrameIndex = frameIndex;
 	m_img = QImage(m_currentImgSet->frames[m_currentFrameIndex]->imagePath);
 	m_imgOriginal = m_img;
-	if (m_hueFactor != 0 || m_saturationFactor != 100 || m_brightnessFactor != 100) {
-		applyImageTransformations(m_hueFactor, m_saturationFactor, m_brightnessFactor);
+	if (m_hueFactor != 0 || m_saturationFactor != 100 || m_brightnessFactor != 100 || m_contrastFactor != 100) {
+		applyImageTransformations(m_hueFactor, m_saturationFactor, m_brightnessFactor, m_contrastFactor);
 	}
 	m_rect = m_img.rect();
 	m_crop = m_rect;
@@ -39,11 +39,12 @@ void ImageViewer::setFrame(ImgSet *imgSet, int frameIndex) {
 
 
 void ImageViewer::imageTransformationChangedSlot(int hueFactor, int saturationFactor,
-			int brightnessFactor) {
+			int brightnessFactor, int contrastFactor) {
 	m_hueFactor = hueFactor;
 	m_saturationFactor = saturationFactor;
 	m_brightnessFactor = brightnessFactor;
-	applyImageTransformations(hueFactor, saturationFactor, brightnessFactor);
+	m_contrastFactor = contrastFactor;
+	applyImageTransformations(hueFactor, saturationFactor, brightnessFactor, contrastFactor);
 	update();
 }
 
@@ -55,14 +56,25 @@ void ImageViewer::keypointSizeChangedSlot(int size) {
 
 
 void ImageViewer::applyImageTransformations(int hueFactor, int saturationFactor,
-			int brightnessFactor) {
+			int brightnessFactor, int contrastFactor) {
 	int h,s,v;
+	long avg_brightness = 0;
+	double factor = contrastFactor/100.;
 	for (int i = 0; i < m_img.width(); i++) {
 		for (int j = 0; j < m_img.height(); j++) {
 			QColor color = m_imgOriginal.pixelColor(i,j);
 			color.getHsv(&h,&s,&v);
+			avg_brightness += v;
+		}
+	}
+	avg_brightness = avg_brightness/(m_img.width()*m_img.height());
+	for (int i = 0; i < m_img.width(); i++) {
+		for (int j = 0; j < m_img.height(); j++) {
+			QColor color = m_imgOriginal.pixelColor(i,j);
+			color.getHsv(&h,&s,&v);
+			v = (v-avg_brightness)*factor+ avg_brightness;
 			color.setHsv((h+hueFactor)%360,std::min(s*saturationFactor/100,255),
-									 std::min(v*brightnessFactor*brightnessFactor/10000,255));
+									 std::max(0,std::min(v*brightnessFactor*brightnessFactor/10000,255)));
 			m_img.setPixelColor(i,j,color);
 		}
 	}

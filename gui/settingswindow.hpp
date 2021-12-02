@@ -33,7 +33,7 @@ class SettingsWindow : public QWidget {
 
 	signals:
 		void imageTranformationChanged(int hueFactor, int saturationFactor,
-					int brightnessFactor);
+					int brightnessFactor, int contrastFactor);
 		void keypointSizeChanged(int value);
 		void keypointShapeChanged(const QString& entity, KeypointShape shape);
 		void colorMapChanged(const QString& entity, ColorMap::ColorMapType type,
@@ -47,7 +47,7 @@ class SettingsWindow : public QWidget {
 
 	private:
 		void loadSettings();
-		QImage createColorMapPreview(ColorMap::ColorMapType type, 
+		QImage createColorMapPreview(ColorMap::ColorMapType type,
 					QColor color = QColor(0,0,255));
 
 		QSettings *settings;
@@ -62,6 +62,9 @@ class SettingsWindow : public QWidget {
 		QSlider *brightnessSlider;
 		QSpinBox *brightnessBox;
 		QPushButton *brightnessResetButton;
+		QSlider *contrastSlider;
+		QSpinBox *contrastBox;
+		QPushButton *contrastResetButton;
 
 		QGroupBox *annotationSettingsBox;
 		QSpinBox *keypointSizeEdit;
@@ -85,6 +88,7 @@ class SettingsWindow : public QWidget {
 		void hueResetClickedSlot();
 		void saturationResetClickedSlot();
 		void brightnessResetClickedSlot();
+		void contrastResetClickedSlot();
 		void keypointShapeChangedSlot(int index);
 		void colorMapChangedSlot(int index);
 		void colorChooserClickedSlot();

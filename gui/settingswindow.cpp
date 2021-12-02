@@ -84,6 +84,25 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 					this, &SettingsWindow::imageTranformationChangedSlot);
 	connect(brightnessResetButton, &QPushButton::clicked,
 					this, &SettingsWindow::brightnessResetClickedSlot);
+		QLabel *contrastLabel = new QLabel("Contrast");
+		contrastSlider = new QSlider(Qt::Horizontal,this);
+		contrastSlider->setRange(0,200);
+		contrastSlider->setValue(100);
+		contrastBox = new QSpinBox(this);
+		contrastBox->setRange(0,200);
+		contrastBox->setValue(100);
+		contrastBox->setMinimumSize(80,30);
+		contrastResetButton = new QPushButton(this);
+		contrastResetButton->setMinimumSize(30,30);
+		contrastResetButton->setIcon(QIcon::fromTheme("reset"));
+		connect(contrastSlider, &QSlider::valueChanged,
+						contrastBox, &QSpinBox::setValue);
+		connect(contrastBox, QOverload<int>::of(&QSpinBox::valueChanged),
+						contrastSlider, &QSlider::setValue);
+		connect(contrastBox, QOverload<int>::of(&QSpinBox::valueChanged),
+						this, &SettingsWindow::imageTranformationChangedSlot);
+		connect(contrastResetButton, &QPushButton::clicked,
+						this, &SettingsWindow::contrastResetClickedSlot);
 
 	imagesettingslayout->addWidget(grayScaleLabel, 0,0);
 	imagesettingslayout->addWidget(grayScaleToggle,0,1,1,3);
@@ -99,6 +118,11 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	imagesettingslayout->addWidget(brightnessSlider,3,1);
 	imagesettingslayout->addWidget(brightnessBox,3,2);
 	imagesettingslayout->addWidget(brightnessResetButton,3,3);
+	imagesettingslayout->addWidget(contrastLabel,4,0);
+	imagesettingslayout->addWidget(contrastSlider,4,1);
+	imagesettingslayout->addWidget(contrastBox,4,2);
+	imagesettingslayout->addWidget(contrastResetButton,4,3);
+
 
 
 	annotationSettingsBox = new QGroupBox("Keypoint Label Settings");
@@ -237,7 +261,7 @@ void SettingsWindow::loadSettings() {
 
 void SettingsWindow::imageTranformationChangedSlot() {
 	emit imageTranformationChanged(hueBox->value(), saturationBox->value(),
-				brightnessBox->value());
+				brightnessBox->value(), contrastBox->value());
 }
 
 
@@ -278,6 +302,9 @@ void SettingsWindow::brightnessResetClickedSlot() {
 	brightnessSlider->setValue(100);
 }
 
+void SettingsWindow::contrastResetClickedSlot() {
+	contrastSlider->setValue(100);
+}
 
 void SettingsWindow::keypointShapeChangedSlot(int index) {
 	int entityIndex = keypointShapeCombosList.indexOf(

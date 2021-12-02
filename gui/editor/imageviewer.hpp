@@ -51,7 +51,7 @@ class ImageViewer : public QWidget {
 		void currentBodypartChangedSlot(const QString& bodypart, QColor color);
 		void toggleEntityVisibleSlot(const QString& entity, bool toggle);
 		void toggleReprojectionSlot(bool toggle);
-		void imageTransformationChangedSlot(int hueFactor, int saturationFactor, int brightnessFactor);
+		void imageTransformationChangedSlot(int hueFactor, int saturationFactor, int brightnessFactor, int contrastFactor);
 		void keypointSizeChangedSlot(int size);
 		void keypointShapeChangedSlot(const QString& entity, KeypointShape shape);
 		void colorMapChangedSlot(const QString& entity, ColorMap::ColorMapType type, QColor color);
@@ -60,7 +60,7 @@ class ImageViewer : public QWidget {
 		QPointF scaleToImageCoordinates(QPointF rectStart);
 		QPointF transformToImageCoordinates(QPointF rectStart);
 		void drawInfoBox(QPainter& p, QPointF point, const QString& entity, const QString& bodypart);
-		void applyImageTransformations(int hueFactor, int saturationFactor, int brightnessFactor);
+		void applyImageTransformations(int hueFactor, int saturationFactor, int brightnessFactor, int contrastFactor);
 
 		bool m_setImg = false;
 		ImgSet *m_currentImgSet;
@@ -91,6 +91,7 @@ class ImageViewer : public QWidget {
 		int m_hueFactor = 0;
 		int m_saturationFactor = 100;
 		int m_brightnessFactor = 100;
+		int m_contrastFactor = 100;
 		QMap<QString, KeypointShape> m_entityToKeypointShapeMap;
 		int m_keypointSize = 8;
 		ColorMap *m_defaultColormap;
