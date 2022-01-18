@@ -128,8 +128,8 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 					this, &MainWindow::openHelpWindowSlot);
 	connect(editorWidget, &EditorWidget::quitClicked,
 					this, &MainWindow::quitClickedSlot);
-	connect(editorWidget, &EditorWidget::newSegmentLoaded,
-					this, &MainWindow::datasetLoadedSlot);
+	// connect(editorWidget, &EditorWidget::newSegmentLoaded,
+	// 				this, &MainWindow::datasetLoadedSlot);
 	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded,
 					this, &MainWindow::datasetLoadedSlot);
 	connect(mainBar, &MainBar::exitToMainPage,
@@ -154,10 +154,6 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 					editorWidget, &EditorWidget::boneLengthErrorThresholdChanged);
 	connect(editorWidget, &EditorWidget::datasetLoaded,
 					settingsWindow, &SettingsWindow::datasetLoadedSlot);
-	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded,
-					editorWidget, &EditorWidget::datasetLoadedSlot);
-	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded,
-					editorWidget, &EditorWidget::datasetLoaded);
 }
 
 
@@ -195,6 +191,7 @@ void MainWindow::exportTrainingsetClickedSlot() {
 
 void MainWindow::datasetLoadedSlot() {
 	stackedWidget->setCurrentWidget(editorWidget);
+	editorWidget->datasetLoadedSlot();
 }
 
 

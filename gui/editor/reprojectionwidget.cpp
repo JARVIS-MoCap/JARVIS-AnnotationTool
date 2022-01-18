@@ -43,47 +43,17 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 	calibrationSetup = new QWidget(stackedWidget);
 	QGridLayout *calibrationsetuplayout = new QGridLayout(calibrationSetup);
 
-	intrinsicsBox = new QGroupBox("Intrinsic Camera Parameters");
-	QGridLayout *intrinsicslayout = new QGridLayout(intrinsicsBox);
-	QLabel *intrinsicsPathLabel = new QLabel("Intrinsics Path:",intrinsicsBox);
-	intrinsicsPathEdit = new QLineEdit(intrinsicsBox);
-	intrinsicsPathButton = new QPushButton();
-	intrinsicsPathButton->setMinimumSize(30,30);
-	intrinsicsPathButton->setIcon(QIcon::fromTheme("folder"));
-	connect(intrinsicsPathButton, &QPushButton::clicked, this, &ReprojectionWidget::intrinsicsPathClickedSlot);
-	intrinsicslayout->addWidget(intrinsicsPathLabel,0,0,1,2);
-	intrinsicslayout->addWidget(intrinsicsPathEdit,1,0);
-	intrinsicslayout->addWidget(intrinsicsPathButton,1,2);
-
-	QWidget *spacer = new QWidget(this);
-	spacer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-
-	extrinsicsBox = new QGroupBox("Extrinsic Camera Parameters");
-	QGridLayout *extrinsicslayout = new QGridLayout(extrinsicsBox);
-	QWidget *primaryWidget = new QWidget(this);
-	QGridLayout *primarylayout = new QGridLayout(primaryWidget);
-	QLabel *primaryLabel = new QLabel("Primary");
-	primarylayout->setMargin(0);
-	primaryCombo = new QComboBox(extrinsicsBox);
-	primarylayout->addWidget(primaryLabel,0,0);
-	primarylayout->addWidget(primaryCombo,0,1);
-	QLabel *extrinsicsPathLabel = new QLabel("Extrinsics Path:" ,extrinsicsBox);
-	extrinsicsPathEdit = new QLineEdit(extrinsicsBox);
-	extrinsicsPathButton = new QPushButton();
-	extrinsicsPathButton->setMinimumSize(30,30);
-	extrinsicsPathButton->setIcon(QIcon::fromTheme("folder"));
-	connect(extrinsicsPathButton, &QPushButton::clicked, this, &ReprojectionWidget::extrinsicsPathClickedSlot);
-	extrinsicslayout->addWidget(primaryWidget,0,0,1,2);
-	extrinsicslayout->addWidget(extrinsicsPathLabel,1,0,1,2);
-	extrinsicslayout->addWidget(extrinsicsPathEdit,2,0);
-	extrinsicslayout->addWidget(extrinsicsPathButton,2,1);
-	initReprojectionButton = new QPushButton("Initialise Reprojection Tool");
+	initReprojectionButton = new QPushButton();
+	initReprojectionButton->setIcon(QIcon::fromTheme("add"));
+	initReprojectionButton->setIconSize(QSize(100,100));
+	initReprojectionButton->setStyleSheet("QPushButton {border-radius: 10px;"
+				"background-color: palette(window);"
+				"border: 4px solid rgb(32,100,164);}"
+				"QPushButton:hover{ background-color: rgb(68,74,89);}");
+	initReprojectionButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	connect(initReprojectionButton, &QPushButton::clicked, this, &ReprojectionWidget::initReprojectionClickedSlot);
 
-	calibrationsetuplayout->addWidget(intrinsicsBox,0,0);
-	calibrationsetuplayout->addWidget(extrinsicsBox,1,0);
-	calibrationsetuplayout->addWidget(initReprojectionButton,2,0,Qt::AlignRight);
-	calibrationsetuplayout->addWidget(spacer,3,0);
+	calibrationsetuplayout->addWidget(initReprojectionButton,0,0);
 
 	reprojectionChartWidget = new ReprojectionChartWidget(this);
 	boneLengthChartWidget = new BoneLengthChartWidget(this);
@@ -112,16 +82,10 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 
 
 void ReprojectionWidget::datasetLoadedSlot() {
-	primaryCombo->clear();
 	m_numCameras = Dataset::dataset->numCameras();
 	m_entitiesList = Dataset::dataset->entitiesList();
 	m_bodypartsList = Dataset::dataset->bodypartsList();
 
-	for (int cam = 0; cam < m_numCameras; cam++) {
-		primaryCombo->addItem(Dataset::dataset->cameraName(cam));
-	}
-
-	loadPaths();
 	stackedWidget->setCurrentWidget(calibrationSetup);
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		m_reprojectionErrors[entity] = new std::vector<double>(Dataset::dataset->bodypartsList().size());
@@ -129,8 +93,15 @@ void ReprojectionWidget::datasetLoadedSlot() {
 	}
 
 	switchToggledSlot(false);
-
+	QDir dir(Dataset::dataset->datasetBaseFolder() + "/CalibrationParameters");
 	emit datasetLoaded();
+	if (dir.exists()) {
+		m_calibExists = true;
+		initReprojectionClickedSlot();
+	}
+	else {
+		m_calibExists = false;
+	}
 }
 
 
@@ -153,105 +124,54 @@ void ReprojectionWidget::switchToggledSlot(bool toggle) {
 }
 
 
-void ReprojectionWidget::intrinsicsPathClickedSlot() {
-	QString path = QFileDialog::getExistingDirectory(this, "Select Intrinsics Parameter Path", m_parameterDir.path());
-	if (path != "") {
-		m_parameterDir.setPath(path);
-		m_parameterDir.cdUp();
-		intrinsicsPathEdit->setText(path);
-		m_intrinsicsPathValid = true;
-	}
-}
-
-
-void ReprojectionWidget::extrinsicsPathClickedSlot() {
-	QString path = QFileDialog::getExistingDirectory(this, "Select Extrnsics Parameter Path", m_parameterDir.path());
-	if (path != "") {
-		m_parameterDir.setPath(path);
-		m_parameterDir.cdUp();
-		extrinsicsPathEdit->setText(path);
-		m_extrinsicsPathValid = true;
-	}
-}
-
-
-bool ReprojectionWidget::checkIntrinsicsPath(QString path) {
-	for (int cam = 0; cam < m_numCameras; cam++) {
-		if (!QFile::exists(path + "/" + "Intrinsics_" + Dataset::dataset->cameraName(cam) + ".yaml")) {
-			QErrorMessage *msg = new QErrorMessage();
-			msg->showMessage("Intrinsics File \"Intrinsics_" + Dataset::dataset->cameraName(cam) + ".yaml\" does not exist.");
+bool ReprojectionWidget::checkCalibParams(const QString &path) {
+	for (const auto & cameraName : Dataset::dataset->cameraNames()) {
+		QFileInfo calibFile(path + "/" + cameraName + ".yaml");
+		if (!calibFile.exists()) {
 			return false;
 		}
 	}
 	return true;
 }
-
-
-bool ReprojectionWidget::checkExtrinsicsPath(QString path) {
-	for (int cam = 0; cam < m_numCameras; cam++) {
-		if (cam != primaryCombo->currentIndex() && !QFile::exists(path + "/" + "Extrinsics_" + primaryCombo->currentText() + "_" + Dataset::dataset->cameraName(cam) + ".yaml")) {
-			QErrorMessage *msg = new QErrorMessage();
-			msg->showMessage("Extrinsics File \"Extrinsics_" + primaryCombo->currentText() + "_" + Dataset::dataset->cameraName(cam) + ".yaml\" does not exist.");
-			return false;
-		}
-	}
-	return true;
-}
-
 
 void ReprojectionWidget::initReprojectionClickedSlot() {
-	if (!checkIntrinsicsPath(intrinsicsPathEdit->text()) || !checkExtrinsicsPath(extrinsicsPathEdit->text())) {
-		return;
+	QString path = Dataset::dataset->datasetBaseFolder() + "/CalibrationParameters";
+	if (!m_calibExists) {
+		QString newCalibPath = QFileDialog::getExistingDirectory(this, "Select CalibrationParameters Path", m_parameterDir.path());
+		if (path == "" || !checkCalibParams(newCalibPath)) return;
+		QDir dir;
+		dir.mkpath(path);
+		QDir calibDir(newCalibPath);
+		QStringList calibFiles = calibDir.entryList(QStringList() << "*.yaml",QDir::Files);
+		foreach(QString filename, calibFiles) {
+		QFile calibFile(newCalibPath + "/" + filename);
+		calibFile.copy(path + "/" + filename);
+		}
+		path = newCalibPath;
+	}
+	else {
+		if (!checkCalibParams(path)) {
+			std::cout << "WRONG CALIB FILES!" << std::endl;
+			m_calibExists = false;
+			return;
+		}
 	}
 	getSettings();
-	savePaths();
 	toggleSwitch->setEnabled(true);
 	toggleSwitch->setToggled(true);
 	emit reprojectionToolToggled(true);
 	m_reprojectionActive = true;
 	QList<QString> intrinsicsList;
 	for (int cam = 0; cam < m_numCameras; cam++) {
-		intrinsicsList.append(intrinsicsPathEdit->text() + "/" + "Intrinsics_" + Dataset::dataset->cameraName(cam) + ".yaml");
+		intrinsicsList.append(path + "/" + Dataset::dataset->cameraName(cam) + ".yaml");
 	}
 	QList<QString> extrinsicsList;
-	for (int cam = 0; cam < m_numCameras; cam++) {
-			extrinsicsList.append(extrinsicsPathEdit->text() + "/" + "Extrinsics_" + primaryCombo->currentText() +"_" + Dataset::dataset->cameraName(cam) + ".yaml");
-	}
-	reprojectionTool = new ReprojectionTool(intrinsicsList, extrinsicsList,primaryCombo->currentIndex());
+	reprojectionTool = new ReprojectionTool(intrinsicsList, extrinsicsList,0);
 	stackedWidget->setCurrentWidget(reprojectionChartWidget);
 	modeLabel->show();
 	modeCombo->show();
 	calculateAllReprojections();
 	calculateReprojectionSlot(m_currentImgSetIndex, m_currentFrameIndex);
-}
-
-
-void ReprojectionWidget::savePaths() {
-	settings->beginGroup("CalibrationPaths");
-	settings->setValue("NumberCameras", Dataset::dataset->numCameras());
-	settings->setValue("IntrinsicsPath", intrinsicsPathEdit->text());
-	settings->setValue("ExtrinsicsPath", extrinsicsPathEdit->text());
-	settings->setValue("PrimaryIndex", primaryCombo->currentIndex());
-	settings->endGroup();
-}
-
-
-void ReprojectionWidget::loadPaths() {
-	settings->beginGroup("CalibrationPaths");
-	if(settings->value("NumberCameras").toInt() == Dataset::dataset->numCameras()) {
-			intrinsicsPathEdit->setText(settings->value("IntrinsicsPath").toString());
-			extrinsicsPathEdit->setText(settings->value("ExtrinsicsPath").toString());
-			primaryCombo->setCurrentIndex(settings->value("PrimaryIndex").toInt());
-			if (settings->contains("ExtrinsicsPath")) {
-				m_parameterDir.setPath(settings->value("ExtrinsicsPath").toString());
-				m_parameterDir.cdUp();
-			}
-			else {
-				m_parameterDir.setPath(QDir::homePath());
-			}
-
-		}
-	settings->endGroup();
 }
 
 

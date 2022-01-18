@@ -37,8 +37,8 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	newDatasetLabel->setFont(QFont("Sans Serif", 18, QFont::Bold));
 
 
-	loadPresetsWindow = new PresetsWindow(&presets, "load", "New Dataset Window/");
-	savePresetsWindow = new PresetsWindow(&presets, "save", "New Dataset Window/");
+	loadPresetsWindow = new PresetsWindow(&presets, "load", "New Dataset Window/", this);
+	savePresetsWindow = new PresetsWindow(&presets, "save", "New Dataset Window/", this);
 	connect(loadPresetsWindow, SIGNAL(loadPreset(QString)), this, SLOT(loadPresetSlot(QString)));
 	connect(savePresetsWindow, SIGNAL(savePreset(QString)), this, SLOT(savePresetSlot(QString)));
 
@@ -210,13 +210,13 @@ void NewDatasetWindow::datasetCreationFailedSlot(QString errorMsg) {
 
 void NewDatasetWindow::savePresetsClickedSlot() {
 	savePresetsWindow->updateListSlot();
-	savePresetsWindow->show();
+	savePresetsWindow->exec();
 }
 
 
 void NewDatasetWindow::loadPresetsClickedSlot() {
 	loadPresetsWindow->updateListSlot();
-	loadPresetsWindow->show();
+	loadPresetsWindow->exec();
 }
 
 void NewDatasetWindow::importPresetsClickedSlot() {

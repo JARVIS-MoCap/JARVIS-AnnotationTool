@@ -91,10 +91,8 @@ struct CalibrationConfig {
 	QString calibrationSetName;
 	QString calibrationSetPath;
 	bool seperateIntrinsics;
-	bool calibrateExtrinsics;
 	QString intrinsicsPath;
 	QString extrinsicsPath;
-	int maxSamplingFrameRate;
 	int framesForIntrinsics;
 	int framesForExtrinsics;
 	QString boardType;
@@ -104,7 +102,6 @@ struct CalibrationConfig {
 	QList<QString> cameraNames;
 	QList<QList<QString>> cameraPairs;
 	bool single_primary = false;
-
 };
 
 struct AnnotationCount {
@@ -151,6 +148,7 @@ struct ExportKeypoint {
 struct ExportFrameSet {
 	QString originalPath;
 	QString basePath;
+	//int calibIndex = 0;
 	QList<QString> cameras;
 	QList<QString> frameNames;
 	QMap<QString, QPair<QString,QList<ExportKeypoint>>> keypoints;

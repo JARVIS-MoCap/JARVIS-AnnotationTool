@@ -17,10 +17,11 @@
 
 Dataset * Dataset::dataset = nullptr;
 
-Dataset::Dataset(const QString& datasetFolder, QList<QString> cameraNames,
-			QList<SkeletonComponent> skeleton, QList<QString> segmentNames) :
-			m_datasetFolder(datasetFolder), m_skeleton(skeleton),
-			m_segmentNames(segmentNames) {
+Dataset::Dataset(const QString& datasetFolder, const QString& datasetBaseFolder,
+			QList<QString> cameraNames, QList<SkeletonComponent> skeleton,
+			QList<QString> segmentNames) :
+			m_datasetFolder(datasetFolder), m_datasetBaseFolder(datasetBaseFolder),
+			m_skeleton(skeleton), m_segmentNames(segmentNames) {
 	m_colorMap = new ColorMap(ColorMap::Jet);
 	if (cameraNames.size() == 0) {
 		m_cameraNames = QDir(datasetFolder).entryList(QDir::AllDirs |

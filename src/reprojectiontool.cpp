@@ -17,19 +17,8 @@ ReprojectionTool::ReprojectionTool(QList<QString> intrinsicsPaths,
 		CameraIntrinics cameraIntrinics;
 		readIntrinsics(path, cameraIntrinics);
 		m_cameraIntrinsicsList.append(cameraIntrinics);
-	}
-	for (int i = 0; i < extrinsicsPaths.size(); i++) {
 		CameraExtrinsics cameraExtrinsics;
-		if (i != m_primaryIndex) {
-			readExtrinsincs(extrinsicsPaths[i], cameraExtrinsics);
-		}
-		else {
-			cameraExtrinsics.rotationMatrix = cv::Mat::eye(3, 3, CV_64F);
-			cameraExtrinsics.translationVector = cv::Mat::zeros(3,1, CV_64F);
-			cv::vconcat(cameraExtrinsics.rotationMatrix,
-									cameraExtrinsics.translationVector.t(),
-									cameraExtrinsics.locationMatrix);
-		}
+		readExtrinsincs(path, cameraExtrinsics);
 		m_cameraExtrinsicsList.append(cameraExtrinsics);
 	}
 }
@@ -48,8 +37,6 @@ void ReprojectionTool::readExtrinsincs(const QString& path,
 	cv::FileStorage fs(path.toStdString(), cv::FileStorage::READ);
 	fs["R"] >> cameraExtrinsics.rotationMatrix;
 	fs["T"] >> cameraExtrinsics.translationVector;
-	fs["E"] >> cameraExtrinsics.essentialMatrix;
-	fs["F"] >> cameraExtrinsics.fundamentalMatrix;
 	cv::vconcat(cameraExtrinsics.rotationMatrix,
 							cameraExtrinsics.translationVector.t(),
 							cameraExtrinsics.locationMatrix);
@@ -77,21 +64,20 @@ cv::Mat ReprojectionTool::reconstructPoint3D(QList<QPointF> points,
 		cv::undistortPoints(point, undistPoint, intrinsicMats[i].t(),
 					distCoefficients[i]);
 		undistPoint.at<double>(0) = undistPoint.at<double>(0) *
-																intrinsicMats[i].at<double>(0,0) +
-																intrinsicMats[i].at<double>(2,0);
+					intrinsicMats[i].at<double>(0,0) +
+					intrinsicMats[i].at<double>(2,0);
 		undistPoint.at<double>(1) = undistPoint.at<double>(1) *
-																intrinsicMats[i].at<double>(1,1) +
-																intrinsicMats[i].at<double>(2,1);
+					intrinsicMats[i].at<double>(1,1) +
+					intrinsicMats[i].at<double>(2,1);
 		undistPoint = cv::Mat({undistPoint.at<double>(0),
-													 undistPoint.at<double>(1)});
+	 				undistPoint.at<double>(1)});
 
 		A(cv::Range(2*i, 2*i+2), cv::Range::all()) = undistPoint *
-																								 camMats[i](cv::Range(2,3),
-																								 cv::Range::all()) -
-																								 camMats[i](cv::Range(0, 2),
-																								 cv::Range::all());
+	 				camMats[i](cv::Range(2,3),
+	 				cv::Range::all()) -
+	 				camMats[i](cv::Range(0, 2),
+	 				cv::Range::all());
 	}
-
 	cv::Mat w, u, vt;
 	cv::SVD::compute(A, w, u, vt);
 	cv::Mat X =  vt.t().col(3);

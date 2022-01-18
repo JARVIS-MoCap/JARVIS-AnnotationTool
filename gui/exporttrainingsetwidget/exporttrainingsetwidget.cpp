@@ -30,8 +30,8 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	trainingSetExporter->moveToThread(thread);
 	thread->start();
 
-	loadPresetsWindow = new PresetsWindow(&presets, "load", "Export Dataset Widget/");
-	savePresetsWindow = new PresetsWindow(&presets, "save", "Export Dataset Widget/");
+	loadPresetsWindow = new PresetsWindow(&presets, "load", "Export Dataset Widget/", this);
+	savePresetsWindow = new PresetsWindow(&presets, "save", "Export Dataset Widget/", this);
 	connect(loadPresetsWindow, SIGNAL(loadPreset(QString)), this, SLOT(loadPresetSlot(QString)));
 	connect(savePresetsWindow, SIGNAL(savePreset(QString)), this, SLOT(savePresetSlot(QString)));
 
@@ -331,13 +331,13 @@ void ExportTrainingsetWidget::keypointsListChangedSlot(int row, bool state) {
 
 void ExportTrainingsetWidget::savePresetsClickedSlot() {
 	savePresetsWindow->updateListSlot();
-	savePresetsWindow->show();
+	savePresetsWindow->exec();
 }
 
 
 void ExportTrainingsetWidget::loadPresetsClickedSlot() {
 	loadPresetsWindow->updateListSlot();
-	loadPresetsWindow->show();
+	loadPresetsWindow->exec();
 }
 
 

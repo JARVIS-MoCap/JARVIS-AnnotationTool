@@ -53,10 +53,7 @@ class ReprojectionWidget : public QWidget {
 		// void boneLengthErrorThresholdChangedSlot(double value);
 
 	private:
-		bool checkIntrinsicsPath(QString path);
-		bool checkExtrinsicsPath(QString path);
-		void savePaths();
-		void loadPaths();
+		bool checkCalibParams(const QString &path);
 		void undoReprojection();
 		void calculateAllReprojections();
 		void getSettings();
@@ -74,25 +71,14 @@ class ReprojectionWidget : public QWidget {
 		QStackedWidget *stackedWidget;
 
 		QWidget *calibrationSetup;
-		QGroupBox *intrinsicsBox;
-		QLineEdit *intrinsicsPathEdit;
-		QPushButton *intrinsicsPathButton;
-		bool m_intrinsicsPathValid = false;
-		QGroupBox *extrinsicsBox;
-		QComboBox *primaryCombo;
-		QLineEdit *extrinsicsPathEdit;
-		QPushButton *extrinsicsPathButton;
-		bool m_extrinsicsPathValid = false;
 		QPushButton *initReprojectionButton;
 
 		QWidget *reprojectionController;
 		QGridLayout *reprojectioncontrollerlayout;
 
-		QList< QLineEdit* > intrinsicsPathEdits;
-		QList< QLineEdit* > extrinsicsPathEdits;
 		bool m_reprojectionActive = false;
+		bool m_calibExists = false;
 		int m_numCameras = 0;
-		int m_primaryIndex = 0;
 		int m_minViews = 2;
 		double m_errorThreshold = 10.0;
 		QList<QString> m_entitiesList;
@@ -107,8 +93,6 @@ class ReprojectionWidget : public QWidget {
 
 	private slots:
 		void switchToggledSlot(bool toggle);
-		void intrinsicsPathClickedSlot();
-		void extrinsicsPathClickedSlot();
 		void initReprojectionClickedSlot();
 		void modeComboChangedSlot(const QString& mode);
 };

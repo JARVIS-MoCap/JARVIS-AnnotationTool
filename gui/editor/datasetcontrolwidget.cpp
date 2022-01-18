@@ -197,10 +197,10 @@ void DatasetControlWidget::segmentChangedSlot(const QString& segment) {
 	QList<QString> cameraNames = Dataset::dataset->cameraNames();
 	QList<SkeletonComponent> skeleton = Dataset::dataset->skeleton();
 	QString datasetFolder = Dataset::dataset->datasetFolder();
-	QString datasetFolder2 = Dataset::dataset->datasetFolder();
-	datasetFolder = datasetFolder.remove(m_currentSegment);
-	datasetFolder = datasetFolder + segment;
-	Dataset::dataset = new Dataset(datasetFolder,
+	QString datasetBaseFolder = Dataset::dataset->datasetBaseFolder();
+	//datasetFolder = datasetFolder.remove(m_currentSegment);
+	datasetFolder = datasetBaseFolder +"/" + segment;
+	Dataset::dataset = new Dataset(datasetFolder, datasetBaseFolder,
 	 								 		cameraNames, skeleton, segmentNames);
 	m_currentSegment = segment;
 	m_currentImgSetIndex = 0;

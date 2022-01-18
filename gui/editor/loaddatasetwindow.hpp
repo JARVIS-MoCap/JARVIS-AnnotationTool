@@ -65,7 +65,7 @@ class LoadDatasetWindow : public QDialog {
 
 	private slots:
 		void datasetFileClickedSlot();
-		void datasetFileEditedSlot();
+		void datasetFileEditedSlot(const QString &path);
 		void loadDatasetClickedSlot();
 		void moveLabelUpSlot();
 		void moveLabelDownSlot();

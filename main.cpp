@@ -111,6 +111,7 @@ int main(int argc, char **argv)
   qRegisterMetaTypeStreamOperators<QList<QList<QPair<QString, bool>>>> ("QList<QList<QPair<QString, bool>>>");
   qRegisterMetaTypeStreamOperators<QList<QPair<QString,bool>>> ("QList<QPair<QString,bool>>");
   qRegisterMetaType<ExportConfig>("ExportConfig");
+	qRegisterMetaType<cv::Mat>("cv::Mat");
   //qRegisterMetaType<SkeletonComponent>("SkeletonComponent");
   qRegisterMetaTypeStreamOperators<QList<SkeletonComponent> >("QList<SkeletonComponent>");
 

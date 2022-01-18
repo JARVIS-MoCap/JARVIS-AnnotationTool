@@ -124,6 +124,9 @@ class KeypointWidget : public QWidget {
 	private:
 		ColorMap *colorMap;
 
+		bool m_init = false;
+
+		QGridLayout *keypointlayout;
 		QWidget *hideEntityWidget;
 		QGridLayout *hideentitylayout;
 		QList<QCheckBox*> hideEntitiesBoxesList;
