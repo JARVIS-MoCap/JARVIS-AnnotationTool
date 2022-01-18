@@ -151,6 +151,7 @@ struct ExportKeypoint {
 struct ExportFrameSet {
 	QString originalPath;
 	QString basePath;
+	int calibIndex = 0;
 	QList<QString> cameras;
 	QList<QString> frameNames;
 	QMap<QString, QPair<QString,QList<ExportKeypoint>>> keypoints;

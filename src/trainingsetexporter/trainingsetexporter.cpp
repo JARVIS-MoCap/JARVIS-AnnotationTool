@@ -158,18 +158,12 @@ void TrainingSetExporter::addCalibration(json &j, ExportConfig &exportConfig) {
 			return;
 		}
 	}
-	m_primaryCamera = primaryCamera;
-	j["calibration"]["primary_camera"] = primaryCamera.toStdString();
-	j["calibration"]["intrinsics"] = json::object();
-	j["calibration"]["extrinsics"] = json::object();
-	for (const auto & cam : cameras) {
-		std::cout << "Calib: " << cam.toStdString() << std::endl;
-		j["calibration"]["intrinsics"].push_back({cam.toStdString(),
-					"calib_params/Intrinsics/Intrinsics_" + cam.toStdString() + ".yaml"});
-		if (cam != primaryCamera) {
-			j["calibration"]["extrinsics"].push_back({cam.toStdString(),
-						"calib_params/Extrinsics/Extrinsics_" +
-						primaryCamera.toStdString() + "_" + cam.toStdString() + ".yaml"});
+	QList<QString> datasetNames = {"Dataset", "Dataset2"};
+	for (const auto& datasetName : datasetNames) {
+		j["calibrations"][datasetName.toStdString()] = json::object();
+		for (const auto & cam : cameras) {
+			j["calibrations"][datasetName.toStdString()].push_back({cam.toStdString(),
+						"calib_params/" + datasetName.toStdString() + "/" + cam.toStdString() + ".yaml"});
 		}
 	}
 }
@@ -211,7 +205,7 @@ QList<ExportFrameSet> TrainingSetExporter::loadAllFrameSets(
 							QDir(exportItem.basePath + "/" + subSet.first).entryList(
 							QDir::AllDirs | QDir::NoDotAndDotDot);
 				for (const auto & camera : cameras) {
-					std::cout << "Frame: " << camera.toStdString() << std::endl;
+					std::cout << "Frame: " << (exportItem.basePath + "/" + subSet.first).toStdString() << std::endl;
 					QList<QPair<QString,QList<ExportKeypoint>>> framesList;
 					QFile *file = new QFile(exportItem.basePath + "/" + subSet.first + "/"
 								+ camera + "/annotations.csv");
@@ -310,7 +304,7 @@ void TrainingSetExporter::addFrameSetsToJSON(ExportConfig &exportConfig,
 				{"id", id},
 				{"file_name", (frameSet.basePath + "/" + camera + "/" +
 							frameSet.keypoints[camera].first).toStdString()},
-				{"width", 1280},
+				{"width", 1280},	//TODO: Make this not be hardcoded!
 				{"height", 1024},
 				{"date_captured", ""},
 				{"license", 1},
@@ -352,9 +346,10 @@ void TrainingSetExporter::addFrameSetsToJSON(ExportConfig &exportConfig,
 		}
 		if (exportConfig.trainingSetType == "3D") {
 			for(const auto &frameName : frameSetIndexMap.keys()) {
-				j["framesets"][frameName.toStdString()] = json::array();
+				j["framesets"][frameName.toStdString()]["calibIndex"] = 0;
+				j["framesets"][frameName.toStdString()]["frames"] = json::array();
 				for (const auto &id : frameSetIndexMap[frameName]) {
-					j["framesets"][frameName.toStdString()].push_back(id);
+					j["framesets"][frameName.toStdString()]["frames"].push_back(id);
 				}
 			}
 		}
