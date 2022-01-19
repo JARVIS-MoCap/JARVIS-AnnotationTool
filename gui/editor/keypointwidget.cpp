@@ -14,7 +14,7 @@
 
 KeypointWidget::KeypointWidget(QWidget *parent) : QWidget(parent) {
 	colorMap = new ColorMap(ColorMap::Jet);
-	QGridLayout *keypointlayout = new QGridLayout(this);
+	keypointlayout = new QGridLayout(this);
 	keypointlayout->setMargin(0);
 	keypointlayout->setSpacing(20);
 
@@ -25,15 +25,7 @@ KeypointWidget::KeypointWidget(QWidget *parent) : QWidget(parent) {
 	hideEntityLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
 	hideentitylayout->addWidget(hideEntityLabel,0,0);
 
-	keypointTabWidget = new QTabWidget(this);
-	keypointTabWidget->setStyleSheet("QTabBar::tab{padding:4px 6px;"
-  																	"background-color:palette(base);"
-  																	"border-bottom:3px solid palette(alternate-base);}"
-																	"QTabBar::tab:selected,QTabBar::tab:hover{"
-  																"background-color: palette(alternate-base);}");
-
 	keypointlayout->addWidget(hideEntityWidget,0,0);
-	keypointlayout->addWidget(keypointTabWidget,1,0);
 
 
 	//--- SIGNAL-SLOT Connections ---//
@@ -46,11 +38,10 @@ KeypointWidget::KeypointWidget(QWidget *parent) : QWidget(parent) {
 
 
 void KeypointWidget::init() {
+	std::cout << entitiesList.size() << std::endl;
+
 	entitiesList.clear();
 	hideEntitiesBoxesList.clear();
-	keypointTabWidget->blockSignals(true);
-	keypointTabWidget->clear();
-	keypointTabWidget->blockSignals(false);
 
 	int i = 1;
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
@@ -61,10 +52,21 @@ void KeypointWidget::init() {
 		entitiesList.append(hideBox->text());
 		connect(hideBox, &QCheckBox::stateChanged, this, &KeypointWidget::hideEntitySlot);
 	}
+
+	keypointListMap.clear();
+
+	//delete keypointTabWidget;
+	keypointTabWidget = new QTabWidget(this);
+	keypointTabWidget->setStyleSheet("QTabBar::tab{padding:4px 6px;"
+																		"background-color:palette(base);"
+																		"border-bottom:3px solid palette(alternate-base);}"
+																	"QTabBar::tab:selected,QTabBar::tab:hover{"
+																	"background-color: palette(alternate-base);}");
+	keypointlayout->addWidget(keypointTabWidget,1,0);
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		KeypointListWidget *bodyPartsListWidget = new KeypointListWidget();
 		bodyPartsListWidget->setAlternatingRowColors(true);
-		connect(bodyPartsListWidget, &QListWidget::itemClicked, this, &KeypointWidget::itemChangedSlot);
+		connect(bodyPartsListWidget, &KeypointListWidget::itemClicked, this, &KeypointWidget::itemChangedSlot);
 		connect(bodyPartsListWidget, &KeypointListWidget::removeKeypoint, this, &KeypointWidget::removeKeypointSlot);
 		connect(bodyPartsListWidget, &KeypointListWidget::suppressKeypoint, this, &KeypointWidget::suppressKeypointSlot);
 		connect(bodyPartsListWidget, &KeypointListWidget::unsuppressKeypoint, this, &KeypointWidget::unsuppressKeypointSlot);
@@ -81,11 +83,13 @@ void KeypointWidget::init() {
 		keypointTabWidget->addTab(bodyPartsListWidget, entity);
 		keypointListMap[entity] = bodyPartsListWidget;
 	}
+	std::cout <<  entitiesList[0].toStdString() << std::endl;
 	m_currentEntity = entitiesList[0];
 	connect(keypointTabWidget, &QTabWidget::currentChanged, this, &KeypointWidget::currentTabChangedSlot);
 	QColor color = colorMap->getColor(0, keypointListMap[m_currentEntity]->count());
 	emit currentEntityChanged(m_currentEntity);
 	emit currentBodypartChanged(m_currentBodypart, color);
+
 }
 
 

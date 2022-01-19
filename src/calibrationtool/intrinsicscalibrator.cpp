@@ -23,8 +23,8 @@ IntrinsicsCalibrator::IntrinsicsCalibrator(CalibrationConfig *calibrationConfig,
       m_calibrationConfig(calibrationConfig),
       m_cameraName(cameraName.toStdString()), m_threadNumber(threadNumber){
   QDir dir;
-  dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" +
-             m_calibrationConfig->calibrationSetName + "/Intrinsics");
+  // dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" +
+  //            m_calibrationConfig->calibrationSetName + "/Intrinsics");
   if (m_calibrationConfig->debug) {
     dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" +
     m_calibrationConfig->calibrationSetName + "/debug/Intrinsics/" +
@@ -60,12 +60,6 @@ void IntrinsicsCalibrator::run() {
   std::vector<std::string> fileNames;
   QString format = getFormat(m_calibrationConfig->intrinsicsPath,
                              QString::fromStdString(m_cameraName));
-  cv::VideoCapture cap(m_calibrationConfig->intrinsicsPath.toStdString() + "/" +
-                       m_cameraName + "." + format.toStdString());
-  int frameCount = cap.get(cv::CAP_PROP_FRAME_COUNT);
-  int frameRate = cap.get(cv::CAP_PROP_FPS);
-  int skipIndex = std::max(frameRate /
-        m_calibrationConfig->maxSamplingFrameRate-1,0);
 
   std::vector< std::vector< cv::Point3f > > objectPointsAll, objectPoints;
   std::vector< std::vector< cv::Point2f > > imagePointsAll, imagePoints;
@@ -77,45 +71,69 @@ void IntrinsicsCalibrator::run() {
   params.corner_type = cbdetect::SaddlePoint;
   params.show_processing = false;
   params.show_debug_image = false;
+	int iteration = 0;
+	int skipIndex;
 
-  bool read_success = true;
-  int counter = 0;
-  cv::Mat img;
-  while (read_success && !m_interrupt) {
-    read_success = cap.read(img);
-    if (read_success) {
-      corners.clear();
-      size = img.size();
-      int frameIndex = cap.get(cv::CAP_PROP_POS_FRAMES);
-      cap.set(cv::CAP_PROP_POS_FRAMES, frameIndex+skipIndex);
-      if (frameIndex > frameCount) read_success = false;
-      cbdetect::find_corners(img, cbCorners, params);
-      bool patternFound = (cbCorners.p.size() >=
-            m_calibrationConfig->patternHeight *
-            m_calibrationConfig->patternWidth);
+	while (objectPointsAll.size() < m_calibrationConfig->framesForIntrinsics) {
+		cv::VideoCapture cap(m_calibrationConfig->intrinsicsPath.toStdString() + "/" +
+												 m_cameraName + "." + format.toStdString());
+		int frameCount = cap.get(cv::CAP_PROP_FRAME_COUNT);
+		if (iteration == 0) {
+			skipIndex = std::max(1, frameCount/(m_calibrationConfig->framesForIntrinsics*2));
+			skipIndex = skipIndex-skipIndex%4;
+		}
+		else if (iteration% 2 == 1 && iteration < 4) {
+			cap.set(cv::CAP_PROP_POS_FRAMES, skipIndex/2);
+		}
+		else if (iteration == 2) {
+			cap.set(cv::CAP_PROP_POS_FRAMES, skipIndex/4);
+			skipIndex = skipIndex/2;
+		}
+		else {
+			break;
+		}
+		iteration++;
 
-      if (patternFound) {
-        cbdetect::boards_from_corners(img, cbCorners, boards, params);
-        if(boards.size() == 1) {
-          patternFound = boardToCorners(boards[0], cbCorners, corners);
-        }
-        else {
-          patternFound = false;
-        }
-      }
-      if (patternFound && checkRotation(corners, img)) {
-        if (m_calibrationConfig->debug) {
-          saveCheckerboard(img, corners, counter);
-        }
-        imagePointsAll.push_back(corners);
-        objectPointsAll.push_back(checkerBoardPoints);
-      }
-      emit intrinsicsProgress(counter * (skipIndex + 1), frameCount,
-            m_threadNumber);
-      counter++;
-    }
-  }
-  if (m_interrupt) return;
+	  bool read_success = true;
+	  int counter = 0;
+	  cv::Mat img;
+	  while (read_success && !m_interrupt) {
+	    read_success = cap.read(img);
+	    if (read_success) {
+	      corners.clear();
+	      size = img.size();
+	      int frameIndex = cap.get(cv::CAP_PROP_POS_FRAMES);
+	      cap.set(cv::CAP_PROP_POS_FRAMES, frameIndex+skipIndex);
+	      if (frameIndex > frameCount) read_success = false;
+	      cbdetect::find_corners(img, cbCorners, params);
+	      bool patternFound = (cbCorners.p.size() >=
+	            m_calibrationConfig->patternHeight *
+	            m_calibrationConfig->patternWidth);
+
+	      if (patternFound) {
+	        cbdetect::boards_from_corners(img, cbCorners, boards, params);
+	        if(boards.size() == 1) {
+	          patternFound = boardToCorners(boards[0], cbCorners, corners);
+	        }
+	        else {
+	          patternFound = false;
+	        }
+	      }
+	      if (patternFound && checkRotation(corners, img)) {
+	        if (m_calibrationConfig->debug) {
+	          saveCheckerboard(img, corners, counter);
+	        }
+	        imagePointsAll.push_back(corners);
+	        objectPointsAll.push_back(checkerBoardPoints);
+	      }
+	      emit intrinsicsProgress(counter * (skipIndex + 1), frameCount,
+	            m_threadNumber);
+	      counter++;
+	    }
+	  }
+		cap.release();
+	  if (m_interrupt) return;
+	}
 
   if (objectPointsAll.size() < 15) {
       emit calibrationError("Camera" + QString::fromStdString(m_cameraName) +
@@ -143,11 +161,11 @@ void IntrinsicsCalibrator::run() {
         cv::TermCriteria(cv::TermCriteria::MAX_ITER |
           cv::TermCriteria::EPS, 100, 1e-7));
 
-  cv::FileStorage fs1(m_parametersSavePath + "/Intrinsics/Intrinsics_" +
-        m_cameraName + ".yaml", cv::FileStorage::WRITE);
-  fs1 << "intrinsicMatrix" << K.t();
-  fs1 << "distortionCoefficients" << D;
-  emit finishedIntrinsics(repro_error, m_threadNumber);
+  // cv::FileStorage fs1(m_parametersSavePath + "/Intrinsics/Intrinsics_" +
+  //       m_cameraName + ".yaml", cv::FileStorage::WRITE);
+  // fs1 << "intrinsicMatrix" << K.t();
+  // fs1 << "distortionCoefficients" << D;
+  emit finishedIntrinsics(K, D, repro_error, m_threadNumber);
 }
 
 
@@ -222,7 +240,6 @@ bool IntrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1,
               markerIds[i];
       }
     }
-    std::cout << m_detectedPattern << std::endl;
     int match = matchPattern();
     if (match == 0) {
       return false;

@@ -58,12 +58,10 @@ class NewCalibrationWidget : public QWidget {
 		QLineEdit *calibrationSetNameEdit;
 		DirPathWidget *calibrationSetPathWidget;
 		YesNoRadioWidget *seperateRadioWidget;
-		YesNoRadioWidget *calibrateExtrinsicsRadioWidget;
 		DirPathWidget *intrinsicsPathWidget;
 		DirPathWidget *extrinsicsPathWidget;
 		QPushButton *updateNamesListButton;
 
-		QSpinBox *maxSamplingFrameRateEdit;
 		QSpinBox *intrinsicsFramesEdit;
 		QSpinBox *extrinsicsFramesEdit;
 		YesNoRadioWidget *saveDebugRadioWidget;
@@ -104,7 +102,6 @@ class NewCalibrationWidget : public QWidget {
 		void calibrationCanceledSlot();
 		void calibrationErrorSlot(const QString &errorMsg);
 		void sperateRadioStateChangedSlot(bool state);
-		void calibrateExtrinsicsRadioStateChangedSlot(bool state);
 		void checkerBoardPatternChangesSlot(int val);
 
 		void intrinsicsPathChangedSlot(const QString &path);

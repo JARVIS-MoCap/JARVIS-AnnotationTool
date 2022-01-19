@@ -47,15 +47,18 @@ class CalibrationTool : public QObject {
 		void cancelCalibrationSlot();
 
   private:
+		void saveCalibration();
+
     CalibrationConfig *m_calibrationConfig;
 		QMap<int, double> m_intrinsicsReproErrors;
 		QMap<int, double> m_extrinsicsReproErrors;
+		QMap<QString, QMap<QString, cv::Mat>> m_intrinsicParameters;
+		QMap<QString, QMap<QString, cv::Mat>> m_extrinsicParameters;
 		bool m_calibrationCanceled = false;
 
 	private slots:
-		void finishedIntrinsicsSlot(double reproError, int threadNumber);
-		void finishedExtrinsicsSlot(double reproError,
-					QMap<QString, double> intrinsicsErrorMap, int threadNumber);
+		void finishedIntrinsicsSlot(cv::Mat K, cv::Mat D, double reproError, int threadNumber);
+		void finishedExtrinsicsSlot(cv::Mat R, cv::Mat T, double reproError, int threadNumber);
 		void calibrationErrorSlot(const QString &errorMsg);
 };
 

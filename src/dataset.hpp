@@ -20,12 +20,13 @@ class Dataset : public QObject {
 
 	public:
 		explicit Dataset(const QString& datasetFolder,
-					QList<QString> cameraNames = {},
+			const QString& datasetBaseFolder, QList<QString> cameraNames = {},
 					QList<SkeletonComponent> skeleton = {},
 					QList<QString> segmentNames = {});
 		static Dataset *dataset;
 		QList<ImgSet*> imgSets() {return m_imgSets;}
 		const QString& datasetFolder() {return m_datasetFolder;}
+		const QString& datasetBaseFolder() {return m_datasetBaseFolder;}
 		const QString& cameraName(int i) {return m_cameraNames[i];}
 		QList <QString> cameraNames() {return m_cameraNames;}
 		QList <SkeletonComponent> skeleton() {return m_skeleton;}
@@ -44,6 +45,7 @@ class Dataset : public QObject {
 		bool GetImageSizeEx(QString fn, int *x,int *y);
 
 		const QString m_datasetFolder;
+		const QString m_datasetBaseFolder;
 		bool m_loadSuccessfull = false;
 		int m_numCameras;
 		int m_numEntities;

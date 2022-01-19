@@ -135,13 +135,41 @@ void LoadDatasetWindow::datasetFileClickedSlot() {
 }
 
 
-void LoadDatasetWindow::datasetFileEditedSlot() {
+void LoadDatasetWindow::datasetFileEditedSlot(const QString &path) {
+	QFileInfo file(path);
+	if (path != "" && file.exists() && file.completeSuffix() == "yaml") {
+		m_datasetYaml = YAML::LoadFile(path.toStdString());
+		updateCameraOrderList();
+		updateDatasetSegmentTree();
+		m_skeleton.clear();
+		for (const auto& compYaml : m_datasetYaml["Skeleton"]) {
+			SkeletonComponent comp;
+			comp.name = QString::fromStdString(compYaml.first.as<std::string>());
+			comp.keypointA = QString::fromStdString(compYaml.second["Keypoints"][0].as<std::string>());
+			comp.keypointB = QString::fromStdString(compYaml.second["Keypoints"][1].as<std::string>());
+			comp.length = compYaml.second["Length"][0].as<float>();
+			m_skeleton.append(comp);
+		}
+	}
+	else {
+		cameraOrderList->clear();
+		m_cameraNames.clear();
+		m_segments.clear();
+		selectedSegmentEdit->setText("");
+		loadDatasetButton->setEnabled(false);
+		loadDatasetButton->setToolTip("Load a dataset and select a segment to annotate first!");
+		datasetSegmentsTree->blockSignals(true);
+		datasetSegmentsTree->clear();
+		m_datasetFolder = "";
+	}
 
 }
 
 void LoadDatasetWindow::loadDatasetClickedSlot() {
 	if (m_datasetFolder != "") {
-		Dataset::dataset = new Dataset(m_datasetFolder,
+		QDir baseDir = QFileInfo(datasetFileEdit->text()).absoluteDir();
+		QString baseDirPath = baseDir.absolutePath();
+		Dataset::dataset = new Dataset(m_datasetFolder, baseDirPath,
 									   m_cameraNames, m_skeleton, m_segments);
 		if (Dataset::dataset->loadSuccessfull()) {
 			emit datasetLoaded();

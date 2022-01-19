@@ -39,7 +39,7 @@ class IntrinsicsCalibrator : public QObject, public QRunnable {
 
 	signals:
 		void intrinsicsProgress(int counter, int frameCount, int threadNumber);
-		void finishedIntrinsics(double reproError, int threadNumber);
+		void finishedIntrinsics(cv::Mat K, cv::Mat D, double reproError, int threadNumber);
 		void calibrationError(const QString &errorMsg);
 
 	public slots:

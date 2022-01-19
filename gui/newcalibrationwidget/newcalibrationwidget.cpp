@@ -35,8 +35,8 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	thread->start();
 	connect(this, &NewCalibrationWidget::makeCalibrationSet, calibrationTool, &CalibrationTool::makeCalibrationSet);
 
-	loadPresetsWindow = new PresetsWindow(&presets, "load", "New Calibration Widget/");
-	savePresetsWindow = new PresetsWindow(&presets, "save", "New Calibration Widget/");
+	loadPresetsWindow = new PresetsWindow(&presets, "load", "New Calibration Widget/", this);
+	savePresetsWindow = new PresetsWindow(&presets, "save", "New Calibration Widget/", this);
 	connect(loadPresetsWindow, SIGNAL(loadPreset(QString)), this, SLOT(loadPresetSlot(QString)));
 	connect(savePresetsWindow, SIGNAL(savePreset(QString)), this, SLOT(savePresetSlot(QString)));
 
@@ -72,10 +72,6 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	seperateRadioWidget = new YesNoRadioWidget(generalWidget);
 	seperateRadioWidget->setState(true);
 	connect(seperateRadioWidget, &YesNoRadioWidget::stateChanged, this, &NewCalibrationWidget::sperateRadioStateChangedSlot);
-	LabelWithToolTip *CalibrateExtrinsicsLabel = new LabelWithToolTip("  Calibrate Extrinsics");
-	calibrateExtrinsicsRadioWidget = new YesNoRadioWidget(generalWidget);
-	calibrateExtrinsicsRadioWidget->setState(true);
-	connect(calibrateExtrinsicsRadioWidget, &YesNoRadioWidget::stateChanged, this, &NewCalibrationWidget::calibrateExtrinsicsRadioStateChangedSlot);
 	LabelWithToolTip *intrinsicsPathLabel = new LabelWithToolTip("  Intrinsics Folder Path");
 	intrinsicsPathWidget = new DirPathWidget("Select Intrinsics Path");
 	intrinsicsPathWidget->setPlaceholderText("Select a Path...");
@@ -97,8 +93,6 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	generallayout->addWidget(calibrationSetPathWidget,i++,1);
 	generallayout->addWidget(seperateIntrinsicsLabel,i,0);
 	generallayout->addWidget(seperateRadioWidget,i++,1);
-	generallayout->addWidget(CalibrateExtrinsicsLabel,i,0);
-	generallayout->addWidget(calibrateExtrinsicsRadioWidget,i++,1);
 	generallayout->addWidget(intrinsicsPathLabel,i,0);
 	generallayout->addWidget(intrinsicsPathWidget,i++,1);
 	generallayout->addWidget(extrinsicsPathLabel,i,0);
@@ -112,10 +106,6 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	QWidget *calibParamsWidget = new QWidget(configWidget);
 	QGridLayout *calibparamslayout = new QGridLayout(calibParamsWidget);
 	calibparamslayout->setMargin(0);
-	LabelWithToolTip *maxSamplingFrameRateLabel = new LabelWithToolTip("  Max. Sampling Framerate");
-	maxSamplingFrameRateEdit = new QSpinBox();
-	maxSamplingFrameRateEdit->setRange(1,100);
-	maxSamplingFrameRateEdit->setValue(5);
 	LabelWithToolTip *intrinsicsFramesLabel = new LabelWithToolTip("  Max. Number of Frames for Intrinsics Calibration");
 	intrinsicsFramesEdit = new QSpinBox(calibParamsWidget);
 	intrinsicsFramesEdit->setRange(0,999);
@@ -128,8 +118,6 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	saveDebugRadioWidget = new YesNoRadioWidget(calibParamsWidget);
 	saveDebugRadioWidget->setState(false);
 	i = 0;
-	calibparamslayout->addWidget(maxSamplingFrameRateLabel,i,0);
-	calibparamslayout->addWidget(maxSamplingFrameRateEdit,i++,1);
 	calibparamslayout->addWidget(intrinsicsFramesLabel,i,0);
 	calibparamslayout->addWidget(intrinsicsFramesEdit,i++,1);
 	calibparamslayout->addWidget(extrinsicsFramesLabel,i,0);
@@ -371,35 +359,29 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 		return;
 	}
 
-	if (!seperateRadioWidget->state() || calibrateExtrinsicsRadioWidget->state()) {
-		if (cameraPairs.size() == 0) {
-			m_errorMsg->showMessage("No Camera Pairs defined, aborting Calibration.");
-			return;
-		}
+	if (cameraPairs.size() == 0) {
+		m_errorMsg->showMessage("No Camera Pairs defined, aborting Calibration.");
+		return;
 	}
 
+	QString errorMsg;
 	if (seperateRadioWidget->state()) {
-		QString errorMsg;
 		if (!checkIntrinsics(intrinsicsPath, errorMsg)) {
 			m_errorMsg->showMessage(errorMsg);
 			return;
 		}
 	}
-	if (!seperateRadioWidget->state() || calibrateExtrinsicsRadioWidget->state()) {
-		QString errorMsg;
-		if (!checkExtrinsics(extrinsicsPath, errorMsg)) {
-			m_errorMsg->showMessage(errorMsg);
-			return;
-		}
+
+	if (!checkExtrinsics(extrinsicsPath, errorMsg)) {
+		m_errorMsg->showMessage(errorMsg);
+		return;
 	}
 
 	m_calibrationConfig->calibrationSetName = calibrationSetNameEdit->text();
 	m_calibrationConfig->calibrationSetPath = calibrationSetPathWidget->path();
 	m_calibrationConfig->seperateIntrinsics = seperateRadioWidget->state();
-	m_calibrationConfig->calibrateExtrinsics = calibrateExtrinsicsRadioWidget->state();
 	m_calibrationConfig->intrinsicsPath = intrinsicsPathWidget->path();
 	m_calibrationConfig->extrinsicsPath = extrinsicsPathWidget->path();
-	m_calibrationConfig->maxSamplingFrameRate = maxSamplingFrameRateEdit->value();
 	m_calibrationConfig->framesForIntrinsics = intrinsicsFramesEdit->value();
 	m_calibrationConfig->framesForExtrinsics = extrinsicsFramesEdit->value();
 	m_calibrationConfig->debug = saveDebugRadioWidget->state();
@@ -550,22 +532,9 @@ bool NewCalibrationWidget::checkIsValidRecording(const QString& path, const QStr
 void NewCalibrationWidget::sperateRadioStateChangedSlot(bool state) {
 	if (state) {
 		intrinsicsPathWidget->setEnabled(true);
-		calibrateExtrinsicsRadioWidget->setEnabled(true);
 	}
 	else {
 		intrinsicsPathWidget->setEnabled(false);
-		calibrateExtrinsicsRadioWidget->setState(true);
-		calibrateExtrinsicsRadioWidget->setEnabled(false);
-	}
-}
-
-
-void NewCalibrationWidget::calibrateExtrinsicsRadioStateChangedSlot(bool state) {
-	if (state) {
-		extrinsicsPathWidget->setEnabled(true);
-	}
-	else {
-		extrinsicsPathWidget->setEnabled(false);
 	}
 }
 
@@ -613,13 +582,13 @@ void NewCalibrationWidget::intrinsicsPathChangedSlot(const QString &path) {
 
 void NewCalibrationWidget::savePresetsClickedSlot() {
 	savePresetsWindow->updateListSlot();
-	savePresetsWindow->show();
+	savePresetsWindow->exec();
 }
 
 
 void NewCalibrationWidget::loadPresetsClickedSlot() {
 	loadPresetsWindow->updateListSlot();
-	loadPresetsWindow->show();
+	loadPresetsWindow->exec();
 }
 
 
@@ -636,10 +605,8 @@ void NewCalibrationWidget::savePresetSlot(const QString& preset) {
 	settings->setValue("calibrationSetName", calibrationSetNameEdit->text());
 	settings->setValue("calibrationSetPath", calibrationSetPathWidget->path());
 	settings->setValue("seperateIntrinsics", seperateRadioWidget->state());
-	settings->setValue("calibrateExtrinsics", calibrateExtrinsicsRadioWidget->state());
 	settings->setValue("intrinsicsFolder", intrinsicsPathWidget->path());
 	settings->setValue("extrinsicsFolder", extrinsicsPathWidget->path());
-	settings->setValue("maxSamplingFrameRate", maxSamplingFrameRateEdit->value());
 	settings->setValue("intrinsicsFrames", intrinsicsFramesEdit->value());
 	settings->setValue("extrinsicsFrames", extrinsicsFramesEdit->value());
 	settings->setValue("saveDebugImages", saveDebugRadioWidget->state());
@@ -669,13 +636,11 @@ void NewCalibrationWidget::loadPresetSlot(const QString& preset) {
 	}
 	calibrationSetPathWidget->setPath(settings->value("calibrationSetPath").toString());
 	seperateRadioWidget->setState(settings->value("seperateIntrinsics").toBool());
-	calibrateExtrinsicsRadioWidget->setState(settings->value("calibrateExtrinsics").toBool());
 	intrinsicsPathWidget->setPath(settings->value("intrinsicsFolder").toString());
 	extrinsicsPathWidget->setPath(settings->value("extrinsicsFolder").toString());
 	intrinsicsFramesEdit->setValue(settings->value("intrinsicsFrames").toInt());
 	extrinsicsFramesEdit->setValue(settings->value("extrinsicsFrames").toInt());
 	saveDebugRadioWidget->setState(settings->value("saveDebugImages").toBool());
-	maxSamplingFrameRateEdit->setValue(settings->value("maxSamplingFrameRate").toInt());
 	widthEdit->setValue(settings->value("patternWidth").toInt());
 	heightEdit->setValue(settings->value("patternHeight").toInt());
 	sideLengthEdit->setValue(settings->value("sideLength").toDouble());

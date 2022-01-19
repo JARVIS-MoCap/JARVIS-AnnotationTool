@@ -129,12 +129,13 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(imageViewer, &ImageViewer::panFinished, this, &EditorWidget::panFinishedSlot);
 	connect(datasetControlWidget, &DatasetControlWidget::frameSelectionChanged, this, &EditorWidget::frameChangedSlot);
 	connect(datasetControlWidget, &DatasetControlWidget::imgSetChanged, this, &EditorWidget::imgSetChangedSlot);
+	connect(datasetControlWidget, &DatasetControlWidget::datasetLoaded, this, &EditorWidget::datasetLoadedSlot);
 
 
 	//<- Outgoing Signals
-	connect(this, &EditorWidget::datasetLoaded, keypointWidget, &KeypointWidget::datasetLoadedSlot);
-	connect(this, &EditorWidget::datasetLoaded, reprojectionWidget, &ReprojectionWidget::datasetLoadedSlot);
-	connect(this, &EditorWidget::datasetLoaded, datasetControlWidget, &DatasetControlWidget::datasetLoadedSlot);
+	// connect(this, &EditorWidget::datasetLoaded, keypointWidget, &KeypointWidget::datasetLoadedSlot);
+	// connect(this, &EditorWidget::datasetLoaded, reprojectionWidget, &ReprojectionWidget::datasetLoadedSlot);
+  // connect(this, &EditorWidget::datasetLoaded, datasetControlWidget, &DatasetControlWidget::datasetLoadedSlot);
 	connect(this, &EditorWidget::zoomToggled, imageViewer, &ImageViewer::zoomToggledSlot);
 	connect(this, &EditorWidget::panToggled, imageViewer, &ImageViewer::panToggledSlot);
 	connect(this, &EditorWidget::homeClicked, imageViewer, &ImageViewer::homeClickedSlot);
@@ -148,7 +149,6 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 
 	//<-> Relayed Signals
 	connect(datasetControlWidget, &DatasetControlWidget::datasetLoaded, this, &EditorWidget::newSegmentLoaded);
-	connect(datasetControlWidget, &DatasetControlWidget::datasetLoaded, this, &EditorWidget::datasetLoadedSlot);
 	connect(keypointWidget, &KeypointWidget::currentEntityChanged, imageViewer, &ImageViewer::currentEntityChangedSlot);
 	connect(keypointWidget, &KeypointWidget::currentBodypartChanged, imageViewer, &ImageViewer::currentBodypartChangedSlot);
 	connect(keypointWidget, &KeypointWidget::toggleEntityVisible, imageViewer, &ImageViewer::toggleEntityVisibleSlot);
@@ -353,9 +353,12 @@ void EditorWidget::datasetLoadedSlot() {
 	previousButton->setEnabled(false);
 	previousSetButton->setEnabled(false);
 	splitterMovedSlot(0,0);
+	keypointWidget->datasetLoadedSlot();
+	reprojectionWidget->datasetLoadedSlot();
+	datasetControlWidget->datasetLoadedSlot();
 	connect(Dataset::dataset, &Dataset::keypointStateChanged, datasetControlWidget, &DatasetControlWidget::keypointStateChangedSlot);
+	emit datasetLoaded();
 }
-
 
 void EditorWidget::quitClickedSlot() {
 	Dataset::dataset->save();
