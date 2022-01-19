@@ -53,18 +53,25 @@ void DatasetList::itemSelectedSlot(QListWidgetItem *item) {
 
 
 void DatasetList::addItemSlot() {
-	QString path = QFileDialog::getExistingDirectory(this,"Add Dataset", m_currentPath,
-				QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	QString path = QFileDialog::getOpenFileName(
+							this, "Select Dataset YAML File", m_currentPath, "YAML Files (*.yaml)");
 	if (path != "") {
 		addItem(path);
 	}
+
 }
 
 void DatasetList::addItem(const QString &path) {
 	QDir dir = QDir(path);
+	QString filePath = path;
+	if (path.contains(".yaml")) {
+		dir = QFileInfo(path).absoluteDir();
+		filePath = dir.absolutePath();
+	}
 	DatasetExportItem exportItem;
 	exportItem.name = dir.dirName();
-	exportItem.basePath = path;
+	std::cout << "AA: "<< filePath.toStdString() << std::endl;
+	exportItem.basePath = filePath;
 	if (analyseDatasetPath(&exportItem, exportItem.basePath)) {
 		addListItem(exportItem.name);
 		m_datasetExportItems.append(exportItem);

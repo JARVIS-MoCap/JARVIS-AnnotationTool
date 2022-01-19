@@ -213,7 +213,6 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	listlayout->addWidget(keypointListBox,2,0);
 
 
-
 	QWidget *buttonBarWidget = new QWidget(this);
 	buttonBarWidget->setMaximumSize(100000,50);
 	QGridLayout *buttonbarlayout = new QGridLayout(buttonBarWidget);
@@ -324,10 +323,12 @@ void ExportTrainingsetWidget::entitiesListChangedSlot(int row, bool state) {
 	emit updateCounts();
 }
 
+
 void ExportTrainingsetWidget::keypointsListChangedSlot(int row, bool state) {
 	m_keypoints[row].second = state;
 	emit updateCounts();
 }
+
 
 void ExportTrainingsetWidget::savePresetsClickedSlot() {
 	savePresetsWindow->updateListSlot();
