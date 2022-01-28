@@ -38,11 +38,6 @@ void TrainingSetExporter::exportTrainingsetSlot(ExportConfig exportConfig) {
 		copyCalibrationParams(exportConfig);
 	}
 
-	for (const auto& exportItem : m_datasetExportItems) {
-		std::cout << "Name: " << exportItem.name.toStdString() << std::endl;
-		std::cout << "Path: " << exportItem.basePath.toStdString() << std::endl;
-	}
-
 	json trainingSet;
 	addInfo(trainingSet);
 	addCategories(trainingSet, exportConfig);
@@ -134,9 +129,9 @@ void TrainingSetExporter::addCategories(json &j, ExportConfig &exportConfig) {
 
 void TrainingSetExporter::addCalibration(json &j, ExportConfig &exportConfig) {
 	QList<QString> cameras;
-	for (auto & fileName : QDir(exportConfig.intrinsicsPath).entryList(QDir::Files
+	for (auto & fileName : QDir(m_datasetExportItems[0].basePath + "/CalibrationParameters").entryList(QDir::Files
 				| QDir::NoDotAndDotDot)) {
-		cameras.append(fileName.remove("Intrinsics_").remove(".yaml"));
+		cameras.append(fileName.remove(".yaml"));
 	}
 
 	QList<QString> extrinsicsPairs = QDir(exportConfig.extrinsicsPath).entryList(
@@ -177,45 +172,19 @@ void TrainingSetExporter::addCalibration(json &j, ExportConfig &exportConfig) {
 }
 
 
-// void TrainingSetExporter::copyCalibrationParams(ExportConfig &exportConfig) {
-// 	QDir dir;
-// 	dir.mkpath(exportConfig.savePath + "/" + exportConfig.trainingSetName +
-// 				"/calib_params/Intrinsics");
-// 	for (auto & fileName : QDir(exportConfig.intrinsicsPath).entryList(
-// 				QDir::Files | QDir::NoDotAndDotDot)) {
-// 		QFile::copy(exportConfig.intrinsicsPath + "/" +
-// 					fileName, exportConfig.savePath + "/" + exportConfig.trainingSetName +
-// 					"/calib_params/Intrinsics/" + fileName);
-// 	}
-// 	dir.mkpath(exportConfig.savePath + "/" + exportConfig.trainingSetName +
-// 	"/calib_params/Extrinsics");
-// 	for (auto & fileName : QDir(exportConfig.extrinsicsPath).entryList(
-// 				QDir::Files | QDir::NoDotAndDotDot)) {
-// 		QFile::copy(exportConfig.extrinsicsPath + "/" +
-// 					fileName, exportConfig.savePath + "/" + exportConfig.trainingSetName +
-// 					"/calib_params/Extrinsics/" + fileName);
-// 	}
-// }
-
-
 void TrainingSetExporter::copyCalibrationParams(ExportConfig &exportConfig) {
-	QDir dir;
-	dir.mkpath(exportConfig.savePath + "/" + exportConfig.trainingSetName +
-				"/calib_params/Intrinsics");
-	for (auto & fileName : QDir(exportConfig.intrinsicsPath).entryList(
-				QDir::Files | QDir::NoDotAndDotDot)) {
-		QFile::copy(exportConfig.intrinsicsPath + "/" +
-					fileName, exportConfig.savePath + "/" + exportConfig.trainingSetName +
-					"/calib_params/Intrinsics/" + fileName);
+	for (const auto& exportItem : m_datasetExportItems) {
+		QDir dir;
+		dir.mkpath(exportConfig.savePath + "/" + exportConfig.trainingSetName +
+		"/calib_params/" + exportItem.name);
+		for (auto & fileName : QDir(exportItem.basePath + "/CalibrationParameters").entryList(
+					QDir::Files | QDir::NoDotAndDotDot)) {
+			QFile::copy(exportItem.basePath + "/CalibrationParameters/" + fileName,
+						exportConfig.savePath + "/" + exportConfig.trainingSetName +
+						"/calib_params/" + exportItem.name + "/" + fileName);
+		}
 	}
-	dir.mkpath(exportConfig.savePath + "/" + exportConfig.trainingSetName +
-	"/calib_params/Extrinsics");
-	for (auto & fileName : QDir(exportConfig.extrinsicsPath).entryList(
-				QDir::Files | QDir::NoDotAndDotDot)) {
-		QFile::copy(exportConfig.extrinsicsPath + "/" +
-					fileName, exportConfig.savePath + "/" + exportConfig.trainingSetName +
-					"/calib_params/Extrinsics/" + fileName);
-	}
+	std::cout << "Done copying" << std::endl;
 }
 
 
@@ -234,7 +203,6 @@ QList<ExportFrameSet> TrainingSetExporter::loadAllFrameSets(
 							QDir(exportItem.basePath + "/" + subSet.first).entryList(
 							QDir::AllDirs | QDir::NoDotAndDotDot);
 				for (const auto & camera : cameras) {
-					//std::cout << "Frame: " << (exportItem.basePath + "/" + subSet.first).toStdString() << std::endl;
 					QList<QPair<QString,QList<ExportKeypoint>>> framesList;
 					QFile *file = new QFile(exportItem.basePath + "/" + subSet.first + "/"
 								+ camera + "/annotations.csv");

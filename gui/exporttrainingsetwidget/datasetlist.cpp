@@ -70,7 +70,6 @@ void DatasetList::addItem(const QString &path) {
 	}
 	DatasetExportItem exportItem;
 	exportItem.name = dir.dirName();
-	std::cout << "AA: "<< filePath.toStdString() << std::endl;
 	exportItem.basePath = filePath;
 	if (analyseDatasetPath(&exportItem, exportItem.basePath)) {
 		addListItem(exportItem.name);
