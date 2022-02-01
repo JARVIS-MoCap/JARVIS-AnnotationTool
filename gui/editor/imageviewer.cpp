@@ -10,7 +10,7 @@
 #include "imageviewer.hpp"
 
 #include <QMouseEvent>
-
+#include <cmath>
 
 void ImageViewer::fitToScreen() {
 	float scaleWidth = static_cast<float>(this->size().width())/m_crop.width();
@@ -204,7 +204,8 @@ void ImageViewer::mousePressEvent(QMouseEvent *event) {
 	else if (event->button() == Qt::MiddleButton) {
 		if (hiddenEntityList.contains(m_currentEntity)) return;
 		for (auto& pt : m_currentImgSet->frames[m_currentFrameIndex]->keypoints) {
-			if ((position-pt->coordinates()).manhattanLength() < m_keypointSize/2) {
+			double length = std::sqrt(std::pow((position-pt->coordinates()).x(), 2) + std::pow((position-pt->coordinates()).y(), 2));
+			if (length < m_keypointSize/2) {
 				if (pt->state() == Annotated || pt->state() == Reprojected) {
 					pt->setState(NotAnnotated);
 					emit keypointRemoved(pt);
@@ -219,7 +220,8 @@ void ImageViewer::mousePressEvent(QMouseEvent *event) {
 	else if (event->button() == Qt::LeftButton) {
 		if (hiddenEntityList.contains(m_currentEntity)) return;
 		for (auto& pt : m_currentImgSet->frames[m_currentFrameIndex]->keypoints) {
-			if ((position-pt->coordinates()).manhattanLength() < m_keypointSize/2 && (pt->state() == Annotated ||
+			double length = std::sqrt(std::pow((position-pt->coordinates()).x(), 2) + std::pow((position-pt->coordinates()).y(), 2));
+			if (m_draggedPoint != pt && length < m_keypointSize/2 && (pt->state() == Annotated ||
 					pt->state() == Reprojected)) {
 				m_draggedPoint = pt;
 				pt->setState(Annotated);
