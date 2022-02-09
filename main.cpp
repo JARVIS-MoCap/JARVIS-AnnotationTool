@@ -113,6 +113,7 @@ int main(int argc, char **argv)
   qRegisterMetaType<ExportConfig>("ExportConfig");
   //qRegisterMetaType<SkeletonComponent>("SkeletonComponent");
   qRegisterMetaTypeStreamOperators<QList<SkeletonComponent> >("QList<SkeletonComponent>");
+  qRegisterMetaType< cv::Mat >("cv::Mat");
 
 	QApplication app (argc, argv);
 	app.setStyle(new DarkStyle);

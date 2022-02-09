@@ -115,6 +115,7 @@ void CalibrationTool::finishedIntrinsicsSlot(cv::Mat K, cv::Mat D, double reproE
 	intrinsics["K"] = K;
 	intrinsics["D"] = D;
 	m_intrinsicParameters[m_calibrationConfig->cameraNames[threadNumber]] = intrinsics;
+  std::cout << "Finsihed Calib " << threadNumber << std::endl;
 }
 
 
