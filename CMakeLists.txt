@@ -48,11 +48,10 @@ message (STATUS "${yaml-cpp_DIR}")
 find_package(yaml-cpp REQUIRED)
 
 if(APPLE)
-	set(Eigen3_DIR "libs/eigen-3.3.8/MacOS/build")
-	message("${EIGEN3_DIR}")
-	find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+	#set(Eigen3_DIR "libs/eigen-3.3.8/MacOS/share/eigen3")
+	#message("${EIGEN3_DIR}")
+	#find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 endif()
-
 
 # detect operating system and host processor
 message(STATUS "We are on a ${CMAKE_SYSTEM_NAME} system")
