@@ -155,8 +155,7 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair,
 	  cv::VideoCapture cap2(cap2Path);
 		int frameCount = cap1.get(cv::CAP_PROP_FRAME_COUNT);
 		if (iteration == 0) {
-			skipIndex = frameCount/(m_calibrationConfig->framesForExtrinsics*10);
-      //TODO: This isn't great for combined intrinsics/extrinsics
+			skipIndex = frameCount/(m_calibrationConfig->framesForExtrinsics*1.5);
 			skipIndex = std::max(1, skipIndex-skipIndex%4);
 		}
 		else if (iteration% 2 == 1 && iteration < 4 && skipIndex > 1) {
@@ -168,9 +167,17 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair,
 			cap2.set(cv::CAP_PROP_POS_FRAMES, skipIndex/4);
 			skipIndex = skipIndex/2;
 		}
-		else {
-			break;
+		else if (iteration < 5) {
+      imagePointsAll1.clear();
+      imagePointsAll2.clear();
+      objectPointsAll.clear();
+      cap1.set(cv::CAP_PROP_POS_FRAMES, 0);
+      cap2.set(cv::CAP_PROP_POS_FRAMES, 0);
+      skipIndex = 5;
 		}
+    else {
+      break;
+    }
 		iteration++;
 
 	  bool read_success = true;
@@ -182,7 +189,6 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair,
 	    read_success = read_success1 && read_success2;
 	    if (read_success) {
 	      int frameIndex = cap1.get(cv::CAP_PROP_POS_FRAMES);
-        std::cout << skipIndex << std::endl;
 	      cap1.set(cv::CAP_PROP_POS_FRAMES, frameIndex+skipIndex);
 	      cap2.set(cv::CAP_PROP_POS_FRAMES, frameIndex+skipIndex);
 	      if (frameIndex > frameCount) read_success = false;

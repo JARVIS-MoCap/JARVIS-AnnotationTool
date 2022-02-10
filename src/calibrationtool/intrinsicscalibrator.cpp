@@ -90,7 +90,10 @@ void IntrinsicsCalibrator::run() {
 			skipIndex = skipIndex/2;
 		}
 		else {
-			break;
+      imagePointsAll.clear();
+      objectPointsAll.clear();
+      cap.set(cv::CAP_PROP_POS_FRAMES, 0);
+      skipIndex = 10;
 		}
 		iteration++;
 
@@ -136,8 +139,8 @@ void IntrinsicsCalibrator::run() {
 	}
 
   if (objectPointsAll.size() < 15) {
-      emit calibrationError("Camera" + QString::fromStdString(m_cameraName) +
-      ": Found only" + QString::number(objectPointsAll.size()) +
+      emit calibrationError("Camera " + QString::fromStdString(m_cameraName) +
+      ": Found only " + QString::number(objectPointsAll.size()) +
       " valid checkerboards, aborting calibration. Make sure your checkerboard "
       "parameters are set correctly.");
       return;

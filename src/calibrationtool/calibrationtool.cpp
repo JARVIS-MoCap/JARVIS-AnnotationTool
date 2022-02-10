@@ -54,8 +54,10 @@ void CalibrationTool::makeCalibrationSet()  {
     QCoreApplication::instance()->processEvents();
   }
 	while (m_intrinsicParameters.size() != m_calibrationConfig->cameraNames.size()) {
+    std::cout << m_intrinsicParameters.size() << " / " << m_calibrationConfig->cameraNames.size() << std::endl;
 		QCoreApplication::instance()->processEvents();
 	}
+  std::cout << "FINISHED INTRINSICS" << std::endl;
   if (m_calibrationCanceled) return;
   threadPool->clear();
   thread = 0;
