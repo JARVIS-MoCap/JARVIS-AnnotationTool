@@ -138,7 +138,7 @@ void IntrinsicsCalibrator::run() {
 	  if (m_interrupt) return;
 	}
 
-  if (objectPointsAll.size() < 15) {
+  if (objectPointsAll.size() < m_calibrationConfig->framesForIntrinsics) {
       emit calibrationError("Camera " + QString::fromStdString(m_cameraName) +
       ": Found only " + QString::number(objectPointsAll.size()) +
       " valid checkerboards, aborting calibration. Make sure your checkerboard "

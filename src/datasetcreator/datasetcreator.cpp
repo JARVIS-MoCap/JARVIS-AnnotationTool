@@ -257,13 +257,12 @@ QList<int> DatasetCreator::extractFrames(const QString &path,
 		loop.exec();
 
 		emit startedClustering();
-
 		cv::Mat dctImagesList;
 		for (int i = 0; i < m_dctMap[0].size(); i++) {
 			cv::Mat dctImages;
 			for (const auto dctImage : m_dctMap) {
 				if (dctImages.empty()) {
-					dctImages = dctImage[i];
+					dctImages = dctImage[i].clone();
 				}
 				else {
 					cv::vconcat(dctImages, dctImage[i], dctImages);
