@@ -23,7 +23,6 @@
 
 VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWidget *parent)
 	: m_timeLineWindows(timeLineWindows), QWidget(parent, Qt::Window) {
-	this->resize(1200,800);
 	this->setMinimumSize(800,600);
 	settings = new QSettings();
 	setWindowTitle("Video Segmentation Tool");
@@ -63,6 +62,7 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
 
   timeLine = new TimeLine(m_timeLineWindows);
   timeLine->setMinimumSize(500,25);
+	timeLine->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   connect(timeLine, &TimeLine::offsetAndZoomChanged, this, &VideoCutterWindow::offsetAndZoomChangedSlot);
   startTimeLabel = new QLabel("00:00");
   startTimeLabel->setMinimumSize(30,30);
@@ -210,7 +210,12 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
 	layout->addWidget(bottomButtonWidget,1,0);
 
 	mainSplitter->setStretchFactor(0,2);
+	this->resize(1199,800);
+	QTimer::singleShot(100, this, &VideoCutterWindow::updateSize);
+}
 
+void VideoCutterWindow::updateSize() {
+	this->resize(1200,800);
 }
 
 void VideoCutterWindow::openVideo(const QString &path) {

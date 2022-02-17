@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
 
-
 project(AnnotationTool VERSION 0.2.0  LANGUAGES CXX)
 
 if(APPLE)
@@ -48,11 +47,10 @@ message (STATUS "${yaml-cpp_DIR}")
 find_package(yaml-cpp REQUIRED)
 
 if(APPLE)
-	set(Eigen3_DIR "libs/eigen-3.3.8/MacOS/build")
-	message("${EIGEN3_DIR}")
-	find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+	#set(Eigen3_DIR "libs/eigen-3.3.8/MacOS/share/eigen3")
+	#message("${EIGEN3_DIR}")
+	#find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 endif()
-
 
 # detect operating system and host processor
 message(STATUS "We are on a ${CMAKE_SYSTEM_NAME} system")
@@ -94,7 +92,15 @@ elseif (UNIX)
       globals.hpp
       gui/Qt-DarkStyle/darkstyle.qrc
   )
+<<<<<<< HEAD
   install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_0.3-1_amd64_2004/usr/local/bin)
+=======
+  if(${UBUNTU_VERSION} STREQUAL "2004")
+    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_0.3-1_amd64_2004/usr/local/bin)
+  else()
+    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_0.3-1_amd64_1804/usr/local/bin)
+  endif()
+>>>>>>> 0e7899da59de426c16dd3898a845b461d71e7dcf
 endif()
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused)

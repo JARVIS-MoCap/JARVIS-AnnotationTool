@@ -341,9 +341,6 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	QString extrinsicsPath = extrinsicsPathWidget->path();
 	QList<QString> cameraNames = cameraList->getItems();
 	QList<QList<QString>> cameraPairs = extrinsicsPairList->getItems();
-	for (const auto &pair : cameraPairs) {
-		std::cout << "Size: " << pair.size() << std::endl;
-	}
 	if (calibrationSetPathWidget->path() == "") {
 		m_errorMsg->showMessage("Please enter a savepath!");
 		return;
@@ -607,6 +604,7 @@ void NewCalibrationWidget::savePresetSlot(const QString& preset) {
 	settings->setValue("seperateIntrinsics", seperateRadioWidget->state());
 	settings->setValue("intrinsicsFolder", intrinsicsPathWidget->path());
 	settings->setValue("extrinsicsFolder", extrinsicsPathWidget->path());
+	settings->setValue("singlePrimary", m_calibrationConfig->single_primary);
 	settings->setValue("intrinsicsFrames", intrinsicsFramesEdit->value());
 	settings->setValue("extrinsicsFrames", extrinsicsFramesEdit->value());
 	settings->setValue("saveDebugImages", saveDebugRadioWidget->state());
@@ -638,6 +636,8 @@ void NewCalibrationWidget::loadPresetSlot(const QString& preset) {
 	seperateRadioWidget->setState(settings->value("seperateIntrinsics").toBool());
 	intrinsicsPathWidget->setPath(settings->value("intrinsicsFolder").toString());
 	extrinsicsPathWidget->setPath(settings->value("extrinsicsFolder").toString());
+	m_calibrationConfig->single_primary = settings->value("singlePrimary").toBool();
+
 	intrinsicsFramesEdit->setValue(settings->value("intrinsicsFrames").toInt());
 	extrinsicsFramesEdit->setValue(settings->value("extrinsicsFrames").toInt());
 	saveDebugRadioWidget->setState(settings->value("saveDebugImages").toBool());

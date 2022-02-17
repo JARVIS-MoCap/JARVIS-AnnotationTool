@@ -151,12 +151,7 @@ void RecordingsTable::editRecordingClickedSlot() {
 }
 
 bool RecordingsTable::editVideo(QString path) {
-	if (videoCutterWindow != nullptr) {
-		delete videoCutterWindow;
-		videoCutterWindow = nullptr;
-	}
-
-	videoCutterWindow = new VideoCutterWindow(m_recordingItems[m_editingIndex].timeLineList);
+	videoCutterWindow = new VideoCutterWindow(m_recordingItems[m_editingIndex].timeLineList, this);
 	QList<QString> videoPaths = getVideoPaths(path);
 	if (videoCutterWindow->openVideos(videoPaths)) {
 		connect(videoCutterWindow, &VideoCutterWindow::editingFinished, this, &RecordingsTable::editingFinishedSlot);
@@ -181,7 +176,6 @@ void RecordingsTable::editingFinishedSlot(QList<TimeLineWindow> timeLineWindows,
 	recordingsTable->setItem(m_editingIndex,2,iconItem);
 	m_editingActive = false;
 	recordingsTable->cellWidget(m_editingIndex,4)->setEnabled(true);
-
 }
 
 QImage RecordingsTable::createTimeLineImage(QList<TimeLineWindow> timeLineWindows, int frameCount) {

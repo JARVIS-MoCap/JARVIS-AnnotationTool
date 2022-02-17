@@ -23,6 +23,8 @@ CalibrationTool::CalibrationTool(CalibrationConfig *calibrationConfig) :
 
 
 void CalibrationTool::makeCalibrationSet()  {
+	m_intrinsicParameters.clear();
+	m_extrinsicParameters.clear();
 	QDir dir;
 	dir.mkpath(m_calibrationConfig->calibrationSetPath + "/" +
 			m_calibrationConfig->calibrationSetName);
@@ -53,8 +55,8 @@ void CalibrationTool::makeCalibrationSet()  {
   while (!threadPool->waitForDone(10)) {
     QCoreApplication::instance()->processEvents();
   }
-	while (m_intrinsicParameters.size() != m_calibrationConfig->cameraNames.size()) {
-    std::cout << m_intrinsicParameters.size() << " / " << m_calibrationConfig->cameraNames.size() << std::endl;
+	while (m_intrinsicParameters.size() != m_calibrationConfig->cameraNames.size() && !m_calibrationCanceled) {
+    std::cout << "INtrinsics: " << m_intrinsicParameters.size() << " / " << m_calibrationConfig->cameraNames.size() << std::endl;
 		QCoreApplication::instance()->processEvents();
 	}
   std::cout << "FINISHED INTRINSICS" << std::endl;
@@ -79,7 +81,8 @@ void CalibrationTool::makeCalibrationSet()  {
   while (!threadPool->waitForDone(10)) {
     QCoreApplication::instance()->processEvents();
   }
-	while (m_extrinsicParameters.size() != m_calibrationConfig->cameraPairs.size()) {
+	while (m_extrinsicParameters.size() != m_calibrationConfig->cameraPairs.size() && !m_calibrationCanceled) {
+		std::cout << "Extrinsics: " << m_extrinsicParameters.size() << " / " << m_calibrationConfig->cameraPairs.size() << std::endl;
 		QCoreApplication::instance()->processEvents();
 	}
   if (!m_calibrationCanceled) {
