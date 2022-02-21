@@ -18,6 +18,8 @@
 #include "datasetlist.hpp"
 #include "checkableitemlist.hpp"
 #include "trainingsetexporter.hpp"
+#include "trainingsetprogressinfowindow.hpp"
+
 
 
 #include <QPushButton>
@@ -40,6 +42,10 @@ class ExportTrainingsetWidget : public QWidget {
 	signals:
 		void updateCounts();
 		void exportTrainingset(ExportConfig exportConfig);
+		void copiedFrameSet(int counter, int total, const QString &setName);
+		void exportFinished();
+		void exportCanceled();
+
 
 	public slots:
 
@@ -51,13 +57,13 @@ class ExportTrainingsetWidget : public QWidget {
 		PresetsWindow *savePresetsWindow;
 		QList<QString> presets;
 		TrainingSetExporter *trainingSetExporter;
+		TrainingSetInfoWindow *trainingSetInfoWindow;
+
 
 		QLineEdit *trainingsetNameEdit;
 		DirPathWidget *trainingsetSavePathWidget;
 		QRadioButton *type2DButton;
 		QRadioButton *type3DButton;
-		DirPathWidget *intrinsicsPathWidget;
-		DirPathWidget *extrinsicsPathWidget;
 		QDoubleSpinBox *validationFractionEdit;
 		YesNoRadioWidget *shuffleBeforeSplitWidget;
 		YesNoRadioWidget *randomShuffleSeedWidget;
@@ -86,7 +92,6 @@ class ExportTrainingsetWidget : public QWidget {
 	private slots:
 		void hoverStartedSlot(int index);
 		void hoverEndedSlot();
-		void trainingsetTypeChangedSlot(bool toggle);
 		void shuffleBeforeSplitStateChangedSlot(bool state);
 		void randomShuffleSeedStateChangedSlot(bool state);
 		void datasetListChangedSlot();

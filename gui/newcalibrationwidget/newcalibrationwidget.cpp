@@ -80,7 +80,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	extrinsicsPathWidget = new DirPathWidget("Select Extrinsics Path");
 	extrinsicsPathWidget->setPlaceholderText("Select a Path...");
 	updateNamesListButton = new QPushButton("Update Camera Names",this);
-	updateNamesListButton->setMinimumSize(30,30);
+	updateNamesListButton->setMinimumSize(30,40);
 	updateNamesListButton->setIcon(QIcon::fromTheme("update"));
 	connect(updateNamesListButton, &QPushButton::clicked, this, &NewCalibrationWidget::updateNamesListSlot);
 
@@ -193,7 +193,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	//camerasBox->setMinimumSize(1000,400);
 	QGridLayout *cameraslayout = new QGridLayout(camerasBox);
 	cameraslayout->setMargin(0);
-	cameraList = new ConfigurableItemList("Cameras");
+	cameraList = new CameraNamesList("Cameras");
 	cameraslayout->addWidget(cameraList,0,0);
 
 	QGroupBox *cameraPairsBox = new QGroupBox("Camera Pairs", this);
@@ -236,7 +236,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	connect(calibrationTool, &CalibrationTool::calibrationError, this, &NewCalibrationWidget::calibrationErrorSlot);
 
 	//Signal Relay:
-	connect(cameraList, &ConfigurableItemList::itemsChanged, extrinsicsPairList, &ExtrinsicsPairList::cameraNamesChangedSlot);
+	connect(cameraList, &CameraNamesList::itemsChanged, extrinsicsPairList, &ExtrinsicsPairList::cameraNamesChangedSlot);
 }
 
 
@@ -296,6 +296,7 @@ void NewCalibrationWidget::updateNamesListSlot() {
 				cameraList->addItem(name);
 			}
 		}
+		cameraList->addCameras(detectedCams);
 		extrinsicsPairList->cameraNamesChangedSlot(cameraList->getItems());
 	}
 	QList<QList<QString>> detectedPairs;
@@ -624,6 +625,7 @@ void NewCalibrationWidget::loadPresetSlot(const QString& preset) {
 	for (const auto& item : cameraNames) {
 		cameraList->addItem(item);
 	}
+	cameraList->addCameras(cameraNames);
 	settings->endGroup();
 	settings->beginGroup("cameraPairs");
 	extrinsicsPairList->setItems(settings->value("itemsList").value<QList<QList<QString>>>());

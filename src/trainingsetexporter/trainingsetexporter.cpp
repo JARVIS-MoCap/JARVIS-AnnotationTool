@@ -20,6 +20,7 @@
 #include <QTextStream>
 #include <QDirIterator>
 #include <QThreadPool>
+#include <QErrorMessage>
 
 
 TrainingSetExporter::TrainingSetExporter(
@@ -35,7 +36,13 @@ void TrainingSetExporter::exportTrainingsetSlot(ExportConfig exportConfig) {
 				"/annotations");
 
 	if (exportConfig.trainingSetType == "3D") {
-		copyCalibrationParams(exportConfig);
+		if (checkCalibrationParamPaths(exportConfig)) {
+			copyCalibrationParams(exportConfig);
+		}
+		else {
+			QErrorMessage* errorMsg = new QErrorMessage();
+			errorMsg->showMessage("Check if all datasets contain correct CalibrationParameters!");
+		}
 	}
 
 	json trainingSet;
@@ -94,7 +101,11 @@ void TrainingSetExporter::exportTrainingsetSlot(ExportConfig exportConfig) {
 				exportConfig.trainingSetName +
 				"/annotations/instances_val.json").toStdString());
 	valStream << validationSet << std::endl;
-
+	if (m_exportCanceled) {
+		m_exportCanceled = false;
+		return;
+	}
+	emit exportFinished();
 }
 
 
@@ -133,31 +144,6 @@ void TrainingSetExporter::addCalibration(json &j, ExportConfig &exportConfig) {
 				| QDir::NoDotAndDotDot)) {
 		cameras.append(fileName.remove(".yaml"));
 	}
-
-	QList<QString> extrinsicsPairs = QDir(exportConfig.extrinsicsPath).entryList(
-				QDir::Files | QDir::NoDotAndDotDot);
-
-	QString primaryCamera;
-	for (const auto &path : extrinsicsPairs) {
-		QString pairPrimary;
-		int minIndex = 9999;
-		for (const auto &cam : cameras) {
-			int index = path.indexOf(cam);
-			if (path.indexOf(cam) != -1) {
-				if (index < minIndex) {
-					pairPrimary = cam;
-					minIndex = index;
-				}
-			}
-		}
-		if (primaryCamera == "") {
-			primaryCamera = pairPrimary;
-		}
-		else if (primaryCamera != pairPrimary) {
-			std::cout << "INVALID CALIBRATION SET" << std::endl;
-			return;
-		}
-	}
 	QList<QString> datasetNames;
 	for (const auto& exportItem : m_datasetExportItems) {
 		datasetNames.append(exportItem.name);
@@ -184,7 +170,25 @@ void TrainingSetExporter::copyCalibrationParams(ExportConfig &exportConfig) {
 						"/calib_params/" + exportItem.name + "/" + fileName);
 		}
 	}
-	std::cout << "Done copying" << std::endl;
+}
+
+
+bool TrainingSetExporter::checkCalibrationParamPaths(ExportConfig &exportConfig) {
+	int num_calibs = -1;
+	for (const auto& exportItem : m_datasetExportItems) {
+		QList<QString> calibFiles = QDir(exportItem.basePath + "/CalibrationParameters").entryList(
+					QDir::Files | QDir::NoDotAndDotDot);
+		if (num_calibs == -1) {
+			num_calibs = calibFiles.size();
+		}
+		else {
+			if (num_calibs != calibFiles.size()) {
+				return false;
+			}
+		}
+	}
+	if (num_calibs == 0) return false;
+	return true;
 }
 
 
@@ -360,7 +364,12 @@ void TrainingSetExporter::addFrameSetsToJSON(ExportConfig &exportConfig,
 
 void TrainingSetExporter::copyFrames(ExportConfig &exportConfig,
 			const QList<ExportFrameSet> &frameSets, const QString &setName) {
+	if (m_exportCanceled) {
+		return;
+	}
 	QDir dir;
+	std::cout << "FramesSets: " << frameSets.size() << std::endl;
+	int frameSetCounter = 1;
 	for (const auto &frameSet : frameSets) {
 		for (const auto &camera : frameSet.cameras) {
 			dir.mkpath(exportConfig.savePath + "/" + exportConfig.trainingSetName +
@@ -373,5 +382,13 @@ void TrainingSetExporter::copyFrames(ExportConfig &exportConfig,
 						frameSet.keypoints[camera].first;
 			QFile::copy(originalPath, newPath);
 		}
+		if (m_exportCanceled) {
+			return;
+		}
+		emit copiedFrameSet(frameSetCounter++, frameSets.size(), setName);
 	}
+}
+
+void TrainingSetExporter::exportCanceledSlot() {
+	m_exportCanceled = true;
 }
