@@ -13,6 +13,8 @@ add_library(newcalibrationwidget
   calibrationchartview.cpp
   namesuggestiondialog.hpp
   namesuggestiondialog.cpp
+	cameranameslist.hpp
+	cameranameslist.cpp
 )
 
 target_include_directories(newcalibrationwidget

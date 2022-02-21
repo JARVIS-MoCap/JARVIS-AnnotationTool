@@ -20,6 +20,7 @@
 #include <QSettings>
 #include <QToolBar>
 #include <QDialog>
+#include <QKeyEvent>
 
 
 class PresetsWindow : public QDialog {
@@ -66,6 +67,7 @@ class PresetsWindow : public QDialog {
 		void presetClickedSlot(QListWidgetItem *item);
 		void presetNameEditedSlot(const QString& name);
 		void currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous);
+		void keyPressEvent(QKeyEvent *evt);
 };
 
 #endif

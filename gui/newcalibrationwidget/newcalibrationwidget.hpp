@@ -15,6 +15,7 @@
 #include "labelwithtooltip.hpp"
 #include "pathwidget.hpp"
 #include "configurableitemlist.hpp"
+#include "cameranameslist.hpp"
 #include "extrinsicspairlist.hpp"
 #include "calibrationtool.hpp"
 #include "calibrationprogressinfowindow.hpp"
@@ -74,7 +75,7 @@ class NewCalibrationWidget : public QWidget {
 		QLabel *checkerBoardPreview;
 		QLabel *checkerBoardPreviewLabel;
 
-		ConfigurableItemList *cameraList;
+		CameraNamesList *cameraList;
 
 		ExtrinsicsPairList *extrinsicsPairList;
 

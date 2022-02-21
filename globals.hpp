@@ -133,8 +133,6 @@ struct ExportConfig {
 	QString trainingSetName;
 	QString savePath;
 	QString trainingSetType;
-	QString intrinsicsPath;
-	QString extrinsicsPath;
 	double validationFraction;
 	bool shuffleBeforeSplit;
 	bool useRandomShuffleSeed;

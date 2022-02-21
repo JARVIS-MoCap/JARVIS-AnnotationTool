@@ -9,6 +9,8 @@ add_library(exporttrainingset
   datasetlist.cpp
   segmentselectorwindow.hpp
   segmentselectorwindow.cpp
+	trainingsetprogressinfowindow.hpp
+	trainingsetprogressinfowindow.cpp
 )
 
 target_include_directories(exporttrainingset

@@ -58,8 +58,6 @@ QDataStream& operator>>(QDataStream& in, ExportConfig& v) {
     in >> v.trainingSetName;
     in >> v.savePath;
 		in >> v.trainingSetType;
-    in >> v.intrinsicsPath;
-    in >> v.extrinsicsPath;
     in >> v.validationFraction;
     in >> v.shuffleBeforeSplit;
     in >> v.useRandomShuffleSeed;

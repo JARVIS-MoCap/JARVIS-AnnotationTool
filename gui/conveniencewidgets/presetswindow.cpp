@@ -211,3 +211,12 @@ void PresetsWindow::addItem(const QString &text) {
 	seperatorItem->setBackground(QColor(46, 50, 60));
 	presetsList->addItem(seperatorItem);
 }
+
+
+void PresetsWindow::keyPressEvent(QKeyEvent *evt) {
+    if(evt->key() == Qt::Key_Enter || evt->key() == Qt::Key_Return) {	
+			loadClickedSlot();
+      return;
+		}
+    QDialog::keyPressEvent(evt);
+}
