@@ -1,5 +1,5 @@
-This is the official Github Repository for the JARVIS Annotation Tool. To find out more about our 3D markerless motion capture toolbox have a look at 
-[our website](https://jarvis-mocap.github.io/jarvis-docs/).
+This is the official Github Repository for the **JARVIS Annotation Tool**. To find out more about our 3D markerless motion capture toolbox have a look at 
+**[our website](https://jarvis-mocap.github.io/jarvis-docs/)**.
 
 Installing our prebuild packages is easy! Just go to [our downloads page](https://jarvis-mocap.github.io/jarvis-docs/) and grab the installer for your operating system. We currently support Windows, MacOS and Debian based Linux distributions. Installers for the current and previous versions can also be found under [Releases](https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool/releases).
 
