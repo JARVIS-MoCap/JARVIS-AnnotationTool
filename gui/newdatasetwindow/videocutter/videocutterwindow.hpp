@@ -94,6 +94,7 @@ class VideoCutterWindow : public QWidget {
 		bool loadSegmentation();
 
 		private slots:
+			void updateSize();
 			void playerPositionChangedSlot(qint64 duration);
 
 			void maxValueChangedSlot(int value);

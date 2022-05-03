@@ -193,6 +193,7 @@ void DatasetControlWidget::imgSetChangedSlot() {
 
 void DatasetControlWidget::segmentChangedSlot(const QString& segment) {
 	Dataset::dataset->save();
+	std::cout << "Changing Segment" << std::endl;
 	QList<QString> segmentNames = Dataset::dataset->segmentNames();
 	QList<QString> cameraNames = Dataset::dataset->cameraNames();
 	QList<SkeletonComponent> skeleton = Dataset::dataset->skeleton();
@@ -206,5 +207,6 @@ void DatasetControlWidget::segmentChangedSlot(const QString& segment) {
 	m_currentImgSetIndex = 0;
 	frameSetEdit->setText(QString::number(m_currentImgSetIndex+1));
 	totalFrameSetLabel->setText(QString::number(Dataset::dataset->imgSets().length()));
+	std::cout << "Changed Segment" << std::endl;
 	emit datasetLoaded();
 }

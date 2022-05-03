@@ -26,12 +26,19 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	m_errorMsg = new QErrorMessage();
 
 	trainingSetExporter = new TrainingSetExporter(m_datasetExportItems);
+	connect(trainingSetExporter, &TrainingSetExporter::copiedFrameSet, this, &ExportTrainingsetWidget::copiedFrameSet);
+	connect(trainingSetExporter, &TrainingSetExporter::exportFinished, this, &ExportTrainingsetWidget::exportFinished);
+
 	QThread *thread = new QThread;
 	trainingSetExporter->moveToThread(thread);
 	thread->start();
 
-	loadPresetsWindow = new PresetsWindow(&presets, "load", "Export Dataset Widget/", this);
-	savePresetsWindow = new PresetsWindow(&presets, "save", "Export Dataset Widget/", this);
+	trainingSetInfoWindow = new TrainingSetInfoWindow(this);
+	connect(this, &ExportTrainingsetWidget::copiedFrameSet, trainingSetInfoWindow, &TrainingSetInfoWindow::copyImagesProgressSlot);
+	connect(this, &ExportTrainingsetWidget::exportFinished, trainingSetInfoWindow, &TrainingSetInfoWindow::exportFinishedSlot);
+
+	loadPresetsWindow = new PresetsWindow(&presets, "load", "Export Dataset Widget/");
+	savePresetsWindow = new PresetsWindow(&presets, "save", "Export Dataset Widget/");
 	connect(loadPresetsWindow, SIGNAL(loadPreset(QString)), this, SLOT(loadPresetSlot(QString)));
 	connect(savePresetsWindow, SIGNAL(savePreset(QString)), this, SLOT(savePresetSlot(QString)));
 
@@ -70,16 +77,9 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	trainingsettypelayout->setMargin(0);
 	type3DButton = new QRadioButton("3D",this);
 	type3DButton->setChecked(true);
-	connect(type3DButton, &QRadioButton::toggled, this, &ExportTrainingsetWidget::trainingsetTypeChangedSlot);
 	type2DButton = new QRadioButton("2D",this);
 	trainingsettypelayout->addWidget(type3DButton,0,1);
 	trainingsettypelayout->addWidget(type2DButton,0,0);
-	LabelWithToolTip *intrinsicsPathLabel = new LabelWithToolTip("  Intrinsics Folder Path");
-	intrinsicsPathWidget = new DirPathWidget("Select Intrinsics Path");
-	intrinsicsPathWidget->setPlaceholderText("Select a Path...");
-	LabelWithToolTip *extrinsicsPathLabel = new LabelWithToolTip("  Extrinsics Folder Path");
-	extrinsicsPathWidget = new DirPathWidget("Select Extrinsics Path");
-	extrinsicsPathWidget->setPlaceholderText("Select a Path...");
 	QWidget *setupSpacer2 = new QWidget(configWidget);
 
 	setupSpacer2->setMinimumSize(10,10);
@@ -110,10 +110,6 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	configurationlayout->addWidget(setupSpacer1,i++,1,1,2);
 	configurationlayout->addWidget(trainingsetTypeLabel,i,0);
 	configurationlayout->addWidget(trainingsetTypeWidget,i++,1);
-	configurationlayout->addWidget(intrinsicsPathLabel,i,0);
-	configurationlayout->addWidget(intrinsicsPathWidget,i++,1);
-	configurationlayout->addWidget(extrinsicsPathLabel,i,0);
-	configurationlayout->addWidget(extrinsicsPathWidget,i++,1);
 	configurationlayout->addWidget(setupSpacer2,i++,1,1,2);
 	configurationlayout->addWidget(validationFractionLabel,i,0);
 	configurationlayout->addWidget(validationFractionEdit,i++,1);
@@ -188,7 +184,7 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	QGroupBox *datasetListBox = new QGroupBox("Datasets", this);
 	QGridLayout *datasetlistlayout = new QGridLayout(datasetListBox);
 	datasetlistlayout->setMargin(0);
-	datasetList = new DatasetList(m_datasetExportItems, m_entities, m_keypoints, datasetListBox);
+	datasetList = new DatasetList(m_datasetExportItems, m_entities, m_keypoints, m_skeleton, datasetListBox);
 	connect(datasetList, &DatasetList::itemsChanged, this, &ExportTrainingsetWidget::datasetListChangedSlot);
 	datasetlistlayout->addWidget(datasetList,0,0);
 
@@ -211,7 +207,6 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	listlayout->addWidget(datasetListBox,0,0);
 	listlayout->addWidget(entitiesListBox,1,0);
 	listlayout->addWidget(keypointListBox,2,0);
-
 
 
 	QWidget *buttonBarWidget = new QWidget(this);
@@ -276,12 +271,6 @@ void ExportTrainingsetWidget::hoverEndedSlot() {
 }
 
 
-void ExportTrainingsetWidget::trainingsetTypeChangedSlot(bool toggle) {
-	intrinsicsPathWidget->setEnabled(toggle);
-	extrinsicsPathWidget->setEnabled(toggle);
-}
-
-
 void ExportTrainingsetWidget::shuffleBeforeSplitStateChangedSlot(bool state) {
 	if (state == true) {
 		randomShuffleSeedWidget->setEnabled(true);
@@ -324,10 +313,12 @@ void ExportTrainingsetWidget::entitiesListChangedSlot(int row, bool state) {
 	emit updateCounts();
 }
 
+
 void ExportTrainingsetWidget::keypointsListChangedSlot(int row, bool state) {
 	m_keypoints[row].second = state;
 	emit updateCounts();
 }
+
 
 void ExportTrainingsetWidget::savePresetsClickedSlot() {
 	savePresetsWindow->updateListSlot();
@@ -347,8 +338,6 @@ void ExportTrainingsetWidget::savePresetSlot(const QString& preset) {
 	settings->setValue("trainingSetName", trainingsetNameEdit->text());
 	settings->setValue("trainingSetPath", trainingsetSavePathWidget->path());
 	settings->setValue("trainingSetType", type3DButton->isChecked());
-	settings->setValue("intrinsicsPath", intrinsicsPathWidget->path());
-	settings->setValue("extrinsicsPath", extrinsicsPathWidget->path());
 	settings->setValue("validationFraction", validationFractionEdit->value());
 	settings->setValue("shuffleBeforeSplit", shuffleBeforeSplitWidget->state());
 	settings->setValue("randomShuffleSeed", randomShuffleSeedWidget->state());
@@ -389,8 +378,6 @@ void ExportTrainingsetWidget::loadPresetSlot(const QString& preset) {
 	else {
 		type2DButton->setChecked(true);
 	}
-	intrinsicsPathWidget->setPath(settings->value("intrinsicsPath").toString());
-	extrinsicsPathWidget->setPath(settings->value("extrinsicsPath").toString());
 	validationFractionEdit->setValue(settings->value("validationFraction").toDouble());
 	shuffleBeforeSplitWidget->setState(settings->value("shuffleBeforeSplit").toBool());
 	randomShuffleSeedWidget->setState(settings->value("randomShuffleSeed").toBool());
@@ -441,6 +428,7 @@ void ExportTrainingsetWidget::exportClickedSlot() {
 	}
 	exportConfig.entitiesList = m_entities;
 	exportConfig.keypointsList = m_keypoints;
+	exportConfig.skeleton = m_skeleton;
 	if (trainingsetNameEdit->text() == "") {
 		return;
 	}
@@ -451,14 +439,6 @@ void ExportTrainingsetWidget::exportClickedSlot() {
 	exportConfig.savePath = trainingsetSavePathWidget->path();
 	if (type3DButton->isChecked()) {
 		exportConfig.trainingSetType = "3D";
-		if (intrinsicsPathWidget->path() == "") {
-			return;
-		}
-		exportConfig.intrinsicsPath = intrinsicsPathWidget->path();
-		if (extrinsicsPathWidget->path() == "") {
-			return;
-		}
-		exportConfig.extrinsicsPath = extrinsicsPathWidget->path();
 	}
 	else {
 		exportConfig.trainingSetType = "2D";
@@ -472,5 +452,13 @@ void ExportTrainingsetWidget::exportClickedSlot() {
 		}
 	}
 	emit exportTrainingset(exportConfig);
-
+	int returnVal = trainingSetInfoWindow->exec();
+	if (returnVal == QDialog::Rejected) {
+		emit exportCanceled();
+	}
+	else {
+		QMessageBox msgBox;
+		msgBox.setText("TrainingSet exported succesfully!");
+		msgBox.exec();
+	}
 }

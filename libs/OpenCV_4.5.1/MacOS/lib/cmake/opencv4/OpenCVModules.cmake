@@ -16,7 +16,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_targetsDefined)
 set(_targetsNotDefined)
 set(_expectedTargets)
-foreach(_expectedTarget libjpeg-turbo libwebp libpng ippiw ittnotify ade ocv.3rdparty.avfoundation opencv_core opencv_flann opencv_imgproc opencv_features2d opencv_imgcodecs opencv_videoio opencv_calib3d opencv_aruco)
+foreach(_expectedTarget libwebp libpng ippiw ittnotify ade ocv.3rdparty.avfoundation opencv_core opencv_flann opencv_imgproc opencv_features2d opencv_imgcodecs opencv_videoio opencv_calib3d opencv_aruco)
   list(APPEND _expectedTargets ${_expectedTarget})
   if(NOT TARGET ${_expectedTarget})
     list(APPEND _targetsNotDefined ${_expectedTarget})
@@ -49,9 +49,6 @@ get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
 if(_IMPORT_PREFIX STREQUAL "/")
   set(_IMPORT_PREFIX "")
 endif()
-
-# Create imported target libjpeg-turbo
-add_library(libjpeg-turbo STATIC IMPORTED)
 
 # Create imported target libwebp
 add_library(libwebp STATIC IMPORTED)
@@ -118,7 +115,7 @@ set_target_properties(opencv_features2d PROPERTIES
 add_library(opencv_imgcodecs STATIC IMPORTED)
 
 set_target_properties(opencv_imgcodecs PROPERTIES
-  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:opencv_core>;\$<LINK_ONLY:opencv_imgproc>;opencv_core;opencv_imgproc;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/lib/libz.tbd;\$<LINK_ONLY:libjpeg-turbo>;\$<LINK_ONLY:libwebp>;\$<LINK_ONLY:libpng>;-framework AppKit"
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:opencv_core>;\$<LINK_ONLY:opencv_imgproc>;opencv_core;opencv_imgproc;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/lib/libz.tbd;/Users/thueser/Desktop/libjpeg-turbo/install/lib/libjpeg.a;\$<LINK_ONLY:libwebp>;\$<LINK_ONLY:libpng>;-framework AppKit"
 )
 
 # Create imported target opencv_videoio

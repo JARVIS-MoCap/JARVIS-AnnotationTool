@@ -62,6 +62,7 @@ Dataset::Dataset(const QString& datasetFolder, const QString& datasetBaseFolder,
 		saveFiles[i]->readLine();
 		saveFiles[i]->readLine();
 	}
+	std::cout << "HEREEE " << std::endl;
 	while (!saveFiles[0]->atEnd()) {
 		ImgSet *imgSet = new ImgSet();
 		imgSet->numCameras = m_numCameras;

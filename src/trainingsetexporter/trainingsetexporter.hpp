@@ -23,13 +23,17 @@ class TrainingSetExporter : public QObject {
 		explicit TrainingSetExporter(QList<DatasetExportItem> &datasetExportItems);
 
 	signals:
+		void copiedFrameSet(int counter, int total, const QString &setName);
+		void exportFinished();
 
 	public slots:
 		void exportTrainingsetSlot(ExportConfig exportConfig);
+		void exportCanceledSlot();
 
 	private:
 		QList<DatasetExportItem> &m_datasetExportItems;
 		QString m_primaryCamera;
+		bool m_exportCanceled = false;
 
 		void addInfo(json &j);
 		void addCategories(json &j, ExportConfig &exportConfig);
@@ -42,6 +46,8 @@ class TrainingSetExporter : public QObject {
 					const QList<QPair<QString, bool>> &pairs);
 		void copyFrames(ExportConfig &exportConfig,
 					const QList<ExportFrameSet> &frameSets, const QString &setName);
+		bool checkCalibrationParamPaths(ExportConfig &exportConfig);
+
 	private slots:
 
 

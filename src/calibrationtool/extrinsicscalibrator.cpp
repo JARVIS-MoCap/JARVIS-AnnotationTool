@@ -112,6 +112,13 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair,
             m_calibrationConfig->patternSideLength,
             (float)i * m_calibrationConfig->patternSideLength, 0));
 
+  // cv::Mat checkerBoardPoints;
+  // cv::FileStorage fs("/home/lambda2/Documents/Miller_Lab/CalibrationTest4/Test/cam_0.yaml", cv::FileStorage::READ);
+  // std::cout << "LOADING" << std::endl;
+  // fs["newObjectPoints"] >> checkerBoardPoints;
+  // std::cout << "READING" << std::endl;
+
+
   std::string cap1Path;
   std::string cap2Path;
   if (m_calibrationConfig->single_primary == false) {
@@ -167,9 +174,17 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair,
 			cap2.set(cv::CAP_PROP_POS_FRAMES, skipIndex/4);
 			skipIndex = skipIndex/2;
 		}
-		else {
-			break;
+		else if (iteration < 5) {
+      imagePointsAll1.clear();
+      imagePointsAll2.clear();
+      objectPointsAll.clear();
+      cap1.set(cv::CAP_PROP_POS_FRAMES, 0);
+      cap2.set(cv::CAP_PROP_POS_FRAMES, 0);
+      skipIndex = 5;
 		}
+    else {
+      break;
+    }
 		iteration++;
 
 	  bool read_success = true;
@@ -234,7 +249,7 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair,
 	  if (m_interrupt) return false;
 	}
 
-  if(objectPointsAll.size() < 15) {
+  if(objectPointsAll.size() < m_calibrationConfig->framesForExtrinsics) {
     emit calibrationError("Found only " +
           QString::number(objectPointsAll.size()) + " valid checkerboards, "
           "aborting calibration. Make sure your checkerboard parameters are "
@@ -372,8 +387,8 @@ bool ExtrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1,
     cv::aruco::detectMarkers(img1, board->dictionary, markerCorners, markerIds,
           params);
     if (markerIds.size() == 0) return false;
-    cv::aruco::drawDetectedMarkers(imageCopy, markerCorners, markerIds);
-    cv::imwrite(m_parametersSavePath  + "test.jpg", imageCopy);
+    // cv::aruco::drawDetectedMarkers(imageCopy, markerCorners, markerIds);
+    // cv::imwrite(m_parametersSavePath  + "test.jpg", imageCopy);
 
     m_detectedPattern = -1;
     for (int i = 0; i < markerCorners.size(); i++) {

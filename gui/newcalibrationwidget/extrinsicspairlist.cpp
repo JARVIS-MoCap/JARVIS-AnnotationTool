@@ -131,6 +131,17 @@ void ExtrinsicsPairList::removeItemSlot() {
 
 void ExtrinsicsPairList::cameraNamesChangedSlot(QList<QString> cameraNames) {
 	m_cameraNames = cameraNames;
+	QList<QList<QString>> validPairs = m_cameraPairs;
+	for (const auto &pair : m_cameraPairs) {
+		for (const auto &cam : pair) {
+			if (!cameraNames.contains(cam)) {
+				validPairs.removeAll(pair);
+				break;
+			}
+		}
+	}
+	m_cameraPairs = validPairs;
+	setItems(m_cameraPairs);
 }
 
 

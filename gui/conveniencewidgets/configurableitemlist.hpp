@@ -32,9 +32,12 @@ class ConfigurableItemList : public QWidget {
 	signals:
 		void itemsChanged(QList<QString> items);
 
+	protected slots:
+		void addItemSlot();
+
 	private:
-		QListWidget *itemSelectorList;
 		QString m_name;
+		QListWidget *itemSelectorList;
 		QPushButton *moveItemUpButton;
 		QPushButton *moveItemDownButton;
 		QPushButton *addItemButton;
@@ -44,7 +47,6 @@ class ConfigurableItemList : public QWidget {
 		void itemSelectedSlot(QListWidgetItem *item);
 		void moveItemUpSlot();
 		void moveItemDownSlot();
-		void addItemSlot();
 		void removeItemSlot();
 		void currentItemChangedSlot(QListWidgetItem *current, QListWidgetItem *previous);
 };

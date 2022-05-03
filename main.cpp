@@ -58,8 +58,6 @@ QDataStream& operator>>(QDataStream& in, ExportConfig& v) {
     in >> v.trainingSetName;
     in >> v.savePath;
 		in >> v.trainingSetType;
-    in >> v.intrinsicsPath;
-    in >> v.extrinsicsPath;
     in >> v.validationFraction;
     in >> v.shuffleBeforeSplit;
     in >> v.useRandomShuffleSeed;
@@ -114,6 +112,7 @@ int main(int argc, char **argv)
 	qRegisterMetaType<cv::Mat>("cv::Mat");
   //qRegisterMetaType<SkeletonComponent>("SkeletonComponent");
   qRegisterMetaTypeStreamOperators<QList<SkeletonComponent> >("QList<SkeletonComponent>");
+  qRegisterMetaType< cv::Mat >("cv::Mat");
 
 	QApplication app (argc, argv);
 	app.setStyle(new DarkStyle);

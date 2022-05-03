@@ -20,6 +20,7 @@
 #include <QTextStream>
 #include <QDirIterator>
 #include <QThreadPool>
+#include <QErrorMessage>
 
 
 TrainingSetExporter::TrainingSetExporter(
@@ -35,7 +36,13 @@ void TrainingSetExporter::exportTrainingsetSlot(ExportConfig exportConfig) {
 				"/annotations");
 
 	if (exportConfig.trainingSetType == "3D") {
-		copyCalibrationParams(exportConfig);
+		if (checkCalibrationParamPaths(exportConfig)) {
+			copyCalibrationParams(exportConfig);
+		}
+		else {
+			QErrorMessage* errorMsg = new QErrorMessage();
+			errorMsg->showMessage("Check if all datasets contain correct CalibrationParameters!");
+		}
 	}
 
 	json trainingSet;
@@ -94,7 +101,11 @@ void TrainingSetExporter::exportTrainingsetSlot(ExportConfig exportConfig) {
 				exportConfig.trainingSetName +
 				"/annotations/instances_val.json").toStdString());
 	valStream << validationSet << std::endl;
-
+	if (m_exportCanceled) {
+		m_exportCanceled = false;
+		return;
+	}
+	emit exportFinished();
 }
 
 
@@ -112,9 +123,13 @@ void TrainingSetExporter::addInfo(json &j) {
 
 void TrainingSetExporter::addCategories(json &j, ExportConfig &exportConfig) {
 	j["categories"] = json::array();
+	j["keypoint_names"] = json::array();
 	int num_keypoints = 0;
 	for (const auto &keypoint : exportConfig.keypointsList) {
-		if (keypoint.second) num_keypoints++;
+		if (keypoint.second) {
+			num_keypoints++;
+			j["keypoint_names"].push_back(keypoint.first.toStdString());
+		}
 	}
 	int counter = 0;
 	for (const auto &entity : exportConfig.entitiesList) {
@@ -124,75 +139,69 @@ void TrainingSetExporter::addCategories(json &j, ExportConfig &exportConfig) {
 						{"num_keypoints", num_keypoints}});
 		}
 	}
+	j["skeleton"] = json::array();
+
+	for (const auto &skeletonComp : exportConfig.skeleton) {
+		j["skeleton"].push_back({
+					{"name", skeletonComp.name.toStdString()},
+					{"keypointA", skeletonComp.keypointA.toStdString()},
+					{"keypointB", skeletonComp.keypointB.toStdString()},
+					{"length", skeletonComp.length}});
+	}
 }
 
 
 void TrainingSetExporter::addCalibration(json &j, ExportConfig &exportConfig) {
 	QList<QString> cameras;
-	for (auto & fileName : QDir(exportConfig.intrinsicsPath).entryList(QDir::Files
+	for (auto & fileName : QDir(m_datasetExportItems[0].basePath + "/CalibrationParameters").entryList(QDir::Files
 				| QDir::NoDotAndDotDot)) {
-		cameras.append(fileName.remove("Intrinsics_").remove(".yaml"));
+		cameras.append(fileName.remove(".yaml"));
 	}
-
-	QList<QString> extrinsicsPairs = QDir(exportConfig.extrinsicsPath).entryList(
-				QDir::Files | QDir::NoDotAndDotDot);
-
-	QString primaryCamera;
-	for (const auto &path : extrinsicsPairs) {
-		QString pairPrimary;
-		int minIndex = 9999;
-		for (const auto &cam : cameras) {
-			int index = path.indexOf(cam);
-			if (path.indexOf(cam) != -1) {
-				if (index < minIndex) {
-					pairPrimary = cam;
-					minIndex = index;
-				}
-			}
-		}
-		if (primaryCamera == "") {
-			primaryCamera = pairPrimary;
-		}
-		else if (primaryCamera != pairPrimary) {
-			std::cout << "INVALID CALIBRATION SET" << std::endl;
-			return;
-		}
+	QList<QString> datasetNames;
+	for (const auto& exportItem : m_datasetExportItems) {
+		datasetNames.append(exportItem.name);
 	}
-	m_primaryCamera = primaryCamera;
-	j["calibration"]["primary_camera"] = primaryCamera.toStdString();
-	j["calibration"]["intrinsics"] = json::object();
-	j["calibration"]["extrinsics"] = json::object();
-	for (const auto & cam : cameras) {
-		std::cout << "Calib: " << cam.toStdString() << std::endl;
-		j["calibration"]["intrinsics"].push_back({cam.toStdString(),
-					"calib_params/Intrinsics/Intrinsics_" + cam.toStdString() + ".yaml"});
-		if (cam != primaryCamera) {
-			j["calibration"]["extrinsics"].push_back({cam.toStdString(),
-						"calib_params/Extrinsics/Extrinsics_" +
-						primaryCamera.toStdString() + "_" + cam.toStdString() + ".yaml"});
+	for (const auto& datasetName : datasetNames) {
+		j["calibrations"][datasetName.toStdString()] = json::object();
+		for (const auto & cam : cameras) {
+			j["calibrations"][datasetName.toStdString()].push_back({cam.toStdString(),
+						"calib_params/" + datasetName.toStdString() + "/" + cam.toStdString() + ".yaml"});
 		}
 	}
 }
 
 
 void TrainingSetExporter::copyCalibrationParams(ExportConfig &exportConfig) {
-	QDir dir;
-	dir.mkpath(exportConfig.savePath + "/" + exportConfig.trainingSetName +
-				"/calib_params/Intrinsics");
-	for (auto & fileName : QDir(exportConfig.intrinsicsPath).entryList(
-				QDir::Files | QDir::NoDotAndDotDot)) {
-		QFile::copy(exportConfig.intrinsicsPath + "/" +
-					fileName, exportConfig.savePath + "/" + exportConfig.trainingSetName +
-					"/calib_params/Intrinsics/" + fileName);
+	for (const auto& exportItem : m_datasetExportItems) {
+		QDir dir;
+		dir.mkpath(exportConfig.savePath + "/" + exportConfig.trainingSetName +
+		"/calib_params/" + exportItem.name);
+		for (auto & fileName : QDir(exportItem.basePath + "/CalibrationParameters").entryList(
+					QDir::Files | QDir::NoDotAndDotDot)) {
+			QFile::copy(exportItem.basePath + "/CalibrationParameters/" + fileName,
+						exportConfig.savePath + "/" + exportConfig.trainingSetName +
+						"/calib_params/" + exportItem.name + "/" + fileName);
+		}
 	}
-	dir.mkpath(exportConfig.savePath + "/" + exportConfig.trainingSetName +
-	"/calib_params/Extrinsics");
-	for (auto & fileName : QDir(exportConfig.extrinsicsPath).entryList(
-				QDir::Files | QDir::NoDotAndDotDot)) {
-		QFile::copy(exportConfig.extrinsicsPath + "/" +
-					fileName, exportConfig.savePath + "/" + exportConfig.trainingSetName +
-					"/calib_params/Extrinsics/" + fileName);
+}
+
+
+bool TrainingSetExporter::checkCalibrationParamPaths(ExportConfig &exportConfig) {
+	int num_calibs = -1;
+	for (const auto& exportItem : m_datasetExportItems) {
+		QList<QString> calibFiles = QDir(exportItem.basePath + "/CalibrationParameters").entryList(
+					QDir::Files | QDir::NoDotAndDotDot);
+		if (num_calibs == -1) {
+			num_calibs = calibFiles.size();
+		}
+		else {
+			if (num_calibs != calibFiles.size()) {
+				return false;
+			}
+		}
 	}
+	if (num_calibs == 0) return false;
+	return true;
 }
 
 
@@ -211,7 +220,6 @@ QList<ExportFrameSet> TrainingSetExporter::loadAllFrameSets(
 							QDir(exportItem.basePath + "/" + subSet.first).entryList(
 							QDir::AllDirs | QDir::NoDotAndDotDot);
 				for (const auto & camera : cameras) {
-					std::cout << "Frame: " << camera.toStdString() << std::endl;
 					QList<QPair<QString,QList<ExportKeypoint>>> framesList;
 					QFile *file = new QFile(exportItem.basePath + "/" + subSet.first + "/"
 								+ camera + "/annotations.csv");
@@ -248,6 +256,7 @@ QList<ExportFrameSet> TrainingSetExporter::loadAllFrameSets(
 				}
 				for (int i = 0; i < keypointsMap[cameras[0]].size(); i++) {
 					ExportFrameSet frameSet;
+					frameSet.datasetName = exportItem.name;
 					frameSet.originalPath = exportItem.basePath + "/" + subSet.first;
 					frameSet.basePath = exportItem.basePath.split("/").takeLast() + "/" +
 								subSet.first;
@@ -282,6 +291,7 @@ void TrainingSetExporter::addFrameSetsToJSON(ExportConfig &exportConfig,
 	j["annotations"] = json::array();
 	j["images"] = json::array();
 	QMap<QString, QList<int>> frameSetIndexMap;
+	QMap<QString, QString> calibDatasetNameMap;
 	for (const auto &frameSet : frameSets) {
 		for (const auto &camera : frameSet.cameras) {
 			float x_min = -1;
@@ -310,7 +320,7 @@ void TrainingSetExporter::addFrameSetsToJSON(ExportConfig &exportConfig,
 				{"id", id},
 				{"file_name", (frameSet.basePath + "/" + camera + "/" +
 							frameSet.keypoints[camera].first).toStdString()},
-				{"width", 1280},
+				{"width", 1280},	//TODO: Make this not be hardcoded!
 				{"height", 1024},
 				{"date_captured", ""},
 				{"license", 1},
@@ -346,16 +356,19 @@ void TrainingSetExporter::addFrameSetsToJSON(ExportConfig &exportConfig,
 				else {
 					frameSetIndexMap[frameSet.basePath + "/" +
 								frameSet.keypoints[camera].first.split(".").takeFirst()] = {id};
+					calibDatasetNameMap[frameSet.basePath + "/" +
+								frameSet.keypoints[camera].first.split(".").takeFirst()] = frameSet.datasetName;
 				}
 			}
 			id++;
 		}
-		if (exportConfig.trainingSetType == "3D") {
-			for(const auto &frameName : frameSetIndexMap.keys()) {
-				j["framesets"][frameName.toStdString()] = json::array();
-				for (const auto &id : frameSetIndexMap[frameName]) {
-					j["framesets"][frameName.toStdString()].push_back(id);
-				}
+	}
+	if (exportConfig.trainingSetType == "3D") {
+		for(const auto &frameName : frameSetIndexMap.keys()) {
+			j["framesets"][frameName.toStdString()]["datasetName"] = calibDatasetNameMap[frameName].toStdString();
+			j["framesets"][frameName.toStdString()]["frames"] = json::array();
+			for (const auto &id : frameSetIndexMap[frameName]) {
+				j["framesets"][frameName.toStdString()]["frames"].push_back(id);
 			}
 		}
 	}
@@ -364,7 +377,12 @@ void TrainingSetExporter::addFrameSetsToJSON(ExportConfig &exportConfig,
 
 void TrainingSetExporter::copyFrames(ExportConfig &exportConfig,
 			const QList<ExportFrameSet> &frameSets, const QString &setName) {
+	if (m_exportCanceled) {
+		return;
+	}
 	QDir dir;
+	std::cout << "FramesSets: " << frameSets.size() << std::endl;
+	int frameSetCounter = 1;
 	for (const auto &frameSet : frameSets) {
 		for (const auto &camera : frameSet.cameras) {
 			dir.mkpath(exportConfig.savePath + "/" + exportConfig.trainingSetName +
@@ -377,5 +395,13 @@ void TrainingSetExporter::copyFrames(ExportConfig &exportConfig,
 						frameSet.keypoints[camera].first;
 			QFile::copy(originalPath, newPath);
 		}
+		if (m_exportCanceled) {
+			return;
+		}
+		emit copiedFrameSet(frameSetCounter++, frameSets.size(), setName);
 	}
+}
+
+void TrainingSetExporter::exportCanceledSlot() {
+	m_exportCanceled = true;
 }

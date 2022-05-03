@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
 
-
 project(AnnotationTool VERSION 0.2.0  LANGUAGES CXX)
 
 if(APPLE)
@@ -93,6 +92,7 @@ elseif (UNIX)
       globals.hpp
       gui/Qt-DarkStyle/darkstyle.qrc
   )
+
   if(${UBUNTU_VERSION} STREQUAL "2004")
     install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_0.3-1_amd64_2004/usr/local/bin)
   else()

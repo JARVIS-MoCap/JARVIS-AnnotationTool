@@ -80,7 +80,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	extrinsicsPathWidget = new DirPathWidget("Select Extrinsics Path");
 	extrinsicsPathWidget->setPlaceholderText("Select a Path...");
 	updateNamesListButton = new QPushButton("Update Camera Names",this);
-	updateNamesListButton->setMinimumSize(30,30);
+	updateNamesListButton->setMinimumSize(30,40);
 	updateNamesListButton->setIcon(QIcon::fromTheme("update"));
 	connect(updateNamesListButton, &QPushButton::clicked, this, &NewCalibrationWidget::updateNamesListSlot);
 
@@ -101,7 +101,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	QWidget *generalSpacer = new QWidget(configWidget);
 	generalSpacer->setMinimumSize(0,20);
 
-	QLabel *calibParamsLabel = new QLabel("Calibration Parameters");
+	QLabel *calibParamsLabel = new QLabel("Calibration Settings");
 	calibParamsLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
 	QWidget *calibParamsWidget = new QWidget(configWidget);
 	QGridLayout *calibparamslayout = new QGridLayout(calibParamsWidget);
@@ -193,7 +193,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	//camerasBox->setMinimumSize(1000,400);
 	QGridLayout *cameraslayout = new QGridLayout(camerasBox);
 	cameraslayout->setMargin(0);
-	cameraList = new ConfigurableItemList("Cameras");
+	cameraList = new CameraNamesList("Cameras");
 	cameraslayout->addWidget(cameraList,0,0);
 
 	QGroupBox *cameraPairsBox = new QGroupBox("Camera Pairs", this);
@@ -236,7 +236,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	connect(calibrationTool, &CalibrationTool::calibrationError, this, &NewCalibrationWidget::calibrationErrorSlot);
 
 	//Signal Relay:
-	connect(cameraList, &ConfigurableItemList::itemsChanged, extrinsicsPairList, &ExtrinsicsPairList::cameraNamesChangedSlot);
+	connect(cameraList, &CameraNamesList::itemsChanged, extrinsicsPairList, &ExtrinsicsPairList::cameraNamesChangedSlot);
 }
 
 
@@ -296,6 +296,7 @@ void NewCalibrationWidget::updateNamesListSlot() {
 				cameraList->addItem(name);
 			}
 		}
+		cameraList->addCameras(detectedCams);
 		extrinsicsPairList->cameraNamesChangedSlot(cameraList->getItems());
 	}
 	QList<QList<QString>> detectedPairs;
@@ -341,9 +342,6 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	QString extrinsicsPath = extrinsicsPathWidget->path();
 	QList<QString> cameraNames = cameraList->getItems();
 	QList<QList<QString>> cameraPairs = extrinsicsPairList->getItems();
-	for (const auto &pair : cameraPairs) {
-		std::cout << "Size: " << pair.size() << std::endl;
-	}
 	if (calibrationSetPathWidget->path() == "") {
 		m_errorMsg->showMessage("Please enter a savepath!");
 		return;
@@ -607,6 +605,7 @@ void NewCalibrationWidget::savePresetSlot(const QString& preset) {
 	settings->setValue("seperateIntrinsics", seperateRadioWidget->state());
 	settings->setValue("intrinsicsFolder", intrinsicsPathWidget->path());
 	settings->setValue("extrinsicsFolder", extrinsicsPathWidget->path());
+	settings->setValue("singlePrimary", m_calibrationConfig->single_primary);
 	settings->setValue("intrinsicsFrames", intrinsicsFramesEdit->value());
 	settings->setValue("extrinsicsFrames", extrinsicsFramesEdit->value());
 	settings->setValue("saveDebugImages", saveDebugRadioWidget->state());
@@ -626,6 +625,7 @@ void NewCalibrationWidget::loadPresetSlot(const QString& preset) {
 	for (const auto& item : cameraNames) {
 		cameraList->addItem(item);
 	}
+	cameraList->addCameras(cameraNames);
 	settings->endGroup();
 	settings->beginGroup("cameraPairs");
 	extrinsicsPairList->setItems(settings->value("itemsList").value<QList<QList<QString>>>());
@@ -638,6 +638,8 @@ void NewCalibrationWidget::loadPresetSlot(const QString& preset) {
 	seperateRadioWidget->setState(settings->value("seperateIntrinsics").toBool());
 	intrinsicsPathWidget->setPath(settings->value("intrinsicsFolder").toString());
 	extrinsicsPathWidget->setPath(settings->value("extrinsicsFolder").toString());
+	m_calibrationConfig->single_primary = settings->value("singlePrimary").toBool();
+
 	intrinsicsFramesEdit->setValue(settings->value("intrinsicsFrames").toInt());
 	extrinsicsFramesEdit->setValue(settings->value("extrinsicsFrames").toInt());
 	saveDebugRadioWidget->setState(settings->value("saveDebugImages").toBool());

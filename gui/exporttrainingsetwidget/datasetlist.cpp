@@ -17,10 +17,14 @@
 #include <QInputDialog>
 #include <QDirIterator>
 #include <QErrorMessage>
+#include "yaml-cpp/yaml.h"
 
 
-DatasetList::DatasetList(QList<DatasetExportItem> &datasetExportItems, QList<QPair<QString,bool>> &entities, QList<QPair<QString,bool>> &keypoints, QWidget *parent) :
-			QWidget(parent), m_datasetExportItems(datasetExportItems), m_entities(entities), m_keypoints(keypoints) {
+DatasetList::DatasetList(QList<DatasetExportItem> &datasetExportItems,
+			QList<QPair<QString,bool>> &entities, QList<QPair<QString,bool>> &keypoints,
+			QList<SkeletonComponent> &skeleton, QWidget *parent) :
+			QWidget(parent), m_datasetExportItems(datasetExportItems),
+			m_entities(entities), m_keypoints(keypoints), m_skeleton(skeleton) {
 	m_currentPath = QDir::homePath();
 	QGridLayout *layout = new QGridLayout(this);
 	layout->setMargin(3);
@@ -53,18 +57,36 @@ void DatasetList::itemSelectedSlot(QListWidgetItem *item) {
 
 
 void DatasetList::addItemSlot() {
-	QString path = QFileDialog::getExistingDirectory(this,"Add Dataset", m_currentPath,
-				QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	QString path = QFileDialog::getOpenFileName(
+							this, "Select Dataset YAML File", m_currentPath, "YAML Files (*.yaml)");
 	if (path != "") {
 		addItem(path);
 	}
+
 }
 
 void DatasetList::addItem(const QString &path) {
 	QDir dir = QDir(path);
+	QString filePath = path;
+	if (path.contains(".yaml")) {
+		dir = QFileInfo(path).absoluteDir();
+		filePath = dir.absolutePath();
+	}
 	DatasetExportItem exportItem;
 	exportItem.name = dir.dirName();
-	exportItem.basePath = path;
+	exportItem.basePath = filePath;
+	exportItem.configFilePath = path;
+	YAML::Node datasetYaml = YAML::LoadFile(path.toStdString());
+	m_skeleton.clear();
+	for (const auto& compYaml : datasetYaml["Skeleton"]) {
+		SkeletonComponent comp;
+		comp.name = QString::fromStdString(compYaml.first.as<std::string>());
+		comp.keypointA = QString::fromStdString(compYaml.second["Keypoints"][0].as<std::string>());
+		comp.keypointB = QString::fromStdString(compYaml.second["Keypoints"][1].as<std::string>());
+		comp.length = compYaml.second["Length"][0].as<float>();
+		m_skeleton.append(comp);
+	}
+
 	if (analyseDatasetPath(&exportItem, exportItem.basePath)) {
 		addListItem(exportItem.name);
 		m_datasetExportItems.append(exportItem);
@@ -77,7 +99,7 @@ void DatasetList::addItem(const QString &path) {
 QList<QString> DatasetList::itemPaths() {
 	QList<QString> paths;
 	for (const auto &item : m_datasetExportItems) {
-		paths.append(item.basePath);
+		paths.append(item.configFilePath);
 	}
 	return paths;
 }
@@ -135,7 +157,7 @@ bool DatasetList::getDatasetDirInfo(DatasetExportItem * exportItem, const QStrin
 		for (const auto & entity : m_entities) {
 			entityNames.append(entity.first);
 		}
-		if (m_entities.size() == 0) {
+		//if (m_entities.size() == 0) {
 			for (int i = 1; i < entities.size(); i+= 3) {
 				if(!entityNames.contains(entities[i])) {
 					QPair<QString, bool> newEntity;
@@ -145,17 +167,17 @@ bool DatasetList::getDatasetDirInfo(DatasetExportItem * exportItem, const QStrin
 					entityNames.append(entities[i]);
 				}
 			}
-		}
-		else {
-			QList<QString> testEntities;
-			for (int i = 1; i < entities.size(); i+= 3) {
-				if(!testEntities.contains(entities[i])) testEntities.append(entities[i]);
-			}
-			if (testEntities != entityNames) {
-				file->close();
-				return false;
-			}
-		}
+	//	}
+		// else {
+		// 	QList<QString> testEntities;
+		// 	for (int i = 1; i < entities.size(); i+= 3) {
+ 		// 		if(!testEntities.contains(entities[i])) entities.append(entities[i]);
+		// 	}
+		// 	if (testEntities != entityNames) {
+		// 		file->close();
+		// 		return false;
+		// 	}
+		// }
 
 		QList<QByteArray> keypoints = file->readLine().split(',');
 		QList<QString> keypointNames;

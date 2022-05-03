@@ -12,7 +12,7 @@ Building static OpenCV:
 	-> get opencv from git with: git clone https://github.com/opencv/opencv.git
 	-> git checkout 4.5.1 (DONT use 4.5.3, somehow it doesn't build libade.a)
 	-> configure opencv with:
-  cmake -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TIFF=OFF -DWITH_TIFF=OFF -DBUILD_JPEG=OFF -DJPEG_LIBRARY=/Users/thueser/Desktop/libjpeg-turbo/install/lib/libjpeg.a -DBUILD_ZLIB=OFF -DBUILD_WEBP=OFF -DBUILD_PNG=OFF -DWITH_OPENEXR=OFF -DWITH_OPENJPEG=OFF -DWITH_JASPER=OFF -DWITH_PROTOBUF=OFF -DWITH_QUIRC=OFF -DWITH_1394=OFF -DWITH_V4L=OFF  -DWITH_GSTREAMER=ON -DWITH_FFMPEG=ON -DWITH_GTK=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_LIST="core,calib3d,imgproc,videoio,aruco" -DCMAKE_INSTALL_PREFIX=../install  -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ../opencv
+	    cmake -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TIFF=OFF -DWITH_TIFF=OFF -DBUILD_JPEG=OFF -DJPEG_LIBRARY=/Users/thueser/Desktop/libjpeg-turbo/install/lib/libjpeg.a -DBUILD_ZLIB=OFF -DJPEG_INCLUDE_DIR=/Users/thueser/Desktop/libjpeg-turbo/install/include -DBUILD_WEBP=OFF -DBUILD_PNG=OFF -DWITH_OPENEXR=OFF -DWITH_OPENJPEG=OFF -DWITH_JASPER=OFF -DWITH_PROTOBUF=OFF -DWITH_QUIRC=OFF -DWITH_1394=OFF -DWITH_V4L=OFF  -DWITH_GSTREAMER=ON -DWITH_FFMPEG=ON -DWITH_GTK=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_LIST="core,calib3d,imgproc,videoio,aruco" -DCMAKE_INSTALL_PREFIX=../install  -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ../opencv 
 	-> run cmake --build . -jx (with x being the number of threads on your system e.g. -j12)
 	-> run cmake --install .
 
