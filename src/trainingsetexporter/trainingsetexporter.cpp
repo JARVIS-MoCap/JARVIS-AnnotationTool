@@ -123,9 +123,13 @@ void TrainingSetExporter::addInfo(json &j) {
 
 void TrainingSetExporter::addCategories(json &j, ExportConfig &exportConfig) {
 	j["categories"] = json::array();
+	j["keypoint_names"] = json::array();
 	int num_keypoints = 0;
 	for (const auto &keypoint : exportConfig.keypointsList) {
-		if (keypoint.second) num_keypoints++;
+		if (keypoint.second) {
+			num_keypoints++;
+			j["keypoint_names"].push_back(keypoint.first.toStdString());
+		}
 	}
 	int counter = 0;
 	for (const auto &entity : exportConfig.entitiesList) {
@@ -134,6 +138,15 @@ void TrainingSetExporter::addCategories(json &j, ExportConfig &exportConfig) {
 						{"name", entity.first.toStdString()}, {"supercategory", "None"},
 						{"num_keypoints", num_keypoints}});
 		}
+	}
+	j["skeleton"] = json::array();
+
+	for (const auto &skeletonComp : exportConfig.skeleton) {
+		j["skeleton"].push_back({
+					{"name", skeletonComp.name.toStdString()},
+					{"keypointA", skeletonComp.keypointA.toStdString()},
+					{"keypointB", skeletonComp.keypointB.toStdString()},
+					{"length", skeletonComp.length}});
 	}
 }
 

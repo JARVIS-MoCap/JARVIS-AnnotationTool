@@ -124,6 +124,7 @@ struct AnnotationCount {
 struct DatasetExportItem {
 	QString name;
 	QString basePath;
+	QString configFilePath;
 	QList<QPair<QString, bool>> subSets;
 	AnnotationCount annotationCount;
 	int frameCount = 0;
@@ -139,6 +140,7 @@ struct ExportConfig {
 	int shuffleSeed;
 	QList<QPair<QString,bool>> entitiesList;
 	QList<QPair<QString,bool>> keypointsList;
+	QList<SkeletonComponent> skeleton;
 };
 
 struct ExportKeypoint {

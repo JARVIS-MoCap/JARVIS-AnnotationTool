@@ -158,16 +158,20 @@ void IntrinsicsCalibrator::run() {
   cv::Mat K, D;
   std::vector< cv::Mat > rvecs, tvecs;
   cv::Mat newObjectPoints;
-  double repro_error = calibrateCameraRO(objectPoints, imagePoints, size,
-        1, K, D, rvecs, tvecs, newObjectPoints,
+  // double repro_error = calibrateCameraRO(objectPoints, imagePoints, size,
+  //       1, K, D, rvecs, tvecs, newObjectPoints,
+  //       cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST,
+  //       cv::TermCriteria(cv::TermCriteria::MAX_ITER |
+  //         cv::TermCriteria::EPS, 100, 1e-7));
+  double repro_error = calibrateCamera(objectPoints, imagePoints, size,
+        K, D, rvecs, tvecs,
         cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST,
         cv::TermCriteria(cv::TermCriteria::MAX_ITER |
           cv::TermCriteria::EPS, 100, 1e-7));
-
-  // cv::FileStorage fs1(m_parametersSavePath + "/Intrinsics/Intrinsics_" +
+  // cv::FileStorage fs1(m_parametersSavePath + "/Test/" +
   //       m_cameraName + ".yaml", cv::FileStorage::WRITE);
-  // fs1 << "intrinsicMatrix" << K.t();
-  // fs1 << "distortionCoefficients" << D;
+  // fs1 << "newObjectPoints" << newObjectPoints;
+  // fs1 << "objectPoints" << checkerBoardPoints;
   emit finishedIntrinsics(K, D, repro_error, m_threadNumber);
 }
 
@@ -231,8 +235,8 @@ bool IntrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1,
     cv::aruco::detectMarkers(img1, board->dictionary, markerCorners, markerIds,
           params);
     if (markerIds.size() == 0) return false;
-    cv::aruco::drawDetectedMarkers(imageCopy, markerCorners, markerIds);
-    cv::imwrite(m_parametersSavePath  + "test.jpg", imageCopy);
+    // cv::aruco::drawDetectedMarkers(imageCopy, markerCorners, markerIds);
+    // cv::imwrite(m_parametersSavePath  + "test.jpg", imageCopy);
 
     m_detectedPattern = -1;
     for (int i = 0; i < markerCorners.size(); i++) {

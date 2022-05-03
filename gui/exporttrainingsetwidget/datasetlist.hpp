@@ -25,7 +25,9 @@ class DatasetList : public QWidget {
 
 	public:
 		explicit DatasetList(QList<DatasetExportItem> &datasetExportItems,
-					QList<QPair<QString,bool>> &entities, QList<QPair<QString,bool>> &keypoints, QWidget *parent = nullptr);
+					QList<QPair<QString,bool>> &entities,
+					QList<QPair<QString,bool>> &keypoints,
+					QList<SkeletonComponent> &skeleton, QWidget *parent = nullptr);
 		void clear() {
 			itemSelectorList->clear();
 			m_datasetExportItems.clear();
@@ -48,6 +50,8 @@ class DatasetList : public QWidget {
 		QList<DatasetExportItem> &m_datasetExportItems;
 		QList<QPair<QString,bool>> &m_entities;
 		QList<QPair<QString,bool>> &m_keypoints;
+		QList<SkeletonComponent> &m_skeleton;
+
 
 		bool analyseDatasetPath(DatasetExportItem * exportItem, const QString &basePath);
 		bool getDatasetDirInfo(DatasetExportItem * exportItem, const QString &path);

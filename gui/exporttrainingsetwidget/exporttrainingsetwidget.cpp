@@ -184,7 +184,7 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	QGroupBox *datasetListBox = new QGroupBox("Datasets", this);
 	QGridLayout *datasetlistlayout = new QGridLayout(datasetListBox);
 	datasetlistlayout->setMargin(0);
-	datasetList = new DatasetList(m_datasetExportItems, m_entities, m_keypoints, datasetListBox);
+	datasetList = new DatasetList(m_datasetExportItems, m_entities, m_keypoints, m_skeleton, datasetListBox);
 	connect(datasetList, &DatasetList::itemsChanged, this, &ExportTrainingsetWidget::datasetListChangedSlot);
 	datasetlistlayout->addWidget(datasetList,0,0);
 
@@ -428,6 +428,7 @@ void ExportTrainingsetWidget::exportClickedSlot() {
 	}
 	exportConfig.entitiesList = m_entities;
 	exportConfig.keypointsList = m_keypoints;
+	exportConfig.skeleton = m_skeleton;
 	if (trainingsetNameEdit->text() == "") {
 		return;
 	}

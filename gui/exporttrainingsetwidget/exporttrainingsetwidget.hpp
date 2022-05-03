@@ -88,6 +88,7 @@ class ExportTrainingsetWidget : public QWidget {
 		QList<AnnotationCount> m_annotationCounts;
 		QList<QPair<QString,bool>> m_entities;
 		QList<QPair<QString,bool>> m_keypoints;
+		QList<SkeletonComponent> m_skeleton;
 
 	private slots:
 		void hoverStartedSlot(int index);

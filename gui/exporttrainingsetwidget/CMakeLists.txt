@@ -26,4 +26,5 @@ target_link_libraries(exporttrainingset
 	src
   conveniencewidgets
   trainingsetexporter
+  gui
 )

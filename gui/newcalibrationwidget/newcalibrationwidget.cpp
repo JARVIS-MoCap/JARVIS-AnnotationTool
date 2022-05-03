@@ -101,7 +101,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	QWidget *generalSpacer = new QWidget(configWidget);
 	generalSpacer->setMinimumSize(0,20);
 
-	QLabel *calibParamsLabel = new QLabel("Calibration Parameters");
+	QLabel *calibParamsLabel = new QLabel("Calibration Settings");
 	calibParamsLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
 	QWidget *calibParamsWidget = new QWidget(configWidget);
 	QGridLayout *calibparamslayout = new QGridLayout(calibParamsWidget);
