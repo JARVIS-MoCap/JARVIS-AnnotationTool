@@ -4,7 +4,6 @@ add_subdirectory(newcalibrationwidget)
 add_subdirectory(exporttrainingsetwidget)
 add_subdirectory(editor)
 add_subdirectory(conveniencewidgets)
-add_subdirectory(helpwindow)
 
 add_library(gui
     mainwindow.hpp
@@ -20,7 +19,6 @@ target_include_directories(gui
     ${PROJECT_SOURCE_DIR}
     editor
     exporttrainingsetwidget
-    helpwindow
     newcalibrationwidget
     newdatasetwindow
 )
@@ -33,5 +31,4 @@ target_link_libraries(gui
   newcalibrationwidget
   exporttrainingset
   conveniencewidgets
-  helpwindow
 )

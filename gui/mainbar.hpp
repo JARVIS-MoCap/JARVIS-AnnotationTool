@@ -25,14 +25,11 @@ class MainBar : public QToolBar {
 
 	signals:
 		void openSettingsWindow();
-		void openHelpWindow();
 		void exitToMainPage();
 
 	private:
 		QToolButton *settingsButton;
 		QAction *settingsAction;
-		QToolButton *helpButton;
-		QAction *helpAction;
 		QToolButton *exitButton;
 		QAction *exitAction;
 };

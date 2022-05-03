@@ -37,7 +37,6 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	statusBar()->showMessage(tr("Ready"), 2000);
 
 	settingsWindow = new SettingsWindow(this);
-	helpWindow = new HelpWindow(this);
 
 	mainBar = new MainBar(this);
 	this->addToolBar(mainBar);
@@ -124,8 +123,6 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	//-> Incoming Signals
 	connect(mainBar, &MainBar::openSettingsWindow,
 					this, &MainWindow::openSettingsWindowSlot);
-	connect(mainBar, &MainBar::openHelpWindow,
-					this, &MainWindow::openHelpWindowSlot);
 	connect(editorWidget, &EditorWidget::quitClicked,
 					this, &MainWindow::quitClickedSlot);
 	// connect(editorWidget, &EditorWidget::newSegmentLoaded,
@@ -160,12 +157,6 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 void MainWindow::openSettingsWindowSlot() {
 	settingsWindow->show();
 	settingsWindow->raise();
-}
-
-
-void MainWindow::openHelpWindowSlot() {
-	helpWindow->show();
-	helpWindow->raise();
 }
 
 

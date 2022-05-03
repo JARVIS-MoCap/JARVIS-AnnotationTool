@@ -50,7 +50,7 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	LabelWithToolTip *datasetNameLabel = new LabelWithToolTip("New Dataset Name", "");
 	datasetNameEdit = new QLineEdit(m_datasetConfig->datasetName, configBox);
 
-	LabelWithToolTip *datasetPathLabel = new LabelWithToolTip("New Dataset Path");
+	LabelWithToolTip *datasetPathLabel = new LabelWithToolTip("New Dataset Path", "This is the location that your new dataset will be saved at.");
 	datasetPathWidget = new DirPathWidget("Select new Dataset Path");
 	datasetPathWidget->setPlaceholderText("Select a Path...");
 	LabelWithToolTip *frameSetsRecordingLabel = new LabelWithToolTip("Framesets to extract per Segment", "Select how many framesets will be created per recording or per segment if you defined any.");
