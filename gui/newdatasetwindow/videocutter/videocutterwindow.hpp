@@ -1,8 +1,10 @@
 /*------------------------------------------------------------
- *  videocutterwindow.hpp
- *  Created: 16. July 2021
- *  Author:   Timo Hüser
- * Contact: 	timo.hueser@gmail.com
+ * videocutterwindow.hpp
+ * Created: 		16. July 2021
+ * Author:			Timo Hueser
+ * Contact: 		timo.hueser@gmail.com
+ * Copyright: 	2022 Timo Hueser
+ * License:   	LGPL v2.1
  *------------------------------------------------------------*/
 
 #ifndef VIDEOCUTTERWINDOW_H

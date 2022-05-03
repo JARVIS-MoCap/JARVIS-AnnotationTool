@@ -1,8 +1,10 @@
 /*****************************************************************
- * File:			progressinfowindow.cpp
- * Created: 	24. July 2021
- * Author:		Timo Hüser
- * Contact: 	timo.hueser@gmail.com
+ * File:				progressinfowindow.cpp
+ * Created: 		24. July 2021
+ * Author:			Timo Hueser
+ * Contact: 		timo.hueser@gmail.com
+ * Copyright: 	2022 Timo Hueser
+ * License:   	LGPL v2.1
  *****************************************************************/
 
 #include "datasetprogressinfowindow.hpp"

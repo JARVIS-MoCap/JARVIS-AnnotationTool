@@ -1,8 +1,10 @@
 /*------------------------------------------------------------
- *  newdatasetwindow.hpp
- *  Created: 07. July 2020
- *  Author:   Timo Hüser
- * Contact: 	timo.hueser@gmail.com
+ * newdatasetwindow.hpp
+ * Created: 		07. July 2020
+ * Author:			Timo Hueser
+ * Contact: 		timo.hueser@gmail.com
+ * Copyright: 	2022 Timo Hueser
+ * License:   	LGPL v2.1
  *------------------------------------------------------------*/
 
 #ifndef NEWDATASETWINDOW_H

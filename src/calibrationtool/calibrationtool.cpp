@@ -3,8 +3,8 @@
  * Created: 	  30. July 2021
  * Author:		  Timo Hueser
  * Contact: 	  timo.hueser@gmail.com
- * Copyright:   2021 Timo Hueser
- * License:     LGPL v3.0
+ * Copyright:   2022 Timo Hueser
+ * License:     LGPL v2.1
  ******************************************************************************/
 
 

@@ -1,8 +1,10 @@
 /*****************************************************************
  * File:			recordingstable.cpp
  * Created: 	19. July 2021
- * Author:		Timo Hüser
+ * Author:		Timo Hueser
  * Contact: 	timo.hueser@gmail.com
+ * Copyright: 2022 Timo Hueser
+ * License:   LGPL v2.1
  *****************************************************************/
 
 #include "recordingstable.hpp"

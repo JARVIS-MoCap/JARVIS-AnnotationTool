@@ -1,8 +1,10 @@
 /*------------------------------------------------------------
- *  timeline.hpp
- *  Created: 19. July 2021
- *  Author:   Timo Hüser
- * Contact: 	timo.hueser@gmail.com
+ * timeline.hpp
+ * Created: 		19. July 2021
+ * Author:			Timo Hueser
+ * Contact: 		timo.hueser@gmail.com
+ * Copyright: 	2022 Timo Hueser
+ * License:   	LGPL v2.1
  *------------------------------------------------------------*/
 
 #ifndef TIMELINE_H

@@ -3,8 +3,8 @@
 	* Created: 	  12. August 2021
 	* Author:		  Timo Hueser
 	* Contact: 	  timo.hueser@gmail.com
-	* Copyright:  2021 Timo Hueser
-	* License:    GPL v3.0
+	* Copyright:  2022 Timo Hueser
+	* License:    LGPL v2.1
 	*****************************************************************/
 
 #include "yesnoradiowidget.hpp"
