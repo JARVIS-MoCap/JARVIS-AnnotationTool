@@ -44,7 +44,7 @@ If you want to remove it run
 # Building OpenCV QT5 and yaml-cpp yourself
 We try to provide prebuild versions of all the libraries you will need to compile the tool. You only need to build them yourself incase they don't work for your OS or you want to use different versions than the ones we ship it with.
 
-### Linux
+## Linux
 
 #### Build QT5:
 - Get QT from git with: 
@@ -115,7 +115,7 @@ We try to provide prebuild versions of all the libraries you will need to compil
  - Inside the yaml-cpp directory create a build directory with:
  
        mkdir build && cd build
- 
+  
  - Run Cmake (set DCMAKE_INSTALL_PREFIX to the path you want to install it to):
  
        cmake .. -DCMAKE_INSTALL_PREFIX=<PATH TO INSTALL To>
@@ -123,3 +123,10 @@ We try to provide prebuild versions of all the libraries you will need to compil
  - Make and install with:
  
        make -j8 && make install
+       
+ 
+ ## Windows
+ Coming soon...
+ 
+ ## MacOS
+ Coming soon...
