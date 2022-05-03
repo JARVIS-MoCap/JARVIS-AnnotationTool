@@ -61,17 +61,19 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	configScrollArea->setWidgetResizable(true);
 	configScrollArea->setWidget(configWidget);
 
-	LabelWithToolTip *trainingsetNameLabel = new LabelWithToolTip("  Trainingset Name");
+	LabelWithToolTip *trainingsetNameLabel = new LabelWithToolTip("  Trainingset Name", "");
 	trainingsetNameEdit = new QLineEdit(configWidget);
 	trainingsetNameEdit->setText("New Trainingset");
-	LabelWithToolTip *trainingsetPathLabel = new LabelWithToolTip("  Trainingset Savepath");
+	LabelWithToolTip *trainingsetPathLabel = new LabelWithToolTip("  Trainingset Savepath", "");
 	trainingsetSavePathWidget = new DirPathWidget("Select Trainingset Savepath");
 	trainingsetSavePathWidget->setPlaceholderText("Select a Path...");
 	QWidget *setupSpacer1 = new QWidget(configWidget);
 
 	setupSpacer1->setMinimumSize(10,10);
 	setupSpacer1->setMaximumSize(9999,10);
-	LabelWithToolTip *trainingsetTypeLabel = new LabelWithToolTip("  Trainingset Type");
+	LabelWithToolTip *trainingsetTypeLabel = new LabelWithToolTip("  Trainingset Type",
+				"If you select 2D no calibration parameters will be required or used. "
+				"\nOnly use this if you're creating pretraining datasets or you don't want to train a 3D model");
 	QWidget *trainingsetTypeWidget = new QWidget(configWidget);
 	QGridLayout *trainingsettypelayout = new QGridLayout(trainingsetTypeWidget);
 	trainingsettypelayout->setMargin(0);
@@ -84,19 +86,21 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 
 	setupSpacer2->setMinimumSize(10,10);
 	setupSpacer2->setMaximumSize(9999,10);
-	LabelWithToolTip *validationFractionLabel = new LabelWithToolTip("  Validation Split Fraction");
+	LabelWithToolTip *validationFractionLabel = new LabelWithToolTip("  Validation Split Fraction",
+				"Training/Validation split to be used.\nThe value indicates the fraction of the framesets that will be used as validation data.");
 	validationFractionEdit = new QDoubleSpinBox(configWidget);
 	validationFractionEdit->setRange(0.001,0.999);
 	validationFractionEdit->setValue(0.1);
-	LabelWithToolTip *shuffleBeforeSplitLabel = new LabelWithToolTip("  Shuffle before Train/Validation Split");
+	LabelWithToolTip *shuffleBeforeSplitLabel = new LabelWithToolTip("  Shuffle before Train/Validation Split", "Only set this to 'No' if you know what you're doing.");
 	shuffleBeforeSplitWidget = new YesNoRadioWidget(configWidget);
 	shuffleBeforeSplitWidget->setState(true);
 	connect(shuffleBeforeSplitWidget, &YesNoRadioWidget::stateChanged, this, &ExportTrainingsetWidget::shuffleBeforeSplitStateChangedSlot);
-	LabelWithToolTip *randomShuffleSeedLabel = new LabelWithToolTip("  Random Shuffle Seed");
+	LabelWithToolTip *randomShuffleSeedLabel = new LabelWithToolTip("  Random Shuffle Seed", "If 'Yes' the exact train/val split used in this trainingset will not be reproducible!");
 	randomShuffleSeedWidget = new YesNoRadioWidget(configWidget);
-	randomShuffleSeedWidget->setState(true);
+	randomShuffleSeedWidget->setState(false);
 	connect(randomShuffleSeedWidget, &YesNoRadioWidget::stateChanged, this, &ExportTrainingsetWidget::randomShuffleSeedStateChangedSlot);
-	LabelWithToolTip *shuffleSeedLabel = new LabelWithToolTip("  Shuffle Seed");
+	LabelWithToolTip *shuffleSeedLabel = new LabelWithToolTip("  Shuffle Seed",
+				"Use the same seed when you're updating a trainingset (e.g for correcting some annotations) to make sure the train/val split will stay the same.");
 	shuffleSeedEdit = new QSpinBox(configWidget);
 	shuffleSeedEdit->setRange(0,99999);
 	QWidget *configBottomSpacer = new QWidget(configWidget);

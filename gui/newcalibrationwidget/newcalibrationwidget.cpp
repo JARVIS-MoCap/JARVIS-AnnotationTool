@@ -63,20 +63,20 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	QWidget *generalWidget = new QWidget(configWidget);
 	QGridLayout *generallayout = new QGridLayout(generalWidget);
 	generallayout->setMargin(0);
-	LabelWithToolTip *calibrationSetNameLabel = new LabelWithToolTip("  Calibration Set Name");
+	LabelWithToolTip *calibrationSetNameLabel = new LabelWithToolTip("  Calibration Set Name", "");
 	calibrationSetNameEdit = new QLineEdit("New Calibration Set");
-	LabelWithToolTip *calibrationSetPathLabel = new LabelWithToolTip("  Calibration Set Savepath");
+	LabelWithToolTip *calibrationSetPathLabel = new LabelWithToolTip("  Calibration Set Savepath", "");
 	calibrationSetPathWidget = new DirPathWidget("Select Calibration Set Savepath");
 	calibrationSetPathWidget->setPlaceholderText("Select a Path...");
-	LabelWithToolTip *seperateIntrinsicsLabel = new LabelWithToolTip("  Seperate Recordings for Intrinsics");
+	LabelWithToolTip *seperateIntrinsicsLabel = new LabelWithToolTip("  Seperate Recordings for Intrinsics", "Select 'Yes' if you have seperate single-camera recordings that you want to use for calibrating the intrinsics");
 	seperateRadioWidget = new YesNoRadioWidget(generalWidget);
 	seperateRadioWidget->setState(true);
 	connect(seperateRadioWidget, &YesNoRadioWidget::stateChanged, this, &NewCalibrationWidget::sperateRadioStateChangedSlot);
-	LabelWithToolTip *intrinsicsPathLabel = new LabelWithToolTip("  Intrinsics Folder Path");
+	LabelWithToolTip *intrinsicsPathLabel = new LabelWithToolTip("  Intrinsics Folder Path", "");
 	intrinsicsPathWidget = new DirPathWidget("Select Intrinsics Path");
 	intrinsicsPathWidget->setPlaceholderText("Select a Path...");
 	connect(intrinsicsPathWidget, &DirPathWidget::pathChanged, this, &NewCalibrationWidget::intrinsicsPathChangedSlot);
-	LabelWithToolTip *extrinsicsPathLabel = new LabelWithToolTip("  Extrinsics Folder Path");
+	LabelWithToolTip *extrinsicsPathLabel = new LabelWithToolTip("  Extrinsics Folder Path", "");
 	extrinsicsPathWidget = new DirPathWidget("Select Extrinsics Path");
 	extrinsicsPathWidget->setPlaceholderText("Select a Path...");
 	updateNamesListButton = new QPushButton("Update Camera Names",this);
@@ -106,15 +106,18 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	QWidget *calibParamsWidget = new QWidget(configWidget);
 	QGridLayout *calibparamslayout = new QGridLayout(calibParamsWidget);
 	calibparamslayout->setMargin(0);
-	LabelWithToolTip *intrinsicsFramesLabel = new LabelWithToolTip("  Max. Number of Frames for Intrinsics Calibration");
+	LabelWithToolTip *intrinsicsFramesLabel = new LabelWithToolTip("  Max. Number of Frames for Intrinsics Calibration",
+				"A good value is around 20-30. Note that the calibrator will only use as many checkerboards as it can detect.");
 	intrinsicsFramesEdit = new QSpinBox(calibParamsWidget);
 	intrinsicsFramesEdit->setRange(0,999);
 	intrinsicsFramesEdit->setValue(20);
-	LabelWithToolTip *extrinsicsFramesLabel = new LabelWithToolTip("  Max. Number of  Frames for Extrinsics Calibration");
+	LabelWithToolTip *extrinsicsFramesLabel = new LabelWithToolTip("  Max. Number of  Frames for Extrinsics Calibration",
+			"A good value is around 20-30. Note that the calibrator will only use as many checkerboards as it can detect.");
 	extrinsicsFramesEdit = new QSpinBox(calibParamsWidget);
 	extrinsicsFramesEdit->setRange(0,999);
 	extrinsicsFramesEdit->setValue(20);
-	LabelWithToolTip *saveDebugLabel = new LabelWithToolTip("  Save Debug Images");
+	LabelWithToolTip *saveDebugLabel = new LabelWithToolTip("  Save Debug Images",
+				"If you select 'Yes' a directory showing all detected checkerboards will be saved alongside the calibration parameters.");
 	saveDebugRadioWidget = new YesNoRadioWidget(calibParamsWidget);
 	saveDebugRadioWidget->setState(false);
 	i = 0;
@@ -130,22 +133,26 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	QWidget *checkerboardWiget = new QWidget(configWidget);
 	QGridLayout *checkerboardwidgetlayout = new QGridLayout(checkerboardWiget);
 	checkerboardwidgetlayout->setMargin(0);
-	LabelWithToolTip *boardTypeLabel = new LabelWithToolTip("  Board Type");
+	LabelWithToolTip *boardTypeLabel = new LabelWithToolTip("  Board Type",
+				"ChAruco currently only supports one specific pattern, use with care!");
 	boardTypeCombo = new QComboBox(checkerboardWiget);
 	boardTypeCombo->addItem("Standard");
 	boardTypeCombo->addItem("ChAruco");
 	connect(boardTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NewCalibrationWidget::checkerBoardPatternChangesSlot);
-	LabelWithToolTip *widthLabel = new LabelWithToolTip("  Pattern Width");
+	LabelWithToolTip *widthLabel = new LabelWithToolTip("  Pattern Width",
+				"Does not count the outer edge of the pattern. Make sure the visualization matches your board!");
 	widthEdit = new QSpinBox();
 	widthEdit->setRange(0,20);
 	widthEdit->setValue(9);
 	connect(widthEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &NewCalibrationWidget::checkerBoardPatternChangesSlot);
-	LabelWithToolTip *heightLabel = new LabelWithToolTip("  Pattern Height");
+	LabelWithToolTip *heightLabel = new LabelWithToolTip("  Pattern Height",
+			"Does not count the outer edge of the pattern. Make sure the visualization matches your board!");
 	heightEdit = new QSpinBox();
 	heightEdit->setRange(0,20);
 	heightEdit->setValue(6);
 	connect(heightEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &NewCalibrationWidget::checkerBoardPatternChangesSlot);
-	LabelWithToolTip *sideLengthLabel = new LabelWithToolTip("  Side Length [mm]");
+	LabelWithToolTip *sideLengthLabel = new LabelWithToolTip("  Side Length [mm]",
+			"Sidelength of a single checkerboard square. Make sure you measure this accurately!");
 	sideLengthEdit = new QDoubleSpinBox();
 	sideLengthEdit->setRange(0.0,1000.0);
 	sideLengthEdit->setValue(26.7);
