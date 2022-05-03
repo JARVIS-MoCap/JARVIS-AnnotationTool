@@ -44,7 +44,7 @@ If you want to remove it run
 # Building OpenCV QT5 and yaml-cpp yourself
 We try to provide prebuild versions of all the libraries you will need to compile the tool. You only need to build them yourself incase they don't work for your OS or you want to use different versions than the ones we ship it with.
 
-## Linux
+## Linux and MacOS
 
 #### Build QT5:
 - Get QT from git with: 
@@ -78,10 +78,11 @@ We try to provide prebuild versions of all the libraries you will need to compil
        
  - You can then either change the QT_DIR paths to point to the directory you installed to or copy the files in the install directory to 
  
-        ${AnnotationTool_Directory}/libs/Qt_5.15.2/Ubuntu_xx04
+        ${AnnotationTool_Directory}/libs/Qt_5.15.2/Ubuntu_xx04(MacOS)
  
 
 #### Building OpenCV:
+- On MacOS: build [libjpeg turbo](https://github.com/libjpeg-turbo/libjpeg-turbo) from git (make sure to build Version 8!)
 - Get opencv from git with: 
   
       git clone https://github.com/opencv/opencv.git
@@ -104,7 +105,7 @@ We try to provide prebuild versions of all the libraries you will need to compil
        
  - You can then either change the OpenCV_DIR paths to point to the directory you installed to or copy the files in the install directory to 
 
-        ${AnnotationTool_Directory}/libs/OpenCV_4.5.1/Ubuntu_xx04
+        ${AnnotationTool_Directory}/libs/OpenCV_4.5.1/Ubuntu_xx04(MacOS)
   
   
 #### Building yaml-cpp
@@ -127,6 +128,5 @@ We try to provide prebuild versions of all the libraries you will need to compil
  
  ## Windows
  Coming soon...
- 
- ## MacOS
- Coming soon...
+      
+    
