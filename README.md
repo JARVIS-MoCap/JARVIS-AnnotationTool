@@ -118,7 +118,7 @@ We try to provide prebuild versions of all the libraries you will need to compil
  
  - Run Cmake (set DCMAKE_INSTALL_PREFIX to the path you want to install it to):
  
-       cmake .. -DCMAKE_INSTALL_PREFIX=<PATH TO INstall To>
+       cmake .. -DCMAKE_INSTALL_PREFIX=<PATH TO INSTALL To>
       
  - Make and install with:
  
