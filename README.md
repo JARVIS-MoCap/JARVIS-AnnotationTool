@@ -1,9 +1,15 @@
-![](IconThemes/Banner.png)
-
 # JARVIS AnnotationTool
+
+<p align="center">
+<img src="IconThemes/DarkIconTheme/Banner.png" alt="banner" width="75%"/>
+</p>
 
 This is the official Github Repository for the **JARVIS Annotation Tool**. To find out more about our 3D markerless motion capture toolbox have a look at 
 **[our website](https://jarvis-mocap.github.io/jarvis-docs/)**.
+
+All you need to get started are synchronized multi-camera recordings (check out our [AcquisitionTool](https://github.com/JARVIS-MoCap/JARVIS-AcquisitionTool) and calibration recordings using a simple checkerboard or ChArUco-board. 
+The AnnotationTool has functionallity to extract representative frames from your recordings in a semi-supervised fashion and it can be used to calibrate your cameras.\
+It then uses live updating reprojection-error statistics to make the process of creating 3D keypoint annotations as intuitive and precise as possible. If you have real world measurements of the animal or object you're annotating (e.g. the length of all finger segments) you can also use those metrics to guide you during the annotation process.
 
 Installing our prebuild packages is easy! Just go to [our downloads page](https://jarvis-mocap.github.io/jarvis-docs/) and grab the installer for your operating system. We currently support Windows, MacOS and Debian based Linux distributions. Installers for the current and previous versions can also be found under [Releases](https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool/releases).
 
