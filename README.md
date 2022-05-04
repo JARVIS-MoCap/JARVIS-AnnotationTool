@@ -1,3 +1,7 @@
+![](IconThemes/Banner.png)
+
+# JARVIS AnnotationTool
+
 This is the official Github Repository for the **JARVIS Annotation Tool**. To find out more about our 3D markerless motion capture toolbox have a look at 
 **[our website](https://jarvis-mocap.github.io/jarvis-docs/)**.
 
