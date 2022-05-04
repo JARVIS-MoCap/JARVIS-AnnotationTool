@@ -7,15 +7,17 @@
 This is the official Github Repository for the **JARVIS Annotation Tool**. To find out more about our 3D markerless motion capture toolbox have a look at 
 **[our website](https://jarvis-mocap.github.io/jarvis-docs/)**.
 
-All you need to get started are synchronized multi-camera recordings (check out our [AcquisitionTool](https://github.com/JARVIS-MoCap/JARVIS-AcquisitionTool) and calibration recordings using a simple checkerboard or ChArUco-board. 
-The AnnotationTool has functionallity to extract representative frames from your recordings in a semi-supervised fashion and it can be used to calibrate your cameras.\
-It then uses live updating reprojection-error statistics to make the process of creating 3D keypoint annotations as intuitive and precise as possible. If you have real world measurements of the animal or object you're annotating (e.g. the length of all finger segments) you can also use those metrics to guide you during the annotation process.
+All you need to get started are synchronized multi-camera recordings (check out our [AcquisitionTool](https://github.com/JARVIS-MoCap/JARVIS-AcquisitionTool)) and calibration recordings using a simple checkerboard or ChArUco-board. 
+The AnnotationTool has functionallity to **extract representative frames** from your recordings in a semi-supervised fashion and it can be used to **calibrate your cameras**.\
+It then uses live updating reprojection-error statistics to make the process of **creating 3D keypoint annotations** as intuitive and precise as possible. If you have real world measurements of the animal or object you're annotating (e.g. the length of all finger segments) you can also use those metrics to guide you during the annotation process.
 
-Installing our prebuild packages is easy! Just go to [our downloads page](https://jarvis-mocap.github.io/jarvis-docs/) and grab the installer for your operating system. We currently support Windows, MacOS and Debian based Linux distributions. Installers for the current and previous versions can also be found under [Releases](https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool/releases).
+**Installing our prebuild packages is easy!** Just go to **[our downloads page](https://jarvis-mocap.github.io/jarvis-docs/)** and grab the installer for your operating system. We currently support Windows, MacOS and Debian based Linux distributions. Installers for the current and previous versions can also be found under [Releases](https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool/releases).
 
 If you want to build the tool yourself here's a step by step guide on how to do it. If the prebuild OpenCV, Qt and yaml-cpp libraries we ship it with don't work for you there's a guide on how to [build the dependencies](#building-opencv-qt5-and-yaml-cpp-yourself) at the bottom of this page. (Please note that the guide is currently not verified, please let us know if you run into any issues!)
 
-# Linux 
+# Building from Source
+
+## Linux
 
 ### Installing the dependencies
 To be able to build the tool install all the dependencies with
@@ -51,7 +53,14 @@ If you want to remove it run
 
      sudo dpkg -r AnnotationTool
 
-# Building OpenCV QT5 and yaml-cpp yourself
+## MacOS
+Coming soon...
+
+## Widows
+coming soon...
+
+
+# Building OpenCV, QT5 and yaml-cpp yourself
 We try to provide prebuild versions of all the libraries you will need to compile the tool. You only need to build them yourself incase they don't work for your OS or you want to use different versions than the ones we ship it with.
 
 ## Linux and MacOS
