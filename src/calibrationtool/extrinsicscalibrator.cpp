@@ -250,7 +250,8 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair,
 	}
 
   if(objectPointsAll.size() < m_calibrationConfig->framesForExtrinsics) {
-    emit calibrationError("Found only " +
+    emit calibrationError("Camera pair [" + cameraPair[0] + ", "
+          + cameraPair[1] +  "]: Found only " +
           QString::number(objectPointsAll.size()) + " valid checkerboards, "
           "aborting calibration. Make sure your checkerboard parameters are "
           "set correctly.");
