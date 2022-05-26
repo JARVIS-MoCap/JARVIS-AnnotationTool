@@ -21,6 +21,8 @@
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/calib3d.hpp"
 #include <opencv2/aruco/charuco.hpp>
+//#include "opencv2/highgui.hpp"
+
 
 
 #include <string>
@@ -62,6 +64,9 @@ class IntrinsicsCalibrator : public QObject, public QRunnable {
 		bool m_interrupt = false;
 		QList<QString> m_validRecordingFormats = {"avi", "mp4", "mov", "wmv",
 																							"AVI", "MP4", "WMV"};
+
+		void run_standard();
+		void run_charuco();
 
 		bool checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1);
 		cv::Point2i getPositionOfMarkerOnBoard(

@@ -24,4 +24,5 @@ target_link_libraries(calibrationtool
   opencv_videoio
   opencv_imgproc
   opencv_aruco
+  #opencv_highgui
 )

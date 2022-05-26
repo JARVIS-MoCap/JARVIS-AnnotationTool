@@ -64,25 +64,18 @@ void ExtrinsicsCalibrator::run() {
   double mean_repro_error;
 
   if (numCameras == 2) {
-    if (!calibrateExtrinsicsPair(m_cameraPair, extrinsics1, mean_repro_error)) {
+    if (!calibrateExtrinsicsPairCharuco(m_cameraPair, extrinsics1, mean_repro_error)) {
       return;
     }
     emit finishedExtrinsics(extrinsics1.R, extrinsics1.T, mean_repro_error, m_threadNumber);
     if (m_interrupt) return;
-    // cv::FileStorage fse(m_parametersSavePath + "/Extrinsics/Extrinsics_" +
-    //       m_cameraPair[0].toStdString() + "_" + m_cameraPair[1].toStdString() +
-    //       ".yaml", cv::FileStorage::WRITE);
-    // fse << "R" << extrinsics1.R.t();
-    // fse << "T" << extrinsics1.T;
-    // fse << "E" << extrinsics1.E;
-    // fse << "F" << extrinsics1.F;
   }
 
   else if (numCameras == 3) {
     QList<QString> cameraPair1 = {m_cameraPair[0], m_cameraPair[1]};
     QList<QString> cameraPair2 = {m_cameraPair[1], m_cameraPair[2]};
-    bool success1 = calibrateExtrinsicsPair(cameraPair1, extrinsics1, mean_repro_error);
-    bool success2 = calibrateExtrinsicsPair(cameraPair2, extrinsics2, mean_repro_error);
+    bool success1 = calibrateExtrinsicsPairCharuco(cameraPair1, extrinsics1, mean_repro_error);
+    bool success2 = calibrateExtrinsicsPairCharuco(cameraPair2, extrinsics2, mean_repro_error);
     if (!success1 || !success2) {
       return;
     }
@@ -92,13 +85,6 @@ void ExtrinsicsCalibrator::run() {
     cv::Mat R = extrinsics2.R*extrinsics1.R;
     cv::Mat T = R*(T1_t + extrinsics1.R.t()*T2_t);
     emit finishedExtrinsics(R, T, mean_repro_error, m_threadNumber);
-    // cv::FileStorage fse(m_parametersSavePath + "/Extrinsics/Extrinsics_" +
-    //       m_cameraPair[0].toStdString() + "_" + m_cameraPair[2].toStdString() +
-    //       ".yaml", cv::FileStorage::WRITE);
-    // fse << "R" << R.t();
-    // fse << "T" << T;
-    // fse << "E" << extrinsics1.E;
-    // fse << "F" << extrinsics1.F;
   }
 }
 
@@ -111,13 +97,6 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair,
       checkerBoardPoints.push_back(cv::Point3f((float)j *
             m_calibrationConfig->patternSideLength,
             (float)i * m_calibrationConfig->patternSideLength, 0));
-
-  // cv::Mat checkerBoardPoints;
-  // cv::FileStorage fs("/home/lambda2/Documents/Miller_Lab/CalibrationTest4/Test/cam_0.yaml", cv::FileStorage::READ);
-  // std::cout << "LOADING" << std::endl;
-  // fs["newObjectPoints"] >> checkerBoardPoints;
-  // std::cout << "READING" << std::endl;
-
 
   std::string cap1Path;
   std::string cap2Path;
@@ -239,6 +218,214 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair,
 	          objectPointsAll.push_back(checkerBoardPoints);
 	        }
 	      }
+	      emit extrinsicsProgress(counter*(skipIndex+1), frameCount,
+	            m_threadNumber);
+	      counter++;
+	    }
+	  }
+		cap1.release();
+		cap2.release();
+	  if (m_interrupt) return false;
+	}
+
+  if(objectPointsAll.size() < m_calibrationConfig->framesForExtrinsics) {
+    emit calibrationError("Camera pair [" + cameraPair[0] + ", "
+          + cameraPair[1] +  "]: Found only " +
+          QString::number(objectPointsAll.size()) + " valid checkerboards, "
+          "aborting calibration. Make sure your checkerboard parameters are "
+          "set correctly.");
+    return false;
+  }
+
+  double keep_ratio = imagePointsAll1.size() /
+        (double)std::min(m_calibrationConfig->framesForExtrinsics,
+        (int)imagePointsAll1.size());
+  for (double k = 0; k < imagePointsAll1.size(); k += keep_ratio) {
+    imagePoints1.push_back(imagePointsAll1[(int)k]);
+    imagePoints2.push_back(imagePointsAll2[(int)k]);
+    objectPoints.push_back(objectPointsAll[(int)k]);
+  }
+
+  Intrinsics i1,i2;
+	i1.K = m_intrinsicParameters[m_cameraPair[0]]["K"];
+	i1.D = m_intrinsicParameters[m_cameraPair[0]]["D"];
+	i2.K = m_intrinsicParameters[m_cameraPair[1]]["K"];
+	i2.D = m_intrinsicParameters[m_cameraPair[1]]["D"];
+
+  mean_repro_error = stereoCalibrationStep(objectPoints, imagePoints1,
+        imagePoints2, i1,i2,e, size, 1.4);
+  std::cout << "Mean Reprojection Error after Stage 1: " <<
+        mean_repro_error << std::endl;
+  std::cout << "Number Images for Stage 2: " <<
+        imagePoints1.size() << std::endl;
+
+  mean_repro_error = stereoCalibrationStep(objectPoints, imagePoints1,
+        imagePoints2, i1,i2,e, size, 1.6);
+  std::cout << "Mean Reprojection Error after Stage 2: " <<
+        mean_repro_error << std::endl;
+  std::cout << "Final Number Images: " <<imagePoints1.size() << std::endl;
+
+  cv::Mat errs;
+  mean_repro_error = cv::stereoCalibrate(objectPoints, imagePoints1,
+        imagePoints2, i1.K, i1.D, i2.K, i2.D, size, e.R, e.T, e.E, e.F,errs,
+        cv::CALIB_FIX_INTRINSIC, cv::TermCriteria(cv::TermCriteria::MAX_ITER |
+        cv::TermCriteria::EPS, 120, 1e-7));
+
+  //TODO: this is not quite right for triplet, do average over both instead or something
+  return true;
+}
+
+
+bool ExtrinsicsCalibrator::calibrateExtrinsicsPairCharuco(QList<QString> cameraPair,
+      Extrinsics &e, double &mean_repro_error) {
+
+  cv::Ptr<cv::aruco::Dictionary> dictionary =
+  cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_50);
+  cv::Ptr<cv::aruco::CharucoBoard> board =
+  cv::aruco::CharucoBoard::create(m_calibrationConfig->patternWidth,
+  m_calibrationConfig->patternHeight, 0.04f, 0.02f, dictionary);
+  cv::Ptr<cv::aruco::DetectorParameters> charucoParams =
+  cv::aruco::DetectorParameters::create();
+
+  std::vector<cv::Point3f> checkerBoardPoints;
+  for (int i = 0; i < m_calibrationConfig->patternHeight-1; i++)
+    for (int j = 0; j < m_calibrationConfig->patternWidth-1; j++)
+      checkerBoardPoints.push_back(cv::Point3f((float)j *
+            m_calibrationConfig->patternSideLength, (float)i *
+            m_calibrationConfig->patternSideLength, 0));
+
+  std::string cap1Path;
+  std::string cap2Path;
+  if (m_calibrationConfig->single_primary == false) {
+    QString format1 = getFormat(m_calibrationConfig->extrinsicsPath + "/" +
+          cameraPair[0] + "-" + cameraPair[1], cameraPair[0]);
+    QString format2 = getFormat(m_calibrationConfig->extrinsicsPath + "/" +
+          cameraPair[0] + "-" + cameraPair[1], cameraPair[1]);
+    cap1Path = (m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] +
+          "-" + cameraPair[1] + "/" + cameraPair[0] + "." +
+          format1).toStdString();
+    cap2Path = (m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] +
+          "-" + cameraPair[1] + "/" + cameraPair[1] + "." +
+          format1).toStdString();
+  }
+  else {
+    QString format1 = getFormat(m_calibrationConfig->extrinsicsPath,
+          cameraPair[0]);
+    QString format2 = getFormat(m_calibrationConfig->extrinsicsPath,
+          cameraPair[1]);
+    cap1Path = (m_calibrationConfig->extrinsicsPath + "/" + cameraPair[0] +
+          "." + format1).toStdString();
+    cap2Path = (m_calibrationConfig->extrinsicsPath + "/" + cameraPair[1] +
+          "." + format2).toStdString();
+  }
+
+  std::vector<std::vector<cv::Point3f>> objectPointsAll, objectPoints;
+  std::vector<std::vector<cv::Point2f>> imagePointsAll1, imagePointsAll2,
+                                        imagePoints1, imagePoints2;
+	cv::Size size;
+	int iteration = 0;
+	int skipIndex;
+
+	while (objectPointsAll.size() < m_calibrationConfig->framesForExtrinsics) {
+		cv::VideoCapture cap1(cap1Path);
+	  cv::VideoCapture cap2(cap2Path);
+		int frameCount = cap1.get(cv::CAP_PROP_FRAME_COUNT);
+		if (iteration == 0) {
+			skipIndex = frameCount/(m_calibrationConfig->framesForExtrinsics*1.5);
+			skipIndex = std::max(1, skipIndex-skipIndex%4);
+		}
+		else if (iteration% 2 == 1 && iteration < 4 && skipIndex > 1) {
+			cap1.set(cv::CAP_PROP_POS_FRAMES, skipIndex/2);
+			cap2.set(cv::CAP_PROP_POS_FRAMES, skipIndex/2);
+		}
+		else if (iteration == 2 && skipIndex > 3) {
+			cap1.set(cv::CAP_PROP_POS_FRAMES, skipIndex/4);
+			cap2.set(cv::CAP_PROP_POS_FRAMES, skipIndex/4);
+			skipIndex = skipIndex/2;
+		}
+		else if (iteration < 5) {
+      imagePointsAll1.clear();
+      imagePointsAll2.clear();
+      objectPointsAll.clear();
+      cap1.set(cv::CAP_PROP_POS_FRAMES, 0);
+      cap2.set(cv::CAP_PROP_POS_FRAMES, 0);
+      skipIndex = 5;
+		}
+    else {
+      break;
+    }
+		iteration++;
+
+	  bool read_success = true;
+	  int counter = 0;
+	  cv::Mat img1,img2;
+	  while (read_success && !m_interrupt) {
+	    bool read_success1 = cap1.read(img1);
+	    bool read_success2 = cap2.read(img2);
+	    read_success = read_success1 && read_success2;
+	    if (read_success) {
+	      int frameIndex = cap1.get(cv::CAP_PROP_POS_FRAMES);
+	      cap1.set(cv::CAP_PROP_POS_FRAMES, frameIndex+skipIndex);
+	      cap2.set(cv::CAP_PROP_POS_FRAMES, frameIndex+skipIndex);
+	      if (frameIndex > frameCount) read_success = false;
+	      size = img1.size();
+
+        bool patternFound1 = false;
+        bool patternFound2 = false;
+
+        std::vector<int> markerIds1, markerIds2;
+        std::vector<std::vector<cv::Point2f>> markerCorners1, markerCorners2;
+        std::vector<cv::Point2f> charucoCorners1, charucoCorners2;
+        std::vector<int> charucoIds1,charucoIds2;
+        cv::Mat  imageCopy1, imageCopy2;
+        img1.copyTo(imageCopy1);
+        img2.copyTo(imageCopy2);
+        cv::aruco::detectMarkers(img1, board->dictionary, markerCorners1, markerIds1, charucoParams);
+         if (markerIds1.size() > 5) {
+             cv::aruco::drawDetectedMarkers(imageCopy1, markerCorners1, markerIds1);
+             cv::aruco::interpolateCornersCharuco(markerCorners1, markerIds1, img1, board, charucoCorners1, charucoIds1);
+           if (charucoIds1.size() > 5) {
+               cv::Scalar color = cv::Scalar(255, 0, 0);
+               cv::aruco::drawDetectedCornersCharuco(imageCopy1, charucoCorners1, charucoIds1, color);
+               patternFound1 = true;
+             }
+         }
+         cv::aruco::detectMarkers(img2, board->dictionary, markerCorners2, markerIds2, charucoParams);
+          if (markerIds2.size() > 5) {
+              cv::aruco::drawDetectedMarkers(imageCopy2, markerCorners2, markerIds2);
+              cv::aruco::interpolateCornersCharuco(markerCorners2, markerIds2, img2, board, charucoCorners2, charucoIds2);
+            if (charucoIds2.size() > 5) {
+                cv::Scalar color = cv::Scalar(255, 0, 0);
+                cv::aruco::drawDetectedCornersCharuco(imageCopy2, charucoCorners2, charucoIds2, color);
+                patternFound2 = true;
+            }
+          }
+	      if (patternFound1 && patternFound2) {
+          std::vector<cv::Point2f> commonCorners1, commonCorners2;
+          std::vector<int> commonIds;
+          for (int i = 0; i < charucoCorners1.size(); i++) {
+            for (int j = 0; j < charucoCorners2.size(); j++) {
+              if (charucoIds1.at(i) == charucoIds2.at(j)) {
+                commonIds.push_back(charucoIds1.at(i));
+                commonCorners1.push_back(charucoCorners1.at(i));
+                commonCorners2.push_back(charucoCorners2.at(j));
+              }
+            }
+          }
+          if (commonIds.size() > 4) {
+            cv::imwrite("/home/timo/Documents/JARVIS-AnnotationTool/temp/A_B/1_" + std::to_string(counter) + ".png" , imageCopy1);
+            cv::imwrite("/home/timo/Documents/JARVIS-AnnotationTool/temp/A_B/2_" + std::to_string(counter) + ".png" , imageCopy2);
+            std::vector<cv::Point3f> objectPointsDetected;
+            std::cout << "IDs:" << std::endl;
+            for (int i = 0; i < commonIds.size(); i++) {
+              std::cout << commonIds.at(i) << std::endl;
+              objectPointsDetected.push_back(checkerBoardPoints.at(commonIds.at(i)));
+            }
+            imagePointsAll1.push_back(commonCorners1);
+            imagePointsAll2.push_back(commonCorners2);
+            objectPointsAll.push_back(objectPointsDetected);
+          }
+        }
 	      emit extrinsicsProgress(counter*(skipIndex+1), frameCount,
 	            m_threadNumber);
 	      counter++;

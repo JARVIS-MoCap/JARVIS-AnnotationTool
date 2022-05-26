@@ -51,6 +51,15 @@ IntrinsicsCalibrator::IntrinsicsCalibrator(CalibrationConfig *calibrationConfig,
 
 
 void IntrinsicsCalibrator::run() {
+  if (m_calibrationConfig->boardType == "Standard" || m_calibrationConfig->boardType == "ChAruco") {
+    run_standard();
+  }
+  else {
+    run_charuco();
+  }
+}
+
+void IntrinsicsCalibrator::run_standard() {
   std::vector<cv::Point3f> checkerBoardPoints;
   for (int i = 0; i < m_calibrationConfig->patternHeight; i++)
     for (int j = 0; j < m_calibrationConfig->patternWidth; j++)
@@ -78,6 +87,7 @@ void IntrinsicsCalibrator::run() {
 		cv::VideoCapture cap(m_calibrationConfig->intrinsicsPath.toStdString() + "/" +
 												 m_cameraName + "." + format.toStdString());
 		int frameCount = cap.get(cv::CAP_PROP_FRAME_COUNT);
+
 		if (iteration == 0) {
 			skipIndex = std::max(1, frameCount/(m_calibrationConfig->framesForIntrinsics*2));
 			skipIndex = skipIndex-skipIndex%4;
@@ -89,12 +99,15 @@ void IntrinsicsCalibrator::run() {
 			cap.set(cv::CAP_PROP_POS_FRAMES, skipIndex/4);
 			skipIndex = skipIndex/2;
 		}
-		else {
+		else if (iteration < 5) {
       imagePointsAll.clear();
       objectPointsAll.clear();
       cap.set(cv::CAP_PROP_POS_FRAMES, 0);
-      skipIndex = 10;
+      skipIndex = 1;
 		}
+    else {
+      break;
+    }
 		iteration++;
 
 	  bool read_success = true;
@@ -157,21 +170,157 @@ void IntrinsicsCalibrator::run() {
 
   cv::Mat K, D;
   std::vector< cv::Mat > rvecs, tvecs;
-  cv::Mat newObjectPoints;
-  // double repro_error = calibrateCameraRO(objectPoints, imagePoints, size,
-  //       1, K, D, rvecs, tvecs, newObjectPoints,
-  //       cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST,
-  //       cv::TermCriteria(cv::TermCriteria::MAX_ITER |
-  //         cv::TermCriteria::EPS, 100, 1e-7));
   double repro_error = calibrateCamera(objectPoints, imagePoints, size,
-        K, D, rvecs, tvecs,
-        cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST,
+    K, D, rvecs, tvecs,
+    cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST,
+    cv::TermCriteria(cv::TermCriteria::MAX_ITER |
+      cv::TermCriteria::EPS, 100, 1e-7));
+
+  emit finishedIntrinsics(K, D, repro_error, m_threadNumber);
+}
+
+
+
+void IntrinsicsCalibrator::run_charuco() {
+  std::vector<std::string> fileNames;
+  QString format = getFormat(m_calibrationConfig->intrinsicsPath,
+                             QString::fromStdString(m_cameraName));
+  cv::Size size;
+	int iteration = 0;
+	int skipIndex;
+
+  // std::vector<cv::Point3f> checkerBoardPoints;
+  // for (int i = 0; i < m_calibrationConfig->patternHeight-1; i++)
+  //   for (int j = 0; j < m_calibrationConfig->patternWidth-1; j++)
+  //     checkerBoardPoints.push_back(cv::Point3f((float)j *
+  //           m_calibrationConfig->patternSideLength, (float)i *
+  //           m_calibrationConfig->patternSideLength, 0));
+
+  cv::Ptr<cv::aruco::Dictionary> dictionary =
+  cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_50);
+  cv::Ptr<cv::aruco::CharucoBoard> board =
+  cv::aruco::CharucoBoard::create(m_calibrationConfig->patternWidth,
+  m_calibrationConfig->patternHeight, 0.04f, 0.02f, dictionary);
+  cv::Ptr<cv::aruco::DetectorParameters> charucoParams =
+  cv::aruco::DetectorParameters::create();
+
+  cv::Mat imageCopy;
+  cv::Mat boardImage;
+  board->draw(cv::Size(600, 500), boardImage, 10, 1);
+  cv::imwrite("/home/timo/Documents/JARVIS-AnnotationTool/BoardImage.jpg", boardImage);
+
+  std::vector<std::vector<int>> charucoIdsAll, charucoIds;
+  std::vector<std::vector<cv::Point2f>> charucoCornersAll, charucoCorners;
+
+
+	while (charucoIdsAll.size() < m_calibrationConfig->framesForIntrinsics) {
+    std::cout << charucoIdsAll.size() << std::endl;
+		cv::VideoCapture cap(m_calibrationConfig->intrinsicsPath.toStdString() + "/" +
+												 m_cameraName + "." + format.toStdString());
+		int frameCount = cap.get(cv::CAP_PROP_FRAME_COUNT);
+
+
+		if (iteration == 0) {
+			skipIndex = std::max(1, frameCount/(m_calibrationConfig->framesForIntrinsics*2));
+			skipIndex = skipIndex-skipIndex%4;
+		}
+		else if (iteration% 2 == 1 && iteration < 4) {
+			cap.set(cv::CAP_PROP_POS_FRAMES, skipIndex/2);
+		}
+		else if (iteration == 2) {
+			cap.set(cv::CAP_PROP_POS_FRAMES, skipIndex/4);
+			skipIndex = skipIndex/2;
+		}
+    else if (iteration < 5) {
+      charucoIdsAll.clear();
+      charucoCornersAll.clear();
+      cap.set(cv::CAP_PROP_POS_FRAMES, 0);
+      skipIndex = 10;
+		}
+    else {
+      break;
+    }
+		iteration++;
+
+	  bool read_success = true;
+	  int counter = 0;
+	  cv::Mat img;
+	  while (read_success && !m_interrupt) {
+	    read_success = cap.read(img);
+	    if (read_success) {
+	      size = img.size();
+	      int frameIndex = cap.get(cv::CAP_PROP_POS_FRAMES);
+	      cap.set(cv::CAP_PROP_POS_FRAMES, frameIndex+skipIndex);
+	      if (frameIndex > frameCount) read_success = false;
+        std::vector<int> markerIds;
+        std::vector<std::vector<cv::Point2f>> markerCorners;
+        img.copyTo(imageCopy);
+        cv::aruco::detectMarkers(img, board->dictionary, markerCorners, markerIds, charucoParams);
+         // if at least one marker detected
+         if (markerIds.size() > 5) {
+             //cv::aruco::drawDetectedMarkers(imageCopy, markerCorners, markerIds);
+             std::vector<cv::Point2f> charucoCorners;
+             std::vector<int> charucoIds;
+             cv::aruco::interpolateCornersCharuco(markerCorners, markerIds, img, board, charucoCorners, charucoIds);
+             // if at least one charuco corner detected
+         if (charucoIds.size() > 5) {
+             cv::Scalar color = cv::Scalar(255, 0, 0);
+             cv::aruco::drawDetectedCornersCharuco(imageCopy, charucoCorners, charucoIds, color);
+             charucoCornersAll.push_back(charucoCorners);
+             charucoIdsAll.push_back(charucoIds);
+
+             // std::vector<cv::Point3f> objectPointsDetected;
+             // for (int i = 0; i < charucoIds.size(); i++) {
+             //   std::cout << charucoIds.at(i) << std::endl;
+             //   objectPointsDetected.push_back(checkerBoardPoints.at(charucoIds.at(i)));
+             // }
+             // std::cout << "VEC: " << std::endl;
+             // for (auto point : objectPointsDetected) {
+             //   std::cout << point << std::endl;
+             // }
+
+
+           }
+        }
+        cv::imwrite("/home/timo/Documents/JARVIS-AnnotationTool/temp/"+ m_cameraName + "/" + std::to_string(counter) + ".png" , imageCopy);
+	      emit intrinsicsProgress(counter * (skipIndex + 1), frameCount,
+	            m_threadNumber);
+	      counter++;
+	    }
+	  }
+		cap.release();
+	  if (m_interrupt) return;
+	}
+
+  if (charucoIdsAll.size() < m_calibrationConfig->framesForIntrinsics) {
+      emit calibrationError("Camera " + QString::fromStdString(m_cameraName) +
+      ": Found only " + QString::number(charucoIdsAll.size()) +
+      " valid checkerboards, aborting calibration. Make sure your checkerboard "
+      "parameters are set correctly.");
+      return;
+  }
+
+  double keep_ratio = charucoIdsAll.size() /
+        (double)std::min(m_calibrationConfig->framesForIntrinsics,
+        (int)charucoIdsAll.size());
+
+  for (double k = 0; k < charucoIdsAll.size(); k += keep_ratio) {
+    charucoIds.push_back(charucoIdsAll[(int)k]);
+    charucoCorners.push_back(charucoCornersAll[(int)k]);
+  }
+
+  cv::Mat K, D;
+  std::vector< cv::Mat > rvecs, tvecs;
+  double repro_error = cv::aruco::calibrateCameraCharuco(charucoCornersAll,
+        charucoIdsAll, board, size, K,
+        D, rvecs, tvecs, cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST,
         cv::TermCriteria(cv::TermCriteria::MAX_ITER |
-          cv::TermCriteria::EPS, 100, 1e-7));
-  // cv::FileStorage fs1(m_parametersSavePath + "/Test/" +
-  //       m_cameraName + ".yaml", cv::FileStorage::WRITE);
-  // fs1 << "newObjectPoints" << newObjectPoints;
-  // fs1 << "objectPoints" << checkerBoardPoints;
+        cv::TermCriteria::EPS, 100, 1e-7));
+  std::cout << K << std::endl;
+  std::cout << D << std::endl;
+
+  std::cout << "Repro Error: " << repro_error << std::endl;
+
   emit finishedIntrinsics(K, D, repro_error, m_threadNumber);
 }
 

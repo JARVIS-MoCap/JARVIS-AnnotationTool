@@ -138,6 +138,8 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	boardTypeCombo = new QComboBox(checkerboardWiget);
 	boardTypeCombo->addItem("Standard");
 	boardTypeCombo->addItem("ChAruco");
+	boardTypeCombo->addItem("ChArUco_OpenCV");
+
 	connect(boardTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NewCalibrationWidget::checkerBoardPatternChangesSlot);
 	LabelWithToolTip *widthLabel = new LabelWithToolTip("  Pattern Width",
 				"Does not count the outer edge of the pattern. Make sure the visualization matches your board!");
@@ -503,7 +505,7 @@ bool NewCalibrationWidget::checkExtrinsics(const QString& path, QString & errorM
 
 
 bool NewCalibrationWidget::checkCheckerboard() {
-	if (m_calibrationConfig->boardType == "ChAruco" || m_calibrationConfig->patternWidth%2 + m_calibrationConfig->patternHeight%2 == 1) {
+	if (m_calibrationConfig->boardType == "ChAruco" || m_calibrationConfig->boardType == "ChArUco_OpenCV" || m_calibrationConfig->patternWidth%2 + m_calibrationConfig->patternHeight%2 == 1) {
 		return true;
 	}
 	else {

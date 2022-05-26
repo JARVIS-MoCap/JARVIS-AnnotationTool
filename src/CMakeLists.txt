@@ -26,4 +26,5 @@ target_link_libraries(src
 	opencv_calib3d
 	opencv_videoio
 	opencv_imgproc
+	#opencv_highgui
 )
