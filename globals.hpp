@@ -96,9 +96,11 @@ struct CalibrationConfig {
 	int framesForIntrinsics;
 	int framesForExtrinsics;
 	QString boardType;
+	int charucoPatternIdx;
 	int patternWidth;
 	int patternHeight;
 	double patternSideLength;
+	double markerSideLength;
 	QList<QString> cameraNames;
 	QList<QList<QString>> cameraPairs;
 	bool single_primary = false;

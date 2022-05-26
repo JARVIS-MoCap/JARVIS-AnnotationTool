@@ -189,18 +189,12 @@ void IntrinsicsCalibrator::run_charuco() {
 	int iteration = 0;
 	int skipIndex;
 
-  // std::vector<cv::Point3f> checkerBoardPoints;
-  // for (int i = 0; i < m_calibrationConfig->patternHeight-1; i++)
-  //   for (int j = 0; j < m_calibrationConfig->patternWidth-1; j++)
-  //     checkerBoardPoints.push_back(cv::Point3f((float)j *
-  //           m_calibrationConfig->patternSideLength, (float)i *
-  //           m_calibrationConfig->patternSideLength, 0));
-
   cv::Ptr<cv::aruco::Dictionary> dictionary =
-  cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_50);
+    cv::aruco::getPredefinedDictionary(m_calibrationConfig->charucoPatternIdx);
   cv::Ptr<cv::aruco::CharucoBoard> board =
   cv::aruco::CharucoBoard::create(m_calibrationConfig->patternWidth,
-  m_calibrationConfig->patternHeight, 0.04f, 0.02f, dictionary);
+  m_calibrationConfig->patternHeight, m_calibrationConfig->patternSideLength,
+        m_calibrationConfig->markerSideLength, dictionary);
   cv::Ptr<cv::aruco::DetectorParameters> charucoParams =
   cv::aruco::DetectorParameters::create();
 
@@ -214,7 +208,6 @@ void IntrinsicsCalibrator::run_charuco() {
 
 
 	while (charucoIdsAll.size() < m_calibrationConfig->framesForIntrinsics) {
-    std::cout << charucoIdsAll.size() << std::endl;
 		cv::VideoCapture cap(m_calibrationConfig->intrinsicsPath.toStdString() + "/" +
 												 m_cameraName + "." + format.toStdString());
 		int frameCount = cap.get(cv::CAP_PROP_FRAME_COUNT);
@@ -256,30 +249,16 @@ void IntrinsicsCalibrator::run_charuco() {
         std::vector<std::vector<cv::Point2f>> markerCorners;
         img.copyTo(imageCopy);
         cv::aruco::detectMarkers(img, board->dictionary, markerCorners, markerIds, charucoParams);
-         // if at least one marker detected
          if (markerIds.size() > 5) {
              //cv::aruco::drawDetectedMarkers(imageCopy, markerCorners, markerIds);
              std::vector<cv::Point2f> charucoCorners;
              std::vector<int> charucoIds;
              cv::aruco::interpolateCornersCharuco(markerCorners, markerIds, img, board, charucoCorners, charucoIds);
-             // if at least one charuco corner detected
          if (charucoIds.size() > 5) {
              cv::Scalar color = cv::Scalar(255, 0, 0);
              cv::aruco::drawDetectedCornersCharuco(imageCopy, charucoCorners, charucoIds, color);
              charucoCornersAll.push_back(charucoCorners);
              charucoIdsAll.push_back(charucoIds);
-
-             // std::vector<cv::Point3f> objectPointsDetected;
-             // for (int i = 0; i < charucoIds.size(); i++) {
-             //   std::cout << charucoIds.at(i) << std::endl;
-             //   objectPointsDetected.push_back(checkerBoardPoints.at(charucoIds.at(i)));
-             // }
-             // std::cout << "VEC: " << std::endl;
-             // for (auto point : objectPointsDetected) {
-             //   std::cout << point << std::endl;
-             // }
-
-
            }
         }
         cv::imwrite("/home/timo/Documents/JARVIS-AnnotationTool/temp/"+ m_cameraName + "/" + std::to_string(counter) + ".png" , imageCopy);
@@ -316,14 +295,11 @@ void IntrinsicsCalibrator::run_charuco() {
         D, rvecs, tvecs, cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST,
         cv::TermCriteria(cv::TermCriteria::MAX_ITER |
         cv::TermCriteria::EPS, 100, 1e-7));
-  std::cout << K << std::endl;
-  std::cout << D << std::endl;
 
-  std::cout << "Repro Error: " << repro_error << std::endl;
+  //std::cout << "Repro Error: " << repro_error << std::endl;
 
   emit finishedIntrinsics(K, D, repro_error, m_threadNumber);
 }
-
 
 QString IntrinsicsCalibrator::getFormat(const QString& path,
         const QString& cameraName) {

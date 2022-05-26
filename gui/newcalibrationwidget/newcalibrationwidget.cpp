@@ -139,8 +139,23 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	boardTypeCombo->addItem("Standard");
 	boardTypeCombo->addItem("ChAruco");
 	boardTypeCombo->addItem("ChArUco_OpenCV");
-
 	connect(boardTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NewCalibrationWidget::checkerBoardPatternChangesSlot);
+	connect(boardTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NewCalibrationWidget::boardTypeChangedSlot);
+
+
+	LabelWithToolTip *charucoPatternLabel = new LabelWithToolTip("  ChArUco Pattern",
+				"ArUco marker set used on your checkerboard!");
+	charucoPatternCombo = new QComboBox(checkerboardWiget);
+
+	charucoPatternCombo->addItems({"DICT_4X4_50","DICT_4X4_100","DICT_4X4_250",
+				"DICT_4X4_1000","DICT_5X5_50","DICT_5X5_100","DICT_5X5_250",
+				"DICT_5X5_1000","DICT_6X6_50","DICT_6X6_100","DICT_6X6_250",
+				"DICT_6X6_1000","DICT_7X7_50","DICT_7X7_100","DICT_7X7_250",
+				"DICT_7X7_1000","DICT_ARUCO_ORIGINAL","DICT_APRILTAG_16h5",
+				"DICT_APRILTAG_25h9","DICT_APRILTAG_36h10","DICT_APRILTAG_36h11"});
+	charucoPatternCombo->setCurrentIndex(8);
+	charucoPatternCombo->setEnabled(false);
+
 	LabelWithToolTip *widthLabel = new LabelWithToolTip("  Pattern Width",
 				"Does not count the outer edge of the pattern. Make sure the visualization matches your board!");
 	widthEdit = new QSpinBox();
@@ -158,7 +173,12 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	sideLengthEdit = new QDoubleSpinBox();
 	sideLengthEdit->setRange(0.0,1000.0);
 	sideLengthEdit->setValue(26.7);
-
+	LabelWithToolTip *markerLengthLabel = new LabelWithToolTip("  ArUco Marker Length [mm]",
+			"Sidelength of a single ArUco Marker square. Make sure you measure this accurately!");
+	markerLengthEdit = new QDoubleSpinBox();
+	markerLengthEdit->setRange(0.0,1000.0);
+	markerLengthEdit->setValue(10.0);
+	markerLengthEdit->setEnabled(false);
 
 	checkerBoardPreviewBox = new QGroupBox(this);
 	QGridLayout *checkerboardpreviewlayout = new QGridLayout(checkerBoardPreviewBox);
@@ -174,12 +194,16 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	i = 0;
 	checkerboardwidgetlayout->addWidget(boardTypeLabel,i,0);
 	checkerboardwidgetlayout->addWidget(boardTypeCombo,i++,1);
+	checkerboardwidgetlayout->addWidget(charucoPatternLabel,i,0);
+	checkerboardwidgetlayout->addWidget(charucoPatternCombo,i++,1);
 	checkerboardwidgetlayout->addWidget(widthLabel,i,0);
 	checkerboardwidgetlayout->addWidget(widthEdit,i++,1);
 	checkerboardwidgetlayout->addWidget(heightLabel,i,0);
 	checkerboardwidgetlayout->addWidget(heightEdit,i++,1);
 	checkerboardwidgetlayout->addWidget(sideLengthLabel,i,0);
 	checkerboardwidgetlayout->addWidget(sideLengthEdit,i++,1);
+	checkerboardwidgetlayout->addWidget(markerLengthLabel,i,0);
+	checkerboardwidgetlayout->addWidget(markerLengthEdit,i++,1);
 	checkerboardwidgetlayout->addWidget(checkerBoardPreviewBox,i++,1, Qt::AlignCenter);
 	checkerboardwidgetlayout->addWidget(checkerBoardPreviewLabel,i++,1, Qt::AlignCenter);
 
@@ -384,6 +408,7 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 		return;
 	}
 
+
 	m_calibrationConfig->calibrationSetName = calibrationSetNameEdit->text();
 	m_calibrationConfig->calibrationSetPath = calibrationSetPathWidget->path();
 	m_calibrationConfig->seperateIntrinsics = seperateRadioWidget->state();
@@ -393,11 +418,18 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	m_calibrationConfig->framesForExtrinsics = extrinsicsFramesEdit->value();
 	m_calibrationConfig->debug = saveDebugRadioWidget->state();
 	m_calibrationConfig->boardType = boardTypeCombo->currentText();
+	m_calibrationConfig->charucoPatternIdx = charucoPatternCombo->currentIndex();
 	m_calibrationConfig->patternWidth = widthEdit->value();
 	m_calibrationConfig->patternHeight = heightEdit->value();
 	m_calibrationConfig->patternSideLength = sideLengthEdit->value();
+	m_calibrationConfig->markerSideLength = markerLengthEdit->value();
 	m_calibrationConfig->cameraNames = cameraList->getItems();
 	m_calibrationConfig->cameraPairs = extrinsicsPairList->getItems();
+
+	if (m_calibrationConfig->patternSideLength <= m_calibrationConfig->markerSideLength) {
+		m_errorMsg->showMessage("Marker size cannot be bigger than pattern size!");
+		return;
+	}
 
 	if (!checkCalibrationExists(m_calibrationConfig->calibrationSetPath + "/" + m_calibrationConfig->calibrationSetName)) {
 		return;
@@ -547,8 +579,16 @@ void NewCalibrationWidget::sperateRadioStateChangedSlot(bool state) {
 
 
 QImage NewCalibrationWidget::createCheckerboardPreview() {
-	int width = widthEdit->value();
-	int height = heightEdit->value();
+	int width, height;
+	if (boardTypeCombo->currentText() == "ChArUco_OpenCV") {
+		width = widthEdit->value()-1;
+		height = heightEdit->value()-1;
+	}
+	else {
+		width = widthEdit->value();
+		height = heightEdit->value();
+	}
+
 	QImage checkerBoardImage(width+1, height+1, QImage::Format_RGB888);
 	for (int i = 0; i < width+1; i++) {
 		for (int j = 0; j < height+1; j++) {
@@ -566,14 +606,31 @@ QImage NewCalibrationWidget::createCheckerboardPreview() {
 
 void NewCalibrationWidget::checkerBoardPatternChangesSlot(int val) {
 	Q_UNUSED(val);
-	checkerBoardPreview->setPixmap(QPixmap::fromImage(createCheckerboardPreview().scaled((widthEdit->value()+1)*20,(heightEdit->value()+1)*20)));
-	if (boardTypeCombo->currentText() != "ChAruco" && (widthEdit->value()+ heightEdit->value()) % 2 == 0) {
+	if (boardTypeCombo->currentText() == "ChArUco_OpenCV") {
+		checkerBoardPreview->setPixmap(QPixmap::fromImage(createCheckerboardPreview().scaled((widthEdit->value())*20,(heightEdit->value())*20)));
+	}
+	else {
+		checkerBoardPreview->setPixmap(QPixmap::fromImage(createCheckerboardPreview().scaled((widthEdit->value()+1)*20,(heightEdit->value()+1)*20)));
+	}
+	if (boardTypeCombo->currentText() == "Standard" && (widthEdit->value()+ heightEdit->value()) % 2 == 0) {
 		checkerBoardPreviewBox->setStyleSheet("QGroupBox {  border: 4px solid rgba(164,32,34,255);}");
 		checkerBoardPreviewLabel->setText("<font color=#a42022>Use an assymetric Checkerboard!</font>");
 	}
 	else {
 		checkerBoardPreviewBox->setStyleSheet("QGroupBox {  border: 4px solid palette(highlight);}");
-		checkerBoardPreviewLabel->setText("<font color=#64a420>Make sure this matches your Checkerboard!</font>");
+		checkerBoardPreviewLabel->setText("<font color=#64a420>Make sure this matches your Checkerboard Pattern!</font>");
+	}
+}
+
+void NewCalibrationWidget::boardTypeChangedSlot(int val) {
+	Q_UNUSED(val);
+	if (boardTypeCombo->currentText() == "ChArUco_OpenCV") {
+		charucoPatternCombo->setEnabled(true);
+		markerLengthEdit->setEnabled(true);
+	}
+	else {
+		charucoPatternCombo->setEnabled(false);
+		markerLengthEdit->setEnabled(false);
 	}
 }
 
@@ -618,9 +675,12 @@ void NewCalibrationWidget::savePresetSlot(const QString& preset) {
 	settings->setValue("intrinsicsFrames", intrinsicsFramesEdit->value());
 	settings->setValue("extrinsicsFrames", extrinsicsFramesEdit->value());
 	settings->setValue("saveDebugImages", saveDebugRadioWidget->state());
+	settings->setValue("boardType", boardTypeCombo->currentIndex());
+	settings->setValue("charucoPattern", charucoPatternCombo->currentIndex());
 	settings->setValue("patternWidth", widthEdit->value());
 	settings->setValue("patternHeight", heightEdit->value());
 	settings->setValue("sideLength", sideLengthEdit->value());
+	settings->setValue("markerLength", markerLengthEdit->value());
 	settings->endGroup();
 	settings->endGroup();
 }
@@ -648,13 +708,18 @@ void NewCalibrationWidget::loadPresetSlot(const QString& preset) {
 	intrinsicsPathWidget->setPath(settings->value("intrinsicsFolder").toString());
 	extrinsicsPathWidget->setPath(settings->value("extrinsicsFolder").toString());
 	m_calibrationConfig->single_primary = settings->value("singlePrimary").toBool();
+	boardTypeCombo->setCurrentIndex(settings->value("boardType").toInt());
+	charucoPatternCombo->setCurrentIndex(settings->value("charucoPattern").toInt());
 
 	intrinsicsFramesEdit->setValue(settings->value("intrinsicsFrames").toInt());
 	extrinsicsFramesEdit->setValue(settings->value("extrinsicsFrames").toInt());
 	saveDebugRadioWidget->setState(settings->value("saveDebugImages").toBool());
+
 	widthEdit->setValue(settings->value("patternWidth").toInt());
 	heightEdit->setValue(settings->value("patternHeight").toInt());
 	sideLengthEdit->setValue(settings->value("sideLength").toDouble());
+	markerLengthEdit->setValue(settings->value("markerLength").toDouble());
+
 	settings->endGroup();
 	settings->endGroup();
 	extrinsicsPairList->cameraNamesChangedSlot(cameraList->getItems());

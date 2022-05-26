@@ -68,9 +68,12 @@ class NewCalibrationWidget : public QWidget {
 		YesNoRadioWidget *saveDebugRadioWidget;
 
 		QComboBox *boardTypeCombo;
+		QComboBox *charucoPatternCombo;
+
 		QSpinBox *widthEdit;
 		QSpinBox *heightEdit;
 		QDoubleSpinBox *sideLengthEdit;
+		QDoubleSpinBox *markerLengthEdit;
 		QGroupBox *checkerBoardPreviewBox;
 		QLabel *checkerBoardPreview;
 		QLabel *checkerBoardPreviewLabel;
@@ -104,6 +107,7 @@ class NewCalibrationWidget : public QWidget {
 		void calibrationErrorSlot(const QString &errorMsg);
 		void sperateRadioStateChangedSlot(bool state);
 		void checkerBoardPatternChangesSlot(int val);
+		void boardTypeChangedSlot(int val);
 
 		void intrinsicsPathChangedSlot(const QString &path);
 };
