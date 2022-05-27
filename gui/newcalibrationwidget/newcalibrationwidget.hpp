@@ -68,11 +68,13 @@ class NewCalibrationWidget : public QWidget {
 		YesNoRadioWidget *saveDebugRadioWidget;
 
 		QComboBox *boardTypeCombo;
+		LabelWithToolTip *charucoPatternLabel;
 		QComboBox *charucoPatternCombo;
 
 		QSpinBox *widthEdit;
 		QSpinBox *heightEdit;
 		QDoubleSpinBox *sideLengthEdit;
+		LabelWithToolTip *markerLengthLabel;
 		QDoubleSpinBox *markerLengthEdit;
 		QGroupBox *checkerBoardPreviewBox;
 		QLabel *checkerBoardPreview;

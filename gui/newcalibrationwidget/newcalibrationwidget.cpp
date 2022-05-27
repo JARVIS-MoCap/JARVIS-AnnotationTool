@@ -141,12 +141,9 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	boardTypeCombo->addItem("ChArUco_OpenCV");
 	connect(boardTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NewCalibrationWidget::checkerBoardPatternChangesSlot);
 	connect(boardTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NewCalibrationWidget::boardTypeChangedSlot);
-
-
-	LabelWithToolTip *charucoPatternLabel = new LabelWithToolTip("  ChArUco Pattern",
+	charucoPatternLabel = new LabelWithToolTip("  ChArUco Pattern",
 				"ArUco marker set used on your checkerboard!");
 	charucoPatternCombo = new QComboBox(checkerboardWiget);
-
 	charucoPatternCombo->addItems({"DICT_4X4_50","DICT_4X4_100","DICT_4X4_250",
 				"DICT_4X4_1000","DICT_5X5_50","DICT_5X5_100","DICT_5X5_250",
 				"DICT_5X5_1000","DICT_6X6_50","DICT_6X6_100","DICT_6X6_250",
@@ -154,7 +151,8 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 				"DICT_7X7_1000","DICT_ARUCO_ORIGINAL","DICT_APRILTAG_16h5",
 				"DICT_APRILTAG_25h9","DICT_APRILTAG_36h10","DICT_APRILTAG_36h11"});
 	charucoPatternCombo->setCurrentIndex(8);
-	charucoPatternCombo->setEnabled(false);
+	charucoPatternCombo->hide();
+	charucoPatternLabel->hide();
 
 	LabelWithToolTip *widthLabel = new LabelWithToolTip("  Pattern Width",
 				"Does not count the outer edge of the pattern. Make sure the visualization matches your board!");
@@ -173,12 +171,12 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	sideLengthEdit = new QDoubleSpinBox();
 	sideLengthEdit->setRange(0.0,1000.0);
 	sideLengthEdit->setValue(26.7);
-	LabelWithToolTip *markerLengthLabel = new LabelWithToolTip("  ArUco Marker Length [mm]",
+	markerLengthLabel = new LabelWithToolTip("  ArUco Marker Length [mm]",
 			"Sidelength of a single ArUco Marker square. Make sure you measure this accurately!");
 	markerLengthEdit = new QDoubleSpinBox();
 	markerLengthEdit->setRange(0.0,1000.0);
 	markerLengthEdit->setValue(10.0);
-	markerLengthEdit->setEnabled(false);
+	markerLengthEdit->hide();
 
 	checkerBoardPreviewBox = new QGroupBox(this);
 	QGridLayout *checkerboardpreviewlayout = new QGridLayout(checkerBoardPreviewBox);
@@ -625,12 +623,16 @@ void NewCalibrationWidget::checkerBoardPatternChangesSlot(int val) {
 void NewCalibrationWidget::boardTypeChangedSlot(int val) {
 	Q_UNUSED(val);
 	if (boardTypeCombo->currentText() == "ChArUco_OpenCV") {
-		charucoPatternCombo->setEnabled(true);
-		markerLengthEdit->setEnabled(true);
+		charucoPatternCombo->show();
+		charucoPatternLabel->show();
+		markerLengthEdit->show();
+		markerLengthLabel->show();
 	}
 	else {
-		charucoPatternCombo->setEnabled(false);
-		markerLengthEdit->setEnabled(false);
+		charucoPatternCombo->hide();
+		charucoPatternLabel->hide();
+		markerLengthEdit->hide();
+		markerLengthLabel->hide();
 	}
 }
 

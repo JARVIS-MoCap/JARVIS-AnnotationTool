@@ -16,23 +16,12 @@ elseif(UNIX)
   endif()
 endif()
 
-# set(Qt5_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5")
-# set(Qt5Core_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Core")
-# set(Qt5Widgets_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Widgets")
-# set(Qt5Charts_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Charts")
-# set(Qt5Multimedia_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Multimedia")
-# set(Qt5MultimediaWidgets_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5MultimediaWidgets")
-
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Charts REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
 find_package(Qt5MultimediaWidgets REQUIRED)
 message (STATUS "QT DIRECTORY ${Qt5Core_DIR}")
-
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
 
 if(NOT WIN32)
 	set(OpenCV_DIR "libs/OpenCV_4.5.1/${OS_LIB_DIR}/lib/cmake/opencv4")
@@ -42,9 +31,20 @@ endif()
 find_package(OpenCV REQUIRED)
 message(STATUS "OPENCV_DIR ${OpenCV_DIR}")
 
-set(yaml-cpp_DIR "libs/libyaml-cpp/${OS_LIB_DIR}/share/cmake/yaml-cpp")
-message (STATUS "${yaml-cpp_DIR}")
-find_package(yaml-cpp REQUIRED)
+
+set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "disable yaml tests")
+set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "disable yaml tools")
+set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "disable yaml contrib")
+
+add_subdirectory(libs/yaml-cpp/)
+
+
+find_package(OpenCV REQUIRED)
+
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
 if(APPLE)
 	#set(Eigen3_DIR "libs/eigen-3.3.8/MacOS/share/eigen3")
@@ -86,7 +86,7 @@ elseif(WIN32)
   )
 
 elseif (UNIX)
-  set(CMAKE_INSTALL_RPATH /usr/local/lib/JARVIS-AnnotationTool;/usr/local/lib/JARVIS-AnnotationTool/OpenCV;/usr/local/lib/JARVIS-AnnotationTool/Qt5/lib)
+  set(CMAKE_INSTALL_RPATH /usr/local/lib/JARVIS-AnnotationTool;/usr/local/lib/JARVIS-AnnotationTool/OpenCV;)
   add_executable(${PROJECT_NAME}
       main.cpp
       globals.hpp
@@ -116,4 +116,5 @@ target_link_libraries(${PROJECT_NAME}
   gui
   src
   darkstyle
+  yaml-cpp
 )
