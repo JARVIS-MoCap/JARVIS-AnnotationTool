@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::FontDatabaseSupport)
         endif()
     endif()
 
-    _populate_FontDatabaseSupport_target_properties(RELEASE "libQt5FontDatabaseSupport.a" "" FALSE)
+    _populate_FontDatabaseSupport_target_properties(RELEASE "Qt5FontDatabaseSupport.lib" "" FALSE)
 
-    if (EXISTS "${_qt5FontDatabaseSupport_install_prefix}/lib/libQt5FontDatabaseSupport.a" )
-        _populate_FontDatabaseSupport_target_properties(DEBUG "libQt5FontDatabaseSupport.a" "" FALSE)
+    if (EXISTS "${_qt5FontDatabaseSupport_install_prefix}/lib/Qt5FontDatabaseSupportd.lib" )
+        _populate_FontDatabaseSupport_target_properties(DEBUG "Qt5FontDatabaseSupportd.lib" "" FALSE)
     endif()
 
 

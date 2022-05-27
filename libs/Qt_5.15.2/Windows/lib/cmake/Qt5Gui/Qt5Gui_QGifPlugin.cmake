@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QGifPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Gui_QGifPlugin_Import.cpp"
 )
 
-_populate_Gui_plugin_properties(QGifPlugin RELEASE "imageformats/libqgif.a" FALSE)
+_populate_Gui_plugin_properties(QGifPlugin RELEASE "imageformats/qgif.lib" FALSE)
 
 list(APPEND Qt5Gui_PLUGINS Qt5::QGifPlugin)
 set_property(TARGET Qt5::Gui APPEND PROPERTY QT_ALL_PLUGINS_imageformats Qt5::QGifPlugin)

@@ -28,9 +28,8 @@
 #define QT_FEATURE_eglfs_vsp2 -1
 #define QT_FEATURE_eglfs_x11 -1
 #define QT_FEATURE_evdev -1
+#define QT_FEATURE_fontconfig -1
 #define QT_FEATURE_freetype 1
-#define QT_FEATURE_system_freetype 1
-#define QT_FEATURE_fontconfig 1
 #define QT_FEATURE_gif 1
 #define QT_FEATURE_harfbuzz 1
 #define QT_FEATURE_ico 1
@@ -46,9 +45,10 @@
 #define QT_FEATURE_multiprocess 1
 #define QT_FEATURE_png 1
 #define QT_FEATURE_raster_64bit 1
+#define QT_FEATURE_system_freetype -1
 #define QT_FEATURE_system_harfbuzz -1
-#define QT_FEATURE_system_jpeg 1
-#define QT_FEATURE_system_png 1
+#define QT_FEATURE_system_jpeg -1
+#define QT_FEATURE_system_png -1
 #define QT_FEATURE_tslib -1
 #define QT_FEATURE_tuiotouch 1
 #define QT_FEATURE_vkgen 1

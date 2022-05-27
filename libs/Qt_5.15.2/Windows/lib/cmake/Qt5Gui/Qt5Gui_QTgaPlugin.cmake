@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QTgaPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Gui_QTgaPlugin_Import.cpp"
 )
 
-_populate_Gui_plugin_properties(QTgaPlugin RELEASE "imageformats/libqtga.a" FALSE)
+_populate_Gui_plugin_properties(QTgaPlugin RELEASE "imageformats/qtga.lib" FALSE)
 
 list(APPEND Qt5Gui_PLUGINS Qt5::QTgaPlugin)
 set_property(TARGET Qt5::Gui APPEND PROPERTY QT_ALL_PLUGINS_imageformats Qt5::QTgaPlugin)

@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::DBus)
         endif()
     endif()
 
-    _populate_DBus_target_properties(RELEASE "libQt5DBus.a" "" FALSE)
+    _populate_DBus_target_properties(RELEASE "Qt5DBus.lib" "" FALSE)
 
-    if (EXISTS "${_qt5DBus_install_prefix}/lib/libQt5DBus.a" )
-        _populate_DBus_target_properties(DEBUG "libQt5DBus.a" "" FALSE)
+    if (EXISTS "${_qt5DBus_install_prefix}/lib/Qt5DBusd.lib" )
+        _populate_DBus_target_properties(DEBUG "Qt5DBusd.lib" "" FALSE)
     endif()
 
 

@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::Svg)
         endif()
     endif()
 
-    _populate_Svg_target_properties(RELEASE "libQt5Svg.a" "" FALSE)
+    _populate_Svg_target_properties(RELEASE "Qt5Svg.lib" "" FALSE)
 
-    if (EXISTS "${_qt5Svg_install_prefix}/lib/libQt5Svg.a" )
-        _populate_Svg_target_properties(DEBUG "libQt5Svg.a" "" FALSE)
+    if (EXISTS "${_qt5Svg_install_prefix}/lib/Qt5Svgd.lib" )
+        _populate_Svg_target_properties(DEBUG "Qt5Svgd.lib" "" FALSE)
     endif()
 
 

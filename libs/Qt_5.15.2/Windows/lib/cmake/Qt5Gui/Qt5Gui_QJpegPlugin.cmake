@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QJpegPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Gui_QJpegPlugin_Import.cpp"
 )
 
-_populate_Gui_plugin_properties(QJpegPlugin RELEASE "imageformats/libqjpeg.a" FALSE)
+_populate_Gui_plugin_properties(QJpegPlugin RELEASE "imageformats/qjpeg.lib" FALSE)
 
 list(APPEND Qt5Gui_PLUGINS Qt5::QJpegPlugin)
 set_property(TARGET Qt5::Gui APPEND PROPERTY QT_ALL_PLUGINS_imageformats Qt5::QJpegPlugin)

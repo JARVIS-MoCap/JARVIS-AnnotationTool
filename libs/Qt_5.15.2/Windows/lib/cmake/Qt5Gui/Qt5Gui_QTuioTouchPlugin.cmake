@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QTuioTouchPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Gui_QTuioTouchPlugin_Import.cpp"
 )
 
-_populate_Gui_plugin_properties(QTuioTouchPlugin RELEASE "generic/libqtuiotouchplugin.a" FALSE)
+_populate_Gui_plugin_properties(QTuioTouchPlugin RELEASE "generic/qtuiotouchplugin.lib" FALSE)
 
 list(APPEND Qt5Gui_PLUGINS Qt5::QTuioTouchPlugin)
 set_property(TARGET Qt5::Gui APPEND PROPERTY QT_ALL_PLUGINS_generic Qt5::QTuioTouchPlugin)

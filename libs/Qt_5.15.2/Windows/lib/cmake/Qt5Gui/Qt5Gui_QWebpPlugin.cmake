@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QWebpPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Gui_QWebpPlugin_Import.cpp"
 )
 
-_populate_Gui_plugin_properties(QWebpPlugin RELEASE "imageformats/libqwebp.a" FALSE)
+_populate_Gui_plugin_properties(QWebpPlugin RELEASE "imageformats/qwebp.lib" FALSE)
 
 list(APPEND Qt5Gui_PLUGINS Qt5::QWebpPlugin)
 set_property(TARGET Qt5::Gui APPEND PROPERTY QT_ALL_PLUGINS_imageformats Qt5::QWebpPlugin)

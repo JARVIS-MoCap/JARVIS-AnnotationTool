@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::WindowsUIAutomationSupport)
         endif()
     endif()
 
-    _populate_WindowsUIAutomationSupport_target_properties(RELEASE "libQt5WindowsUIAutomationSupport.a" "" FALSE)
+    _populate_WindowsUIAutomationSupport_target_properties(RELEASE "Qt5WindowsUIAutomationSupport.lib" "" FALSE)
 
-    if (EXISTS "${_qt5WindowsUIAutomationSupport_install_prefix}/lib/libQt5WindowsUIAutomationSupport.a" )
-        _populate_WindowsUIAutomationSupport_target_properties(DEBUG "libQt5WindowsUIAutomationSupport.a" "" FALSE)
+    if (EXISTS "${_qt5WindowsUIAutomationSupport_install_prefix}/lib/Qt5WindowsUIAutomationSupportd.lib" )
+        _populate_WindowsUIAutomationSupport_target_properties(DEBUG "Qt5WindowsUIAutomationSupportd.lib" "" FALSE)
     endif()
 
 

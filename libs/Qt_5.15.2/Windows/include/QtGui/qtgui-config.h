@@ -16,6 +16,7 @@
 #define QT_NO_OPENGL 
 #define QT_FEATURE_openvg -1
 #define QT_NO_EGL 
+#define QT_NO_FONTCONFIG 
 #define QT_FEATURE_imageformatplugin 1
 #define QT_FEATURE_highdpiscaling 1
 #define QT_FEATURE_im 1

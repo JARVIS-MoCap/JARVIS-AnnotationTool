@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::Sql)
         endif()
     endif()
 
-    _populate_Sql_target_properties(RELEASE "libQt5Sql.a" "" FALSE)
+    _populate_Sql_target_properties(RELEASE "Qt5Sql.lib" "" FALSE)
 
-    if (EXISTS "${_qt5Sql_install_prefix}/lib/libQt5Sql.a" )
-        _populate_Sql_target_properties(DEBUG "libQt5Sql.a" "" FALSE)
+    if (EXISTS "${_qt5Sql_install_prefix}/lib/Qt5Sqld.lib" )
+        _populate_Sql_target_properties(DEBUG "Qt5Sqld.lib" "" FALSE)
     endif()
 
 

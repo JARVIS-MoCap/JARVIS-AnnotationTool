@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::Core)
         endif()
     endif()
 
-    _populate_Core_target_properties(RELEASE "libQt5Core.a" "" FALSE)
+    _populate_Core_target_properties(RELEASE "Qt5Core.lib" "" FALSE)
 
-    if (EXISTS "${_qt5Core_install_prefix}/lib/libQt5Core.a" )
-        _populate_Core_target_properties(DEBUG "libQt5Core.a" "" FALSE)
+    if (EXISTS "${_qt5Core_install_prefix}/lib/Qt5Cored.lib" )
+        _populate_Core_target_properties(DEBUG "Qt5Cored.lib" "" FALSE)
     endif()
 
 

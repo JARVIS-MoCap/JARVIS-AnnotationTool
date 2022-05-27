@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QWindowsPrinterSupportPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5PrintSupport_QWindowsPrinterSupportPlugin_Import.cpp"
 )
 
-_populate_PrintSupport_plugin_properties(QWindowsPrinterSupportPlugin RELEASE "printsupport/libwindowsprintersupport.a" FALSE)
+_populate_PrintSupport_plugin_properties(QWindowsPrinterSupportPlugin RELEASE "printsupport/windowsprintersupport.lib" FALSE)
 
 list(APPEND Qt5PrintSupport_PLUGINS Qt5::QWindowsPrinterSupportPlugin)
 set_property(TARGET Qt5::PrintSupport APPEND PROPERTY QT_ALL_PLUGINS_printsupport Qt5::QWindowsPrinterSupportPlugin)

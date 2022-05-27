@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::ThemeSupport)
         endif()
     endif()
 
-    _populate_ThemeSupport_target_properties(RELEASE "libQt5ThemeSupport.a" "" FALSE)
+    _populate_ThemeSupport_target_properties(RELEASE "Qt5ThemeSupport.lib" "" FALSE)
 
-    if (EXISTS "${_qt5ThemeSupport_install_prefix}/lib/libQt5ThemeSupport.a" )
-        _populate_ThemeSupport_target_properties(DEBUG "libQt5ThemeSupport.a" "" FALSE)
+    if (EXISTS "${_qt5ThemeSupport_install_prefix}/lib/Qt5ThemeSupportd.lib" )
+        _populate_ThemeSupport_target_properties(DEBUG "Qt5ThemeSupportd.lib" "" FALSE)
     endif()
 
 

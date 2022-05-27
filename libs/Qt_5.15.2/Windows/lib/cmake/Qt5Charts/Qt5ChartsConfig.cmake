@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::Charts)
         endif()
     endif()
 
-    _populate_Charts_target_properties(RELEASE "libQt5Charts.a" "" FALSE)
+    _populate_Charts_target_properties(RELEASE "Qt5Charts.lib" "" FALSE)
 
-    if (EXISTS "${_qt5Charts_install_prefix}/lib/libQt5Charts.a" )
-        _populate_Charts_target_properties(DEBUG "libQt5Charts.a" "" FALSE)
+    if (EXISTS "${_qt5Charts_install_prefix}/lib/Qt5Chartsd.lib" )
+        _populate_Charts_target_properties(DEBUG "Qt5Chartsd.lib" "" FALSE)
     endif()
 
 

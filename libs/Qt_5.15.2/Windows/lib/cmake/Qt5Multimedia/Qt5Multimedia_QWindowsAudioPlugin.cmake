@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QWindowsAudioPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Multimedia_QWindowsAudioPlugin_Import.cpp"
 )
 
-_populate_Multimedia_plugin_properties(QWindowsAudioPlugin RELEASE "audio/libqtaudio_windows.a" FALSE)
+_populate_Multimedia_plugin_properties(QWindowsAudioPlugin RELEASE "audio/qtaudio_windows.lib" FALSE)
 
 list(APPEND Qt5Multimedia_PLUGINS Qt5::QWindowsAudioPlugin)
 set_property(TARGET Qt5::Multimedia APPEND PROPERTY QT_ALL_PLUGINS_audio Qt5::QWindowsAudioPlugin)

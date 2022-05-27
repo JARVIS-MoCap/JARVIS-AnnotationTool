@@ -296,10 +296,10 @@ if (NOT TARGET Qt5::Gui)
                  opengles2;dynamicgl;angle;combined-angle-lib;opengl;openvg;opengles3;opengles31;opengles32;system-textmarkdownreader;vulkan)
     set_property(TARGET Qt5::Gui
                  PROPERTY QT_ENABLED_PRIVATE_FEATURES
-                 dxgi;direct3d11;direct2d;direct2d1_1;dxgi1_2;direct3d11_1;direct3d9;directwrite;directwrite1;directwrite2;dxguid;freetype;system-freetype;fontconfig;gif;harfbuzz;ico;imageio-text-loading;jpeg;multiprocess;png;raster-64bit;system-jpeg;system-png;tuiotouch;vkgen)
+                 dxgi;direct3d11;direct2d;direct2d1_1;dxgi1_2;direct3d11_1;direct3d9;directwrite;directwrite1;directwrite2;dxguid;freetype;gif;harfbuzz;ico;imageio-text-loading;jpeg;multiprocess;png;raster-64bit;tuiotouch;vkgen)
     set_property(TARGET Qt5::Gui
                  PROPERTY QT_DISABLED_PRIVATE_FEATURES
-                 xcb;accessibility-atspi-bridge;angle_d3d11_qdtd;directfb;drm_atomic;egl;egl_x11;eglfs;eglfs_brcm;eglfs_egldevice;eglfs_gbm;eglfs_mali;eglfs_openwfd;eglfs_rcar;eglfs_viv;eglfs_viv_wl;eglfs_vsp2;eglfs_x11;evdev;integrityfb;integrityhid;kms;libinput;libinput-axis-api;linuxfb;mtdev;system-harfbuzz;tslib;vnc;vsp2;xlib;xcb-xlib;xkbcommon;xkbcommon-x11)
+                 xcb;accessibility-atspi-bridge;angle_d3d11_qdtd;directfb;drm_atomic;egl;egl_x11;eglfs;eglfs_brcm;eglfs_egldevice;eglfs_gbm;eglfs_mali;eglfs_openwfd;eglfs_rcar;eglfs_viv;eglfs_viv_wl;eglfs_vsp2;eglfs_x11;evdev;fontconfig;integrityfb;integrityhid;kms;libinput;libinput-axis-api;linuxfb;mtdev;system-freetype;system-harfbuzz;system-jpeg;system-png;tslib;vnc;vsp2;xlib;xcb-xlib;xkbcommon;xkbcommon-x11)
 
     set_property(TARGET Qt5::Gui PROPERTY INTERFACE_QT_PLUGIN_TYPES "accessiblebridge;platforms;platforms/darwin;xcbglintegrations;platformthemes;platforminputcontexts;generic;iconengines;imageformats;egldeviceintegrations")
 
@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::Gui)
         endif()
     endif()
 
-    _populate_Gui_target_properties(RELEASE "libQt5Gui.a" "" FALSE)
+    _populate_Gui_target_properties(RELEASE "Qt5Gui.lib" "" FALSE)
 
-    if (EXISTS "${_qt5Gui_install_prefix}/lib/libQt5Gui.a" )
-        _populate_Gui_target_properties(DEBUG "libQt5Gui.a" "" FALSE)
+    if (EXISTS "${_qt5Gui_install_prefix}/lib/Qt5Guid.lib" )
+        _populate_Gui_target_properties(DEBUG "Qt5Guid.lib" "" FALSE)
     endif()
 
 

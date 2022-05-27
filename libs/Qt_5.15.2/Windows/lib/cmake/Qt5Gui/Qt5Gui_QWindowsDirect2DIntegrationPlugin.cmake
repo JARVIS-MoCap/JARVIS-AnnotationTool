@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QWindowsDirect2DIntegrationPlugin PROPERTY INTERFACE_SO
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Gui_QWindowsDirect2DIntegrationPlugin_Import.cpp"
 )
 
-_populate_Gui_plugin_properties(QWindowsDirect2DIntegrationPlugin RELEASE "platforms/libqdirect2d.a" FALSE)
+_populate_Gui_plugin_properties(QWindowsDirect2DIntegrationPlugin RELEASE "platforms/qdirect2d.lib" FALSE)
 
 list(APPEND Qt5Gui_PLUGINS Qt5::QWindowsDirect2DIntegrationPlugin)
 set_property(TARGET Qt5::Gui APPEND PROPERTY QT_ALL_PLUGINS_platforms Qt5::QWindowsDirect2DIntegrationPlugin)

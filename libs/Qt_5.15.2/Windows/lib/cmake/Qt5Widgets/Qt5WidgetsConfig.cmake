@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::Widgets)
         endif()
     endif()
 
-    _populate_Widgets_target_properties(RELEASE "libQt5Widgets.a" "" FALSE)
+    _populate_Widgets_target_properties(RELEASE "Qt5Widgets.lib" "" FALSE)
 
-    if (EXISTS "${_qt5Widgets_install_prefix}/lib/libQt5Widgets.a" )
-        _populate_Widgets_target_properties(DEBUG "libQt5Widgets.a" "" FALSE)
+    if (EXISTS "${_qt5Widgets_install_prefix}/lib/Qt5Widgetsd.lib" )
+        _populate_Widgets_target_properties(DEBUG "Qt5Widgetsd.lib" "" FALSE)
     endif()
 
 

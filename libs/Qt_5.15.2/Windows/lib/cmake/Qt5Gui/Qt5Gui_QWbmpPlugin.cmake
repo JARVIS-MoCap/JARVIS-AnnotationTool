@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QWbmpPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Gui_QWbmpPlugin_Import.cpp"
 )
 
-_populate_Gui_plugin_properties(QWbmpPlugin RELEASE "imageformats/libqwbmp.a" FALSE)
+_populate_Gui_plugin_properties(QWbmpPlugin RELEASE "imageformats/qwbmp.lib" FALSE)
 
 list(APPEND Qt5Gui_PLUGINS Qt5::QWbmpPlugin)
 set_property(TARGET Qt5::Gui APPEND PROPERTY QT_ALL_PLUGINS_imageformats Qt5::QWbmpPlugin)

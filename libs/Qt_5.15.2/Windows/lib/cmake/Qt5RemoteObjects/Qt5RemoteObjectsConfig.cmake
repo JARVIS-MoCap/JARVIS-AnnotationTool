@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::RemoteObjects)
         endif()
     endif()
 
-    _populate_RemoteObjects_target_properties(RELEASE "libQt5RemoteObjects.a" "" FALSE)
+    _populate_RemoteObjects_target_properties(RELEASE "Qt5RemoteObjects.lib" "" FALSE)
 
-    if (EXISTS "${_qt5RemoteObjects_install_prefix}/lib/libQt5RemoteObjects.a" )
-        _populate_RemoteObjects_target_properties(DEBUG "libQt5RemoteObjects.a" "" FALSE)
+    if (EXISTS "${_qt5RemoteObjects_install_prefix}/lib/Qt5RemoteObjectsd.lib" )
+        _populate_RemoteObjects_target_properties(DEBUG "Qt5RemoteObjectsd.lib" "" FALSE)
     endif()
 
 

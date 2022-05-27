@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::MultimediaWidgets)
         endif()
     endif()
 
-    _populate_MultimediaWidgets_target_properties(RELEASE "libQt5MultimediaWidgets.a" "" FALSE)
+    _populate_MultimediaWidgets_target_properties(RELEASE "Qt5MultimediaWidgets.lib" "" FALSE)
 
-    if (EXISTS "${_qt5MultimediaWidgets_install_prefix}/lib/libQt5MultimediaWidgets.a" )
-        _populate_MultimediaWidgets_target_properties(DEBUG "libQt5MultimediaWidgets.a" "" FALSE)
+    if (EXISTS "${_qt5MultimediaWidgets_install_prefix}/lib/Qt5MultimediaWidgetsd.lib" )
+        _populate_MultimediaWidgets_target_properties(DEBUG "Qt5MultimediaWidgetsd.lib" "" FALSE)
     endif()
 
 

@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::Xml)
         endif()
     endif()
 
-    _populate_Xml_target_properties(RELEASE "libQt5Xml.a" "" FALSE)
+    _populate_Xml_target_properties(RELEASE "Qt5Xml.lib" "" FALSE)
 
-    if (EXISTS "${_qt5Xml_install_prefix}/lib/libQt5Xml.a" )
-        _populate_Xml_target_properties(DEBUG "libQt5Xml.a" "" FALSE)
+    if (EXISTS "${_qt5Xml_install_prefix}/lib/Qt5Xmld.lib" )
+        _populate_Xml_target_properties(DEBUG "Qt5Xmld.lib" "" FALSE)
     endif()
 
 

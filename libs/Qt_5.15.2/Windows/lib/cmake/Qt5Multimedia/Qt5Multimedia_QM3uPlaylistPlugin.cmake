@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QM3uPlaylistPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Multimedia_QM3uPlaylistPlugin_Import.cpp"
 )
 
-_populate_Multimedia_plugin_properties(QM3uPlaylistPlugin RELEASE "playlistformats/libqtmultimedia_m3u.a" FALSE)
+_populate_Multimedia_plugin_properties(QM3uPlaylistPlugin RELEASE "playlistformats/qtmultimedia_m3u.lib" FALSE)
 
 list(APPEND Qt5Multimedia_PLUGINS Qt5::QM3uPlaylistPlugin)
 set_property(TARGET Qt5::Multimedia APPEND PROPERTY QT_ALL_PLUGINS_playlistformats Qt5::QM3uPlaylistPlugin)

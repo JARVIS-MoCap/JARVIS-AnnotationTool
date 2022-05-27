@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QSvgPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Gui_QSvgPlugin_Import.cpp"
 )
 
-_populate_Gui_plugin_properties(QSvgPlugin RELEASE "imageformats/libqsvg.a" FALSE)
+_populate_Gui_plugin_properties(QSvgPlugin RELEASE "imageformats/qsvg.lib" FALSE)
 
 list(APPEND Qt5Gui_PLUGINS Qt5::QSvgPlugin)
 set_property(TARGET Qt5::Gui APPEND PROPERTY QT_ALL_PLUGINS_imageformats Qt5::QSvgPlugin)

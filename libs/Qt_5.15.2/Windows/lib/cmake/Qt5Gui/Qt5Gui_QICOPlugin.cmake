@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QICOPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Gui_QICOPlugin_Import.cpp"
 )
 
-_populate_Gui_plugin_properties(QICOPlugin RELEASE "imageformats/libqico.a" FALSE)
+_populate_Gui_plugin_properties(QICOPlugin RELEASE "imageformats/qico.lib" FALSE)
 
 list(APPEND Qt5Gui_PLUGINS Qt5::QICOPlugin)
 set_property(TARGET Qt5::Gui APPEND PROPERTY QT_ALL_PLUGINS_imageformats Qt5::QICOPlugin)

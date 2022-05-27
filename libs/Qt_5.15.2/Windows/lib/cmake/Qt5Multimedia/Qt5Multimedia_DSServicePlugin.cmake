@@ -25,7 +25,7 @@ set_property(TARGET Qt5::DSServicePlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Multimedia_DSServicePlugin_Import.cpp"
 )
 
-_populate_Multimedia_plugin_properties(DSServicePlugin RELEASE "mediaservice/libdsengine.a" FALSE)
+_populate_Multimedia_plugin_properties(DSServicePlugin RELEASE "mediaservice/dsengine.lib" FALSE)
 
 list(APPEND Qt5Multimedia_PLUGINS Qt5::DSServicePlugin)
 set_property(TARGET Qt5::Multimedia APPEND PROPERTY QT_ALL_PLUGINS_mediaservice Qt5::DSServicePlugin)

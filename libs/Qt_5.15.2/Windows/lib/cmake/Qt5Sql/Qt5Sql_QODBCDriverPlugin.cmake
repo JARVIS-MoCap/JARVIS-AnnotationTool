@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QODBCDriverPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Sql_QODBCDriverPlugin_Import.cpp"
 )
 
-_populate_Sql_plugin_properties(QODBCDriverPlugin RELEASE "sqldrivers/libqsqlodbc.a" FALSE)
+_populate_Sql_plugin_properties(QODBCDriverPlugin RELEASE "sqldrivers/qsqlodbc.lib" FALSE)
 
 list(APPEND Qt5Sql_PLUGINS Qt5::QODBCDriverPlugin)
 set_property(TARGET Qt5::Sql APPEND PROPERTY QT_ALL_PLUGINS_sqldrivers Qt5::QODBCDriverPlugin)

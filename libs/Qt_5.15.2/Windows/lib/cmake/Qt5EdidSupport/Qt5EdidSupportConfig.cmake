@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::EdidSupport)
         endif()
     endif()
 
-    _populate_EdidSupport_target_properties(RELEASE "libQt5EdidSupport.a" "" FALSE)
+    _populate_EdidSupport_target_properties(RELEASE "Qt5EdidSupport.lib" "" FALSE)
 
-    if (EXISTS "${_qt5EdidSupport_install_prefix}/lib/libQt5EdidSupport.a" )
-        _populate_EdidSupport_target_properties(DEBUG "libQt5EdidSupport.a" "" FALSE)
+    if (EXISTS "${_qt5EdidSupport_install_prefix}/lib/Qt5EdidSupportd.lib" )
+        _populate_EdidSupport_target_properties(DEBUG "Qt5EdidSupportd.lib" "" FALSE)
     endif()
 
 

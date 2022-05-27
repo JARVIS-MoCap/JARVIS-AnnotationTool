@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QWindowsIntegrationPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Gui_QWindowsIntegrationPlugin_Import.cpp"
 )
 
-_populate_Gui_plugin_properties(QWindowsIntegrationPlugin RELEASE "platforms/libqwindows.a" FALSE)
+_populate_Gui_plugin_properties(QWindowsIntegrationPlugin RELEASE "platforms/qwindows.lib" FALSE)
 
 list(APPEND Qt5Gui_PLUGINS Qt5::QWindowsIntegrationPlugin)
 set_property(TARGET Qt5::Gui APPEND PROPERTY QT_ALL_PLUGINS_platforms Qt5::QWindowsIntegrationPlugin)

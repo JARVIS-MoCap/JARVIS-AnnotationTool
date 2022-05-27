@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::AxBase)
         endif()
     endif()
 
-    _populate_AxBase_target_properties(RELEASE "libQt5AxBase.a" "" FALSE)
+    _populate_AxBase_target_properties(RELEASE "Qt5AxBase.lib" "" FALSE)
 
-    if (EXISTS "${_qt5AxBase_install_prefix}/lib/libQt5AxBase.a" )
-        _populate_AxBase_target_properties(DEBUG "libQt5AxBase.a" "" FALSE)
+    if (EXISTS "${_qt5AxBase_install_prefix}/lib/Qt5AxBased.lib" )
+        _populate_AxBase_target_properties(DEBUG "Qt5AxBased.lib" "" FALSE)
     endif()
 
 

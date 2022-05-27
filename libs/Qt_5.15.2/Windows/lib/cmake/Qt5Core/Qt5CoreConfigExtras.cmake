@@ -90,7 +90,7 @@ if (NOT TARGET Qt5::WinMain)
     add_library(Qt5::WinMain STATIC IMPORTED)
 
     set_property(TARGET Qt5::WinMain APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
-    set(imported_location "${_qt5Core_install_prefix}/lib/libqtmain.a")
+    set(imported_location "${_qt5Core_install_prefix}/lib/qtmain.lib")
 
     set_target_properties(Qt5::WinMain PROPERTIES
         IMPORTED_LOCATION_RELEASE ${imported_location}

@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::AccessibilitySupport)
         endif()
     endif()
 
-    _populate_AccessibilitySupport_target_properties(RELEASE "libQt5AccessibilitySupport.a" "" FALSE)
+    _populate_AccessibilitySupport_target_properties(RELEASE "Qt5AccessibilitySupport.lib" "" FALSE)
 
-    if (EXISTS "${_qt5AccessibilitySupport_install_prefix}/lib/libQt5AccessibilitySupport.a" )
-        _populate_AccessibilitySupport_target_properties(DEBUG "libQt5AccessibilitySupport.a" "" FALSE)
+    if (EXISTS "${_qt5AccessibilitySupport_install_prefix}/lib/Qt5AccessibilitySupportd.lib" )
+        _populate_AccessibilitySupport_target_properties(DEBUG "Qt5AccessibilitySupportd.lib" "" FALSE)
     endif()
 
 

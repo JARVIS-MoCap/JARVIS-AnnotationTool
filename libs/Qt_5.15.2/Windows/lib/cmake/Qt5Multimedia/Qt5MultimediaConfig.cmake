@@ -296,10 +296,10 @@ if (NOT TARGET Qt5::Multimedia)
                  )
     set_property(TARGET Qt5::Multimedia
                  PROPERTY QT_ENABLED_PRIVATE_FEATURES
-                 directshow;evr;wshellitem)
+                 directshow;evr;wasapi;wmf;wmsdk;wshellitem)
     set_property(TARGET Qt5::Multimedia
                  PROPERTY QT_DISABLED_PRIVATE_FEATURES
-                 alsa;gpu_vivante;gstreamer_1_0;gstreamer_0_10;gstreamer;gstreamer_app;gstreamer_encodingprofiles;gstreamer_gl;gstreamer_photography;linux_v4l;openal;pulseaudio;resourcepolicy;wasapi;wmf;wmsdk)
+                 alsa;gpu_vivante;gstreamer_1_0;gstreamer_0_10;gstreamer;gstreamer_app;gstreamer_encodingprofiles;gstreamer_gl;gstreamer_photography;linux_v4l;openal;pulseaudio;resourcepolicy)
 
     set_property(TARGET Qt5::Multimedia PROPERTY INTERFACE_QT_PLUGIN_TYPES "mediaservice;audio;video/bufferpool;video/gstvideorenderer;video/videonode;playlistformats;resourcepolicy")
 
@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::Multimedia)
         endif()
     endif()
 
-    _populate_Multimedia_target_properties(RELEASE "libQt5Multimedia.a" "" FALSE)
+    _populate_Multimedia_target_properties(RELEASE "Qt5Multimedia.lib" "" FALSE)
 
-    if (EXISTS "${_qt5Multimedia_install_prefix}/lib/libQt5Multimedia.a" )
-        _populate_Multimedia_target_properties(DEBUG "libQt5Multimedia.a" "" FALSE)
+    if (EXISTS "${_qt5Multimedia_install_prefix}/lib/Qt5Multimediad.lib" )
+        _populate_Multimedia_target_properties(DEBUG "Qt5Multimediad.lib" "" FALSE)
     endif()
 
 

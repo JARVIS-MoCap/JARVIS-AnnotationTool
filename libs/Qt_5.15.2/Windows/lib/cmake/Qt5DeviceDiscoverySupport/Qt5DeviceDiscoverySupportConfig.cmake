@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::DeviceDiscoverySupport)
         endif()
     endif()
 
-    _populate_DeviceDiscoverySupport_target_properties(RELEASE "libQt5DeviceDiscoverySupport.a" "" FALSE)
+    _populate_DeviceDiscoverySupport_target_properties(RELEASE "Qt5DeviceDiscoverySupport.lib" "" FALSE)
 
-    if (EXISTS "${_qt5DeviceDiscoverySupport_install_prefix}/lib/libQt5DeviceDiscoverySupport.a" )
-        _populate_DeviceDiscoverySupport_target_properties(DEBUG "libQt5DeviceDiscoverySupport.a" "" FALSE)
+    if (EXISTS "${_qt5DeviceDiscoverySupport_install_prefix}/lib/Qt5DeviceDiscoverySupportd.lib" )
+        _populate_DeviceDiscoverySupport_target_properties(DEBUG "Qt5DeviceDiscoverySupportd.lib" "" FALSE)
     endif()
 
 

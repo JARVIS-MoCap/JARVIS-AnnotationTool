@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QGenericEnginePlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Network_QGenericEnginePlugin_Import.cpp"
 )
 
-_populate_Network_plugin_properties(QGenericEnginePlugin RELEASE "bearer/libqgenericbearer.a" FALSE)
+_populate_Network_plugin_properties(QGenericEnginePlugin RELEASE "bearer/qgenericbearer.lib" FALSE)
 
 list(APPEND Qt5Network_PLUGINS Qt5::QGenericEnginePlugin)
 set_property(TARGET Qt5::Network APPEND PROPERTY QT_ALL_PLUGINS_bearer Qt5::QGenericEnginePlugin)

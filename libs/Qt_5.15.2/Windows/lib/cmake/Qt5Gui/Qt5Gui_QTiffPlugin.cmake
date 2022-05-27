@@ -1,7 +1,7 @@
 
 add_library(Qt5::QTiffPlugin MODULE IMPORTED)
 
-set(_Qt5QTiffPlugin_MODULE_DEPENDENCIES "Gui;Core")
+set(_Qt5QTiffPlugin_MODULE_DEPENDENCIES "Gui;Core;Zlib")
 
 foreach(_module_dep ${_Qt5QTiffPlugin_MODULE_DEPENDENCIES})
     if(NOT Qt5${_module_dep}_FOUND)
@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QTiffPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Gui_QTiffPlugin_Import.cpp"
 )
 
-_populate_Gui_plugin_properties(QTiffPlugin RELEASE "imageformats/libqtiff.a" FALSE)
+_populate_Gui_plugin_properties(QTiffPlugin RELEASE "imageformats/qtiff.lib" FALSE)
 
 list(APPEND Qt5Gui_PLUGINS Qt5::QTiffPlugin)
 set_property(TARGET Qt5::Gui APPEND PROPERTY QT_ALL_PLUGINS_imageformats Qt5::QTiffPlugin)
@@ -73,7 +73,7 @@ set_property(TARGET Qt5::Gui APPEND PROPERTY INTERFACE_LINK_LIBRARIES
     ${_plugin_genex}
 )
 set_property(TARGET Qt5::QTiffPlugin APPEND PROPERTY INTERFACE_LINK_LIBRARIES
-    "Qt5::Gui;Qt5::Core"
+    "Qt5::Gui;Qt5::Core;Qt5::Zlib"
 )
 set_property(TARGET Qt5::QTiffPlugin PROPERTY QT_PLUGIN_TYPE "imageformats")
 set_property(TARGET Qt5::QTiffPlugin PROPERTY QT_PLUGIN_EXTENDS "")

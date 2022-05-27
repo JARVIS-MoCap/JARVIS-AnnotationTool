@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QSQLiteDriverPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Sql_QSQLiteDriverPlugin_Import.cpp"
 )
 
-_populate_Sql_plugin_properties(QSQLiteDriverPlugin RELEASE "sqldrivers/libqsqlite.a" FALSE)
+_populate_Sql_plugin_properties(QSQLiteDriverPlugin RELEASE "sqldrivers/qsqlite.lib" FALSE)
 
 list(APPEND Qt5Sql_PLUGINS Qt5::QSQLiteDriverPlugin)
 set_property(TARGET Qt5::Sql APPEND PROPERTY QT_ALL_PLUGINS_sqldrivers Qt5::QSQLiteDriverPlugin)

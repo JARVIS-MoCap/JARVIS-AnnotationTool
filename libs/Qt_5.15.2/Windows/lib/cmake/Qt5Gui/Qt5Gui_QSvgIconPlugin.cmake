@@ -25,7 +25,7 @@ set_property(TARGET Qt5::QSvgIconPlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Gui_QSvgIconPlugin_Import.cpp"
 )
 
-_populate_Gui_plugin_properties(QSvgIconPlugin RELEASE "iconengines/libqsvgicon.a" FALSE)
+_populate_Gui_plugin_properties(QSvgIconPlugin RELEASE "iconengines/qsvgicon.lib" FALSE)
 
 list(APPEND Qt5Gui_PLUGINS Qt5::QSvgIconPlugin)
 set_property(TARGET Qt5::Gui APPEND PROPERTY QT_ALL_PLUGINS_iconengines Qt5::QSvgIconPlugin)

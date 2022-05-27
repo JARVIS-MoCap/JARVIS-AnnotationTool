@@ -25,7 +25,7 @@ set_property(TARGET Qt5::AudioCaptureServicePlugin PROPERTY INTERFACE_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/Qt5Multimedia_AudioCaptureServicePlugin_Import.cpp"
 )
 
-_populate_Multimedia_plugin_properties(AudioCaptureServicePlugin RELEASE "mediaservice/libqtmedia_audioengine.a" FALSE)
+_populate_Multimedia_plugin_properties(AudioCaptureServicePlugin RELEASE "mediaservice/qtmedia_audioengine.lib" FALSE)
 
 list(APPEND Qt5Multimedia_PLUGINS Qt5::AudioCaptureServicePlugin)
 set_property(TARGET Qt5::Multimedia APPEND PROPERTY QT_ALL_PLUGINS_mediaservice Qt5::AudioCaptureServicePlugin)

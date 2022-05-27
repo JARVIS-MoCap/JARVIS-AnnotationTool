@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::EventDispatcherSupport)
         endif()
     endif()
 
-    _populate_EventDispatcherSupport_target_properties(RELEASE "libQt5EventDispatcherSupport.a" "" FALSE)
+    _populate_EventDispatcherSupport_target_properties(RELEASE "Qt5EventDispatcherSupport.lib" "" FALSE)
 
-    if (EXISTS "${_qt5EventDispatcherSupport_install_prefix}/lib/libQt5EventDispatcherSupport.a" )
-        _populate_EventDispatcherSupport_target_properties(DEBUG "libQt5EventDispatcherSupport.a" "" FALSE)
+    if (EXISTS "${_qt5EventDispatcherSupport_install_prefix}/lib/Qt5EventDispatcherSupportd.lib" )
+        _populate_EventDispatcherSupport_target_properties(DEBUG "Qt5EventDispatcherSupportd.lib" "" FALSE)
     endif()
 
 

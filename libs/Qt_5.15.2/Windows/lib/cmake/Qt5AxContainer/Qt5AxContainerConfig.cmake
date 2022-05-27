@@ -331,10 +331,10 @@ if (NOT TARGET Qt5::AxContainer)
         endif()
     endif()
 
-    _populate_AxContainer_target_properties(RELEASE "libQt5AxContainer.a" "" FALSE)
+    _populate_AxContainer_target_properties(RELEASE "Qt5AxContainer.lib" "" FALSE)
 
-    if (EXISTS "${_qt5AxContainer_install_prefix}/lib/libQt5AxContainer.a" )
-        _populate_AxContainer_target_properties(DEBUG "libQt5AxContainer.a" "" FALSE)
+    if (EXISTS "${_qt5AxContainer_install_prefix}/lib/Qt5AxContainerd.lib" )
+        _populate_AxContainer_target_properties(DEBUG "Qt5AxContainerd.lib" "" FALSE)
     endif()
 
 

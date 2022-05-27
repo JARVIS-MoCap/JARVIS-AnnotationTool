@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::Test)
         endif()
     endif()
 
-    _populate_Test_target_properties(RELEASE "libQt5Test.a" "" FALSE)
+    _populate_Test_target_properties(RELEASE "Qt5Test.lib" "" FALSE)
 
-    if (EXISTS "${_qt5Test_install_prefix}/lib/libQt5Test.a" )
-        _populate_Test_target_properties(DEBUG "libQt5Test.a" "" FALSE)
+    if (EXISTS "${_qt5Test_install_prefix}/lib/Qt5Testd.lib" )
+        _populate_Test_target_properties(DEBUG "Qt5Testd.lib" "" FALSE)
     endif()
 
 

@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::FbSupport)
         endif()
     endif()
 
-    _populate_FbSupport_target_properties(RELEASE "libQt5FbSupport.a" "" FALSE)
+    _populate_FbSupport_target_properties(RELEASE "Qt5FbSupport.lib" "" FALSE)
 
-    if (EXISTS "${_qt5FbSupport_install_prefix}/lib/libQt5FbSupport.a" )
-        _populate_FbSupport_target_properties(DEBUG "libQt5FbSupport.a" "" FALSE)
+    if (EXISTS "${_qt5FbSupport_install_prefix}/lib/Qt5FbSupportd.lib" )
+        _populate_FbSupport_target_properties(DEBUG "Qt5FbSupportd.lib" "" FALSE)
     endif()
 
 

@@ -331,10 +331,10 @@ if (NOT TARGET Qt5::Concurrent)
         endif()
     endif()
 
-    _populate_Concurrent_target_properties(RELEASE "libQt5Concurrent.a" "" FALSE)
+    _populate_Concurrent_target_properties(RELEASE "Qt5Concurrent.lib" "" FALSE)
 
-    if (EXISTS "${_qt5Concurrent_install_prefix}/lib/libQt5Concurrent.a" )
-        _populate_Concurrent_target_properties(DEBUG "libQt5Concurrent.a" "" FALSE)
+    if (EXISTS "${_qt5Concurrent_install_prefix}/lib/Qt5Concurrentd.lib" )
+        _populate_Concurrent_target_properties(DEBUG "Qt5Concurrentd.lib" "" FALSE)
     endif()
 
 

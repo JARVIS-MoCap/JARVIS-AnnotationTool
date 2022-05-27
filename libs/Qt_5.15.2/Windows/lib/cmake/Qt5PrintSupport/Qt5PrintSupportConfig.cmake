@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::PrintSupport)
         endif()
     endif()
 
-    _populate_PrintSupport_target_properties(RELEASE "libQt5PrintSupport.a" "" FALSE)
+    _populate_PrintSupport_target_properties(RELEASE "Qt5PrintSupport.lib" "" FALSE)
 
-    if (EXISTS "${_qt5PrintSupport_install_prefix}/lib/libQt5PrintSupport.a" )
-        _populate_PrintSupport_target_properties(DEBUG "libQt5PrintSupport.a" "" FALSE)
+    if (EXISTS "${_qt5PrintSupport_install_prefix}/lib/Qt5PrintSupportd.lib" )
+        _populate_PrintSupport_target_properties(DEBUG "Qt5PrintSupportd.lib" "" FALSE)
     endif()
 
 

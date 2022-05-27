@@ -284,22 +284,22 @@ if (NOT TARGET Qt5::Network)
     set_property(TARGET Qt5::Network PROPERTY
       INTERFACE_COMPILE_DEFINITIONS QT_NETWORK_LIB)
 
-    set_property(TARGET Qt5::Network PROPERTY INTERFACE_QT_ENABLED_FEATURES networkinterface;bearermanagement;dnslookup;udpsocket;dtls;ftp;http;localserver;networkdiskcache;networkproxy;opensslv11;ocsp;socks5;ssl;sspi)
-    set_property(TARGET Qt5::Network PROPERTY INTERFACE_QT_DISABLED_FEATURES securetransport;schannel;gssapi;sctp)
+    set_property(TARGET Qt5::Network PROPERTY INTERFACE_QT_ENABLED_FEATURES networkinterface;bearermanagement;dnslookup;ftp;http;localserver;networkdiskcache;networkproxy;socks5;sspi;udpsocket)
+    set_property(TARGET Qt5::Network PROPERTY INTERFACE_QT_DISABLED_FEATURES securetransport;schannel;dtls;gssapi;opensslv11;ocsp;sctp;ssl)
 
     # Qt 6 forward compatible properties.
     set_property(TARGET Qt5::Network
                  PROPERTY QT_ENABLED_PUBLIC_FEATURES
-                 networkinterface;bearermanagement;dnslookup;udpsocket;dtls;ftp;http;localserver;networkdiskcache;networkproxy;opensslv11;ocsp;socks5;ssl;sspi)
+                 networkinterface;bearermanagement;dnslookup;ftp;http;localserver;networkdiskcache;networkproxy;socks5;sspi;udpsocket)
     set_property(TARGET Qt5::Network
                  PROPERTY QT_DISABLED_PUBLIC_FEATURES
-                 securetransport;schannel;gssapi;sctp)
+                 securetransport;schannel;dtls;gssapi;opensslv11;ocsp;sctp;ssl)
     set_property(TARGET Qt5::Network
                  PROPERTY QT_ENABLED_PRIVATE_FEATURES
-                 openssl;system-proxies)
+                 netlistmgr;system-proxies)
     set_property(TARGET Qt5::Network
                  PROPERTY QT_DISABLED_PRIVATE_FEATURES
-                 openssl-linked;libproxy;linux-netlink;netlistmgr)
+                 openssl-linked;openssl;libproxy;linux-netlink)
 
     set_property(TARGET Qt5::Network PROPERTY INTERFACE_QT_PLUGIN_TYPES "bearer")
 
@@ -334,10 +334,10 @@ if (NOT TARGET Qt5::Network)
         endif()
     endif()
 
-    _populate_Network_target_properties(RELEASE "libQt5Network.a" "" FALSE)
+    _populate_Network_target_properties(RELEASE "Qt5Network.lib" "" FALSE)
 
-    if (EXISTS "${_qt5Network_install_prefix}/lib/libQt5Network.a" )
-        _populate_Network_target_properties(DEBUG "libQt5Network.a" "" FALSE)
+    if (EXISTS "${_qt5Network_install_prefix}/lib/Qt5Networkd.lib" )
+        _populate_Network_target_properties(DEBUG "Qt5Networkd.lib" "" FALSE)
     endif()
 
 

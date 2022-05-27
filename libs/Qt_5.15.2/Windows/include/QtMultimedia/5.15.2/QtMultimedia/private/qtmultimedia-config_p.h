@@ -13,7 +13,7 @@
 #define QT_FEATURE_openal -1
 #define QT_FEATURE_pulseaudio -1
 #define QT_FEATURE_resourcepolicy -1
-#define QT_FEATURE_wasapi -1
-#define QT_FEATURE_wmf -1
-#define QT_FEATURE_wmsdk -1
+#define QT_FEATURE_wasapi 1
+#define QT_FEATURE_wmf 1
+#define QT_FEATURE_wmsdk 1
 #define QT_FEATURE_wshellitem 1

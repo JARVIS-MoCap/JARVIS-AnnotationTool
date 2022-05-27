@@ -331,10 +331,10 @@ if (NOT TARGET Qt5::AxServer)
         endif()
     endif()
 
-    _populate_AxServer_target_properties(RELEASE "libQt5AxServer.a" "" FALSE)
+    _populate_AxServer_target_properties(RELEASE "Qt5AxServer.lib" "" FALSE)
 
-    if (EXISTS "${_qt5AxServer_install_prefix}/lib/libQt5AxServer.a" )
-        _populate_AxServer_target_properties(DEBUG "libQt5AxServer.a" "" FALSE)
+    if (EXISTS "${_qt5AxServer_install_prefix}/lib/Qt5AxServerd.lib" )
+        _populate_AxServer_target_properties(DEBUG "Qt5AxServerd.lib" "" FALSE)
     endif()
 
 
