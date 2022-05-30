@@ -43,7 +43,7 @@ class ExportTrainingsetWidget : public QWidget {
 		void updateCounts();
 		void exportTrainingset(ExportConfig exportConfig);
 		void copiedFrameSet(int counter, int total, const QString &setName);
-		void exportFinished();
+		void exportFinished(bool success);
 		void exportCanceled();
 
 

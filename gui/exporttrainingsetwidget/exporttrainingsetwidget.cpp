@@ -458,6 +458,8 @@ void ExportTrainingsetWidget::exportClickedSlot() {
 	emit exportTrainingset(exportConfig);
 	int returnVal = trainingSetInfoWindow->exec();
 	if (returnVal == QDialog::Rejected) {
+		QErrorMessage* errorMsg = new QErrorMessage();
+		errorMsg->showMessage("Check if all datasets contain correct CalibrationParameters!");
 		emit exportCanceled();
 	}
 	else {

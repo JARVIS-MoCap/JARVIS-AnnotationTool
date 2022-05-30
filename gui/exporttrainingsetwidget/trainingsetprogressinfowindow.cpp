@@ -47,6 +47,11 @@ void TrainingSetInfoWindow::keyPressEvent(QKeyEvent *e) {
 }
 
 
-void TrainingSetInfoWindow::exportFinishedSlot() {
-	accept();
+void TrainingSetInfoWindow::exportFinishedSlot(bool success) {
+	if (success) {
+		accept();
+	}
+	else {
+		reject();
+	}
 }

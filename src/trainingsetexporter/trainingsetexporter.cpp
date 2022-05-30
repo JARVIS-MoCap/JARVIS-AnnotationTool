@@ -40,8 +40,8 @@ void TrainingSetExporter::exportTrainingsetSlot(ExportConfig exportConfig) {
 			copyCalibrationParams(exportConfig);
 		}
 		else {
-			QErrorMessage* errorMsg = new QErrorMessage();
-			errorMsg->showMessage("Check if all datasets contain correct CalibrationParameters!");
+			emit exportFinished(false);
+			return;
 		}
 	}
 
@@ -105,7 +105,7 @@ void TrainingSetExporter::exportTrainingsetSlot(ExportConfig exportConfig) {
 		m_exportCanceled = false;
 		return;
 	}
-	emit exportFinished();
+	emit exportFinished(true);
 }
 
 

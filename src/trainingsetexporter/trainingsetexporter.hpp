@@ -24,7 +24,7 @@ class TrainingSetExporter : public QObject {
 
 	signals:
 		void copiedFrameSet(int counter, int total, const QString &setName);
-		void exportFinished();
+		void exportFinished(bool success);
 
 	public slots:
 		void exportTrainingsetSlot(ExportConfig exportConfig);

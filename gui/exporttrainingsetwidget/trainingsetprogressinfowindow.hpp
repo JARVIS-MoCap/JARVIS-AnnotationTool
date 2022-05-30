@@ -27,7 +27,7 @@ class TrainingSetInfoWindow : public QDialog {
 
 	public slots:
 		void copyImagesProgressSlot(int frameCount, int totalNumFrames, const QString& setName);
-		void exportFinishedSlot();
+		void exportFinishedSlot(bool success);
 
 	signals:
 
