@@ -377,26 +377,18 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPairCharuco(QList<QString> cameraP
         std::vector<std::vector<cv::Point2f>> markerCorners1, markerCorners2;
         std::vector<cv::Point2f> charucoCorners1, charucoCorners2;
         std::vector<int> charucoIds1,charucoIds2;
-        cv::Mat  imageCopy1, imageCopy2;
-        img1.copyTo(imageCopy1);
-        img2.copyTo(imageCopy2);
         cv::aruco::detectMarkers(img1, board->dictionary, markerCorners1, markerIds1, charucoParams);
          if (markerIds1.size() > 5) {
-             cv::aruco::drawDetectedMarkers(imageCopy1, markerCorners1, markerIds1);
              cv::aruco::interpolateCornersCharuco(markerCorners1, markerIds1, img1, board, charucoCorners1, charucoIds1);
            if (charucoIds1.size() > 5) {
                cv::Scalar color = cv::Scalar(255, 0, 0);
-               cv::aruco::drawDetectedCornersCharuco(imageCopy1, charucoCorners1, charucoIds1, color);
                patternFound1 = true;
              }
          }
          cv::aruco::detectMarkers(img2, board->dictionary, markerCorners2, markerIds2, charucoParams);
           if (markerIds2.size() > 5) {
-              cv::aruco::drawDetectedMarkers(imageCopy2, markerCorners2, markerIds2);
               cv::aruco::interpolateCornersCharuco(markerCorners2, markerIds2, img2, board, charucoCorners2, charucoIds2);
             if (charucoIds2.size() > 5) {
-                cv::Scalar color = cv::Scalar(255, 0, 0);
-                cv::aruco::drawDetectedCornersCharuco(imageCopy2, charucoCorners2, charucoIds2, color);
                 patternFound2 = true;
             }
           }
@@ -413,12 +405,24 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPairCharuco(QList<QString> cameraP
             }
           }
           if (commonIds.size() > 4) {
-            cv::imwrite("/home/timo/Documents/JARVIS-AnnotationTool/temp/A_B/1_" + std::to_string(counter) + ".png" , imageCopy1);
-            cv::imwrite("/home/timo/Documents/JARVIS-AnnotationTool/temp/A_B/2_" + std::to_string(counter) + ".png" , imageCopy2);
+            if (m_calibrationConfig->debug) {
+              cv::Mat  imageCopy1, imageCopy2, debugImg;
+              img1.copyTo(imageCopy1);
+              img2.copyTo(imageCopy2);
+              cv::Scalar color = cv::Scalar(255, 0, 255);
+              cv::aruco::drawDetectedMarkers(imageCopy1, markerCorners1, markerIds1);
+              cv::aruco::drawDetectedCornersCharuco(imageCopy1, charucoCorners1, charucoIds1, color);
+              cv::aruco::drawDetectedMarkers(imageCopy2, markerCorners2, markerIds2);
+              cv::aruco::drawDetectedCornersCharuco(imageCopy2, charucoCorners2, charucoIds2, color);
+              cv::resize(imageCopy2, imageCopy2, imageCopy1.size());
+              cv::Mat matArray[] = {imageCopy1, imageCopy2};
+              cv::hconcat(matArray, 2, debugImg);
+              cv::imwrite(m_parametersSavePath + "/debug/Extrinsics/" +
+                    cameraPair[0].toStdString() + "_" + cameraPair[1].toStdString() +
+                    "/Frame_" + QString::number(counter).toStdString() + ".jpg", debugImg);
+            }
             std::vector<cv::Point3f> objectPointsDetected;
-            std::cout << "IDs:" << std::endl;
             for (int i = 0; i < commonIds.size(); i++) {
-              std::cout << commonIds.at(i) << std::endl;
               objectPointsDetected.push_back(checkerBoardPoints.at(commonIds.at(i)));
             }
             imagePointsAll1.push_back(commonCorners1);

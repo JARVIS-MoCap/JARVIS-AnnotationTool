@@ -56,10 +56,8 @@ void CalibrationTool::makeCalibrationSet()  {
     QCoreApplication::instance()->processEvents();
   }
 	while (m_intrinsicParameters.size() != m_calibrationConfig->cameraNames.size() && !m_calibrationCanceled) {
-    std::cout << "INtrinsics: " << m_intrinsicParameters.size() << " / " << m_calibrationConfig->cameraNames.size() << std::endl;
 		QCoreApplication::instance()->processEvents();
 	}
-  std::cout << "FINISHED INTRINSICS" << std::endl;
   if (m_calibrationCanceled) return;
   threadPool->clear();
   thread = 0;
@@ -82,14 +80,11 @@ void CalibrationTool::makeCalibrationSet()  {
     QCoreApplication::instance()->processEvents();
   }
 	while (m_extrinsicParameters.size() != m_calibrationConfig->cameraPairs.size() && !m_calibrationCanceled) {
-		std::cout << "Extrinsics: " << m_extrinsicParameters.size() << " / " << m_calibrationConfig->cameraPairs.size() << std::endl;
 		QCoreApplication::instance()->processEvents();
 	}
   if (!m_calibrationCanceled) {
     emit calibrationFinished();
   }
-	std::cout << "ExtSize: " << m_extrinsicParameters.size() << std::endl;
-  std::cout << "IntSize: " << m_intrinsicParameters.size() << std::endl;
 
   saveCalibration();
 }
@@ -120,7 +115,6 @@ void CalibrationTool::finishedIntrinsicsSlot(cv::Mat K, cv::Mat D, double reproE
 	intrinsics["K"] = K;
 	intrinsics["D"] = D;
 	m_intrinsicParameters[m_calibrationConfig->cameraNames[threadNumber]] = intrinsics;
-  std::cout << "Finsihed Calib " << threadNumber << std::endl;
 }
 
 

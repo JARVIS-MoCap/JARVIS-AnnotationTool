@@ -137,8 +137,8 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 				"ChAruco currently only supports one specific pattern, use with care!");
 	boardTypeCombo = new QComboBox(checkerboardWiget);
 	boardTypeCombo->addItem("Standard");
-	boardTypeCombo->addItem("ChAruco");
-	boardTypeCombo->addItem("ChArUco_OpenCV");
+	boardTypeCombo->addItem("ChArUco");
+	boardTypeCombo->addItem("ChArUco_Legacy");
 	connect(boardTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NewCalibrationWidget::checkerBoardPatternChangesSlot);
 	connect(boardTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NewCalibrationWidget::boardTypeChangedSlot);
 	charucoPatternLabel = new LabelWithToolTip("  ChArUco Pattern",
@@ -535,7 +535,7 @@ bool NewCalibrationWidget::checkExtrinsics(const QString& path, QString & errorM
 
 
 bool NewCalibrationWidget::checkCheckerboard() {
-	if (m_calibrationConfig->boardType == "ChAruco" || m_calibrationConfig->boardType == "ChArUco_OpenCV" || m_calibrationConfig->patternWidth%2 + m_calibrationConfig->patternHeight%2 == 1) {
+	if (m_calibrationConfig->boardType == "ChArUco_Legacy" || m_calibrationConfig->boardType == "ChArUco" || m_calibrationConfig->patternWidth%2 + m_calibrationConfig->patternHeight%2 == 1) {
 		return true;
 	}
 	else {
@@ -578,7 +578,7 @@ void NewCalibrationWidget::sperateRadioStateChangedSlot(bool state) {
 
 QImage NewCalibrationWidget::createCheckerboardPreview() {
 	int width, height;
-	if (boardTypeCombo->currentText() == "ChArUco_OpenCV") {
+	if (boardTypeCombo->currentText() == "ChArUco") {
 		width = widthEdit->value()-1;
 		height = heightEdit->value()-1;
 	}
@@ -604,7 +604,7 @@ QImage NewCalibrationWidget::createCheckerboardPreview() {
 
 void NewCalibrationWidget::checkerBoardPatternChangesSlot(int val) {
 	Q_UNUSED(val);
-	if (boardTypeCombo->currentText() == "ChArUco_OpenCV") {
+	if (boardTypeCombo->currentText() == "ChArUco") {
 		checkerBoardPreview->setPixmap(QPixmap::fromImage(createCheckerboardPreview().scaled((widthEdit->value())*20,(heightEdit->value())*20)));
 	}
 	else {
@@ -622,7 +622,7 @@ void NewCalibrationWidget::checkerBoardPatternChangesSlot(int val) {
 
 void NewCalibrationWidget::boardTypeChangedSlot(int val) {
 	Q_UNUSED(val);
-	if (boardTypeCombo->currentText() == "ChArUco_OpenCV") {
+	if (boardTypeCombo->currentText() == "ChArUco") {
 		charucoPatternCombo->show();
 		charucoPatternLabel->show();
 		markerLengthEdit->show();

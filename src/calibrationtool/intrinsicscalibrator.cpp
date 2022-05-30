@@ -199,9 +199,11 @@ void IntrinsicsCalibrator::run_charuco() {
   cv::aruco::DetectorParameters::create();
 
   cv::Mat imageCopy;
-  cv::Mat boardImage;
-  board->draw(cv::Size(600, 500), boardImage, 10, 1);
-  cv::imwrite("/home/timo/Documents/JARVIS-AnnotationTool/BoardImage.jpg", boardImage);
+  if (m_calibrationConfig->debug) {
+    cv::Mat boardImage;
+    board->draw(cv::Size(600, 500), boardImage, 10, 1);
+    cv::imwrite(m_parametersSavePath + "/debug/BoardPreview.jpg", boardImage);
+  }
 
   std::vector<std::vector<int>> charucoIdsAll, charucoIds;
   std::vector<std::vector<cv::Point2f>> charucoCornersAll, charucoCorners;
@@ -247,21 +249,24 @@ void IntrinsicsCalibrator::run_charuco() {
 	      if (frameIndex > frameCount) read_success = false;
         std::vector<int> markerIds;
         std::vector<std::vector<cv::Point2f>> markerCorners;
-        img.copyTo(imageCopy);
         cv::aruco::detectMarkers(img, board->dictionary, markerCorners, markerIds, charucoParams);
          if (markerIds.size() > 5) {
-             //cv::aruco::drawDetectedMarkers(imageCopy, markerCorners, markerIds);
              std::vector<cv::Point2f> charucoCorners;
              std::vector<int> charucoIds;
              cv::aruco::interpolateCornersCharuco(markerCorners, markerIds, img, board, charucoCorners, charucoIds);
          if (charucoIds.size() > 5) {
-             cv::Scalar color = cv::Scalar(255, 0, 0);
-             cv::aruco::drawDetectedCornersCharuco(imageCopy, charucoCorners, charucoIds, color);
              charucoCornersAll.push_back(charucoCorners);
              charucoIdsAll.push_back(charucoIds);
+             if (m_calibrationConfig->debug) {
+               img.copyTo(imageCopy);
+               cv::Scalar color = cv::Scalar(255, 0, 255);
+               cv::aruco::drawDetectedCornersCharuco(imageCopy, charucoCorners, charucoIds, color);
+               cv::aruco::drawDetectedMarkers(imageCopy, markerCorners, markerIds);
+               cv::imwrite(m_parametersSavePath + "/debug/Intrinsics/" + m_cameraName +
+               "/Frame_" + QString::number(counter).toStdString() + ".jpg", imageCopy);
+             }
            }
         }
-        cv::imwrite("/home/timo/Documents/JARVIS-AnnotationTool/temp/"+ m_cameraName + "/" + std::to_string(counter) + ".png" , imageCopy);
 	      emit intrinsicsProgress(counter * (skipIndex + 1), frameCount,
 	            m_threadNumber);
 	      counter++;
@@ -295,8 +300,6 @@ void IntrinsicsCalibrator::run_charuco() {
         D, rvecs, tvecs, cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST,
         cv::TermCriteria(cv::TermCriteria::MAX_ITER |
         cv::TermCriteria::EPS, 100, 1e-7));
-
-  //std::cout << "Repro Error: " << repro_error << std::endl;
 
   emit finishedIntrinsics(K, D, repro_error, m_threadNumber);
 }
