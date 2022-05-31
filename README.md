@@ -58,11 +58,30 @@ If you want to remove it run
 
      sudo dpkg -r AnnotationTool
 
-## MacOS
-Coming soon...
+## MacOS 
+Make sure you have all the necessary build tools (like cmake) installed.
+
+### Cloning the repository
+Next clone our repository with 
+
+     git clone --recursive https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool.git
+     
+Go into the repository and create a build directory
+
+    cd JARVIS-AnnotationTool && mkdir build && cd build
+    
+### Building and installing 
+Run cmake (replace XX04 by either 2004 or 1804) depending on your Ubuntu Version.
+
+	cmake ..
+	
+Run make to build the tool (replace x by the number of available cores on your CPU)
+
+     make -jx
+     
 
 ## Windows
-coming soon...
+Make sure you have a version of Visual Studio Code installed (If you plan to build the AcquisitionTool installed it is best to use VSCode 2015)
 
 
 # Building OpenCV yourself
