@@ -60,16 +60,10 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-if (NOT WIN32)
-#find_package(Eigen3 REQUIRED)
+if (NOT (WIN32 OR APPLE))
+  find_package(Eigen3 REQUIRED)
 endif()
 
-
-if(APPLE)
-	#set(Eigen3_DIR "libs/eigen-3.3.8/MacOS/share/eigen3")
-	#message("Eigen3_DIR ${Eigen3_DIR}")
-	#find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-endif()
 
 # detect operating system and host processor
 message(STATUS "We are on a ${CMAKE_SYSTEM_NAME} system")
