@@ -25,11 +25,11 @@
 #      - OpenCV_INCLUDE_DIRS             : The OpenCV include directories.
 #      - OpenCV_COMPUTE_CAPABILITIES     : The version of compute capability.
 #      - OpenCV_ANDROID_NATIVE_API_LEVEL : Minimum required level of Android API.
-#      - OpenCV_VERSION                  : The version of this OpenCV build: "4.5.0"
+#      - OpenCV_VERSION                  : The version of this OpenCV build: "4.5.5"
 #      - OpenCV_VERSION_MAJOR            : Major version part of OpenCV_VERSION: "4"
 #      - OpenCV_VERSION_MINOR            : Minor version part of OpenCV_VERSION: "5"
-#      - OpenCV_VERSION_PATCH            : Patch version part of OpenCV_VERSION: "0"
-#      - OpenCV_VERSION_STATUS           : Development status of this build: "-dev"
+#      - OpenCV_VERSION_PATCH            : Patch version part of OpenCV_VERSION: "5"
+#      - OpenCV_VERSION_STATUS           : Development status of this build: ""
 #
 #    Advanced variables:
 #      - OpenCV_SHARED                   : Use OpenCV as shared library
@@ -45,12 +45,12 @@
 # ======================================================
 #  Version variables:
 # ======================================================
-SET(OpenCV_VERSION 4.5.0)
+SET(OpenCV_VERSION 4.5.5)
 SET(OpenCV_VERSION_MAJOR  4)
 SET(OpenCV_VERSION_MINOR  5)
-SET(OpenCV_VERSION_PATCH  0)
+SET(OpenCV_VERSION_PATCH  5)
 SET(OpenCV_VERSION_TWEAK  0)
-SET(OpenCV_VERSION_STATUS "-dev")
+SET(OpenCV_VERSION_STATUS "")
 
 include(FindPackageHandleStandardArgs)
 
@@ -96,16 +96,23 @@ endif()
 
 
 
+if(NOT TARGET ippicv)
+  add_library(ippicv STATIC IMPORTED)
+  set_target_properties(ippicv PROPERTIES
+    IMPORTED_LINK_INTERFACE_LIBRARIES ""
+    IMPORTED_LOCATION "${OpenCV_INSTALL_PATH}/lib/opencv4/3rdparty/libippicv.a"
+  )
+endif()
 
 
 
 # Some additional settings are required if OpenCV is built as static libs
-set(OpenCV_SHARED ON)
+set(OpenCV_SHARED OFF)
 
 # Enables mangled install paths, that help with side by side installs
 set(OpenCV_USE_MANGLED_PATHS FALSE)
 
-set(OpenCV_LIB_COMPONENTS opencv_calib3d;opencv_core;opencv_features2d;opencv_flann;opencv_imgcodecs;opencv_imgproc;opencv_videoio;opencv_aruco)
+set(OpenCV_LIB_COMPONENTS opencv_calib3d;opencv_core;opencv_features2d;opencv_flann;opencv_gapi;opencv_imgcodecs;opencv_imgproc;opencv_videoio;opencv_aruco)
 set(__OpenCV_INCLUDE_DIRS "${OpenCV_INSTALL_PATH}/include/opencv4")
 
 set(OpenCV_INCLUDE_DIRS "")
