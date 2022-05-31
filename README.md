@@ -75,7 +75,7 @@ Go into the repository and create a build directory
 ### Building and installing 
 Run cmake (replace XX04 by either 2004 or 1804) depending on your Ubuntu Version.
 
-	cmake ..
+    cmake ..
 	
 Run make to build the tool (replace x by the number of available cores on your CPU)
 
@@ -98,16 +98,16 @@ Go into the repository and create a build directory
 ### Building and installing 
 Switch to a VS Developer Command Prompt and run the following two commands to enable the 64bit built system:
 
-        cd VC
-	vcvarsall.bat amd64
+    cd VC
+    vcvarsall.bat amd64
 
 Then run cmake
 
-	cmake -DCMAKE_BUILD_TYPE=Release .. -G "NMake Makefiles"
+    cmake -DCMAKE_BUILD_TYPE=Release .. -G "NMake Makefiles"
 	
 Run make to build the tool (replace x by the number of available cores on your CPU)
 
-    	cmake --build . -j8
+    cmake --build . -j8
 	
 We currently use the free version Advanced Installer to create our '.msi' installer files. This is not an optimal solution, so if you know how to build a better pipeline to build them please feel free to implement that!
 
