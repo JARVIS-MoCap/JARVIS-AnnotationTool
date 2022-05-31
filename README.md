@@ -26,7 +26,7 @@ If you want to build the tool yourself here's a step by step guide on how to do 
 ### Installing the dependencies
 To be able to build the tool install all the dependencies with
 
-      sudo apt get install libxcb-xinerama0, libdouble-conversion-dev, gstreamer1.0-libav, ffmpeg, libxcb-xinput0, libpcre2-dev, build-essential
+      sudo apt get install libxcb-xinerama0 libdouble-conversion-dev gstreamer1.0-libav ffmpeg libxcb-xinput0 libpcre2-dev build-essential qt5-default libqt5charts5-dev libqt5serialport5-dev qtmultimedia5-dev
       
 ### Cloning the repository
 Next clone our repository with 
@@ -37,6 +37,7 @@ Go into the repository and create a build directory
 
     cd JARVIS-AnnotationTool && mkdir build && cd build
     
+### Building and installing 
 Run cmake (replace XX04 by either 2004 or 1804) depending on your Ubuntu Version.
 
 	cmake -DUBUNTU_VERSION=xx04 ..
@@ -64,12 +65,39 @@ Coming soon...
 coming soon...
 
 
-# Building OpenCV, QT5 and yaml-cpp yourself
+# Building OpenCV yourself
 We try to provide prebuild versions of all the libraries you will need to compile the tool. You only need to build them yourself incase they don't work for your OS or you want to use different versions than the ones we ship it with.
 
 ## Linux and MacOS
+- On MacOS: build [libjpeg turbo](https://github.com/libjpeg-turbo/libjpeg-turbo) from git (make sure to build Version 8!)
+- Get opencv from git with: 
+  
+      git clone https://github.com/opencv/opencv.git
+      
+- Checkout desired version with: 
+  
+      git checkout 4.5.1 (DONT use 4.5.3, somehow it doesn't build libade.a)
+	
+- Configure with (set DCMAKE_INSTALL_PREFIX to the path you want to install it to):
 
-#### Build QT5:
+	    cmake -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TIFF=OFF -DWITH_TIFF=OFF -DBUILD_JPEG=OFF 
+      -DBUILD_ZLIB=OFF -DBUILD_WEBP=OFF -DBUILD_PNG=OFF -DWITH_OPENEXR=OFF -DWITH_OPENJPEG=OFF -DWITH_JASPER=OFF -DWITH_PROTOBUF=OFF 
+      -DWITH_QUIRC=OFF -DWITH_1394=OFF -DWITH_V4L=OFF  -DWITH_GSTREAMER=ON -DWITH_FFMPEG=ON -DWITH_GTK=OFF -DBUILD_SHARED_LIBS=OFF 
+      -DBUILD_LIST="core,calib3d,imgproc,videoio,aruco" -DCMAKE_INSTALL_PREFIX=<PATH TO INSTALL TO> 
+      -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib-master/modules ../opencv-master
+
+ - Build and install OpenCV to the previously selected directory with:
+ 
+       make -j8 && make install
+       
+ - You can then either change the OpenCV_DIR paths to point to the directory you installed to or copy the files in the install directory to 
+
+        ${AnnotationTool_Directory}/libs/OpenCV_4.5.1/Ubuntu_xx04(MacOS)
+  
+## Windows
+ Coming soon...
+
+# Building QT5 yourself (only neccessary on MacOS):
 - Get QT from git with: 
 
       git clone git://code.qt.io/qt/qt5.git
@@ -102,54 +130,5 @@ We try to provide prebuild versions of all the libraries you will need to compil
  - You can then either change the QT_DIR paths to point to the directory you installed to or copy the files in the install directory to 
  
         ${AnnotationTool_Directory}/libs/Qt_5.15.2/Ubuntu_xx04(MacOS)
- 
-
-#### Building OpenCV:
-- On MacOS: build [libjpeg turbo](https://github.com/libjpeg-turbo/libjpeg-turbo) from git (make sure to build Version 8!)
-- Get opencv from git with: 
-  
-      git clone https://github.com/opencv/opencv.git
-      
-- Checkout desired version with: 
-  
-      git checkout 4.5.1 (DONT use 4.5.3, somehow it doesn't build libade.a)
-	
-- Configure with (set DCMAKE_INSTALL_PREFIX to the path you want to install it to):
-
-	    cmake -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TIFF=OFF -DWITH_TIFF=OFF -DBUILD_JPEG=OFF 
-      -DBUILD_ZLIB=OFF -DBUILD_WEBP=OFF -DBUILD_PNG=OFF -DWITH_OPENEXR=OFF -DWITH_OPENJPEG=OFF -DWITH_JASPER=OFF -DWITH_PROTOBUF=OFF 
-      -DWITH_QUIRC=OFF -DWITH_1394=OFF -DWITH_V4L=OFF  -DWITH_GSTREAMER=ON -DWITH_FFMPEG=ON -DWITH_GTK=OFF -DBUILD_SHARED_LIBS=ON 
-      -DBUILD_LIST="core,calib3d,imgproc,videoio,aruco" -DCMAKE_INSTALL_PREFIX=<PATH TO INSTALL TO> 
-      -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib-master/modules ../opencv-master
-
- - Build and install OpenCV to the previously selected directory with:
- 
-       make -j8 && make install
-       
- - You can then either change the OpenCV_DIR paths to point to the directory you installed to or copy the files in the install directory to 
-
-        ${AnnotationTool_Directory}/libs/OpenCV_4.5.1/Ubuntu_xx04(MacOS)
-  
-  
-#### Building yaml-cpp
- - Get yaml-cpp from git with:
- 
-        git clone https://github.com/jbeder/yaml-cpp.git
-        
- - Inside the yaml-cpp directory create a build directory with:
- 
-       mkdir build && cd build
-  
- - Run Cmake (set DCMAKE_INSTALL_PREFIX to the path you want to install it to):
- 
-       cmake .. -DCMAKE_INSTALL_PREFIX=<PATH TO INSTALL To>
-      
- - Make and install with:
- 
-       make -j8 && make install
-       
- 
- ## Windows
- Coming soon...
       
     
