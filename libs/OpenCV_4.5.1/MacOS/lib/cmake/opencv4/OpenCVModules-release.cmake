@@ -5,6 +5,16 @@
 # Commands may need to know the format version.
 set(CMAKE_IMPORT_FILE_VERSION 1)
 
+# Import target "libjpeg-turbo" for configuration "RELEASE"
+set_property(TARGET libjpeg-turbo APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(libjpeg-turbo PROPERTIES
+  IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "C"
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/opencv4/3rdparty/liblibjpeg-turbo.a"
+  )
+
+list(APPEND _IMPORT_CHECK_TARGETS libjpeg-turbo )
+list(APPEND _IMPORT_CHECK_FILES_FOR_libjpeg-turbo "${_IMPORT_PREFIX}/lib/opencv4/3rdparty/liblibjpeg-turbo.a" )
+
 # Import target "libwebp" for configuration "RELEASE"
 set_property(TARGET libwebp APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
 set_target_properties(libwebp PROPERTIES
@@ -124,6 +134,16 @@ set_target_properties(opencv_calib3d PROPERTIES
 
 list(APPEND _IMPORT_CHECK_TARGETS opencv_calib3d )
 list(APPEND _IMPORT_CHECK_FILES_FOR_opencv_calib3d "${_IMPORT_PREFIX}/lib/libopencv_calib3d.a" )
+
+# Import target "opencv_gapi" for configuration "RELEASE"
+set_property(TARGET opencv_gapi APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(opencv_gapi PROPERTIES
+  IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/libopencv_gapi.a"
+  )
+
+list(APPEND _IMPORT_CHECK_TARGETS opencv_gapi )
+list(APPEND _IMPORT_CHECK_FILES_FOR_opencv_gapi "${_IMPORT_PREFIX}/lib/libopencv_gapi.a" )
 
 # Import target "opencv_aruco" for configuration "RELEASE"
 set_property(TARGET opencv_aruco APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)

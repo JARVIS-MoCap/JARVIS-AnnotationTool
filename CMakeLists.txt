@@ -20,7 +20,7 @@ elseif(UNIX)
   endif()
 endif()
 
-if (NOT UNIX)
+if (WIN32 OR APPLE)
   set(Qt5_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5")
   set(Qt5Core_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Core")
   set(Qt5Widgets_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Widgets")
@@ -28,6 +28,7 @@ if (NOT UNIX)
   set(Qt5Multimedia_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Multimedia")
   set(Qt5MultimediaWidgets_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5MultimediaWidgets")
 endif()
+
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
@@ -60,13 +61,13 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 if (NOT WIN32)
-find_package(Eigen3 REQUIRED)
+#find_package(Eigen3 REQUIRED)
 endif()
 
 
 if(APPLE)
 	#set(Eigen3_DIR "libs/eigen-3.3.8/MacOS/share/eigen3")
-	#message("${EIGEN3_DIR}")
+	#message("Eigen3_DIR ${Eigen3_DIR}")
 	#find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 endif()
 
