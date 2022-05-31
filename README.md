@@ -19,6 +19,8 @@ If you want to build the tool yourself here's a step by step guide on how to do 
 <img src="docs/Annotation_Tool_Vid.gif" alt="banner" width="75%"/>
 </p>
 
+<br>
+
 # Building from Source
 
 ## Linux
@@ -81,9 +83,35 @@ Run make to build the tool (replace x by the number of available cores on your C
      
 
 ## Windows
-Make sure you have a version of Visual Studio Code installed (If you plan to build the AcquisitionTool installed it is best to use VSCode 2015)
+Make sure you have a version of Visual Studio Code installed (If you plan to build the AcquisitionTool installed it is best to use VSCode 2015).
+Also make sure you have git installed and run the following in the git bash console:
 
+### Cloning the repository
+Next clone our repository with 
 
+     git clone --recursive https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool.git
+     
+Go into the repository and create a build directory
+
+    cd JARVIS-AnnotationTool && mkdir build && cd build
+
+### Building and installing 
+Switch to a VS Developer Command Prompt and run the following two commands to enable the 64bit built system:
+
+        cd VC
+	vcvarsall.bat amd64
+
+Then run cmake
+
+	cmake -DCMAKE_BUILD_TYPE=Release .. -G "NMake Makefiles"
+	
+Run make to build the tool (replace x by the number of available cores on your CPU)
+
+    	cmake --build . -j8
+	
+We currently use the free version Advanced Installer to create our '.msi' installer files. This is not an optimal solution, so if you know how to build a better pipeline to build them please feel free to implement that!
+
+<br><br>
 # Building OpenCV yourself
 We try to provide prebuild versions of all the libraries you will need to compile the tool. You only need to build them yourself incase they don't work for your OS or you want to use different versions than the ones we ship it with.
 
@@ -116,10 +144,45 @@ We try to provide prebuild versions of all the libraries you will need to compil
   
   
 ## Windows
- Coming soon...
+Make sure you have a version of Visual Studio Code installed (If you plan to build the AcquisitionTool installed it is best to use VSCode 2015)
+Also make sure you have git installed and run the following in the git bash console:
 
+- Get opencv and opencv_contrib from git with: 
+  
+      git clone https://github.com/opencv/opencv.git
+      git clone https://github.com/opencv/opencv_contrib.git
+      
+- Checkout desired version with: 
+  
+      cd opencv && git checkout 4.5.5 cd ../opencv_contrib && checkout 4.5.5 && cd ..
+      
+- Make build directory:
 
-# Building QT5 yourself (only neccessary on MacOS):
+      mkdir build
+
+- Switch to a VS Developer command prompt and run:
+
+      cd VC
+      vcvarsall.bat amd64
+
+- Navigate to your build directory
+
+- Configure with (set DCMAKE_INSTALL_PREFIX to the path you want to install it to):
+
+	    cmake -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TIFF=OFF -DWITH_TIFF=OFF -DBUILD_JPEG=OFF -DBUILD_ZLIB=OFF -DBUILD_WEBP=OFF -DBUILD_PNG=OFF -DWITH_OPENEXR=OFF -DWITH_OPENJPEG=OFF -DWITH_JASPER=OFF -DWITH_PROTOBUF=OFF -DWITH_QUIRC=OFF -DWITH_1394=OFF -DWITH_V4L=OFF  -DWITH_GSTREAMER=ON -DWITH_FFMPEG=ON -DWITH_GTK=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_LIST="core,calib3d,imgproc,videoio,aruco, gapi" -DCMAKE_INSTALL_PREFIX=../opencv_static -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ../opencv -G "NMake Makefiles"
+
+ - Build and install OpenCV to the previously selected directory with:
+ 
+       cmake --build . -j8
+       cmake --install .
+       
+ - You can then either change the OpenCV_DIR paths to point to the directory you installed to or copy the files in the install directory to 
+
+        ${AnnotationTool_Directory}/libs/OpenCV_4.5.1/Windows
+
+<br><br>
+# Building QT5 yourself (only neccessary on MacOS and Windows):
+## MacOS
 - Get QT from git with: 
 
       git clone git://code.qt.io/qt/qt5.git
@@ -138,12 +201,7 @@ We try to provide prebuild versions of all the libraries you will need to compil
 
 - Configure with (set prefix to the path you want to install it to):
 
-      ../qt5/configure -release -no-pch -prefix <PATH TO INSTALL TO> -opensource -confirm-license -nomake tools -nomake tests
-      -nomake examples -no-opengl -skip webengine -skip qt3d -skip qtandroidextras -skip qtcanvas3d -skip qtconnectivity -skip qtdatavis3d 
-      -skip qtdeclarative -skip qtdoc -skip qtgamepad -skip qtgraphicaleffects -skip qtlocation -skip qtmacextras -skip qtnetworkauth 
-      -skip qtpurchasing -skip qtquickcontrols -skip qtquickcontrols2 -skip qtscript -skip qtscxml -skip qtsensors -skip qtserialbus 
-      -skip qtquick3d -skip qtspeech -skip qttools -skip qtsensors -skip qttranslations -skip qtvirtualkeyboard -skip qtwayland -skip qtwebchannel 
-      -skip qtwebengine -skip qtwebsockets -skip qtwebview -skip qtwinextras -skip qtxmlpatterns  -skip qtwebglplugin -no-openssl -no-vulkan
+      ../qt5/configure static -release -no-pch -prefix ../Qt5static_v5.15.2 -opensource -confirm-license -nomake tools -nomake tests -nomake examples -no-opengl -skip webengine -skip qt3d -skip qtandroidextras -skip qtcanvas3d -skip qtconnectivity -skip qtdatavis3d -skip qtdeclarative -skip qtdoc -skip qtgamepad -skip qtgraphicaleffects -skip qtlocation -skip qtmacextras -skip qtnetworkauth -skip qtpurchasing -skip qtquickcontrols -skip qtquickcontrols2 -skip qtscript -skip qtscxml -skip qtsensors -skip qtserialbus -skip qtquick3d -skip qtspeech -skip qttools -skip qtsensors -skip qttranslations -skip qtvirtualkeyboard -skip qtwayland -skip qtwebchannel -skip qtwebengine -skip qtwebsockets -skip qtwebview -skip qtwinextras -skip qtxmlpatterns  -skip qtwebglplugin -no-openssl -no-vulkan
       
  - Build and install Qt to the previously selected directory with:
  
@@ -151,6 +209,34 @@ We try to provide prebuild versions of all the libraries you will need to compil
        
  - You can then either change the QT_DIR paths to point to the directory you installed to or copy the files in the install directory to 
  
-        ${AnnotationTool_Directory}/libs/Qt_5.15.2/Ubuntu_xx04(MacOS)
+        ${AnnotationTool_Directory}/libs/Qt_5.15.2/MacOS
+  
+ ## Windows
+- Get QT from git with: 
+
+      git clone git://code.qt.io/qt/qt5.git
       
+- Checkout desired version with: 
+
+      git checkout 5.15.2
+
+- Inside qt5 run 
+
+      ./init-repository
+      
+- Create build directory and go into it with:
+
+      mkdir build && cd build
+
+- Configure with (set prefix to the path you want to install it to):
+
+      ../qt5/configure static -release -no-pch -prefix ../Qt5static_v5.15.2 -opensource -confirm-license -nomake tools -nomake tests -nomake examples -no-opengl -skip webengine -skip qt3d -skip qtandroidextras -skip qtcanvas3d -skip qtconnectivity -skip qtdatavis3d -skip qtdeclarative -skip qtdoc -skip qtgamepad -skip qtgraphicaleffects -skip qtlocation -skip qtmacextras -skip qtnetworkauth -skip qtpurchasing -skip qtquickcontrols -skip qtquickcontrols2 -skip qtscript -skip qtscxml -skip qtsensors -skip qtserialbus -skip qtquick3d -skip qtspeech -skip qttools -skip qtsensors -skip qttranslations -skip qtvirtualkeyboard -skip qtwayland -skip qtwebchannel -skip qtwebengine -skip qtwebsockets -skip qtwebview -skip qtwinextras -skip qtxmlpatterns  -skip qtwebglplugin -no-openssl -no-vulkan
+      
+ - Build and install Qt to the previously selected directory with:
+ 
+       nmake && nmake install
+       
+ - You can then either change the QT_DIR paths to point to the directory you installed to or copy the files in the install directory to 
+ 
+        ${AnnotationTool_Directory}/libs/Qt_5.15.2/MacOS
     
