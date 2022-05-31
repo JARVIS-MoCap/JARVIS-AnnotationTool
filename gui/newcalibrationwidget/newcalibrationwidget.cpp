@@ -134,7 +134,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	QGridLayout *checkerboardwidgetlayout = new QGridLayout(checkerboardWiget);
 	checkerboardwidgetlayout->setMargin(0);
 	LabelWithToolTip *boardTypeLabel = new LabelWithToolTip("  Board Type",
-				"ChAruco currently only supports one specific pattern, use with care!");
+				"ChAruco_Legacy only supports one specific pattern, use with care!");
 	boardTypeCombo = new QComboBox(checkerboardWiget);
 	boardTypeCombo->addItem("Standard");
 	boardTypeCombo->addItem("ChArUco");

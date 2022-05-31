@@ -46,6 +46,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+find_package(Eigen3 REQUIRED)
+
 if(APPLE)
 	#set(Eigen3_DIR "libs/eigen-3.3.8/MacOS/share/eigen3")
 	#message("${EIGEN3_DIR}")

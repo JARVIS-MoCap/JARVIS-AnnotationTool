@@ -16,7 +16,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_targetsDefined)
 set(_targetsNotDefined)
 set(_expectedTargets)
-foreach(_expectedTarget opencv_core opencv_flann opencv_imgproc opencv_features2d opencv_imgcodecs opencv_videoio opencv_calib3d opencv_aruco)
+foreach(_expectedTarget ippiw ittnotify ade ocv.3rdparty.tesseract opencv_core opencv_flann opencv_imgproc opencv_features2d opencv_imgcodecs ocv.3rdparty.gstreamer ocv.3rdparty.ffmpeg ocv.3rdparty.ffmpeg.builtin_deps opencv_videoio opencv_calib3d opencv_gapi opencv_aruco)
   list(APPEND _expectedTargets ${_expectedTarget})
   if(NOT TARGET ${_expectedTarget})
     list(APPEND _targetsNotDefined ${_expectedTarget})
@@ -50,60 +50,113 @@ if(_IMPORT_PREFIX STREQUAL "/")
   set(_IMPORT_PREFIX "")
 endif()
 
+# Create imported target ippiw
+add_library(ippiw STATIC IMPORTED)
+
+# Create imported target ittnotify
+add_library(ittnotify STATIC IMPORTED)
+
+set_target_properties(ittnotify PROPERTIES
+  INTERFACE_LINK_LIBRARIES "dl"
+)
+
+# Create imported target ade
+add_library(ade STATIC IMPORTED)
+
+# Create imported target ocv.3rdparty.tesseract
+add_library(ocv.3rdparty.tesseract INTERFACE IMPORTED)
+
+set_target_properties(ocv.3rdparty.tesseract PROPERTIES
+  INTERFACE_COMPILE_DEFINITIONS ""
+  INTERFACE_INCLUDE_DIRECTORIES "/usr/include/leptonica"
+  INTERFACE_LINK_LIBRARIES "/usr/lib/x86_64-linux-gnu/libtesseract.so;/usr/lib/x86_64-linux-gnu/libarchive.so"
+  INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "/usr/include/leptonica"
+)
+
 # Create imported target opencv_core
-add_library(opencv_core SHARED IMPORTED)
+add_library(opencv_core STATIC IMPORTED)
+
+set_target_properties(opencv_core PROPERTIES
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>;/usr/lib/x86_64-linux-gnu/libz.so;\$<LINK_ONLY:va>;\$<LINK_ONLY:va-drm>;\$<LINK_ONLY:ittnotify>"
+)
 
 # Create imported target opencv_flann
-add_library(opencv_flann SHARED IMPORTED)
+add_library(opencv_flann STATIC IMPORTED)
 
 set_target_properties(opencv_flann PROPERTIES
-  INTERFACE_LINK_LIBRARIES "opencv_core"
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_core;\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>"
 )
 
 # Create imported target opencv_imgproc
-add_library(opencv_imgproc SHARED IMPORTED)
+add_library(opencv_imgproc STATIC IMPORTED)
 
 set_target_properties(opencv_imgproc PROPERTIES
-  INTERFACE_LINK_LIBRARIES "opencv_core"
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_core;\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>"
 )
 
 # Create imported target opencv_features2d
-add_library(opencv_features2d SHARED IMPORTED)
+add_library(opencv_features2d STATIC IMPORTED)
 
 set_target_properties(opencv_features2d PROPERTIES
-  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc"
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc;opencv_core;opencv_flann;opencv_imgproc;\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>"
 )
 
 # Create imported target opencv_imgcodecs
-add_library(opencv_imgcodecs SHARED IMPORTED)
+add_library(opencv_imgcodecs STATIC IMPORTED)
 
 set_target_properties(opencv_imgcodecs PROPERTIES
-  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_imgproc"
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_imgproc;opencv_core;opencv_imgproc;\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>;/usr/lib/x86_64-linux-gnu/libjpeg.so;/usr/lib/x86_64-linux-gnu/libwebp.so;/usr/lib/x86_64-linux-gnu/libpng.so;/usr/lib/x86_64-linux-gnu/libz.so;/usr/lib/x86_64-linux-gnu/libz.so"
 )
 
+# Create imported target ocv.3rdparty.gstreamer
+add_library(ocv.3rdparty.gstreamer INTERFACE IMPORTED)
+
+set_target_properties(ocv.3rdparty.gstreamer PROPERTIES
+  INTERFACE_COMPILE_DEFINITIONS "HAVE_GSTREAMER"
+  INTERFACE_LINK_LIBRARIES "/usr/lib/x86_64-linux-gnu/libgstbase-1.0.so;/usr/lib/x86_64-linux-gnu/libgstreamer-1.0.so;/usr/lib/x86_64-linux-gnu/libgobject-2.0.so;/usr/lib/x86_64-linux-gnu/libglib-2.0.so;/usr/lib/x86_64-linux-gnu/libgstapp-1.0.so;/usr/lib/x86_64-linux-gnu/libgstbase-1.0.so;/usr/lib/x86_64-linux-gnu/libgstreamer-1.0.so;/usr/lib/x86_64-linux-gnu/libgobject-2.0.so;/usr/lib/x86_64-linux-gnu/libglib-2.0.so;/usr/lib/x86_64-linux-gnu/libgstriff-1.0.so;/usr/lib/x86_64-linux-gnu/libgstreamer-1.0.so;/usr/lib/x86_64-linux-gnu/libgobject-2.0.so;/usr/lib/x86_64-linux-gnu/libglib-2.0.so;/usr/lib/x86_64-linux-gnu/libgstpbutils-1.0.so;/usr/lib/x86_64-linux-gnu/libgstaudio-1.0.so;/usr/lib/x86_64-linux-gnu/libgstvideo-1.0.so;/usr/lib/x86_64-linux-gnu/libgstbase-1.0.so;/usr/lib/x86_64-linux-gnu/libgstreamer-1.0.so;/usr/lib/x86_64-linux-gnu/libgobject-2.0.so;/usr/lib/x86_64-linux-gnu/libglib-2.0.so;/usr/lib/x86_64-linux-gnu/libgstvideo-1.0.so;/usr/lib/x86_64-linux-gnu/libgstbase-1.0.so;/usr/lib/x86_64-linux-gnu/libgstreamer-1.0.so;/usr/lib/x86_64-linux-gnu/libgobject-2.0.so;/usr/lib/x86_64-linux-gnu/libglib-2.0.so;/usr/lib/x86_64-linux-gnu/libgstaudio-1.0.so;/usr/lib/x86_64-linux-gnu/libgstbase-1.0.so;/usr/lib/x86_64-linux-gnu/libgstreamer-1.0.so;/usr/lib/x86_64-linux-gnu/libgobject-2.0.so;/usr/lib/x86_64-linux-gnu/libglib-2.0.so"
+)
+
+# Create imported target ocv.3rdparty.ffmpeg
+add_library(ocv.3rdparty.ffmpeg INTERFACE IMPORTED)
+
+set_target_properties(ocv.3rdparty.ffmpeg PROPERTIES
+  INTERFACE_COMPILE_DEFINITIONS "HAVE_FFMPEG"
+  INTERFACE_LINK_LIBRARIES "/usr/lib/x86_64-linux-gnu/libavcodec.so;/usr/lib/x86_64-linux-gnu/libavformat.so;/usr/lib/x86_64-linux-gnu/libavutil.so;/usr/lib/x86_64-linux-gnu/libswscale.so;/usr/lib/x86_64-linux-gnu/libavresample.so"
+)
+
+# Create imported target ocv.3rdparty.ffmpeg.builtin_deps
+add_library(ocv.3rdparty.ffmpeg.builtin_deps INTERFACE IMPORTED)
+
 # Create imported target opencv_videoio
-add_library(opencv_videoio SHARED IMPORTED)
+add_library(opencv_videoio STATIC IMPORTED)
 
 set_target_properties(opencv_videoio PROPERTIES
-  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_imgproc;opencv_imgcodecs"
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_imgproc;opencv_imgcodecs;opencv_core;opencv_imgproc;opencv_imgcodecs;\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>;\$<LINK_ONLY:ocv.3rdparty.gstreamer>;\$<LINK_ONLY:ocv.3rdparty.ffmpeg>;\$<LINK_ONLY:ocv.3rdparty.ffmpeg.builtin_deps>"
 )
 
 # Create imported target opencv_calib3d
-add_library(opencv_calib3d SHARED IMPORTED)
+add_library(opencv_calib3d STATIC IMPORTED)
 
 set_target_properties(opencv_calib3d PROPERTIES
-  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc;opencv_features2d"
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc;opencv_features2d;opencv_core;opencv_flann;opencv_imgproc;opencv_features2d;\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>"
+)
+
+# Create imported target opencv_gapi
+add_library(opencv_gapi STATIC IMPORTED)
+
+set_target_properties(opencv_gapi PROPERTIES
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc;opencv_features2d;opencv_calib3d;opencv_core;opencv_flann;opencv_imgproc;opencv_features2d;opencv_calib3d;\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>;\$<LINK_ONLY:ade>;\$<LINK_ONLY:ittnotify>;\$<LINK_ONLY:ocv.3rdparty.gstreamer>"
 )
 
 # Create imported target opencv_aruco
-add_library(opencv_aruco SHARED IMPORTED)
+add_library(opencv_aruco STATIC IMPORTED)
 
 set_target_properties(opencv_aruco PROPERTIES
-  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc;opencv_features2d;opencv_calib3d"
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc;opencv_features2d;opencv_calib3d;opencv_core;opencv_flann;opencv_imgproc;opencv_features2d;opencv_calib3d;\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>"
 )
 
-if(CMAKE_VERSION VERSION_LESS 2.8.12)
-  message(FATAL_ERROR "This file relies on consumers using CMake 2.8.12 or greater.")
+if(CMAKE_VERSION VERSION_LESS 3.0.0)
+  message(FATAL_ERROR "This file relies on consumers using CMake 3.0.0 or greater.")
 endif()
 
 # Load information for each installed configuration.

@@ -7,6 +7,7 @@
 
 #include <opencv2/core/async.hpp>
 #include <opencv2/core/detail/async_promise.hpp>
+#include <opencv2/core/utils/logger.hpp>
 
 #include <stdexcept>
 
@@ -103,6 +104,21 @@ String dumpRotatedRect(const RotatedRect& argument)
 }
 
 CV_WRAP static inline
+RotatedRect testRotatedRect(float x, float y, float w, float h, float angle)
+{
+    return RotatedRect(Point2f(x, y), Size2f(w, h), angle);
+}
+
+CV_WRAP static inline
+std::vector<RotatedRect> testRotatedRectVector(float x, float y, float w, float h, float angle)
+{
+    std::vector<RotatedRect> result;
+    for (int i = 0; i < 10; i++)
+        result.push_back(RotatedRect(Point2f(x + i, y + 2 * i), Size2f(w, h), angle + 10 * i));
+    return result;
+}
+
+CV_WRAP static inline
 String dumpRange(const Range& argument)
 {
     if (argument == Range::all())
@@ -112,6 +128,65 @@ String dumpRange(const Range& argument)
     else
     {
         return format("range: (s=%d, e=%d)", argument.start, argument.end);
+    }
+}
+
+CV_WRAP static inline
+int testOverwriteNativeMethod(int argument)
+{
+    return argument;
+}
+
+CV_WRAP static inline
+String testReservedKeywordConversion(int positional_argument, int lambda = 2, int from = 3)
+{
+    return format("arg=%d, lambda=%d, from=%d", positional_argument, lambda, from);
+}
+
+CV_EXPORTS_W String dumpVectorOfInt(const std::vector<int>& vec);
+
+CV_EXPORTS_W String dumpVectorOfDouble(const std::vector<double>& vec);
+
+CV_EXPORTS_W String dumpVectorOfRect(const std::vector<Rect>& vec);
+
+CV_WRAP static inline
+void generateVectorOfRect(size_t len, CV_OUT std::vector<Rect>& vec)
+{
+    vec.resize(len);
+    if (len > 0)
+    {
+        RNG rng(12345);
+        Mat tmp(static_cast<int>(len), 1, CV_32SC4);
+        rng.fill(tmp, RNG::UNIFORM, 10, 20);
+        tmp.copyTo(vec);
+    }
+}
+
+CV_WRAP static inline
+void generateVectorOfInt(size_t len, CV_OUT std::vector<int>& vec)
+{
+    vec.resize(len);
+    if (len > 0)
+    {
+        RNG rng(554433);
+        Mat tmp(static_cast<int>(len), 1, CV_32SC1);
+        rng.fill(tmp, RNG::UNIFORM, -10, 10);
+        tmp.copyTo(vec);
+    }
+}
+
+CV_WRAP static inline
+void generateVectorOfMat(size_t len, int rows, int cols, int dtype, CV_OUT std::vector<Mat>& vec)
+{
+    vec.resize(len);
+    if (len > 0)
+    {
+        RNG rng(65431);
+        for (size_t i = 0; i < len; ++i)
+        {
+            vec[i].create(rows, cols, dtype);
+            rng.fill(vec[i], RNG::UNIFORM, 0, 10);
+        }
     }
 }
 
@@ -144,7 +219,30 @@ AsyncArray testAsyncException()
     return p.getArrayResult();
 }
 
-//! @}
-}} // namespace
+namespace fs {
+    CV_EXPORTS_W cv::String getCacheDirectoryForDownloads();
+} // namespace fs
+
+//! @}  // core_utils
+}  // namespace cv::utils
+
+//! @cond IGNORED
+
+CV_WRAP static inline
+int setLogLevel(int level)
+{
+    // NB: Binding generators doesn't work with enums properly yet, so we define separate overload here
+    return cv::utils::logging::setLogLevel((cv::utils::logging::LogLevel)level);
+}
+
+CV_WRAP static inline
+int getLogLevel()
+{
+    return cv::utils::logging::getLogLevel();
+}
+
+//! @endcond IGNORED
+
+} // namespaces cv /  utils
 
 #endif // OPENCV_CORE_BINDINGS_UTILS_HPP
