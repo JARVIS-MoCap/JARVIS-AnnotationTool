@@ -26,7 +26,7 @@ If you want to build the tool yourself here's a step by step guide on how to do 
 ### Installing the dependencies
 To be able to build the tool install all the dependencies with
 
-      sudo apt get install libxcb-xinerama0 libdouble-conversion-dev gstreamer1.0-libav ffmpeg libxcb-xinput0 libpcre2-dev build-essential qt5-default libqt5charts5-dev libqt5serialport5-dev qtmultimedia5-dev
+      sudo apt get install build-essential libxcb-xinerama0 libdouble-conversion-dev gstreamer1.0-libav ffmpeg libxcb-xinput0 libpcre2-dev libeigen3-dev qt5-default libqt5charts5-dev libqt5serialport5-dev qtmultimedia5-dev
       
 ### Cloning the repository
 Next clone our repository with 
@@ -70,21 +70,18 @@ We try to provide prebuild versions of all the libraries you will need to compil
 
 ## Linux and MacOS
 - On MacOS: build [libjpeg turbo](https://github.com/libjpeg-turbo/libjpeg-turbo) from git (make sure to build Version 8!)
-- Get opencv from git with: 
+- Get opencv and opencv_contrib from git with: 
   
       git clone https://github.com/opencv/opencv.git
+      git clone https://github.com/opencv/opencv_contrib.git
       
 - Checkout desired version with: 
   
-      git checkout 4.5.1 (DONT use 4.5.3, somehow it doesn't build libade.a)
+      git checkout 4.5.5
 	
 - Configure with (set DCMAKE_INSTALL_PREFIX to the path you want to install it to):
 
-	    cmake -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TIFF=OFF -DWITH_TIFF=OFF -DBUILD_JPEG=OFF 
-      -DBUILD_ZLIB=OFF -DBUILD_WEBP=OFF -DBUILD_PNG=OFF -DWITH_OPENEXR=OFF -DWITH_OPENJPEG=OFF -DWITH_JASPER=OFF -DWITH_PROTOBUF=OFF 
-      -DWITH_QUIRC=OFF -DWITH_1394=OFF -DWITH_V4L=OFF  -DWITH_GSTREAMER=ON -DWITH_FFMPEG=ON -DWITH_GTK=OFF -DBUILD_SHARED_LIBS=OFF 
-      -DBUILD_LIST="core,calib3d,imgproc,videoio,aruco" -DCMAKE_INSTALL_PREFIX=<PATH TO INSTALL TO> 
-      -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib-master/modules ../opencv-master
+	    cmake -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TIFF=OFF -DWITH_TIFF=OFF -DBUILD_JPEG=OFF -DBUILD_ZLIB=OFF -DBUILD_WEBP=OFF -DBUILD_PNG=OFF -DWITH_OPENEXR=OFF -DWITH_OPENJPEG=OFF -DWITH_JASPER=OFF -DWITH_PROTOBUF=OFF -DWITH_QUIRC=OFF -DWITH_1394=OFF -DWITH_V4L=OFF  -DWITH_GSTREAMER=ON -DWITH_FFMPEG=ON -DWITH_GTK=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_LIST="core,calib3d,imgproc,videoio,aruco, gapi" -DCMAKE_INSTALL_PREFIX=../opencv_static -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ../opencv
 
  - Build and install OpenCV to the previously selected directory with:
  
@@ -94,8 +91,10 @@ We try to provide prebuild versions of all the libraries you will need to compil
 
         ${AnnotationTool_Directory}/libs/OpenCV_4.5.1/Ubuntu_xx04(MacOS)
   
+  
 ## Windows
  Coming soon...
+
 
 # Building QT5 yourself (only neccessary on MacOS):
 - Get QT from git with: 
