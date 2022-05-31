@@ -26,7 +26,7 @@ If you want to build the tool yourself here's a step by step guide on how to do 
 ### Installing the dependencies
 To be able to build the tool install all the dependencies with
 
-      sudo apt get install build-essential libxcb-xinerama0 libdouble-conversion-dev gstreamer1.0-libav ffmpeg libxcb-xinput0 libpcre2-dev libeigen3-dev qt5-default libqt5charts5-dev libqt5serialport5-dev qtmultimedia5-dev
+      sudo apt install build-essential libxcb-xinerama0 libdouble-conversion-dev gstreamer1.0-libav ffmpeg libxcb-xinput0 libpcre2-dev libeigen3-dev qt5-default libqt5charts5-dev libqt5serialport5-dev qtmultimedia5-dev
       
 ### Cloning the repository
 Next clone our repository with 
