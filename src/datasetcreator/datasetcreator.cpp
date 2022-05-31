@@ -341,7 +341,7 @@ void DatasetCreator::createSavefile(const QString& recording,
 				frameNumbers);
 
 	for (const auto & camera : cameras) {
-		QFile file = QFile(dataFolder + "/" + camera + "/annotations.csv");
+		QFile file(dataFolder + "/" + camera + "/annotations.csv");
 		if (!file.open(QIODevice::WriteOnly)) {
 			emit datasetCreationFailed("Can't open file " + dataFolder + "/" +
 						camera + "/annotations.csv" + " !");;

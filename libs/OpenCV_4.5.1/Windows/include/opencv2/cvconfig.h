@@ -28,9 +28,6 @@
 /* Clp support */
 /* #undef HAVE_CLP */
 
-/* Cocoa API */
-/* #undef HAVE_COCOA */
-
 /* NVIDIA CUDA Runtime API*/
 /* #undef HAVE_CUDA */
 
@@ -56,12 +53,6 @@
 /* Geospatial Data Abstraction Library */
 /* #undef HAVE_GDAL */
 
-/* GTK+ 2.0 Thread support */
-/* #undef HAVE_GTHREAD */
-
-/* GTK+ 2.x toolkit */
-/* #undef HAVE_GTK */
-
 /* Halide support */
 /* #undef HAVE_HALIDE */
 
@@ -69,7 +60,7 @@
 /* #undef HAVE_VULKAN */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#define HAVE_INTTYPES_H 1
+/* #undef HAVE_INTTYPES_H */
 
 /* Intel Integrated Performance Primitives */
 #define HAVE_IPP
@@ -121,12 +112,6 @@
 /* parallel_for with pthreads */
 /* #undef HAVE_PTHREADS_PF */
 
-/* Qt support */
-/* #undef HAVE_QT */
-
-/* Qt OpenGL support */
-/* #undef HAVE_QT_OPENGL */
-
 /* Intel Threading Building Blocks */
 /* #undef HAVE_TBB */
 
@@ -134,10 +119,7 @@
 /* #undef HAVE_HPX */
 
 /* TIFF codec */
-#define HAVE_TIFF
-
-/* Win32 UI */
-#define HAVE_WIN32UI
+/* #undef HAVE_TIFF */
 
 /* Define if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */

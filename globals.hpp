@@ -26,7 +26,7 @@ inline void delayl(int ms) {
 }
 
 enum KeypointState {NotAnnotated, Annotated, Reprojected, Suppressed};
-enum KeypointShape {Circle, Rectangle, Triangle};
+enum class KeypointShape {Circle, Rectangle, Triangle};
 
 
 //----- Structs Definitions ----//

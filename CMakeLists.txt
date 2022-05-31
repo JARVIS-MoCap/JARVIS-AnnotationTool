@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 
-project(AnnotationTool VERSION 0.2.0  LANGUAGES CXX)
+project(AnnotationTool VERSION 1.1.0  LANGUAGES CXX)
 
 if(APPLE)
   set(OS_LIB_DIR "MacOS")
@@ -14,6 +14,15 @@ elseif(UNIX)
   else()
     set(OS_LIB_DIR "Ubuntu_1804")
   endif()
+endif()
+
+if (NOT UNIX)
+  set(Qt5_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5")
+  set(Qt5Core_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Core")
+  set(Qt5Widgets_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Widgets")
+  set(Qt5Charts_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Charts")
+  set(Qt5Multimedia_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Multimedia")
+  set(Qt5MultimediaWidgets_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5MultimediaWidgets")
 endif()
 
 find_package(Qt5Core REQUIRED)
@@ -46,7 +55,10 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+if (NOT WIN32)
 find_package(Eigen3 REQUIRED)
+endif()
+
 
 if(APPLE)
 	#set(Eigen3_DIR "libs/eigen-3.3.8/MacOS/share/eigen3")
@@ -102,7 +114,7 @@ elseif (UNIX)
   endif()
 endif()
 
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wunused)
+target_compile_options(${PROJECT_NAME} PRIVATE)
 
 target_include_directories( ${PROJECT_NAME}
     PUBLIC

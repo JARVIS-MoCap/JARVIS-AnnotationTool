@@ -120,14 +120,14 @@ void ImageViewer::paintEvent(QPaintEvent *) {
 				p.setBrush(ptColor);
 				p.setPen(QColor(0,0,0,0));
 				if(m_entityToKeypointShapeMap.contains(pt->entity())) {
-					if (m_entityToKeypointShapeMap[pt->entity()] == Circle) {
+					if (m_entityToKeypointShapeMap[pt->entity()] == KeypointShape::Circle) {
 						p.drawEllipse(point,m_keypointSize/2.0,m_keypointSize/2.0);
 					}
-					else if (m_entityToKeypointShapeMap[pt->entity()] == Rectangle) {
+					else if (m_entityToKeypointShapeMap[pt->entity()] == KeypointShape::Rectangle) {
 						p.drawRect(QRectF(point.x()-m_keypointSize/2.0,
 											 point.y()-m_keypointSize/2.0,m_keypointSize,m_keypointSize));
 					}
-					else if(m_entityToKeypointShapeMap[pt->entity()] == Triangle) {
+					else if(m_entityToKeypointShapeMap[pt->entity()] == KeypointShape::Triangle) {
 
 					}
 				}

@@ -16,7 +16,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_targetsDefined)
 set(_targetsNotDefined)
 set(_expectedTargets)
-foreach(_expectedTarget opencv_core opencv_flann opencv_imgproc opencv_features2d opencv_imgcodecs opencv_videoio opencv_calib3d opencv_aruco)
+foreach(_expectedTarget opencv_core opencv_flann opencv_imgproc opencv_features2d opencv_imgcodecs opencv_videoio opencv_calib3d opencv_gapi opencv_aruco)
   list(APPEND _expectedTargets ${_expectedTarget})
   if(NOT TARGET ${_expectedTarget})
     list(APPEND _targetsNotDefined ${_expectedTarget})
@@ -57,49 +57,56 @@ add_library(opencv_core SHARED IMPORTED)
 add_library(opencv_flann SHARED IMPORTED)
 
 set_target_properties(opencv_flann PROPERTIES
-  INTERFACE_LINK_LIBRARIES "opencv_core"
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_core"
 )
 
 # Create imported target opencv_imgproc
 add_library(opencv_imgproc SHARED IMPORTED)
 
 set_target_properties(opencv_imgproc PROPERTIES
-  INTERFACE_LINK_LIBRARIES "opencv_core"
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_core"
 )
 
 # Create imported target opencv_features2d
 add_library(opencv_features2d SHARED IMPORTED)
 
 set_target_properties(opencv_features2d PROPERTIES
-  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc"
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc;opencv_core;opencv_flann;opencv_imgproc"
 )
 
 # Create imported target opencv_imgcodecs
 add_library(opencv_imgcodecs SHARED IMPORTED)
 
 set_target_properties(opencv_imgcodecs PROPERTIES
-  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_imgproc"
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_imgproc;opencv_core;opencv_imgproc"
 )
 
 # Create imported target opencv_videoio
 add_library(opencv_videoio SHARED IMPORTED)
 
 set_target_properties(opencv_videoio PROPERTIES
-  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_imgproc;opencv_imgcodecs"
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_imgproc;opencv_imgcodecs;opencv_core;opencv_imgproc;opencv_imgcodecs"
 )
 
 # Create imported target opencv_calib3d
 add_library(opencv_calib3d SHARED IMPORTED)
 
 set_target_properties(opencv_calib3d PROPERTIES
-  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc;opencv_features2d"
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc;opencv_features2d;opencv_core;opencv_flann;opencv_imgproc;opencv_features2d"
+)
+
+# Create imported target opencv_gapi
+add_library(opencv_gapi SHARED IMPORTED)
+
+set_target_properties(opencv_gapi PROPERTIES
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc;opencv_features2d;opencv_calib3d;opencv_core;opencv_flann;opencv_imgproc;opencv_features2d;opencv_calib3d"
 )
 
 # Create imported target opencv_aruco
 add_library(opencv_aruco SHARED IMPORTED)
 
 set_target_properties(opencv_aruco PROPERTIES
-  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc;opencv_features2d;opencv_calib3d"
+  INTERFACE_LINK_LIBRARIES "opencv_core;opencv_flann;opencv_imgproc;opencv_features2d;opencv_calib3d;opencv_core;opencv_flann;opencv_imgproc;opencv_features2d;opencv_calib3d"
 )
 
 if(CMAKE_VERSION VERSION_LESS 2.8.12)
