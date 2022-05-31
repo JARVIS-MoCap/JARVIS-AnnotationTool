@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
-set(CMAKE_CXX_STANDARD 11)
 
+if (WIN32)
+  set(CMAKE_CXX_STANDARD 11)
+else()
+  set(CMAKE_CXX_STANDARD 17)
+endif()
 project(AnnotationTool VERSION 1.1.0  LANGUAGES CXX)
 
 if(APPLE)
