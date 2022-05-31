@@ -96,7 +96,11 @@ We try to provide prebuild versions of all the libraries you will need to compil
       
 - Checkout desired version with: 
   
-      git checkout 4.5.5
+      cd opencv && git checkout 4.5.5 cd ../opencv_contrib && checkout 4.5.5 && cd ..
+      
+- Make build directory:
+
+      mkdir build && cd build
 	
 - Configure with (set DCMAKE_INSTALL_PREFIX to the path you want to install it to):
 
