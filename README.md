@@ -154,7 +154,7 @@ Also make sure you have git installed and run the following in the git bash cons
       
 - Checkout desired version with: 
   
-      cd opencv && git checkout 4.5.5 cd ../opencv_contrib && checkout 4.5.5 && cd ..
+      cd opencv && git checkout 4.5.5 && cd ../opencv_contrib && git checkout 4.5.5 && cd ..
       
 - Make build directory:
 
