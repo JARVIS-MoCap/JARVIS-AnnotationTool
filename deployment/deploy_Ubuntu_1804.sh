@@ -1,6 +1,6 @@
 mkdir ../build
 cd ../build
-cmake ..
+cmake -DUBUNTU_VERSION=1804 ..
 make -j12
 make install
 cd ../deployment

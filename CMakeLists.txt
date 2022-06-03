@@ -99,7 +99,7 @@ elseif(WIN32)
   )
 
 elseif (UNIX)
-  set(CMAKE_INSTALL_RPATH /usr/local/lib/JARVIS-AnnotationTool;/usr/local/lib/JARVIS-AnnotationTool/OpenCV;)
+  set(CMAKE_INSTALL_RPATH /usr/local/lib/JARVIS-AnnotationTool;)
   add_executable(${PROJECT_NAME}
       main.cpp
       globals.hpp
@@ -107,9 +107,9 @@ elseif (UNIX)
   )
 
   if(${UBUNTU_VERSION} STREQUAL "2004")
-    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_0.3-1_amd64_2004/usr/local/bin)
+    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_1.1-1_amd64_2004/usr/local/bin)
   else()
-    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_0.3-1_amd64_1804/usr/local/bin)
+    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_1.1-1_amd64_1804/usr/local/bin)
   endif()
 endif()
 
