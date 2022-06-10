@@ -4,7 +4,7 @@ if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" LESS 2.5)
    message(FATAL_ERROR "CMake >= 2.6.0 required")
 endif()
 cmake_policy(PUSH)
-cmake_policy(VERSION 2.6...3.18)
+cmake_policy(VERSION 2.6)
 #----------------------------------------------------------------
 # Generated CMake target import file.
 #----------------------------------------------------------------
@@ -16,7 +16,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_targetsDefined)
 set(_targetsNotDefined)
 set(_expectedTargets)
-foreach(_expectedTarget ippiw ittnotify ade ocv.3rdparty.tesseract opencv_core opencv_flann opencv_imgproc opencv_features2d opencv_imgcodecs ocv.3rdparty.gstreamer ocv.3rdparty.ffmpeg ocv.3rdparty.ffmpeg.builtin_deps opencv_videoio opencv_calib3d opencv_gapi opencv_aruco)
+foreach(_expectedTarget ippiw ittnotify ade opencv_core opencv_flann opencv_imgproc opencv_features2d opencv_imgcodecs ocv.3rdparty.gstreamer ocv.3rdparty.ffmpeg ocv.3rdparty.ffmpeg.builtin_deps opencv_videoio opencv_calib3d opencv_gapi opencv_aruco)
   list(APPEND _expectedTargets ${_expectedTarget})
   if(NOT TARGET ${_expectedTarget})
     list(APPEND _targetsNotDefined ${_expectedTarget})
@@ -63,21 +63,11 @@ set_target_properties(ittnotify PROPERTIES
 # Create imported target ade
 add_library(ade STATIC IMPORTED)
 
-# Create imported target ocv.3rdparty.tesseract
-add_library(ocv.3rdparty.tesseract INTERFACE IMPORTED)
-
-set_target_properties(ocv.3rdparty.tesseract PROPERTIES
-  INTERFACE_COMPILE_DEFINITIONS ""
-  INTERFACE_INCLUDE_DIRECTORIES "/usr/include/leptonica"
-  INTERFACE_LINK_LIBRARIES "/usr/lib/x86_64-linux-gnu/libtesseract.so;/usr/lib/x86_64-linux-gnu/libarchive.so"
-  INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "/usr/include/leptonica"
-)
-
 # Create imported target opencv_core
 add_library(opencv_core STATIC IMPORTED)
 
 set_target_properties(opencv_core PROPERTIES
-  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>;/usr/lib/x86_64-linux-gnu/libz.so;\$<LINK_ONLY:va>;\$<LINK_ONLY:va-drm>;\$<LINK_ONLY:ittnotify>"
+  INTERFACE_LINK_LIBRARIES "\$<LINK_ONLY:dl>;\$<LINK_ONLY:m>;\$<LINK_ONLY:pthread>;\$<LINK_ONLY:rt>;\$<LINK_ONLY:ippiw>;\$<LINK_ONLY:ippicv>;\$<LINK_ONLY:Eigen3::Eigen>;/usr/lib/x86_64-linux-gnu/libz.so;\$<LINK_ONLY:ittnotify>"
 )
 
 # Create imported target opencv_flann

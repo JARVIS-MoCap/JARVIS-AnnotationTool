@@ -126,10 +126,10 @@
 /* #undef WORDS_BIGENDIAN */
 
 /* VA library (libva) */
-#define HAVE_VA
+/* #undef HAVE_VA */
 
 /* Intel VA-API/OpenCL */
-#define HAVE_VA_INTEL
+/* #undef HAVE_VA_INTEL */
 
 /* Lapack */
 /* #undef HAVE_LAPACK */
