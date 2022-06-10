@@ -124,8 +124,8 @@ We try to provide prebuild versions of all the libraries you will need to compil
       
 - Checkout desired version with: 
   
-      cd opencv && git checkout 4.5.5 cd ../opencv_contrib && checkout 4.5.5 && cd ..
-      
+      cd opencv && git checkout 4.5.5 &&  cd ../opencv_contrib && git checkout 4.5.5 && cd ..
+
 - Make build directory:
 
       mkdir build && cd build
