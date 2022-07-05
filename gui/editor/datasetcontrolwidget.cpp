@@ -16,9 +16,11 @@ DatasetControlWidget::DatasetControlWidget(QWidget *parent) : QWidget(parent) {
 	QGridLayout *layout = new QGridLayout(this);
 	QLabel *datasetControlLabel = new QLabel("Dataset Control");
 	datasetControlLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
+	this->installEventFilter(this);
 
 	QLabel *segmentLabel = new QLabel("Segment");
 	segmentCombo = new QComboBox(this);
+	segmentCombo->installEventFilter(this);
 	segmentCombo->setMinimumSize(200,25);
 	connect(segmentCombo, &QComboBox::currentTextChanged, this, &DatasetControlWidget::segmentChangedSlot);
 
@@ -30,6 +32,7 @@ DatasetControlWidget::DatasetControlWidget(QWidget *parent) : QWidget(parent) {
 	frameSetEdit->setMinimumSize(40,25);
 	frameSetEdit->setMaximumSize(50,25);
 	frameSetEdit->setReadOnly(true);
+	frameSetEdit->installEventFilter(this);
 	QLabel *seperatorLabel = new QLabel("/");
 	QWidget *frameSetSpacer = new QWidget(frameSetWidget);
 	frameSetSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -42,6 +45,7 @@ DatasetControlWidget::DatasetControlWidget(QWidget *parent) : QWidget(parent) {
 	framesetwidgetlayout->addWidget(totalFrameSetLabel,0,3);
 
 	framesTable = new QTableWidget(0, 2);
+	framesTable->installEventFilter(this);
 	framesTable->setAlternatingRowColors(true);
 	framesTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QStringList labels;
@@ -82,7 +86,8 @@ void DatasetControlWidget::datasetLoadedSlot() {
 	segmentCombo->setEnabled(Dataset::dataset->segmentNames().length() != 1);
 	for (const auto &segment : Dataset::dataset->segmentNames()) {
 		segmentCombo->addItem(segment);
-		if (segment.split("/").takeLast() == Dataset::dataset->datasetFolder().split("/").takeLast()) {
+		if (Dataset::dataset->datasetFolder().contains(segment))
+		{
 			segmentIndex = currentIndex;
 			m_currentSegment = segment;
 		}
@@ -98,16 +103,17 @@ void DatasetControlWidget::datasetLoadedSlot() {
 	for (const auto& cameraName : Dataset::dataset->cameraNames()) {
     QTableWidgetItem* frameItem = new QTableWidgetItem();
     frameItem->setText(cameraName);
-		frameItem->setFlags(frameItem->flags() ^ Qt::ItemIsSelectable);
-		frameItem->setIcon(QIcon::fromTheme("no_check"));
+	frameItem->setFlags(frameItem->flags() ^ Qt::ItemIsEditable);
+	frameItem->setFlags(frameItem->flags() ^ Qt::ItemIsSelectable);
+	frameItem->setIcon(QIcon::fromTheme("no_check"));
     framesTable->setItem(row,0,frameItem);
-		QTableWidgetItem* annotationItem = new QTableWidgetItem();
-		getAnnotationCounts(row, m_annotatedCounts[row], m_totalCount);
-		annotationItem->setText("("+ QString::number(m_annotatedCounts[row]) +
-														"/" + QString::number(m_totalCount) + ")");
-		annotationItem->setTextAlignment(Qt::AlignCenter);
-		annotationItem->setFlags(annotationItem->flags() ^ Qt::ItemIsEditable);
-		annotationItem->setFlags(annotationItem->flags() ^ Qt::ItemIsSelectable);
+	QTableWidgetItem* annotationItem = new QTableWidgetItem();
+	getAnnotationCounts(row, m_annotatedCounts[row], m_totalCount);
+	annotationItem->setText("("+ QString::number(m_annotatedCounts[row]) +
+				"/" + QString::number(m_totalCount) + ")");
+	annotationItem->setTextAlignment(Qt::AlignCenter);
+	annotationItem->setFlags(annotationItem->flags() ^ Qt::ItemIsEditable);
+	annotationItem->setFlags(annotationItem->flags() ^ Qt::ItemIsSelectable);
     framesTable->setItem(row,1,annotationItem);
 		row++;
 	}
@@ -183,7 +189,7 @@ void DatasetControlWidget::keypointStateChangedSlot(KeypointState state,
 		}
 	}
 	framesTable->item(frameIndex,1)->setText("("+ QString::number(m_annotatedCounts[frameIndex]) +
-																					 "/" + QString::number(m_totalCount) + ")");
+				"/" + QString::number(m_totalCount) + ")");
 }
 
 
@@ -193,7 +199,6 @@ void DatasetControlWidget::imgSetChangedSlot() {
 
 void DatasetControlWidget::segmentChangedSlot(const QString& segment) {
 	Dataset::dataset->save();
-	std::cout << "Changing Segment" << std::endl;
 	QList<QString> segmentNames = Dataset::dataset->segmentNames();
 	QList<QString> cameraNames = Dataset::dataset->cameraNames();
 	QList<SkeletonComponent> skeleton = Dataset::dataset->skeleton();
@@ -207,6 +212,5 @@ void DatasetControlWidget::segmentChangedSlot(const QString& segment) {
 	m_currentImgSetIndex = 0;
 	frameSetEdit->setText(QString::number(m_currentImgSetIndex+1));
 	totalFrameSetLabel->setText(QString::number(Dataset::dataset->imgSets().length()));
-	std::cout << "Changed Segment" << std::endl;
 	emit datasetLoaded();
 }

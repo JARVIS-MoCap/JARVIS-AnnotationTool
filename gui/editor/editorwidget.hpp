@@ -36,7 +36,7 @@ class EditorWidget : public QWidget {
 
 	signals:
 		void datasetLoaded();
-		void zoomToggled(bool toggle);
+		void cropToggled(bool toggle);
 		void panToggled(bool toggle);
 		void homeClicked();
 		void quitClicked();
@@ -49,6 +49,7 @@ class EditorWidget : public QWidget {
 		void minViewsChanged(int val);
 		void errorThresholdChanged(float val);
 		void boneLengthErrorThresholdChanged(float val);
+		void brightnessChanged(int brightnessFactor);
 
 	public slots:
 		void splitterMovedSlot(int pos, int index);
@@ -57,6 +58,7 @@ class EditorWidget : public QWidget {
 		void imgSetChangedSlot(int index);
 
 	private:
+		void keyPressEvent(QKeyEvent *e);
 		QSplitter *mainSplitter;
 		QSplitter *horizontalSplitter;
 
@@ -72,7 +74,7 @@ class EditorWidget : public QWidget {
 		QWidget  *buttonWidget;
 		QPushButton *previousButton;
 		QPushButton *nextButton;
-		QPushButton *zoomButton;
+		QPushButton *cropButton;
 		QPushButton *panButton;
 		QPushButton *homeButton;
 		QPushButton *previousSetButton;
@@ -83,10 +85,20 @@ class EditorWidget : public QWidget {
 		int m_currentImgSetIndex;
 		int m_currentFrameIndex;
 
+		bool eventFilter(QObject *target, QEvent *event)
+		{
+			if (event->type() == QKeyEvent::KeyPress)
+			{
+				event->ignore();
+				return true;
+			}
+			return QObject::eventFilter(target, event);
+		}
+
 	private slots:
 		void previousClickedSlot();
 		void nextClickedSlot();
-		void zoomToggledSlot(bool);
+		void cropToggledSlot(bool);
 		void panToggledSlot(bool);
 		void homeClickedSlot();
 		void previousSetClickedSlot();

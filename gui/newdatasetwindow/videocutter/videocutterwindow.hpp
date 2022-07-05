@@ -53,6 +53,7 @@ class VideoCutterWindow : public QWidget {
 		int m_duration;
 		int m_frameCount;
 		int m_frameRate;
+		QString m_recordingsPath;
 		RangeOverview *rangeOverview;
 
 		ctkRangeSlider *rangeSlider;
@@ -84,6 +85,7 @@ class VideoCutterWindow : public QWidget {
 		QList<TimeLineWindow> m_timeLineWindows;
 		QList<TimeLineWindow> m_initialTimeLineWindows;
 		QList<TimeLineWindow> m_savedTimeLineWindows;
+
 
 
 		int m_mainValue = 0, m_maximumValue = 0, m_minimumValue = 0;

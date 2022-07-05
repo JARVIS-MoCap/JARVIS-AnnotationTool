@@ -42,14 +42,17 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	keypointWidget->hide();
 
 	buttonWidget = new QWidget(mainSplitter);
+	buttonWidget->installEventFilter(this);
 	QGridLayout *buttonlayout = new QGridLayout(buttonWidget);
 	buttonlayout->setSpacing(20);
-	previousButton = new QPushButton("<< Previous");
-	previousButton->setMinimumSize(130,35);
+	previousButton = new QPushButton("<< Previous", buttonWidget);
+	previousButton->installEventFilter(this);
+	previousButton->setMinimumSize(130, 35);
 	previousButton->setMaximumSize(130,35);
 	previousButton->setEnabled(false);
 	connect(previousButton, &QPushButton::clicked, this, &EditorWidget::previousClickedSlot);
-	nextButton = new QPushButton("Next >>");
+	nextButton = new QPushButton("Next >>", buttonWidget);
+	nextButton->installEventFilter(this);
 	nextButton->setMinimumSize(130,35);
 	nextButton->setMaximumSize(130,35);
 	nextButton->setEnabled(false);
@@ -57,21 +60,24 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	QWidget *buttonSpacer1 = new QWidget(this);
 	buttonSpacer1->setMaximumSize(100,100);
 	buttonSpacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	zoomButton = new QPushButton("Zoom");
-	zoomButton->setIcon(QIcon::fromTheme("search"));
-	zoomButton->setCheckable(true);
-	zoomButton->setMinimumSize(130,35);
-	zoomButton->setMaximumSize(130,35);
-	connect(zoomButton, &QPushButton::toggled, this, &EditorWidget::zoomToggled);
-	connect(zoomButton, &QPushButton::toggled, this, &EditorWidget::zoomToggledSlot);
-	panButton = new QPushButton("Pan");
+	cropButton = new QPushButton("Crop", buttonWidget);
+	cropButton->installEventFilter(this);
+	cropButton->setIcon(QIcon::fromTheme("search"));
+	cropButton->setCheckable(true);
+	cropButton->setMinimumSize(130,35);
+	cropButton->setMaximumSize(130,35);
+	connect(cropButton, &QPushButton::toggled, this, &EditorWidget::cropToggled);
+	connect(cropButton, &QPushButton::toggled, this, &EditorWidget::cropToggledSlot);
+	panButton = new QPushButton("Pan", buttonWidget);
+	panButton->installEventFilter(this);
 	panButton->setIcon(QIcon::fromTheme("move"));
 	panButton->setCheckable(true);
 	panButton->setMinimumSize(130,35);
 	panButton->setMaximumSize(130,35);
 	connect(panButton, &QPushButton::toggled, this, &EditorWidget::panToggled);
 	connect(panButton, &QPushButton::toggled, this, &EditorWidget::panToggledSlot);
-	homeButton = new QPushButton("Home");
+	homeButton = new QPushButton("Home", buttonWidget);
+	homeButton->installEventFilter(this);
 	homeButton->setIcon(QIcon::fromTheme("home"));
 	homeButton->setMinimumSize(130,35);
 	homeButton->setMaximumSize(130,35);
@@ -80,26 +86,29 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	QWidget *buttonSpacer2 = new QWidget(this);
 	buttonSpacer2->setMaximumSize(100,100);
 	buttonSpacer2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	previousSetButton = new QPushButton("<< Previous Set");
+	previousSetButton = new QPushButton("<< Previous Set", buttonWidget);
+	previousSetButton->installEventFilter(this);
 	previousSetButton->setMinimumSize(160,35);
 	previousSetButton->setMaximumSize(160,35);
 	previousSetButton->setEnabled(false);
 	connect(previousSetButton, &QPushButton::clicked, this, &EditorWidget::previousSetClickedSlot);
-	nextSetButton = new QPushButton("Next Set >>");
+	nextSetButton = new QPushButton("Next Set >>", buttonWidget);
+	nextSetButton->installEventFilter(this);
 	nextSetButton->setMinimumSize(160,35);
 	nextSetButton->setMaximumSize(160,35);
 	nextSetButton->setEnabled(false);
 	connect(nextSetButton, &QPushButton::clicked, this, &EditorWidget::nextSetClickedSlot);
 	QWidget *buttonSpacer3 = new QWidget(this);
 	buttonSpacer3->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	quitButton = new QPushButton("Quit");
+	quitButton = new QPushButton("Quit", buttonWidget);
+	quitButton->installEventFilter(this);
 	quitButton->setMinimumSize(130,35);
 	quitButton->setMaximumSize(130,35);
 	connect(quitButton, &QPushButton::clicked, this, &EditorWidget::quitClickedSlot);
 	buttonlayout->addWidget(previousButton,0,0);
 	buttonlayout->addWidget(nextButton,0,1);
 	buttonlayout->addWidget(buttonSpacer1,0,2);
-	buttonlayout->addWidget(zoomButton,0,3);
+	buttonlayout->addWidget(cropButton,0,3);
 	buttonlayout->addWidget(panButton,0,4);
 	buttonlayout->addWidget(homeButton,0,5);
 	buttonlayout->addWidget(buttonSpacer2,0,6);
@@ -130,13 +139,14 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(datasetControlWidget, &DatasetControlWidget::frameSelectionChanged, this, &EditorWidget::frameChangedSlot);
 	connect(datasetControlWidget, &DatasetControlWidget::imgSetChanged, this, &EditorWidget::imgSetChangedSlot);
 	connect(datasetControlWidget, &DatasetControlWidget::datasetLoaded, this, &EditorWidget::datasetLoadedSlot);
+	connect(imageViewer, &ImageViewer::brightnessChanged, this, &EditorWidget::brightnessChanged);
 
 
 	//<- Outgoing Signals
 	// connect(this, &EditorWidget::datasetLoaded, keypointWidget, &KeypointWidget::datasetLoadedSlot);
 	// connect(this, &EditorWidget::datasetLoaded, reprojectionWidget, &ReprojectionWidget::datasetLoadedSlot);
   // connect(this, &EditorWidget::datasetLoaded, datasetControlWidget, &DatasetControlWidget::datasetLoadedSlot);
-	connect(this, &EditorWidget::zoomToggled, imageViewer, &ImageViewer::zoomToggledSlot);
+	connect(this, &EditorWidget::cropToggled, imageViewer, &ImageViewer::cropToggledSlot);
 	connect(this, &EditorWidget::panToggled, imageViewer, &ImageViewer::panToggledSlot);
 	connect(this, &EditorWidget::homeClicked, imageViewer, &ImageViewer::homeClickedSlot);
 	connect(this, &EditorWidget::imageTranformationChanged, imageViewer, &ImageViewer::imageTransformationChangedSlot);
@@ -313,24 +323,24 @@ void EditorWidget::imgSetChangedSlot(int index) {
 }
 
 
-void EditorWidget::zoomToggledSlot(bool toggle) {
+void EditorWidget::cropToggledSlot(bool toggle) {
 	if (toggle) panButton->setChecked(false);
 }
 
 
 void EditorWidget::panToggledSlot(bool toggle) {
-	if (toggle) zoomButton->setChecked(false);
+	if (toggle) cropButton->setChecked(false);
 }
 
 
 void EditorWidget::homeClickedSlot() {
-	zoomButton->setChecked(false);
+	cropButton->setChecked(false);
 	panButton->setChecked(false);
 }
 
 
 void EditorWidget::zoomFinishedSlot() {
-	zoomButton->setChecked(false);
+	cropButton->setChecked(false);
 }
 
 
@@ -348,8 +358,14 @@ void EditorWidget::datasetLoadedSlot() {
 	m_currentImgSetIndex = 0;
 	m_currentFrameIndex = 0;
 	imageViewer->setFrame(m_currentImgSet, m_currentFrameIndex);
-	nextButton->setEnabled(true);
-	nextSetButton->setEnabled(true);
+	if (m_currentImgSet->numCameras != 1)
+	{
+		nextButton->setEnabled(true);
+	}
+	if (Dataset::dataset->imgSets().size() > 1)
+	{
+		nextSetButton->setEnabled(true);
+	}
 	previousButton->setEnabled(false);
 	previousSetButton->setEnabled(false);
 	splitterMovedSlot(0,0);
@@ -363,4 +379,58 @@ void EditorWidget::datasetLoadedSlot() {
 void EditorWidget::quitClickedSlot() {
 	Dataset::dataset->save();
 	emit quitClicked();
+}
+
+void EditorWidget::keyPressEvent(QKeyEvent *e)
+{
+	int key = e->key();
+	if (key == 16777236 || key == 68)
+	{
+		nextClickedSlot();
+	}
+	else if (key == 16777234 || key == 65) {
+		previousClickedSlot();
+	}
+	if (key == 16777237 || key == 83)
+	{
+		if (e->modifiers() & Qt::ControlModifier)
+		{
+			int brightness = imageViewer->getBrightnessFactor();
+			if (brightness > 0)
+			{
+				brightness = std::max(brightness - 4, 0);
+			}
+			imageViewer->setBrightness(brightness);
+		}
+		else
+		{
+			nextSetClickedSlot();
+		}
+	}
+	else if (key == 16777235 || key == 87)
+	{
+		if (e->modifiers() & Qt::ControlModifier)
+		{
+			int brightness = imageViewer->getBrightnessFactor();
+			if (brightness < 200)
+			{
+				brightness = std::min(brightness + 4, 200);
+			}
+			imageViewer->setBrightness(brightness);
+		}
+		else
+		{
+			previousSetClickedSlot();
+		}
+	}
+	else if (key == 72) {
+		emit homeClicked();
+		homeClickedSlot();
+	}
+	else if (key == 67) {
+		bool toggled = cropButton->isChecked();
+		cropButton->setChecked(!toggled);
+		emit cropToggled(!toggled);
+		cropToggledSlot(!toggled);
+	}
 }

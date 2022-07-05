@@ -15,7 +15,7 @@
 #include <QStackedWidget>
 #include <QStatusBar>
 #include <QMenuBar>
-
+#include <QtDataVisualization>
 
 //This is a global funciton, probably not ideal to have it here
 void createToolBarButton(QToolButton *button, QAction*action, QIcon icon,
@@ -149,6 +149,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 					editorWidget, &EditorWidget::errorThresholdChanged);
 	connect(settingsWindow, &SettingsWindow::boneLengthErrorThresholdChanged,
 					editorWidget, &EditorWidget::boneLengthErrorThresholdChanged);
+	connect(editorWidget, &EditorWidget::brightnessChanged, settingsWindow, &SettingsWindow::brightnessChangedSlot);
 	connect(editorWidget, &EditorWidget::datasetLoaded,
 					settingsWindow, &SettingsWindow::datasetLoadedSlot);
 }

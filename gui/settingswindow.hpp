@@ -44,6 +44,7 @@ class SettingsWindow : public QWidget {
 
 	public slots:
 		void datasetLoadedSlot();
+		void brightnessChangedSlot(int brightnessFactor);
 
 	private:
 		void loadSettings();
@@ -76,7 +77,7 @@ class SettingsWindow : public QWidget {
 		QList<QLabel*> colormapPreviewsList;
 		QList<QPushButton*> colorChooserButtonsList;
 		QList<QColor> colorsList;
-
+		QList<QWidget*> singleEntityWidgetList;
 		QGroupBox *reprojectionSettingsBox;
 		QSpinBox *minViewsEdit;
 		QDoubleSpinBox *errorThresholdEdit;

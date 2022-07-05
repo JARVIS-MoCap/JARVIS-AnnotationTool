@@ -3,4 +3,4 @@ Version: 1.1
 Architecture: amd64
 Maintainer: Timo Hueser <timo.hueser@gmail.com>
 Description: Annotation Tool for the JARVIS 3D tracking toolbox.
-Depends: libxcb-xinerama0, libdouble-conversion-dev, gstreamer1.0-libav, ffmpeg, libxcb-xinput0, qt5-default, libqt5charts5-dev, libqt5serialport5-dev, qtmultimedia5-dev, libeigen3-dev
+Depends: libxcb-xinerama0, libdouble-conversion-dev, gstreamer1.0-libav, ffmpeg, libxcb-xinput0, qt5-default, libqt5charts5-dev, libqt5serialport5-dev, qtmultimedia5-dev, libeigen3-dev, libqt5multimedia5-plugins

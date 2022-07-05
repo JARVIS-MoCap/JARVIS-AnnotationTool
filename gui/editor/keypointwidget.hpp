@@ -23,12 +23,13 @@
 #include <QTabWidget>
 #include <QListWidget>
 #include <QMenu>
-
+#include <QKeyEvent>
 
 class KeypointListWidget : public QListWidget {
 	Q_OBJECT
 	public:
 		explicit KeypointListWidget() {
+			this->installEventFilter(this);
 			setContextMenuPolicy(Qt::CustomContextMenu);
 			connect(this, &KeypointListWidget::customContextMenuRequested, this, &KeypointListWidget::showContextMenu);
 			connect(this, &KeypointListWidget::itemDoubleClicked, this, &KeypointListWidget::itemDoubleClickedSlot);
@@ -47,6 +48,15 @@ class KeypointListWidget : public QListWidget {
 
 	private:
 		QList<int> m_suppressedList = {};
+		bool eventFilter(QObject *target, QEvent *event)
+		{
+			if (event->type() == QKeyEvent::KeyPress)
+			{
+				event->ignore();
+				return true;
+			}
+			return QObject::eventFilter(target, event);
+		}
 
 	private slots:
 		void showContextMenu(const QPoint & pos) {
@@ -141,6 +151,16 @@ class KeypointWidget : public QWidget {
 
 		ImgSet *m_currentImgSet;
 		int m_currentFrameIndex;
+
+		bool eventFilter(QObject *target, QEvent *event)
+		{
+			if (event->type() == QKeyEvent::KeyPress)
+			{
+				event->ignore();
+				return true;
+			}
+			return QObject::eventFilter(target, event);
+		}
 
 	private slots:
 		void hideEntitySlot(int toggle);

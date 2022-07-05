@@ -31,6 +31,12 @@ class ImageViewer : public QWidget {
 		void fitToScreen();
 		void setSize(int w, int h) {m_size = QSize(w,h);}
 		QSize sizeHint() const override {return m_size;}
+		int getHueFactor() {return m_hueFactor;};
+		int getSaturationFactor() {return m_saturationFactor;};
+		int getBrightnessFactor() {return m_brightnessFactor;};
+		int getContrastFactor() {return m_contrastFactor;};
+		void setBrightness(int brightnessFactor);
+
 
 	signals:
 		void zoomFinished();
@@ -40,11 +46,12 @@ class ImageViewer : public QWidget {
 		void keypointCorrected(Keypoint *keypoint);
 		void alreadyAnnotated(bool isSuppressed);
 		void keypointChangedForReprojection(int imgSetIndex, int frameIndex);
+		void brightnessChanged(int brightnessFactor);
 
 	public slots:
 		void setFrame(ImgSet *imgSet, int frameIndex);
 		void updateViewer();
-		void zoomToggledSlot(bool toggle);
+		void cropToggledSlot(bool toggle);
 		void panToggledSlot(bool toggle);
 		void homeClickedSlot();
 		void currentEntityChangedSlot(const QString& entity);
@@ -102,6 +109,7 @@ class ImageViewer : public QWidget {
 		void mouseDoubleClickEvent(QMouseEvent *event);
 		void mouseMoveEvent(QMouseEvent *event);
 		void mouseReleaseEvent(QMouseEvent *);
+		void wheelEvent(QWheelEvent *event);
 };
 
 #endif

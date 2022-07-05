@@ -180,19 +180,46 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 
 void SettingsWindow::datasetLoadedSlot() {
 	int i = 0;
-	for (const auto& entity : Dataset::dataset->entitiesList()) {
+	for (auto &widget : keypointShapeCombosList)
+	{
+		delete widget;
+	}
+	keypointShapeCombosList.clear();
+	for (auto &widget : colorMapCombosList)
+	{
+		delete widget;
+	}
+	colorMapCombosList.clear();
+	colorMapTypeList.clear();
+	for (auto &widget : colormapPreviewsList)
+	{
+		delete widget;
+	}
+	colormapPreviewsList.clear();
+	for (auto &widget : colorChooserButtonsList)
+	{
+		delete widget;
+	}
+	colorChooserButtonsList.clear();
+	colorsList.clear();
+	for (auto &widget : singleEntityWidgetList) {
+		delete widget;
+	}
+	singleEntityWidgetList.clear();
+
+	for (const auto &entity : Dataset::dataset->entitiesList())
+	{
 		QWidget *singleEntityWidget = new QWidget(entitySettingsWidget);
 		QLabel *entityLabel = new QLabel(entity);
 		entityLabel->setFont(QFont("Sans Serif", 11, QFont::Bold));
 		QGridLayout *singleentitylayout = new QGridLayout(singleEntityWidget);
 		singleentitylayout->setMargin(0);
 		QLabel *keypointShapeLabel = new QLabel(" Keypoint Shape");
-		QComboBox * keypointShapeCombo = new QComboBox();
+		QComboBox *keypointShapeCombo = new QComboBox();
 		keypointShapeCombo->addItem("Circle");
 		keypointShapeCombo->addItem("Rectangle");
-		connect(keypointShapeCombo, static_cast<void (QComboBox::*)(int)>
-						(&QComboBox::currentIndexChanged),
-						this, &SettingsWindow::keypointShapeChangedSlot);
+		connect(keypointShapeCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+				this, &SettingsWindow::keypointShapeChangedSlot);
 		keypointShapeCombosList.append(keypointShapeCombo);
 		QLabel *colorMapLabel = new QLabel(" Colormap");
 		QComboBox *colorMapCombo = new QComboBox();
@@ -201,34 +228,34 @@ void SettingsWindow::datasetLoadedSlot() {
 		colorMapCombo->addItem("Jet");
 		colorMapCombo->addItem("Fixed");
 		colorMapCombo->addItem("Single");
-		connect(colorMapCombo, static_cast<void (QComboBox::*)(int)>
-						(&QComboBox::currentIndexChanged),
-						this, &SettingsWindow::colorMapChangedSlot);
+		connect(colorMapCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+				this, &SettingsWindow::colorMapChangedSlot);
 		QLabel *colormapPreviewLabel = new QLabel();
 		colormapPreviewsList.append(colormapPreviewLabel);
-		colormapPreviewLabel->setMinimumSize(200,20);
+		colormapPreviewLabel->setMinimumSize(200, 20);
 		QImage colormapPreview = createColorMapPreview(ColorMap::Jet);
 		colormapPreviewLabel->setPixmap(
-					QPixmap::fromImage(colormapPreview).scaled(200,20));
+			QPixmap::fromImage(colormapPreview).scaled(200, 20));
 		QPushButton *colorChooserButton = new QPushButton();
-		colorChooserButton->setMinimumSize(30,30);
-		colorChooserButton->setMaximumSize(30,30);
+		colorChooserButton->setMinimumSize(30, 30);
+		colorChooserButton->setMaximumSize(30, 30);
 		colorChooserButton->setIcon(QIcon::fromTheme("paint"));
 		colorChooserButton->setEnabled(false);
 		connect(colorChooserButton, &QPushButton::clicked,
-						this, &SettingsWindow::colorChooserClickedSlot);
+				this, &SettingsWindow::colorChooserClickedSlot);
 		colorChooserButtonsList.append(colorChooserButton);
-		colorsList.append(QColor(0,0,255));
-		singleentitylayout->addWidget(entityLabel,0,0,1,3);
-		singleentitylayout->addWidget(keypointShapeLabel, 1,0);
-		singleentitylayout->addWidget(keypointShapeCombo,1,1,1,2);
-		singleentitylayout->addWidget(colorMapLabel,2,0);
-		singleentitylayout->addWidget(colorMapCombo,2,1,1,2);
-		singleentitylayout->addWidget(colormapPreviewLabel,3,1);
-		singleentitylayout->addWidget(colorChooserButton,3,2);
+		colorsList.append(QColor(0, 0, 255));
+		singleentitylayout->addWidget(entityLabel, 0, 0, 1, 3);
+		singleentitylayout->addWidget(keypointShapeLabel, 1, 0);
+		singleentitylayout->addWidget(keypointShapeCombo, 1, 1, 1, 2);
+		singleentitylayout->addWidget(colorMapLabel, 2, 0);
+		singleentitylayout->addWidget(colorMapCombo, 2, 1, 1, 2);
+		singleentitylayout->addWidget(colormapPreviewLabel, 3, 1);
+		singleentitylayout->addWidget(colorChooserButton, 3, 2);
 
-		entitysettingslayout->addWidget(singleEntityWidget,i++,0);
-	}
+		entitysettingslayout->addWidget(singleEntityWidget, i++, 0);
+		singleEntityWidgetList.append(singleEntityWidget);
+		}
 }
 
 
@@ -382,4 +409,8 @@ void SettingsWindow::boneLengthErrorThresholdChangedSlot(double val) {
 	settings->endGroup();
 	settings->endGroup();
 	emit boneLengthErrorThresholdChanged(val);
+}
+
+void SettingsWindow::brightnessChangedSlot(int brightnessFactor) {
+	brightnessSlider->setValue(brightnessFactor);
 }

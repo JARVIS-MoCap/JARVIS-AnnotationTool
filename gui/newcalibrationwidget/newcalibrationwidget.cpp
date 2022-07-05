@@ -512,21 +512,48 @@ bool NewCalibrationWidget::checkExtrinsics(const QString& path, QString & errorM
 			}
 		}
 		else if (pair.size() == 3) {
-			if(!checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[0])) {
-				errorMsg = "Recording for primary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
-				allFilesValid = false;
+			if (m_calibrationConfig->single_primary == true) {
+				if (!checkIsValidRecording(path, pair[0]))
+				{
+					errorMsg = "Recording for primary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
+					allFilesValid = false;
+				}
+				if (!checkIsValidRecording(path, pair[1]))
+				{
+					errorMsg = "Recording for secondary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
+					allFilesValid = false;
+				}
+				if (!checkIsValidRecording(path, pair[2]))
+				{
+					errorMsg = "Recording for secondary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
+					allFilesValid = false;
+				}
 			}
-			if (!checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[1])) {
-				errorMsg = "Recording for secondary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
-				allFilesValid = false;
-			}
-			if (!checkIsValidRecording(path + "/" + pair[1] + "-" + pair[2], pair[1])) {
-				errorMsg = "Recording for primary camera in pair \"" + pair[1] + " --> " + pair[2] + "\" not found.";
-				allFilesValid = false;
-			}
-			if (!checkIsValidRecording(path + "/" + pair[1] + "-" + pair[2], pair[2])) {
-				errorMsg = "Recording for secondary camera in pair \"" + pair[1] + " --> " + pair[2] + "\" not found.";
-				allFilesValid = false;
+			else {
+				if (!checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[0]))
+				{
+					errorMsg = "Recording for primary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
+					allFilesValid = false;
+				}
+				if (!checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[1]))
+				{
+					if (!checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[0]))
+					{
+						errorMsg = "Recording for primary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
+						allFilesValid = false;
+					}
+					if (!checkIsValidRecording(path + "/" + pair[0] + "-" + pair[1], pair[1]))
+					{
+						errorMsg = "Recording for secondary camera in pair \"" + pair[0] + " --> " + pair[1] + "\" not found.";
+						allFilesValid = false;
+					}
+					allFilesValid = false;
+				}
+				if (!checkIsValidRecording(path + "/" + pair[1] + "-" + pair[2], pair[2]))
+				{
+					errorMsg = "Recording for secondary camera in pair \"" + pair[1] + " --> " + pair[2] + "\" not found.";
+					allFilesValid = false;
+				}
 			}
 		}
 	}

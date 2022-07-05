@@ -35,7 +35,7 @@ void Switch::paintEvent(QPaintEvent *e) {
 														height() - 2 * m_margin), 8.0, 8.0);
 		p.setBrush(m_thumb);
 		p.setOpacity(1.0);
-		p.drawEllipse(QRectF(offset() - (m_height / 2), m_y - (m_height / 2),
+		p.drawEllipse(QRectF(offset() - (m_height / 2)- 2, m_y - (m_height / 2),
 												 height(), height()));
 	}
 	else {
@@ -45,8 +45,8 @@ void Switch::paintEvent(QPaintEvent *e) {
 														height() - 2 * m_margin), 8.0, 8.0);
 		p.setOpacity(1.0);
 		p.setBrush(QColor("#BDBDBD"));
-		p.drawEllipse(QRectF(offset() - (m_height / 2), m_y - (m_height / 2),
-												 height(), height()));
+		p.drawEllipse(QRectF(offset() - (height() / 2), m_y - (height() / 2),
+							height(), height()));
 	}
 }
 

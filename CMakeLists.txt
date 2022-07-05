@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
+set (UBUNTU_VERSION 2004)
+
 if (WIN32)
   set(CMAKE_CXX_STANDARD 11)
 else()
@@ -35,6 +37,8 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Charts REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
 find_package(Qt5MultimediaWidgets REQUIRED)
+//find_package(Qt5DataVisualization REQUIRED)
+
 message (STATUS "QT DIRECTORY ${Qt5Core_DIR}")
 
 if(NOT WIN32)
@@ -126,6 +130,7 @@ target_link_libraries(${PROJECT_NAME}
 	Qt5::Charts
   Qt5::Multimedia
   Qt5::MultimediaWidgets
+
   gui
   src
   darkstyle

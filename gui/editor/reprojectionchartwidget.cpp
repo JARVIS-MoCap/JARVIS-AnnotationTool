@@ -15,6 +15,7 @@
 ReprojectionChartWidget::ReprojectionChartWidget(QWidget *parent) : QWidget(parent) {
 	QGridLayout *layout = new QGridLayout(this);
 	layout->setMargin(0);
+	this->installEventFilter(this);
 
 	chartsTabWidget = new QTabWidget(this);
 	chartsTabWidget->setStyleSheet("QTabBar::tab{padding:4px 6px;"
@@ -38,6 +39,7 @@ void ReprojectionChartWidget::datasetLoadedSlot() {
 	chartsTabWidget->clear();
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		ReprojectionChartView * chart = new ReprojectionChartView();
+		chart->installEventFilter(this);
 		connect(this, &ReprojectionChartWidget::errorThresholdChanged, chart, &ReprojectionChartView::errorThresholdChangedSlot);
 		reprojectionChartViews[entity] = chart;
 		chart->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);

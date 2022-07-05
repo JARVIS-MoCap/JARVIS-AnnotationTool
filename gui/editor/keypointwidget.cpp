@@ -27,6 +27,8 @@ KeypointWidget::KeypointWidget(QWidget *parent) : QWidget(parent) {
 
 	keypointlayout->addWidget(hideEntityWidget,0,0);
 
+	this->installEventFilter(this);
+
 
 	//--- SIGNAL-SLOT Connections ---//
 	//-> Incoming Signals
@@ -38,14 +40,16 @@ KeypointWidget::KeypointWidget(QWidget *parent) : QWidget(parent) {
 
 
 void KeypointWidget::init() {
-	std::cout << entitiesList.size() << std::endl;
-
 	entitiesList.clear();
+	for (const auto box : hideEntitiesBoxesList) {
+		delete box;
+	}
 	hideEntitiesBoxesList.clear();
 
-	int i = 1;
+		int i = 1;
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		QCheckBox *hideBox = new QCheckBox(entity,hideEntityWidget);
+		hideBox->installEventFilter(this);
 		hideBox->setChecked(true);
 		hideentitylayout->addWidget(hideBox,i++,0);
 		hideEntitiesBoxesList.append(hideBox);
@@ -53,9 +57,7 @@ void KeypointWidget::init() {
 		connect(hideBox, &QCheckBox::stateChanged, this, &KeypointWidget::hideEntitySlot);
 	}
 
-	keypointListMap.clear();
-
-	//delete keypointTabWidget;
+	delete keypointTabWidget;
 	keypointTabWidget = new QTabWidget(this);
 	keypointTabWidget->setStyleSheet("QTabBar::tab{padding:4px 6px;"
 																		"background-color:palette(base);"

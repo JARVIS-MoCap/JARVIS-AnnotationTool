@@ -55,6 +55,16 @@ class DatasetControlWidget : public QWidget {
 		int m_totalCount;
 		QString m_currentSegment;
 
+		bool eventFilter(QObject *target, QEvent *event)
+		{
+			if (event->type() == QKeyEvent::KeyPress)
+			{
+				event->ignore();
+				return true;
+			}
+			return QObject::eventFilter(target, event);
+		}
+
 	private slots:
 		void selectionChangedSlot(int row,int);
 		void imgSetChangedSlot();

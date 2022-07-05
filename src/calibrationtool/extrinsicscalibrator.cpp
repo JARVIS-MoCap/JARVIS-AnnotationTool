@@ -280,7 +280,7 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPairCharuco(QList<QString> cameraP
       Extrinsics &e, double &mean_repro_error) {
 
   cv::Ptr<cv::aruco::Dictionary> dictionary =
-  cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_50);
+  cv::aruco::getPredefinedDictionary(m_calibrationConfig->charucoPatternIdx);
   cv::Ptr<cv::aruco::CharucoBoard> board =
   cv::aruco::CharucoBoard::create(m_calibrationConfig->patternWidth,
   m_calibrationConfig->patternHeight, 0.04f, 0.02f, dictionary);

@@ -38,6 +38,7 @@ void BoneLengthChartWidget::datasetLoadedSlot() {
 	chartsTabWidget->clear();
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		BoneLengthChartView * chart = new BoneLengthChartView();
+		chart->installEventFilter(this);
 		connect(this, &BoneLengthChartWidget::boneLengthErrorThresholdChanged, chart, &BoneLengthChartView::boneLengthErrorThresholdChangedSlot);
 		boneLengthChartViews[entity] = chart;
 		chart->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);

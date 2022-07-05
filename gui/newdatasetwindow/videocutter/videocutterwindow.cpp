@@ -248,7 +248,10 @@ void VideoCutterWindow::openVideo(const QString &path) {
 bool VideoCutterWindow::openVideos(QList<QString> videoPaths) {
 		int frameCount = 0;
 		int frameRate = 0;
-		for (const auto& path : videoPaths) {
+		QDir d = QFileInfo(videoPaths[0]).absoluteDir();
+		m_recordingsPath  = d.absolutePath();
+		for (const auto &path : videoPaths)
+		{
 			cv::VideoCapture cap(path.toStdString());
 			int fc = cap.get(cv::CAP_PROP_FRAME_COUNT);
 			int fr = cap.get(cv::CAP_PROP_FPS);
@@ -582,8 +585,8 @@ bool VideoCutterWindow::saveSegmentation() {
 		return true;
 	}
 	QFileDialog fd(this);
-	QString fileName = fd.getSaveFileName(this, "Save Segmentation", "./segmentation.csv",
-  									 			tr("CSV Files (*.csv)"));
+	QString fileName = fd.getSaveFileName(this, "Save Segmentation",
+										  m_recordingsPath, tr("CSV Files (*.csv)"));
 	fd.setAcceptMode(QFileDialog::AcceptSave);
 	QFile saveFile(fileName);
 	//TODO: maybe warn if file exists?
@@ -605,8 +608,8 @@ bool VideoCutterWindow::saveSegmentation() {
 bool VideoCutterWindow::loadSegmentation() {
 	QList<TimeLineWindow> timeLineWindows;
 	QFileDialog fd(this);
-	QString fileName = fd.getOpenFileName(this, "Save Segmentation", "./segmentation.csv",
-  									 			tr("CSV Files (*.csv)"));
+	QString fileName = fd.getOpenFileName(this, "Load Segmentation",
+										  m_recordingsPath, tr("CSV Files (*.csv)"));
 	fd.setFileMode(	QFileDialog::ExistingFile);
 	QFile saveFile(fileName);
 	QList<QStringList> fileText;

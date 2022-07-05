@@ -48,12 +48,18 @@ void ImageViewer::imageTransformationChangedSlot(int hueFactor, int saturationFa
 	update();
 }
 
+void ImageViewer::setBrightness(int brightnessFactor) {
+	imageTransformationChangedSlot(m_hueFactor, m_saturationFactor, brightnessFactor, m_contrastFactor);
+	update();
+	emit (brightnessChanged(brightnessFactor));
+}
 
-void ImageViewer::keypointSizeChangedSlot(int size) {
+	void
+	ImageViewer::keypointSizeChangedSlot(int size)
+{
 	m_keypointSize = size;
 	update();
 }
-
 
 void ImageViewer::applyImageTransformations(int hueFactor, int saturationFactor,
 			int brightnessFactor, int contrastFactor) {
@@ -83,11 +89,13 @@ void ImageViewer::applyImageTransformations(int hueFactor, int saturationFactor,
 
 void ImageViewer::paintEvent(QPaintEvent *) {
 	QPainter p{this};
+
 	p.translate(rect().center());
 	p.scale(m_scale, m_scale);
 	m_rect = m_crop;
 	m_rect.translate(-m_crop.center());
 	p.drawImage(m_rect, m_img, m_crop);
+
 	if(m_zoomStarted) {
 		QPointF rectImg = scaleToImageCoordinates(m_rectStart);
 		QPointF deltaImg = scaleToImageCoordinates(m_delta);
@@ -181,7 +189,8 @@ void ImageViewer::mousePressEvent(QMouseEvent *event) {
 		m_zoomStarted = true;
 		m_rectStart = event->pos();
 	}
-	else if (event->button() == Qt::LeftButton && m_panActive) {
+	else if ((event->button() == Qt::LeftButton && m_panActive) || event->modifiers() & Qt::ControlModifier)
+	{
 		m_panStarted = true;
 		m_reference = event->pos();
 	}
@@ -322,8 +331,34 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent *event) {
 	}
 }
 
+void ImageViewer::wheelEvent(QWheelEvent *event) {
+	QPointF zoomCenter = event->pos();
+	int scroll_direction = event->angleDelta().y() / abs(event->angleDelta().y());
+	float zoom = 1.0 + scroll_direction * 0.2;
+	m_widthOffset = (this->size().width()/m_scale-m_crop.width())/2;
+	m_heightOffset = (this->size().height()/m_scale-m_crop.height())/2;
+	QPointF position = scaleToImageCoordinates(event->pos());
+	
+	position = QPointF(position.rx()-m_widthOffset,
+				position.ry()-m_heightOffset);
 
-void ImageViewer::zoomToggledSlot(bool toggle) {
+
+	float width_ratio = position.x() / m_crop.width();
+	float height_ratio = position.y() / m_crop.height();
+
+	float crop_width = m_crop.width() / zoom;
+	float crop_height = m_crop.height() / zoom;
+
+	m_crop = QRectF(m_crop.topLeft().rx() + position.x() - crop_width * width_ratio, 
+				m_crop.topLeft().ry() + position.y() - crop_height * height_ratio, 
+				crop_width, crop_height);
+
+	fitToScreen();
+	update();
+}
+
+
+void ImageViewer::cropToggledSlot(bool toggle) {
 	m_zoomActive = toggle;
 	if (toggle) m_panActive = false;
 }
