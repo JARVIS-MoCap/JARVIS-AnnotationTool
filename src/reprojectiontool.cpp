@@ -14,6 +14,7 @@ ReprojectionTool::ReprojectionTool(QList<QString> intrinsicsPaths,
 			QList<QString> extrinsicsPaths, int primaryIndex) :
 			m_primaryIndex(primaryIndex) {
 	for (const auto& path : intrinsicsPaths) {
+		m_cameraNames.append(path.split("/").takeLast().split(".").takeFirst());
 		CameraIntrinics cameraIntrinics;
 		readIntrinsics(path, cameraIntrinics);
 		m_cameraIntrinsicsList.append(cameraIntrinics);

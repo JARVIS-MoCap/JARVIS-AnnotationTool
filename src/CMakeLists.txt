@@ -21,7 +21,7 @@ target_include_directories(src
 
 
 target_link_libraries(src
-  Qt5::Widgets
+  Qt::Widgets
 	opencv_core
 	opencv_calib3d
 	opencv_videoio

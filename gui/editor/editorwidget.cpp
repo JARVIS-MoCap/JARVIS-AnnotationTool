@@ -21,6 +21,9 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	leftSplitter = new QSplitter(Qt::Vertical,horizontalSplitter);
 	leftSplitter->hide();
 
+	visualizationWindow = new VisualizationWindow();
+	//visualizationWindow->show();
+
 	reprojectionWidget = new ReprojectionWidget(this);
 	datasetControlWidget = new DatasetControlWidget(this);
 	leftSplitter->addWidget(datasetControlWidget);
@@ -100,11 +103,19 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(nextSetButton, &QPushButton::clicked, this, &EditorWidget::nextSetClickedSlot);
 	QWidget *buttonSpacer3 = new QWidget(this);
 	buttonSpacer3->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	quitButton = new QPushButton("Quit", buttonWidget);
-	quitButton->installEventFilter(this);
-	quitButton->setMinimumSize(130,35);
-	quitButton->setMaximumSize(130,35);
-	connect(quitButton, &QPushButton::clicked, this, &EditorWidget::quitClickedSlot);
+	saveSetupButton = new QPushButton("Save Setup", buttonWidget);
+	connect(saveSetupButton, &QPushButton::clicked, visualizationWindow, &VisualizationWindow::saveClickedSlot);
+	saveSetupButton->setIcon(QIcon::fromTheme("upload"));
+	saveSetupButton->installEventFilter(this);
+	saveSetupButton->setMinimumSize(130,35);
+	saveSetupButton->setMaximumSize(130,35);
+	saveSetupButton->hide();
+	show3DButton = new QPushButton("Viewer", buttonWidget);
+	show3DButton->setIcon(QIcon::fromTheme("3d"));
+	show3DButton->installEventFilter(this);
+	show3DButton->setMinimumSize(130,35);
+	show3DButton->setMaximumSize(130,35);
+	connect(show3DButton, &QPushButton::clicked, this, &EditorWidget::show3DClickedSlot);
 	buttonlayout->addWidget(previousButton,0,0);
 	buttonlayout->addWidget(nextButton,0,1);
 	buttonlayout->addWidget(buttonSpacer1,0,2);
@@ -115,9 +126,8 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	buttonlayout->addWidget(previousSetButton,0,7);
 	buttonlayout->addWidget(nextSetButton,0,8);
 	buttonlayout->addWidget(buttonSpacer3,0,9);
-	buttonlayout->addWidget(quitButton,0,10);
-
-
+	buttonlayout->addWidget(saveSetupButton,0,10);
+	buttonlayout->addWidget(show3DButton,0,11);
 
 	horizontalSplitter->addWidget(leftSplitter);
 	horizontalSplitter->addWidget(imageViewerContainer);
@@ -143,9 +153,6 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 
 
 	//<- Outgoing Signals
-	// connect(this, &EditorWidget::datasetLoaded, keypointWidget, &KeypointWidget::datasetLoadedSlot);
-	// connect(this, &EditorWidget::datasetLoaded, reprojectionWidget, &ReprojectionWidget::datasetLoadedSlot);
-  // connect(this, &EditorWidget::datasetLoaded, datasetControlWidget, &DatasetControlWidget::datasetLoadedSlot);
 	connect(this, &EditorWidget::cropToggled, imageViewer, &ImageViewer::cropToggledSlot);
 	connect(this, &EditorWidget::panToggled, imageViewer, &ImageViewer::panToggledSlot);
 	connect(this, &EditorWidget::homeClicked, imageViewer, &ImageViewer::homeClickedSlot);
@@ -170,6 +177,8 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(imageViewer, &ImageViewer::keypointChangedForReprojection, reprojectionWidget, &ReprojectionWidget::calculateReprojectionSlot);
 	connect(reprojectionWidget, &ReprojectionWidget::reprojectedPoints, keypointWidget, &KeypointWidget::setKeypointsFromDatasetSlot);
 	connect(reprojectionWidget, &ReprojectionWidget::reprojectionToolToggled, imageViewer, &ImageViewer::toggleReprojectionSlot);
+	connect(reprojectionWidget, &ReprojectionWidget::update3DCoords, visualizationWindow, &VisualizationWindow::update3DCoordsSlot);
+	connect(reprojectionWidget, &ReprojectionWidget::reprojectionToolUpdated, visualizationWindow, &VisualizationWindow::reprojectionToolUpdatedSlot);
 	connect(this, &EditorWidget::minViewsChanged, reprojectionWidget, &ReprojectionWidget::minViewsChangedSlot);
 	connect(this, &EditorWidget::errorThresholdChanged, reprojectionWidget, &ReprojectionWidget::errorThresholdChanged);
 	connect(this, &EditorWidget::boneLengthErrorThresholdChanged, reprojectionWidget, &ReprojectionWidget::boneLengthErrorThresholdChanged);
@@ -349,7 +358,13 @@ void EditorWidget::panFinishedSlot() {
 }
 
 
-void EditorWidget::datasetLoadedSlot() {
+void EditorWidget::datasetLoadedSlot(bool isSetupAnnotation) {
+	if (isSetupAnnotation) {
+		saveSetupButton->show();
+	}
+	else {
+		saveSetupButton->hide();
+	}
 	keypointWidget->init();
 	leftSplitter->show();
 	leftSplitter->setSizes({500,800});
@@ -358,6 +373,7 @@ void EditorWidget::datasetLoadedSlot() {
 	m_currentImgSetIndex = 0;
 	m_currentFrameIndex = 0;
 	imageViewer->setFrame(m_currentImgSet, m_currentFrameIndex);
+
 	if (m_currentImgSet->numCameras != 1)
 	{
 		nextButton->setEnabled(true);
@@ -376,9 +392,9 @@ void EditorWidget::datasetLoadedSlot() {
 	emit datasetLoaded();
 }
 
-void EditorWidget::quitClickedSlot() {
-	Dataset::dataset->save();
-	emit quitClicked();
+void EditorWidget::show3DClickedSlot() {
+	visualizationWindow->show();
+	visualizationWindow->opened();
 }
 
 void EditorWidget::keyPressEvent(QKeyEvent *e)

@@ -172,6 +172,7 @@ void ReprojectionWidget::initReprojectionClickedSlot() {
 	modeCombo->show();
 	calculateAllReprojections();
 	calculateReprojectionSlot(m_currentImgSetIndex, m_currentFrameIndex);
+	emit reprojectionToolUpdated(reprojectionTool);
 }
 
 
@@ -179,6 +180,7 @@ void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int c
 	m_currentImgSetIndex = currentImgSetIndex;
 	m_currentFrameIndex = currentFrameIndex;
 	QMap<QString, cv::Mat> reconPointsMap;
+	QMap<QString, QVector3D> coords3D;
 	if (m_reprojectionActive) {
 		for (const auto& entity : m_entitiesList) {
 			for (const auto& bodypart : m_bodypartsList) {
@@ -198,6 +200,7 @@ void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int c
 				}
 				if (camsToUse.size() >= m_minViews) {
 					cv::Mat X =  reprojectionTool->reconstructPoint3D(points, camsToUse);
+					coords3D[entity + "/" + bodypart] = QVector3D(X.at<double>(0), X.at<double>(1), X.at<double>(2));
 					reconPointsMap[entity + "/" + bodypart] = X;
 					QList<QPointF> reprojectedPoints = reprojectionTool->reprojectPoint(X);
 					double reprojectionError = 0;
@@ -234,7 +237,7 @@ void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int c
 			int idx = 0;
 			for (const auto& comp : Dataset::dataset->skeleton()) {
 				if (reconPointsMap.contains(entity + "/" + comp.keypointA) && reconPointsMap.contains(entity + "/" + comp.keypointB)) {
-					double dist = cv::norm(reconPointsMap[entity + "/" + comp.keypointA] - reconPointsMap[entity + "/" +  comp.keypointB]);
+					double dist = cv::norm(reconPointsMap[entity + "/" + comp.keypointA], reconPointsMap[entity + "/" +  comp.keypointB]);
 					(*m_boneLengthErrors[entity])[idx++] = dist - comp.length;
 				}
 				else {
@@ -243,6 +246,8 @@ void ReprojectionWidget::calculateReprojectionSlot(int currentImgSetIndex, int c
 			}
 		}
 		emit reprojectedPoints(Dataset::dataset->imgSets()[currentImgSetIndex], currentFrameIndex);
+		emit update3DCoords(coords3D);
+
 		emit reprojectionToolToggled(true);
 		reprojectionChartWidget->reprojectionErrorsUpdatedSlot(m_reprojectionErrors);
 		boneLengthChartWidget->boneLengthErrorsUpdatedSlot(m_boneLengthErrors);

@@ -32,7 +32,7 @@ class DatasetControlWidget : public QWidget {
 	signals:
 		void frameSelectionChanged(int index);
 		void imgSetChanged(int index);
-		void datasetLoaded();
+		void datasetLoaded(bool isSetupAnnotation);
 
 	public slots:
 		void datasetLoadedSlot();

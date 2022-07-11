@@ -45,8 +45,7 @@ void KeypointWidget::init() {
 		delete box;
 	}
 	hideEntitiesBoxesList.clear();
-
-		int i = 1;
+	int i = 1;
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		QCheckBox *hideBox = new QCheckBox(entity,hideEntityWidget);
 		hideBox->installEventFilter(this);
@@ -57,7 +56,8 @@ void KeypointWidget::init() {
 		connect(hideBox, &QCheckBox::stateChanged, this, &KeypointWidget::hideEntitySlot);
 	}
 
-	delete keypointTabWidget;
+
+	//delete keypointTabWidget;
 	keypointTabWidget = new QTabWidget(this);
 	keypointTabWidget->setStyleSheet("QTabBar::tab{padding:4px 6px;"
 																		"background-color:palette(base);"
@@ -65,6 +65,7 @@ void KeypointWidget::init() {
 																	"QTabBar::tab:selected,QTabBar::tab:hover{"
 																	"background-color: palette(alternate-base);}");
 	keypointlayout->addWidget(keypointTabWidget,1,0);
+	keypointListMap.clear();
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		KeypointListWidget *bodyPartsListWidget = new KeypointListWidget();
 		bodyPartsListWidget->setAlternatingRowColors(true);
@@ -85,7 +86,6 @@ void KeypointWidget::init() {
 		keypointTabWidget->addTab(bodyPartsListWidget, entity);
 		keypointListMap[entity] = bodyPartsListWidget;
 	}
-	std::cout <<  entitiesList[0].toStdString() << std::endl;
 	m_currentEntity = entitiesList[0];
 	connect(keypointTabWidget, &QTabWidget::currentChanged, this, &KeypointWidget::currentTabChangedSlot);
 	QColor color = colorMap->getColor(0, keypointListMap[m_currentEntity]->count());
@@ -256,7 +256,6 @@ void KeypointWidget::setKeypointsFromDatasetSlot() {
 
 void KeypointWidget::frameChangedSlot(int currentImgSetIndex, int currentFrameIndex) {
 	Dataset::dataset->save();
-	std::cout << "ImgSet: " << currentImgSetIndex << ", Frame: " << currentFrameIndex << std::endl;
 	m_currentImgSet = Dataset::dataset->imgSets()[currentImgSetIndex];
 	m_currentFrameIndex = currentFrameIndex;
 	setKeypointsFromDatasetSlot();

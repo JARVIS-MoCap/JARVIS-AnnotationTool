@@ -15,7 +15,6 @@
 #include <QStackedWidget>
 #include <QStatusBar>
 #include <QMenuBar>
-#include <QtDataVisualization>
 
 //This is a global funciton, probably not ideal to have it here
 void createToolBarButton(QToolButton *button, QAction*action, QIcon icon,
@@ -123,8 +122,8 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	//-> Incoming Signals
 	connect(mainBar, &MainBar::openSettingsWindow,
 					this, &MainWindow::openSettingsWindowSlot);
-	connect(editorWidget, &EditorWidget::quitClicked,
-					this, &MainWindow::quitClickedSlot);
+	// connect(editorWidget, &EditorWidget::quitClicked,
+	// 				this, &MainWindow::quitClickedSlot);
 	// connect(editorWidget, &EditorWidget::newSegmentLoaded,
 	// 				this, &MainWindow::datasetLoadedSlot);
 	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded,
@@ -181,9 +180,9 @@ void MainWindow::exportTrainingsetClickedSlot() {
 }
 
 
-void MainWindow::datasetLoadedSlot() {
+void MainWindow::datasetLoadedSlot(bool isSetupAnnotation) {
 	stackedWidget->setCurrentWidget(editorWidget);
-	editorWidget->datasetLoadedSlot();
+	editorWidget->datasetLoadedSlot(isSetupAnnotation);
 }
 
 

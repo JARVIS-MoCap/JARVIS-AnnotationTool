@@ -39,11 +39,13 @@ class ReprojectionWidget : public QWidget {
 
 	signals:
 		void reprojectedPoints(ImgSet *imgSet, int frameIndex);
+		void update3DCoords(QMap<QString, QVector3D> coords3D);
 		void reprojectionToolToggled(bool toggle);
 		void datasetLoaded();
 		void errorThresholdChanged(double value);
 		void boneLengthErrorThresholdChanged(double value);
 		void reprojectionErrorsUpdated(QMap<QString, std::vector<double> *>);
+		void reprojectionToolUpdated(ReprojectionTool *reproTool);
 
 	public slots:
 		void datasetLoadedSlot();

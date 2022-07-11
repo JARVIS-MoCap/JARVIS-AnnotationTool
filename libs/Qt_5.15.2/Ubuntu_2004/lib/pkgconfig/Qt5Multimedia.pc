@@ -1,0 +1,14 @@
+prefix=/home/timo/Qt_build/Qt5static_v5.15.2
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 Multimedia
+Description: Qt Multimedia module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5Multimedia 
+Libs.private: /home/timo/Qt_build/Qt5static_v5.15.2/lib/libQt5Network.a -L/usr/lib/x86_64-linux-gnu/mit-krb5 -lgssapi_krb5 /home/timo/Qt_build/Qt5static_v5.15.2/lib/libQt5Gui.a -lGL -lpng16 -lharfbuzz /home/timo/Qt_build/Qt5static_v5.15.2/lib/libQt5Core.a -lm -lz -ldouble-conversion -licui18n -licuuc -licudata -ldl -lpcre2-16 -lgthread-2.0 -lglib-2.0 -lpthread -lGL -lpulse-mainloop-glib -lpulse -lglib-2.0   
+Cflags: -DQT_MULTIMEDIA_LIB -I${includedir}/QtMultimedia -I${includedir}
+Requires: Qt5Core Qt5Network Qt5Gui
+

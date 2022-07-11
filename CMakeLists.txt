@@ -22,22 +22,28 @@ elseif(UNIX)
   endif()
 endif()
 
-if (WIN32 OR APPLE)
-  set(Qt5_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5")
-  set(Qt5Core_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Core")
-  set(Qt5Widgets_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Widgets")
-  set(Qt5Charts_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Charts")
-  set(Qt5Multimedia_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Multimedia")
-  set(Qt5MultimediaWidgets_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5MultimediaWidgets")
-endif()
 
+set(Qt5_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5")
+set(Qt5Core_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Core")
+set(Qt5Widgets_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Widgets")
+set(Qt5Charts_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Charts")
+set(Qt5Multimedia_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Multimedia")
+set(Qt5MultimediaWidgets_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5MultimediaWidgets")
+set(Qt53DCore_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt53DCore")
+set(Qt53DRender_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt53DRender")
+set(Qt53DExtras_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt53DExtras")
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Charts REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
 find_package(Qt5MultimediaWidgets REQUIRED)
-//find_package(Qt5DataVisualization REQUIRED)
+find_package(Qt53DCore REQUIRED)
+find_package(Qt53DRender REQUIRED)
+find_package(Qt53DExtras REQUIRED)
+
+
+
 
 message (STATUS "QT DIRECTORY ${Qt5Core_DIR}")
 
@@ -126,10 +132,10 @@ target_include_directories( ${PROJECT_NAME}
 
 
 target_link_libraries(${PROJECT_NAME}
-  Qt5::Widgets
-	Qt5::Charts
-  Qt5::Multimedia
-  Qt5::MultimediaWidgets
+  Qt::Widgets
+	Qt::Charts
+  Qt::Multimedia
+  Qt::MultimediaWidgets
 
   gui
   src

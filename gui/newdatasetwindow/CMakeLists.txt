@@ -20,7 +20,7 @@ target_include_directories(newdatasetwindow
 )
 
 target_link_libraries(newdatasetwindow
-  Qt5::Widgets
+  Qt::Widgets
 	src
   gui
   videocutter

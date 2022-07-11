@@ -1,0 +1,14 @@
+prefix=/home/timo/Qt_build/Qt5static_v5.15.2
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 Concurrent
+Description: Qt Concurrent module
+Version: 5.15.2
+Libs: -L${libdir} -lQt5Concurrent 
+Libs.private: /home/timo/Qt_build/Qt5static_v5.15.2/lib/libQt5Core.a -lm -lz -ldouble-conversion -licui18n -licuuc -licudata -ldl -lpcre2-16 -lgthread-2.0 -lglib-2.0 -lpthread    
+Cflags: -DQT_CONCURRENT_LIB -I${includedir}/QtConcurrent -I${includedir}
+Requires: Qt5Core
+

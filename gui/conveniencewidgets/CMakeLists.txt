@@ -22,6 +22,6 @@ target_include_directories(conveniencewidgets
 )
 
 target_link_libraries(conveniencewidgets
-  Qt5::Widgets
+  Qt::Widgets
 	src
 )

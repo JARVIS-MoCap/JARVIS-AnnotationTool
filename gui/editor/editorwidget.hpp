@@ -15,6 +15,7 @@
 #include "imageviewer.hpp"
 #include "reprojectionwidget.hpp"
 #include "datasetcontrolwidget.hpp"
+#include "visualizationwindow.hpp"
 
 #include <QGridLayout>
 #include <QLabel>
@@ -53,7 +54,7 @@ class EditorWidget : public QWidget {
 
 	public slots:
 		void splitterMovedSlot(int pos, int index);
-		void datasetLoadedSlot();
+		void datasetLoadedSlot(bool isSetupAnnotation);
 		void frameChangedSlot(int index);
 		void imgSetChangedSlot(int index);
 
@@ -69,6 +70,7 @@ class EditorWidget : public QWidget {
 		QWidget *imageViewerContainer;
 		ImageViewer *imageViewer;
 
+		VisualizationWindow *visualizationWindow;
 
 		KeypointWidget *keypointWidget;
 		QWidget  *buttonWidget;
@@ -79,7 +81,8 @@ class EditorWidget : public QWidget {
 		QPushButton *homeButton;
 		QPushButton *previousSetButton;
 		QPushButton *nextSetButton;
-		QPushButton *quitButton;
+		QPushButton *saveSetupButton;
+		QPushButton *show3DButton;
 
 		ImgSet *m_currentImgSet;
 		int m_currentImgSetIndex;
@@ -105,7 +108,7 @@ class EditorWidget : public QWidget {
 		void nextSetClickedSlot();
 		void zoomFinishedSlot();
 		void panFinishedSlot();
-		void quitClickedSlot();
+		void show3DClickedSlot();
 };
 
 #endif

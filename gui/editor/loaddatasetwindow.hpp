@@ -34,7 +34,7 @@ class LoadDatasetWindow : public QDialog {
 		explicit LoadDatasetWindow(QWidget *parent = nullptr);
 
 	signals:
-		void datasetLoaded();
+		void datasetLoaded(bool isSetupAnnotation);
 
 	private:
 		QSettings *settings;
@@ -42,6 +42,7 @@ class LoadDatasetWindow : public QDialog {
 		QLineEdit *datasetFileEdit;
 		QPushButton *datasetFileButton;
 		QLineEdit *selectedSegmentEdit;
+		QPushButton *annotateSetupButton;
 		QPushButton *loadDatasetButton;
 		QPushButton *cancelButton;
 
@@ -72,6 +73,7 @@ class LoadDatasetWindow : public QDialog {
 		void currentItemChangedSlot(QListWidgetItem *current,
 									QListWidgetItem *previous);
 		void datasetSegmentChangedSlot(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+		void annotateSetupButtonClicked();
 };
 
 #endif
