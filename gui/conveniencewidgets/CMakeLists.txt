@@ -13,6 +13,8 @@ add_library(conveniencewidgets
   switch.cpp
   yesnoradiowidget.hpp
   yesnoradiowidget.cpp
+  spoiler.hpp
+  spoiler.cpp
 )
 
 target_include_directories(conveniencewidgets

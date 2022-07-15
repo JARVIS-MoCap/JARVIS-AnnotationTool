@@ -8,6 +8,9 @@
  ******************************************************************************/
 
 #include "controldock.hpp"
+#include "spoiler.hpp"
+
+#include <QGroupBox>
 
 
 ControlDock::ControlDock(QWidget *parent) : QDockWidget(parent) {
@@ -17,11 +20,34 @@ ControlDock::ControlDock(QWidget *parent) : QDockWidget(parent) {
 	QToolBar *newBar = new QToolBar(this);
 	this->setTitleBarWidget(newBar);
 
-    cameraButtonWidget = new QWidget();
+    cameraButtonWidget = new QWidget(mainWidget);
 	camerabuttonlayout = new QGridLayout(cameraButtonWidget);
 	camerabuttonlayout->setSpacing(2);
 
+	Spoiler *displaySettingsWidget = new Spoiler("Settings", 300, mainWidget);
+	QGridLayout *displaysettingslayout = new QGridLayout(displaySettingsWidget);
+	QLabel *keypointSizeLabel = new QLabel("Keypoint Size");
+	keypointSizeBox = new QSpinBox(mainWidget);
+	keypointSizeBox->setValue(5);
+	keypointSizeBox->setRange(0,100);
+	connect(keypointSizeBox, QOverload<int>::of(&QSpinBox::valueChanged),
+				this, &ControlDock::keypointRadiusChanged);
+	QLabel *skeletonSizeLabel = new QLabel("Skeleton Thickness");
+	skeletonSizeBox = new QSpinBox(mainWidget);
+	skeletonSizeBox->setValue(1);
+	skeletonSizeBox->setRange(0,100);
+	connect(skeletonSizeBox, QOverload<int>::of(&QSpinBox::valueChanged),
+				this, &ControlDock::skeletonThicknessChanged);
+
+	displaysettingslayout->addWidget(keypointSizeLabel,0,0);
+	displaysettingslayout->addWidget(keypointSizeBox,0,1);
+	displaysettingslayout->addWidget(skeletonSizeLabel,1,0);
+	displaysettingslayout->addWidget(skeletonSizeBox,1,1);
+	displaySettingsWidget->setContentLayout(*displaysettingslayout);
+
+
 	layout->addWidget(cameraButtonWidget, 0,0,1,2);
+	layout->addWidget(displaySettingsWidget, 1,0,1,2);
 }
 
 void ControlDock::updateCameraButtons(const QList<QString> cameraNames) {

@@ -18,7 +18,7 @@
 #include <QDockWidget>
 #include <QPushButton>
 #include <QGridLayout>
-
+#include <QSpinBox>
 
 
 class ControlDock : public QDockWidget {
@@ -35,12 +35,17 @@ class ControlDock : public QDockWidget {
         void loadClicked();
         void saveClicked();
         void cameraViewChanged(int index);
+        void keypointRadiusChanged(int radius);
+        void skeletonThicknessChanged(int thickness);
 
 	private:
         QWidget *mainWidget;
         QWidget *cameraButtonWidget;
 		QList<QPushButton*> cameraButtonArray;
 		QGridLayout *camerabuttonlayout;
+
+        QSpinBox *keypointSizeBox;
+        QSpinBox *skeletonSizeBox;
 
     private slots:
         void cameraViewChangedSlot();

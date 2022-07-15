@@ -157,6 +157,9 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(this, &EditorWidget::panToggled, imageViewer, &ImageViewer::panToggledSlot);
 	connect(this, &EditorWidget::homeClicked, imageViewer, &ImageViewer::homeClickedSlot);
 	connect(this, &EditorWidget::imageTranformationChanged, imageViewer, &ImageViewer::imageTransformationChangedSlot);
+	connect(this, &EditorWidget::alwaysShowLabelsToggled, imageViewer, &ImageViewer::alwaysShowLabelsToggledSlot);
+	connect(this, &EditorWidget::labelFontColorChanged, imageViewer, &ImageViewer::labelFontColorChangedSlot);
+	connect(this, &EditorWidget::labelBackgroundColorChanged, imageViewer, &ImageViewer::labelBackgroundColorChangedSlot);
 	connect(this, &EditorWidget::keypointSizeChanged, imageViewer, &ImageViewer::keypointSizeChangedSlot);
 	connect(this, &EditorWidget::keypointShapeChanged, imageViewer, &ImageViewer::keypointShapeChangedSlot);
 	connect(this, &EditorWidget::colorMapChanged, imageViewer, &ImageViewer::colorMapChangedSlot);

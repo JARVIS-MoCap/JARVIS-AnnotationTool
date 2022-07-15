@@ -14,8 +14,8 @@
 
 
 SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
-	this->resize(600,600);
-	this->setMinimumSize(500,550);
+	this->resize(600,750);
+	this->setMinimumSize(500,700);
 	settings = new QSettings();
 	setWindowTitle("Settings");
 	QGridLayout *settingslayout = new QGridLayout(this);
@@ -124,10 +124,38 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	imagesettingslayout->addWidget(contrastResetButton,4,3);
 
 
-
 	annotationSettingsBox = new QGroupBox("Keypoint Label Settings");
 	QGridLayout *annotationsettingslayout =
 				new QGridLayout(annotationSettingsBox);
+
+	QLabel *alwaysShowLabelLabel = new QLabel("Always show Labels");
+	alwaysShowLabelsCheckbox = new QCheckBox();
+	alwaysShowLabelsCheckbox->setMinimumSize(30,30);
+	connect(alwaysShowLabelsCheckbox, &QCheckBox::stateChanged,
+					this, &SettingsWindow::alwaysShowLabelsToggledSlot);
+	QLabel *fontColorLabel = new QLabel("Label font color");
+	fontColorChooserButton = new QPushButton();
+	fontColorChooserButton->setMinimumSize(30, 30);
+	fontColorChooserButton->setMaximumSize(30, 30);
+	fontColorChooserButton->setIcon(QIcon::fromTheme("paint"));
+	connect(fontColorChooserButton, &QPushButton::clicked,
+		this, &SettingsWindow::fontColorChooserButtonClickedSlot);
+	fontColorPreview = new QLabel();
+	fontColorPreview->setMinimumSize(200, 20);
+	QImage fontColorImage = createColorPreview(m_labelFontColor);
+	fontColorPreview->setPixmap(QPixmap::fromImage(fontColorImage).scaled(200, 20));
+	QLabel *backgroundColorLabel = new QLabel("Label background color");
+	backgroundColorChooserButton = new QPushButton();
+	backgroundColorChooserButton->setMinimumSize(30, 30);
+	backgroundColorChooserButton->setMaximumSize(30, 30);
+	backgroundColorChooserButton->setIcon(QIcon::fromTheme("paint"));
+	connect(backgroundColorChooserButton, &QPushButton::clicked,
+				this, &SettingsWindow::backgroundColorChooserButtonClickedSlot);
+	backgroundColorPreview = new QLabel();
+	backgroundColorPreview->setMinimumSize(200, 20);
+	QImage backgroundColorImage = createColorPreview(m_labelBackgroundColor);
+	backgroundColorPreview->setPixmap(QPixmap::fromImage(backgroundColorImage).scaled(200, 20));
+
 	QLabel *keypointSizeLabel = new QLabel("Keypoint Label Size");
 	keypointSizeEdit = new QSpinBox(annotationSettingsBox);
 	keypointSizeEdit->setRange(1,200);
@@ -136,9 +164,17 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 					this, &SettingsWindow::keypointSizeChanged);
 	entitySettingsWidget = new QWidget(annotationSettingsBox);
 	entitysettingslayout = new QGridLayout(entitySettingsWidget);
-	annotationsettingslayout->addWidget(keypointSizeLabel,0,0);
-	annotationsettingslayout->addWidget(keypointSizeEdit,0,1);
-	annotationsettingslayout->addWidget(entitySettingsWidget,1,0,1,2);
+	annotationsettingslayout->addWidget(alwaysShowLabelLabel,0,0);
+	annotationsettingslayout->addWidget(alwaysShowLabelsCheckbox,0,1);
+	annotationsettingslayout->addWidget(fontColorLabel,1,0);
+	annotationsettingslayout->addWidget(fontColorPreview,1,1);
+	annotationsettingslayout->addWidget(fontColorChooserButton,1,2);
+	annotationsettingslayout->addWidget(backgroundColorLabel,2,0);
+	annotationsettingslayout->addWidget(backgroundColorPreview,2,1);
+	annotationsettingslayout->addWidget(backgroundColorChooserButton,2,2);
+	annotationsettingslayout->addWidget(keypointSizeLabel,3,0);
+	annotationsettingslayout->addWidget(keypointSizeEdit,3,1);
+	annotationsettingslayout->addWidget(entitySettingsWidget,4,0,1,2);
 
 	reprojectionSettingsBox = new QGroupBox("Reprojection Settings");
 	QGridLayout *reprojectionsettingslayout =
@@ -256,11 +292,35 @@ void SettingsWindow::datasetLoadedSlot() {
 		entitysettingslayout->addWidget(singleEntityWidget, i++, 0);
 		singleEntityWidgetList.append(singleEntityWidget);
 		}
+		emit alwaysShowLabelsToggled(alwaysShowLabelsCheckbox->checkState() == Qt::Checked);
+		emit labelBackroundColorChanged(m_labelBackgroundColor);
+		emit labelFontColorChanged(m_labelFontColor);
+
 }
 
 
 void SettingsWindow::loadSettings() {
 	settings->beginGroup("Settings");
+	settings->beginGroup("KeypointSettings");
+	if (settings->contains("alwaysShowLabels")) {
+		if (settings->value("alwaysShowLabels").toBool()) {
+			alwaysShowLabelsCheckbox->setCheckState(Qt::Checked);
+		}
+		else {
+			alwaysShowLabelsCheckbox->setCheckState(Qt::Unchecked);
+		}
+	}
+	if (settings->contains("fontColor")) {
+		m_labelFontColor = settings->value("fontColor").value<QColor>();
+		QImage fontColorImage = createColorPreview(m_labelFontColor);
+		fontColorPreview->setPixmap(QPixmap::fromImage(fontColorImage).scaled(200, 20));
+	}
+	if (settings->contains("backgroundColor")) {
+		m_labelBackgroundColor = settings->value("backgroundColor").value<QColor>();
+		QImage backgroundColorImage = createColorPreview(m_labelBackgroundColor);
+		backgroundColorPreview->setPixmap(QPixmap::fromImage(backgroundColorImage).scaled(200, 20));
+	}
+	settings->endGroup();
 	settings->beginGroup("ReprojectionSettings");
 	int minViews = 2;
 	if (settings->contains("MinViews")) {
@@ -333,6 +393,54 @@ void SettingsWindow::contrastResetClickedSlot() {
 	contrastSlider->setValue(100);
 }
 
+void SettingsWindow::alwaysShowLabelsToggledSlot(int state) {
+	if (state == Qt::Checked) {
+		m_backgroundAlpha = m_labelBackgroundColor.alpha();
+		m_labelBackgroundColor.setAlpha(0);
+	}
+	else {
+		m_labelBackgroundColor.setAlpha(m_backgroundAlpha);
+	}
+	settings->beginGroup("Settings");
+	settings->beginGroup("KeypointSettings");
+	settings->setValue("alwaysShowLabels", state == Qt::Checked);
+	settings->endGroup();
+	settings->endGroup();
+
+	emit alwaysShowLabelsToggled(state == Qt::Checked);
+	emit labelBackroundColorChanged(m_labelBackgroundColor);
+}
+
+void SettingsWindow::fontColorChooserButtonClickedSlot() {
+	QColor newFontColor = QColorDialog::getColor(m_labelFontColor);
+	if (newFontColor.isValid()) {
+		m_labelFontColor = newFontColor;
+		QImage fontColorImage = createColorPreview(m_labelFontColor);
+		fontColorPreview->setPixmap(QPixmap::fromImage(fontColorImage).scaled(200, 20));
+		settings->beginGroup("Settings");
+		settings->beginGroup("KeypointSettings");
+		settings->setValue("fontColor", m_labelFontColor);
+		settings->endGroup();
+		settings->endGroup();
+		emit labelFontColorChanged(m_labelFontColor);
+	}
+}
+
+void SettingsWindow::backgroundColorChooserButtonClickedSlot() {
+	QColor newBackgroundColor = QColorDialog::getColor(m_labelBackgroundColor, this, "Background Color", QColorDialog::ShowAlphaChannel);
+	if (newBackgroundColor.isValid()) {
+		m_labelBackgroundColor = newBackgroundColor;
+		QImage backgroundColorImage = createColorPreview(m_labelBackgroundColor);
+		backgroundColorPreview->setPixmap(QPixmap::fromImage(backgroundColorImage).scaled(200, 20));
+		settings->beginGroup("Settings");
+		settings->beginGroup("KeypointSettings");
+		settings->setValue("backgroundColor", m_labelBackgroundColor);
+		settings->endGroup();
+		settings->endGroup();
+		emit labelBackroundColorChanged(m_labelBackgroundColor);
+	}
+}
+
 void SettingsWindow::keypointShapeChangedSlot(int index) {
 	int entityIndex = keypointShapeCombosList.indexOf(
 				qobject_cast<QComboBox*>(sender()));
@@ -351,6 +459,13 @@ QImage SettingsWindow::createColorMapPreview(ColorMap::ColorMapType type,
 					Dataset::dataset->bodypartsList().size()));
 	}
 	return colormapPreview;
+}
+
+QImage SettingsWindow::createColorPreview(QColor color) {
+	QImage colorPreview(1, 1,
+				QImage::Format_RGB888);
+	colorPreview.setPixelColor(0,0,color);
+	return colorPreview;
 }
 
 

@@ -43,6 +43,8 @@ VisualizationWindow::VisualizationWindow(QMainWindow *parent) : QMainWindow(pare
 	controlDock = new ControlDock(this);
 	this->addDockWidget(Qt::BottomDockWidgetArea,controlDock);
 	connect(controlDock, &ControlDock::cameraViewChanged, this, &VisualizationWindow::cameraViewChangedSlot);
+	connect(controlDock, &ControlDock::keypointRadiusChanged, viewPort, &ViewPort::setKeypointRadiusSlot);
+	connect(controlDock, &ControlDock::skeletonThicknessChanged, viewPort, &ViewPort::setSkeletonThicknessSlot);
 
 
 	layout->addWidget(viewPort, 0,0);

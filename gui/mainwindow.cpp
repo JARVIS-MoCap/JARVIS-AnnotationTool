@@ -136,6 +136,12 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	//<-> Relayed Signals
 	connect(settingsWindow, &SettingsWindow::imageTranformationChanged,
 					editorWidget, &EditorWidget::imageTranformationChanged);
+	connect(settingsWindow, &SettingsWindow::alwaysShowLabelsToggled, 
+					editorWidget, &EditorWidget::alwaysShowLabelsToggled);
+	connect(settingsWindow, &SettingsWindow::labelFontColorChanged, 
+					editorWidget, &EditorWidget::labelFontColorChanged);
+	connect(settingsWindow, &SettingsWindow::labelBackroundColorChanged, 
+					editorWidget, &EditorWidget::labelBackgroundColorChanged);
 	connect(settingsWindow, &SettingsWindow::keypointSizeChanged,
 					editorWidget, &EditorWidget::keypointSizeChanged);
 	connect(settingsWindow, &SettingsWindow::keypointShapeChanged,

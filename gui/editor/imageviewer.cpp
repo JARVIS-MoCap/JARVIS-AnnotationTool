@@ -48,6 +48,21 @@ void ImageViewer::imageTransformationChangedSlot(int hueFactor, int saturationFa
 	update();
 }
 
+void ImageViewer::alwaysShowLabelsToggledSlot(bool always_visible) {
+	m_labelAlwaysVisible = always_visible;
+	update();
+}
+
+void ImageViewer::labelFontColorChangedSlot(QColor color) {
+	m_labelFontColor = color;
+	update();
+}
+
+void ImageViewer::labelBackgroundColorChangedSlot(QColor color) {
+	m_labelBackgroundColor = color;
+	update();
+}
+
 void ImageViewer::setBrightness(int brightnessFactor) {
 	imageTransformationChangedSlot(m_hueFactor, m_saturationFactor, brightnessFactor, m_contrastFactor);
 	update();
@@ -142,10 +157,10 @@ void ImageViewer::paintEvent(QPaintEvent *) {
 				else {
 					p.drawEllipse(point,m_keypointSize/2.0,m_keypointSize/2.0);
 				}
-				if (pt->showName()) {
+				if (pt->showName() || m_labelAlwaysVisible) {
 					drawInfoBox(p,point, pt->entity(), pt->bodypart());
 				}
-				pt->setShowName(false);
+				//pt->setShowName(false);
 			}
 		}
 	}
@@ -155,15 +170,16 @@ void ImageViewer::paintEvent(QPaintEvent *) {
 void ImageViewer::drawInfoBox(QPainter& p, QPointF point, const QString& entity,
 			const QString& bodypart) {
 	p.setPen(QColor(255,255,255,0));
-	p.setBrush(QColor(34, 36, 40,200));
+	p.setBrush(m_labelBackgroundColor);
 	QFont pFont = QFont("Sans Serif", 11);
-	pFont.setPixelSize(20/(m_scale+0.2));
+	//pFont.setPixelSize(20.0/(m_scale));
+	pFont.setPointSizeF(0.5+10.0/m_scale);
 	p.setFont(pFont);
-	QRect rect = QRect(point.rx()+5, point.ry()+5, 130,50);
-	p.drawRoundedRect(p.boundingRect(rect, Qt::AlignLeft, bodypart + "\n" + entity).adjusted(-2,-2,2,2),
+	QRect rect = QRect(point.rx()+m_keypointSize/2.0/1.414*1.2, point.ry()+m_keypointSize/2.0/1.414*1.2, 400,50);
+	p.drawRoundedRect(p.boundingRect(rect, Qt::AlignLeft, bodypart).adjusted(-0.5-1.5/m_scale,-0.5-1.5/m_scale,0.5+1.5/m_scale,0.5+1.5/m_scale),
 										5, 10, Qt::RelativeSize);
-	p.setPen(QColor(255,255,255));
-	p.drawText(rect, Qt::AlignLeft, bodypart + "\n" + entity);
+	p.setPen(m_labelFontColor);
+	p.drawText(rect, Qt::AlignLeft, bodypart);// + "\n" + entity);
 }
 
 
@@ -214,7 +230,7 @@ void ImageViewer::mousePressEvent(QMouseEvent *event) {
 		if (hiddenEntityList.contains(m_currentEntity)) return;
 		for (auto& pt : m_currentImgSet->frames[m_currentFrameIndex]->keypoints) {
 			double length = std::sqrt(std::pow((position-pt->coordinates()).x(), 2) + std::pow((position-pt->coordinates()).y(), 2));
-			if (length < m_keypointSize/2) {
+			if (length < m_keypointSize/2.0) {
 				if (pt->state() == Annotated || pt->state() == Reprojected) {
 					pt->setState(NotAnnotated);
 					emit keypointRemoved(pt);
@@ -230,7 +246,7 @@ void ImageViewer::mousePressEvent(QMouseEvent *event) {
 		if (hiddenEntityList.contains(m_currentEntity)) return;
 		for (auto& pt : m_currentImgSet->frames[m_currentFrameIndex]->keypoints) {
 			double length = std::sqrt(std::pow((position-pt->coordinates()).x(), 2) + std::pow((position-pt->coordinates()).y(), 2));
-			if (m_draggedPoint != pt && length < m_keypointSize/2 && (pt->state() == Annotated ||
+			if (m_draggedPoint != pt && length < m_keypointSize/2.0 && (pt->state() == Annotated ||
 					pt->state() == Reprojected)) {
 				m_draggedPoint = pt;
 				pt->setState(Annotated);
@@ -271,17 +287,21 @@ void ImageViewer::mouseMoveEvent(QMouseEvent *event) {
 		position = QPointF(m_crop.topLeft().rx()+position.rx()-m_widthOffset,
 											 m_crop.topLeft().ry()+position.ry()-m_heightOffset);
 		for (auto& pt : m_currentImgSet->frames[m_currentFrameIndex]->keypoints) {
-			if ((position-pt->coordinates()).manhattanLength() < m_keypointSize/2 &&
-					(m_previousPosition-pt->coordinates()).manhattanLength() > m_keypointSize/2) {
+			float dist = std::sqrt(std::pow((position-pt->coordinates()).x(), 2) + std::pow((position-pt->coordinates()).y(), 2));
+			float prev_dist = std::sqrt(std::pow((m_previousPosition-pt->coordinates()).x(), 2) + std::pow((m_previousPosition-pt->coordinates()).y(), 2));
+			if ((dist < m_keypointSize/2.0 &&
+					prev_dist > m_keypointSize/2.0)) {
 				pt->setShowName(true);
+				for (auto& other_pt : m_currentImgSet->frames[m_currentFrameIndex]->keypoints) {
+					if (other_pt != pt) other_pt->setShowName(false);
+				}
 				update();
 				break;
 			}
-			else if ((position-pt->coordinates()).manhattanLength() > m_keypointSize*2 &&
-							 (m_previousPosition-pt->coordinates()).manhattanLength() < m_keypointSize*2) {
+			else if (dist > m_keypointSize*2.0 &&
+							 prev_dist < m_keypointSize*2.0) {
 				pt->setShowName(false);
 				update();
-				break;
 			}
 		}
 		m_previousPosition = position;

@@ -34,6 +34,9 @@ class SettingsWindow : public QWidget {
 	signals:
 		void imageTranformationChanged(int hueFactor, int saturationFactor,
 					int brightnessFactor, int contrastFactor);
+		void alwaysShowLabelsToggled(bool toggle);
+		void labelFontColorChanged(QColor color);
+		void labelBackroundColorChanged(QColor color);
 		void keypointSizeChanged(int value);
 		void keypointShapeChanged(const QString& entity, KeypointShape shape);
 		void colorMapChanged(const QString& entity, ColorMap::ColorMapType type,
@@ -50,6 +53,13 @@ class SettingsWindow : public QWidget {
 		void loadSettings();
 		QImage createColorMapPreview(ColorMap::ColorMapType type,
 					QColor color = QColor(0,0,255));
+
+		QImage createColorPreview(QColor color);
+
+		QColor m_labelFontColor = QColor(255,255,255);
+		QColor m_labelBackgroundColor = QColor(32, 100, 164,125);
+		int m_backgroundAlpha = 125;
+
 
 		QSettings *settings;
 		QGroupBox *imageSettingsBox;
@@ -69,6 +79,12 @@ class SettingsWindow : public QWidget {
 
 		QGroupBox *annotationSettingsBox;
 		QSpinBox *keypointSizeEdit;
+		QCheckBox *alwaysShowLabelsCheckbox;
+		QPushButton *fontColorChooserButton;
+		QLabel *fontColorPreview;
+		QPushButton *backgroundColorChooserButton;
+		QLabel *backgroundColorPreview;
+
 		QWidget *entitySettingsWidget;
 		QGridLayout *entitysettingslayout;
 		QList<QComboBox*> keypointShapeCombosList;
@@ -90,6 +106,9 @@ class SettingsWindow : public QWidget {
 		void saturationResetClickedSlot();
 		void brightnessResetClickedSlot();
 		void contrastResetClickedSlot();
+		void alwaysShowLabelsToggledSlot(int state);
+		void fontColorChooserButtonClickedSlot();
+		void backgroundColorChooserButtonClickedSlot();
 		void keypointShapeChangedSlot(int index);
 		void colorMapChangedSlot(int index);
 		void colorChooserClickedSlot();

@@ -248,7 +248,7 @@ void ViewPort::update() {
 				}
 				else {
 					QColor color = Dataset::dataset->imgSets()[0]->frames[0]->keypointMap[id]->color();
-					m_keypointEntities[id] =  addSphere(coord3D, 5,color, animalEntity);
+					m_keypointEntities[id] = addSphere(coord3D, m_keypointRadius,color, animalEntity);
 					adjustView();
 					m_camMoveCounter -= 3;
 				}
@@ -292,7 +292,7 @@ void ViewPort::update() {
 					}
 				}
 				else {
-					m_skeletonEntities[id] = addJoint(coordsA, coordsB, 1, QColor(150, 150, 150));
+					m_skeletonEntities[id] = addJoint(coordsA, coordsB, m_skeletonThickness, QColor(150, 150, 150));
 					m_skeletonEndPoints[id] = QPair(coordsA, coordsB);
 					adjustView();
 					m_camMoveCounter -= 3;
@@ -346,4 +346,20 @@ void ViewPort::toggleSetupInitSlot() {
 
 void ViewPort::toggleViewAdjustSlot(bool toggle) {
 	m_viewAdjust = toggle;
+}
+
+void ViewPort::setKeypointRadiusSlot(int radius) {
+	m_keypointRadius = radius;
+	for (auto &keypoint : m_keypointEntities) {
+		Qt3DExtras::QSphereMesh *mesh = keypoint->componentsOfType<Qt3DExtras::QSphereMesh>()[0];
+		mesh->setRadius(radius);
+	}
+}
+
+void ViewPort::setSkeletonThicknessSlot(int thickness) {
+	m_skeletonThickness = thickness;
+	for (auto &joint : m_skeletonEntities) {
+		Qt3DExtras::QCylinderMesh *mesh = joint->componentsOfType<Qt3DExtras::QCylinderMesh>()[0];
+		mesh->setRadius(thickness);
+	}
 }

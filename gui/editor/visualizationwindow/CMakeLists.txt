@@ -14,6 +14,7 @@ add_library(visualizationwindow
 target_include_directories(visualizationwindow
     PUBLIC
     ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/gui/conveniencewidgets
     ../
     ../../
 )
@@ -24,4 +25,5 @@ target_link_libraries(visualizationwindow
   Qt::3DRender
 
   src
+  conveniencewidgets
 )

@@ -44,6 +44,9 @@ class EditorWidget : public QWidget {
 		void newSegmentLoaded();
 		void frameChanged(int currentImgSetIndex, int currentFrameIndex);
 		void imageTranformationChanged(int hueFactor, int saturationFactor, int brightnessFactor, int contrastFactor);
+		void alwaysShowLabelsToggled(bool always_visible);
+		void labelFontColorChanged(QColor color);
+		void labelBackgroundColorChanged(QColor color);
 		void keypointSizeChanged(int value);
 		void keypointShapeChanged(const QString& entity, KeypointShape shape);
 		void colorMapChanged(const QString& entity, ColorMap::ColorMapType type, QColor color);

@@ -70,6 +70,9 @@ class ViewPort : public QWidget
 		void toggleSetupSlot(bool toggle);
 		void toggleSetupInitSlot();
 		void toggleViewAdjustSlot(bool toggle);
+		void setKeypointRadiusSlot(int radius);
+		void setSkeletonThicknessSlot(int thickness);
+
 
 
 	private:
@@ -81,10 +84,14 @@ class ViewPort : public QWidget
 
 		QMap<QString, QVector3D> m_coords3D;
 		QVector3D m_center;
-
+		
 		bool m_setupVisible = true;
 		bool m_camerasVisible = true;
 		bool m_viewAdjust = true;
+
+		int m_keypointRadius = 5;
+		int m_skeletonThickness = 1;
+
 
 		Qt3DRender::QCamera *camera;
 
