@@ -4,3 +4,12 @@
 [submodule "libs/yaml-cpp"]
 	path = libs/yaml-cpp
 	url = git@github.com:jbeder/yaml-cpp.git
+[submodule "libs/OpenCV/opencv"]
+	path = libs/OpenCV/opencv
+	url = https://github.com/opencv/opencv.git
+[submodule "libs/OpenCV/opencv_contrib"]
+	path = libs/OpenCV/opencv_contrib
+	url = https://github.com/opencv/opencv_contrib
+[submodule "libs/Qt5/qt5"]
+	path = libs/Qt5/qt5
+	url = git://code.qt.io/qt/qt5.git

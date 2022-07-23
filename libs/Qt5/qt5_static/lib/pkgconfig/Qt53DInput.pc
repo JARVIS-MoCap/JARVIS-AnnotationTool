@@ -1,0 +1,14 @@
+prefix=/home/timo/Documents/JARVIS-AnnotationTool/libs/Qt5/qt5_static
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 3DInput
+Description: Qt 3DInput module
+Version: 5.15.2
+Libs: -L${libdir} -lQt53DInput 
+Libs.private: /home/timo/Documents/JARVIS-AnnotationTool/libs/Qt5/qt5_static/lib/libQt53DCore.a -L/usr/lib/x86_64-linux-gnu/mit-krb5 /home/timo/Documents/JARVIS-AnnotationTool/libs/Qt5/qt5_static/lib/libQt5Gui.a -lGL -lpng16 -lharfbuzz /home/timo/Documents/JARVIS-AnnotationTool/libs/Qt5/qt5_static/lib/libQt5Network.a -lgssapi_krb5 /home/timo/Documents/JARVIS-AnnotationTool/libs/Qt5/qt5_static/lib/libQt5Core.a -lm -lz -ldouble-conversion -licui18n -licuuc -licudata -ldl -lpcre2-16 -lgthread-2.0 -lglib-2.0 -lpthread -lGL   
+Cflags: -DQT_3DINPUT_LIB -I${includedir}/Qt3DInput -I${includedir}
+Requires: Qt5Core Qt5Gui Qt53DCore
+
