@@ -27,7 +27,7 @@ DatasetControlWidget::DatasetControlWidget(QWidget *parent) : QWidget(parent) {
 	QLabel *frameSetLabel = new QLabel("Frame Set");
 	QWidget *frameSetWidget = new QWidget(this);
 	QGridLayout *framesetwidgetlayout = new QGridLayout(frameSetWidget);
-	framesetwidgetlayout->setMargin(0);
+	framesetwidgetlayout->setContentsMargins(0,0,0,0);
 	frameSetEdit = new QLineEdit(frameSetWidget);
 	frameSetEdit->setMinimumSize(40,25);
 	frameSetEdit->setMaximumSize(50,25);

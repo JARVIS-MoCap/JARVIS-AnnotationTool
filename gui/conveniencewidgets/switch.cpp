@@ -74,7 +74,7 @@ void Switch::mouseReleaseEvent(QMouseEvent *e) {
 }
 
 
-void Switch::enterEvent(QEvent *e) {
+void Switch::enterEvent(QEnterEvent *e) {
 	setCursor(Qt::PointingHandCursor);
 	QAbstractButton::enterEvent(e);
 }

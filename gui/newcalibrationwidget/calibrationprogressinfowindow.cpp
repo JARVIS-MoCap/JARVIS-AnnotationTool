@@ -23,7 +23,7 @@ CalibrationProgressInfoWindow::CalibrationProgressInfoWindow(QList<QString> came
 	operationLabel->setMinimumSize(100,30);
 	QGroupBox *progressBarBox = new QGroupBox("");
 	QGridLayout *progresslayout = new QGridLayout(progressBarBox);
-	progresslayout->setMargin(0);
+	progresslayout->setContentsMargins(0,0,0,0);
 	progressStackWidget = new QStackedWidget();
 	progresslayout->addWidget(progressStackWidget,0,0);
 	QWidget *intrinsicsWidget = new QWidget();

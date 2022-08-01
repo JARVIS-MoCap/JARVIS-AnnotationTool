@@ -18,7 +18,7 @@
 
 #include <Qt3DCore/QEntity>
 #include <Qt3DCore/QTransform>
-#include <Qt3DRender/QGeometry>
+//#include <Qt3DRender/QGeometry>
 #include <Qt3DRender/QGeometryRenderer>
 #include <Qt3DExtras/Qt3DWindow>
 

@@ -249,7 +249,7 @@ void SettingsWindow::datasetLoadedSlot() {
 		QLabel *entityLabel = new QLabel(entity);
 		entityLabel->setFont(QFont("Sans Serif", 11, QFont::Bold));
 		QGridLayout *singleentitylayout = new QGridLayout(singleEntityWidget);
-		singleentitylayout->setMargin(0);
+		singleentitylayout->setContentsMargins(0,0,0,0);
 		QLabel *keypointShapeLabel = new QLabel(" Keypoint Shape");
 		QComboBox *keypointShapeCombo = new QComboBox();
 		keypointShapeCombo->addItem("Circle");

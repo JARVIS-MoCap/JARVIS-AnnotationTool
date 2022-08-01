@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-threadCount=${1:-4}
 
 unameOut="$(uname -s)"
 case "${unameOut}" in
@@ -27,7 +26,7 @@ cd build
 #         -DBUILD_LIST="core,calib3d,imgproc,videoio,aruco, gapi" \
 #         -DCMAKE_INSTALL_PREFIX=../opencv_static \
 #         -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ../opencv
-#   cmake --build . -j${threadCount}
+#   cmake --build . -parallel
 #   cmake --install .
 # fi
 
@@ -35,34 +34,34 @@ cd ../../
 
 cd Qt5/qt5
 pwd
-./init-repository -f
+./init-repository
 cd ..
 mkdir build
 cd build
 
-if [ "${machine}" = "Linux" ];
-then
-  ../qt5/configure -static -release -no-pch -prefix ../qt5_static -opensource \
-        -confirm-license -nomake tools -nomake tests -nomake examples \
-        -skip webengine -skip qtandroidextras -skip qtconnectivity  \
-        -skip qtdeclarative -skip qtdoc -skip qtgamepad -skip qtgraphicaleffects \
-        -skip qtlocation -skip qtmacextras -skip qtnetworkauth -skip qtpurchasing \
-        -skip qtquickcontrols -skip qtquickcontrols2 -skip qtscript -skip qtscxml \
-        -skip qtsensors -skip qtserialbus -skip qtspeech -skip qttools \
-        -skip qtsensors -skip qttranslations -skip qtvirtualkeyboard \
-        -skip qtwayland -skip qtwebchannel -skip qtwebengine -skip qtwebsockets \
-        -skip qtwebview -skip qtwinextras -skip qtxmlpatterns -skip qtwebglplugin \
-        -no-openssl -skip qtlottie -skip qtmqtt -skip qtopcua -skip qtquicktimeline \
-        -skip qtquick3d
-
-
-
-
-  make -j${threadCount}
-  make install
-fi
+# if [ "${machine}" = "Linux" ];
+# then
+#   ../qt5/configure -static -release -no-pch -prefix ../qt_static -opensource \
+#         -confirm-license -nomake tools -nomake tests -nomake examples \
+#         -skip webengine -skip qtandroidextras -skip qtconnectivity  \
+#         -skip qtdeclarative -skip qtdoc -skip qtgamepad -skip qtgraphicaleffects \
+#         -skip qtlocation -skip qtmacextras -skip qtnetworkauth -skip qtpurchasing \
+#         -skip qtquickcontrols -skip qtquickcontrols2 -skip qtscript -skip qtscxml \
+#         -skip qtsensors -skip qtserialbus -skip qtspeech -skip qttools \
+#         -skip qtsensors -skip qttranslations -skip qtvirtualkeyboard \
+#         -skip qtwayland -skip qtwebchannel -skip qtwebengine -skip qtwebsockets \
+#         -skip qtwebview -skip qtwinextras -skip qtxmlpatterns -skip qtwebglplugin \
+#         -no-openssl -skip qtlottie -skip qtmqtt -skip qtopcua -skip qtquicktimeline \
+#         -skip qtquick3d
+#
+#   cmake --build . --parallel
+#   cmake --install .
+# fi
 
 cd ../../../
 
+mkdir build
+cd build
 
-pwd
+cmake ..
+cmake --build . --parallel

@@ -21,7 +21,7 @@ DirPathWidget::DirPathWidget(const QString& name, const QString& defaultPath, QW
 		m_currentPath = QDir::homePath();
 	}
 	QGridLayout *layout = new QGridLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0,0,0,0);
 	pathEdit = new QLineEdit(defaultPath, this);
 	connect (pathEdit, &QLineEdit::returnPressed, this, &DirPathWidget::pathEditedSlot);
 	connect (pathEdit, &QLineEdit::textChanged, this, &DirPathWidget::pathChangedSlot);

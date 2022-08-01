@@ -34,7 +34,7 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	imageViewerContainer = new QWidget(this);
 	imageViewerContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QGridLayout *containerlayout = new QGridLayout(imageViewerContainer);
-	containerlayout->setMargin(0);
+	containerlayout->setContentsMargins(0,0,0,0);
 	imageViewer = new ImageViewer();
 	imageViewer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	containerlayout->addWidget(imageViewer,0,0);

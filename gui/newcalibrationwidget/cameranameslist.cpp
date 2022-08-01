@@ -22,7 +22,7 @@ CameraNamesList::CameraNamesList(QString name, QWidget *parent) :
 			QWidget(parent), m_name(name) {
 
 	QGridLayout *labelselectorlayout = new QGridLayout(this);
-	labelselectorlayout->setMargin(3);
+	labelselectorlayout->setContentsMargins(3,3,3,3);
 
 	itemSelectorList = new QListWidget(this);
 	itemSelectorList->setFont(QFont("Sans Serif", 12));

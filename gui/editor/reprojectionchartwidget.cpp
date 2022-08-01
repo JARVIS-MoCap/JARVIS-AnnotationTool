@@ -14,7 +14,7 @@
 
 ReprojectionChartWidget::ReprojectionChartWidget(QWidget *parent) : QWidget(parent) {
 	QGridLayout *layout = new QGridLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0,0,0,0);
 	this->installEventFilter(this);
 
 	chartsTabWidget = new QTabWidget(this);

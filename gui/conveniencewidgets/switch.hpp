@@ -38,7 +38,7 @@ class Switch : public QAbstractButton {
 	protected:
 		void paintEvent(QPaintEvent*) override;
 		void mouseReleaseEvent(QMouseEvent*) override;
-		void enterEvent(QEvent*) override;
+		void enterEvent(QEnterEvent*) override;
 
 	private:
 		bool m_switch = false;

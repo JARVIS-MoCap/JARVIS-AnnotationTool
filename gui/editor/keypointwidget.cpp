@@ -15,12 +15,12 @@
 KeypointWidget::KeypointWidget(QWidget *parent) : QWidget(parent) {
 	colorMap = new ColorMap(ColorMap::Jet);
 	keypointlayout = new QGridLayout(this);
-	keypointlayout->setMargin(0);
+	keypointlayout->setContentsMargins(0,0,0,0);
 	keypointlayout->setSpacing(20);
 
 	hideEntityWidget = new QWidget(this);
 	hideentitylayout = new QGridLayout(hideEntityWidget);
-	hideentitylayout->setMargin(0);
+	hideentitylayout->setContentsMargins(0,0,0,0);
 	QLabel *hideEntityLabel = new QLabel("Hide/Show Bodyparts");
 	hideEntityLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
 	hideentitylayout->addWidget(hideEntityLabel,0,0);

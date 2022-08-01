@@ -26,7 +26,7 @@ PairCreatorWindow::PairCreatorWindow(QList<QString> cameraNames, QWidget *parent
 	layout->setHorizontalSpacing(20);
 	QWidget *mainWidget = new QWidget(this);
 	QGridLayout *mainlayout = new QGridLayout(mainWidget);
-	mainlayout->setMargin(0);
+	mainlayout->setContentsMargins(0,0,0,0);
 	mainlayout->setVerticalSpacing(0);
  	LabelWithToolTip *modeLabel = new LabelWithToolTip("Mode");
 	twoCamButton = new QRadioButton("2 Cameras",mainWidget);

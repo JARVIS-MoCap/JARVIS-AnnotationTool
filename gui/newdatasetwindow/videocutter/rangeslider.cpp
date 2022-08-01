@@ -951,7 +951,7 @@ void ctkRangeSlider::mousePressEvent(QMouseEvent* mouseEvent)
           QFlags<ctkRangeSliderPrivate::Handle>(ctkRangeSliderPrivate::MaximumHandle);
         }
         else {
-          d->m_SelectedHandles = 0x0;
+          d->m_SelectedHandles = ctkRangeSliderPrivate::NoHandle;
         }
       this->update(handleRect.united(sr));
       }

@@ -52,8 +52,8 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	configWidget->setStyleSheet("QWidget#configWidget{background-color: rgba(66,66,66,50%)}");
 	QGridLayout *configurationlayout = new QGridLayout(configWidget);
 	QGridLayout *configurationlayoutout = new QGridLayout(configurationBox);
-	configurationlayoutout->setMargin(3);
-	configurationlayout->setMargin(7);
+	configurationlayoutout->setContentsMargins(3,3,3,3);
+	configurationlayout->setContentsMargins(7,7,7,7);
 	configurationlayoutout->addWidget(configScrollArea);
 	configScrollArea->setWidgetResizable(true);
 	configScrollArea->setWidget(configWidget);
@@ -62,7 +62,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	generalLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
 	QWidget *generalWidget = new QWidget(configWidget);
 	QGridLayout *generallayout = new QGridLayout(generalWidget);
-	generallayout->setMargin(0);
+	generallayout->setContentsMargins(0,0,0,0);
 	LabelWithToolTip *calibrationSetNameLabel = new LabelWithToolTip("  Calibration Set Name", "");
 	calibrationSetNameEdit = new QLineEdit("New Calibration Set");
 	LabelWithToolTip *calibrationSetPathLabel = new LabelWithToolTip("  Calibration Set Savepath", "");
@@ -105,7 +105,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	calibParamsLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
 	QWidget *calibParamsWidget = new QWidget(configWidget);
 	QGridLayout *calibparamslayout = new QGridLayout(calibParamsWidget);
-	calibparamslayout->setMargin(0);
+	calibparamslayout->setContentsMargins(0,0,0,0);
 	LabelWithToolTip *intrinsicsFramesLabel = new LabelWithToolTip("  Max. Number of Frames for Intrinsics Calibration",
 				"A good value is around 20-30. Note that the calibrator will only use as many checkerboards as it can detect.");
 	intrinsicsFramesEdit = new QSpinBox(calibParamsWidget);
@@ -132,7 +132,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 
 	QWidget *checkerboardWiget = new QWidget(configWidget);
 	QGridLayout *checkerboardwidgetlayout = new QGridLayout(checkerboardWiget);
-	checkerboardwidgetlayout->setMargin(0);
+	checkerboardwidgetlayout->setContentsMargins(0,0,0,0);
 	LabelWithToolTip *boardTypeLabel = new LabelWithToolTip("  Board Type",
 				"ChAruco_Legacy only supports one specific pattern, use with care!");
 	boardTypeCombo = new QComboBox(checkerboardWiget);
@@ -180,7 +180,7 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 
 	checkerBoardPreviewBox = new QGroupBox(this);
 	QGridLayout *checkerboardpreviewlayout = new QGridLayout(checkerBoardPreviewBox);
-	checkerboardpreviewlayout->setMargin(0);
+	checkerboardpreviewlayout->setContentsMargins(0,0,0,0);
 	checkerBoardPreviewBox->setStyleSheet("QGroupBox {  border: 4px solid palette(highlight);}");
 	checkerBoardPreview = new QLabel(this);
 	checkerBoardPreviewLabel = new QLabel("<font color=#64a420>Make sure this matches your Checkerboard!</font>");
@@ -223,13 +223,13 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	QGroupBox *camerasBox = new QGroupBox("Cameras", this);
 	//camerasBox->setMinimumSize(1000,400);
 	QGridLayout *cameraslayout = new QGridLayout(camerasBox);
-	cameraslayout->setMargin(0);
+	cameraslayout->setContentsMargins(0,0,0,0);
 	cameraList = new CameraNamesList("Cameras");
 	cameraslayout->addWidget(cameraList,0,0);
 
 	QGroupBox *cameraPairsBox = new QGroupBox("Camera Pairs", this);
 	QGridLayout *camerapairlayout = new QGridLayout(cameraPairsBox);
-	camerapairlayout->setMargin(0);
+	camerapairlayout->setContentsMargins(0,0,0,0);
 	extrinsicsPairList = new ExtrinsicsPairList("Extrinsic Pairs");
 	camerapairlayout->addWidget(extrinsicsPairList,0,0);
 

@@ -352,12 +352,12 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void ImageViewer::wheelEvent(QWheelEvent *event) {
-	QPointF zoomCenter = event->pos();
+	QPointF zoomCenter = event->position();
 	int scroll_direction = event->angleDelta().y() / abs(event->angleDelta().y());
 	float zoom = 1.0 + scroll_direction * 0.2;
 	m_widthOffset = (this->size().width()/m_scale-m_crop.width())/2;
 	m_heightOffset = (this->size().height()/m_scale-m_crop.height())/2;
-	QPointF position = scaleToImageCoordinates(event->pos());
+	QPointF position = scaleToImageCoordinates(event->position());
 	
 	position = QPointF(position.rx()-m_widthOffset,
 				position.ry()-m_heightOffset);

@@ -39,9 +39,9 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
 	QWidget *videoPlayerWidget = new QWidget();
 	QGridLayout *videoplayerlayout = new QGridLayout(videoPlayerWidget);
 	player = new QMediaPlayer(this);
-  player->setNotifyInterval(10);
-  connect(player, &QMediaPlayer::positionChanged, this, &VideoCutterWindow::playerPositionChangedSlot);
-	videoplayerlayout->setMargin(0);
+	//player->setNotifyInterval(10);
+	connect(player, &QMediaPlayer::positionChanged, this, &VideoCutterWindow::playerPositionChangedSlot);
+	videoplayerlayout->setContentsMargins(0,0,0,0);
 	videoplayerlayout->setSpacing(0);
 	videoWidget = new QVideoWidget(this);
 	videoWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -117,7 +117,7 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
   connect(addTimeLineElementButton, &QPushButton::clicked, this, &VideoCutterWindow::addTimeLineElementButtonClickedSlot);
   saveCancelWidget = new QWidget();
   QGridLayout *savecancellayout = new QGridLayout(saveCancelWidget);
-  savecancellayout->setMargin(0);
+  savecancellayout->setContentsMargins(0,0,0,0);
   cancelElementButton = new QPushButton("Cancel");
 	cancelElementButton->setIcon(QIcon::fromTheme("discard"));
   cancelElementButton->setMinimumSize(40,40);
@@ -142,7 +142,7 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
 
   QGroupBox *timeWindowBox = new QGroupBox("Segments");
   QGridLayout *timewindowboxlayout = new QGridLayout(timeWindowBox);
-  timewindowboxlayout->setMargin(0);
+  timewindowboxlayout->setContentsMargins(0,0,0,0);
   timeWindowTable = new QTableWidget(0, 5);
   timeWindowTable->setMinimumSize(200,100);
 	timeWindowTable->setAlternatingRowColors(true);
@@ -160,7 +160,7 @@ VideoCutterWindow::VideoCutterWindow(QList<TimeLineWindow> timeLineWindows, QWid
 	QGroupBox *cameraSelectorBox = new QGroupBox("Camera Views");
 	cameraSelectorBox->setMaximumSize(200,10000);
 	QGridLayout *cameraselectorboxlayout = new QGridLayout(cameraSelectorBox);
-	cameraselectorboxlayout->setMargin(0);
+	cameraselectorboxlayout->setContentsMargins(0,0,0,0);
 	camsTable = new QTableWidget(0, 1);
 	camsTable->setAlternatingRowColors(true);
 	QStringList camLabels;
@@ -234,7 +234,7 @@ void VideoCutterWindow::openVideo(const QString &path) {
     rangeSlider->setMaximumPosition(m_frameCount*0.75);
 
 
-		player->setMedia(QUrl::fromLocalFile(QFileInfo(path).absoluteFilePath()));
+	//player->setMedia(QUrl::fromLocalFile(QFileInfo(path).absoluteFilePath()));
     updateTimeLabels();
     updateTimeWindowTable();
 
@@ -276,13 +276,13 @@ bool VideoCutterWindow::openVideos(QList<QString> videoPaths) {
     rangeSlider->setMaximumPosition(m_frameCount*0.75);
 
 
-		m_playlist = new QMediaPlaylist;
+		//m_playlist = new QMediaPlaylist;
 		for (const auto& path : videoPaths) {
-			m_playlist->addMedia(QUrl::fromLocalFile(QFileInfo(path).absoluteFilePath()));
+			//m_playlist->addMedia(QUrl::fromLocalFile(QFileInfo(path).absoluteFilePath()));
 			m_cameraList.append(path.split('/').takeLast().split(".").takeFirst());
 		}
-		player->setPlaylist(m_playlist);
-		m_playlist->setCurrentIndex(1);
+		//player->setPlaylist(m_playlist);
+		//m_playlist->setCurrentIndex(1);
 		player->play();
 		player->pause();
     updateTimeLabels();
@@ -665,8 +665,8 @@ void VideoCutterWindow::updateCameraListSlot() {
 void VideoCutterWindow::changeCameraViewSlot(int row, int) {
 	player->blockSignals(true);
 	player = new QMediaPlayer(this);
-	player->setPlaylist(m_playlist);
-	m_playlist->setCurrentIndex(row);
+	//player->setPlaylist(m_playlist);
+	//m_playlist->setCurrentIndex(row);
 	player->setVideoOutput(videoWidget);
 	connect(player, &QMediaPlayer::positionChanged, this, &VideoCutterWindow::playerPositionChangedSlot);
 	mainValueChangedSlot(rangeSlider->mainValue());
