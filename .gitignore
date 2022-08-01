@@ -27,8 +27,6 @@ CalibParams/
 annotationtool_1.0-1/
 build/
 
-libs/OpenCV/opencv_static/
-libs/OpenCV/build/
 
-libs/Qt5/build
-libs/Qt5/qt5_static
+opencv_static/
+qt5_static/
