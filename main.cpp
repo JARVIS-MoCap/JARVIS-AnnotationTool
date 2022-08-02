@@ -29,18 +29,18 @@ Q_DECLARE_METATYPE(ExportConfig)
 
 
 
-// QDatastream declarations for Signal/Slot system
-QDataStream& operator<<(QDataStream& out, const RecordingItem& v) {
-    out << v.name << v.path << v.timeLineList;
-    return out;
-}
+// // QDatastream declarations for Signal/Slot system
+// QDataStream& operator<<(QDataStream& out, const RecordingItem& v) {
+//     out << v.name << v.path << v.timeLineList;
+//     return out;
+// }
 
-QDataStream& operator>>(QDataStream& in, RecordingItem& v) {
-    in >> v.name;
-    in >> v.path;
-		in >> v.timeLineList;
-    return in;
-}
+// QDataStream& operator>>(QDataStream& in, RecordingItem& v) {
+//     in >> v.name;
+//     in >> v.path;
+// 		in >> v.timeLineList;
+//     return in;
+// }
 
 QDataStream& operator<<(QDataStream& out, const TimeLineWindow& v) {
     out << v.name << v.start << v.end;
@@ -201,18 +201,18 @@ int main(int argc, char **argv) {
 	QCoreApplication::setOrganizationDomain("JARVIS-MoCap");
 	QCoreApplication::setApplicationName("Annotation Tool");
 
-	qRegisterMetaTypeStreamOperators<QList<QString> >("QList<QString>");
-  qRegisterMetaTypeStreamOperators<QList<QList<QString>>>("QList<QList<QString>>");
-  qRegisterMetaTypeStreamOperators<QMap<int,int> >("QMap<int,int>");
-	qRegisterMetaTypeStreamOperators<QList<RecordingItem> >("QList<RecordingItem>");
-  qRegisterMetaTypeStreamOperators<QMap<QString, double> >("QMap<QString, double>");
-  qRegisterMetaTypeStreamOperators<QMap<QString,bool> >("QMap<QString,bool>");
-  qRegisterMetaTypeStreamOperators<QList<QList<QPair<QString, bool>>>> ("QList<QList<QPair<QString, bool>>>");
-  qRegisterMetaTypeStreamOperators<QList<QPair<QString,bool>>> ("QList<QPair<QString,bool>>");
+	// qRegisterMetaTypeStreamOperators<QList<QString> >("QList<QString>");
+  // qRegisterMetaTypeStreamOperators<QList<QList<QString>>>("QList<QList<QString>>");
+  // qRegisterMetaTypeStreamOperators<QMap<int,int> >("QMap<int,int>");
+	// qRegisterMetaTypeStreamOperators<QList<RecordingItem> >("QList<RecordingItem>");
+  // qRegisterMetaTypeStreamOperators<QMap<QString, double> >("QMap<QString, double>");
+  // qRegisterMetaTypeStreamOperators<QMap<QString,bool> >("QMap<QString,bool>");
+  // qRegisterMetaTypeStreamOperators<QList<QList<QPair<QString, bool>>>> ("QList<QList<QPair<QString, bool>>>");
+  // qRegisterMetaTypeStreamOperators<QList<QPair<QString,bool>>> ("QList<QPair<QString,bool>>");
   qRegisterMetaType<ExportConfig>("ExportConfig");
 	qRegisterMetaType<cv::Mat>("cv::Mat");
   //qRegisterMetaType<SkeletonComponent>("SkeletonComponent");
-  qRegisterMetaTypeStreamOperators<QList<SkeletonComponent> >("QList<SkeletonComponent>");
+  // qRegisterMetaTypeStreamOperators<QList<SkeletonComponent> >("QList<SkeletonComponent>");
   qRegisterMetaType< cv::Mat >("cv::Mat");
 
 	QApplication app (argc, argv);

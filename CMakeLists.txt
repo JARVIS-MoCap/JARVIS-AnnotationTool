@@ -37,9 +37,9 @@ endif()
 
 #find_package(Qt6 REQUIRED COMPONENTS Core)
 
-set (CMAKE_PREFIX_PATH "libs/Qt5/qt5_static/lib/cmake/")
+set (CMAKE_PREFIX_PATH "libs/Qt5/qt_static/lib/cmake/")
 
-find_package(Qt6 PATHS "libs/Qt5/qt5_static/lib/cmake/" REQUIRED COMPONENTS Core Widgets Charts Multimedia MultimediaWidgets 3DCore 3DRender 3DExtras)
+find_package(Qt6 PATHS "libs/Qt5/qt_static/lib/cmake/" REQUIRED COMPONENTS Core Widgets Charts Multimedia MultimediaWidgets 3DCore 3DRender 3DExtras)
 qt_standard_project_setup()
 
 if(NOT WIN32)
