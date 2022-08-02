@@ -28,5 +28,5 @@ annotationtool_1.0-1/
 build/
 
 
-opencv_static/
-qt5_static/
+opencv_install/
+qt_install/

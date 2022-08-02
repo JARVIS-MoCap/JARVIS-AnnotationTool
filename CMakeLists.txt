@@ -4,15 +4,15 @@ set (UBUNTU_VERSION 2004)
 
 project(AnnotationTool VERSION 1.1.0  LANGUAGES CXX)
 
-set (CMAKE_PREFIX_PATH "libs/Qt5/qt_static/lib/cmake/")
-find_package(Qt6 PATHS "libs/Qt5/qt_static/lib/cmake/" REQUIRED COMPONENTS Core Widgets Charts Multimedia MultimediaWidgets 3DCore 3DRender 3DExtras)
+set (CMAKE_PREFIX_PATH "libs/Qt5/qt_install/lib/cmake/")
+find_package(Qt6 PATHS "libs/Qt5/qt_install/lib/cmake/" REQUIRED COMPONENTS Core Widgets Charts Multimedia MultimediaWidgets 3DCore 3DRender 3DExtras)
 qt_standard_project_setup()
 
 if(NOT WIN32)
-	set(OpenCV_DIR "libs/OpenCV/opencv_static/lib/cmake/opencv4")
+	set(OpenCV_DIR "libs/OpenCV/opencv_install/lib/cmake/opencv4")
 	set(OpenCV_STATIC ON)
 else()
-	set(OpenCV_DIR "libs/OpenCV/opencv_static")
+	set(OpenCV_DIR "libs/OpenCV/opencv_install")
 endif()
 
 find_package(OpenCV REQUIRED)
