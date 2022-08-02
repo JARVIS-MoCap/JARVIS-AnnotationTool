@@ -2,53 +2,19 @@ cmake_minimum_required(VERSION 3.10)
 
 set (UBUNTU_VERSION 2004)
 
-# if (WIN32)
-#   set(CMAKE_CXX_STANDARD 11)
-# else()
-#   set(CMAKE_CXX_STANDARD 17)
-# endif()
 project(AnnotationTool VERSION 1.1.0  LANGUAGES CXX)
 
-if(APPLE)
-  set(OS_LIB_DIR "MacOS")
-elseif(WIN32)
-  set(OS_LIB_DIR "Windows")
-elseif(UNIX)
-  message ("System ${CMAKE_SYSTEM}")
-  if(${UBUNTU_VERSION} STREQUAL "2004")
-    set(OS_LIB_DIR "Ubuntu_2004")
-  else()
-    set(OS_LIB_DIR "Ubuntu_1804")
-  endif()
-endif()
-
-
-# set(Qt6_DIR "libs/Qt5/qt5_static/lib/cmake/Qt6")
-# set(Qt6Core_DIR "libs/Qt5/qt5_static/lib/cmake/Qt6Core")
-# set(Qt6Widgets_DIR "libs/Qt5/qt5_static/lib/cmake/Qt6Widgets")
-# set(Qt6Charts_DIR "libs/Qt5/qt5_static/lib/cmake/Qt6Charts")
-# set(Qt6Multimedia_DIR "libs/Qt5/qt5_static/lib/cmake/Qt6Multimedia")
-# set(Qt6MultimediaWidgets_DIR "libs/Qt5/qt5_static/lib/cmake/Qt6MultimediaWidgets")
-# set(Qt63DCore_DIR "libs/Qt5/qt5_static/lib/cmake/Qt63DCore")
-# set(Qt63DRender_DIR "libs/Qt5/qt5_static/lib/cmake/Qt63DRender")
-# set(Qt63DExtras_DIR "libs/Qt5/qt5_static/lib/cmake/Qt63DExtras")
-
-#set (Qt6BundledZLIB_DIR "/home/timo/Documents/JARVIS-AnnotationTool/libs/Qt5/qt5_static/lib/cmake/Qt6BundledZLIB/")
-
-#find_package(Qt6 REQUIRED COMPONENTS Core)
-
 set (CMAKE_PREFIX_PATH "libs/Qt5/qt_static/lib/cmake/")
-
 find_package(Qt6 PATHS "libs/Qt5/qt_static/lib/cmake/" REQUIRED COMPONENTS Core Widgets Charts Multimedia MultimediaWidgets 3DCore 3DRender 3DExtras)
 qt_standard_project_setup()
 
 if(NOT WIN32)
 	set(OpenCV_DIR "libs/OpenCV/opencv_static/lib/cmake/opencv4")
+	set(OpenCV_STATIC ON)
 else()
 	set(OpenCV_DIR "libs/OpenCV/opencv_static")
 endif()
 
-set(OpenCV_STATIC ON)
 find_package(OpenCV REQUIRED)
 message(STATUS "OPENCV_DIR ${OpenCV_DIR}")
 
@@ -68,14 +34,9 @@ if (NOT (WIN32 OR APPLE))
 endif()
 
 
-# detect operating system and host processor
-message(STATUS "We are on a ${CMAKE_SYSTEM_NAME} system")
-message(STATUS "The host processor is ${CMAKE_HOST_SYSTEM_PROCESSOR}")
-
 add_subdirectory(libs)
 add_subdirectory(gui)
 add_subdirectory(src)
-
 
 if(APPLE)
 	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15")
@@ -125,13 +86,13 @@ target_include_directories( ${PROJECT_NAME}
 
 
 target_link_libraries(${PROJECT_NAME}
-  Qt::Widgets
+	Qt::Widgets
 	Qt::Charts
-  Qt::Multimedia
-  Qt::MultimediaWidgets
+	Qt::Multimedia
+	Qt::MultimediaWidgets
 
-  gui
-  src
-  darkstyle
-  yaml-cpp
+	gui
+	src
+	darkstyle
+	yaml-cpp
 )
