@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 3.10)
 
 set (UBUNTU_VERSION 2004)
 
-if (WIN32)
-  set(CMAKE_CXX_STANDARD 11)
-else()
-  set(CMAKE_CXX_STANDARD 17)
-endif()
+# if (WIN32)
+#   set(CMAKE_CXX_STANDARD 11)
+# else()
+#   set(CMAKE_CXX_STANDARD 17)
+# endif()
 project(AnnotationTool VERSION 1.1.0  LANGUAGES CXX)
 
 if(APPLE)
@@ -47,6 +47,8 @@ if(NOT WIN32)
 else()
 	set(OpenCV_DIR "libs/OpenCV/opencv_static")
 endif()
+
+set(OpenCV_STATIC ON)
 find_package(OpenCV REQUIRED)
 message(STATUS "OPENCV_DIR ${OpenCV_DIR}")
 
@@ -56,10 +58,6 @@ set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "disable yaml tools")
 set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "disable yaml contrib")
 
 add_subdirectory(libs/yaml-cpp/)
-
-
-find_package(OpenCV REQUIRED)
-
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)

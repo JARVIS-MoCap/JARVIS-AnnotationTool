@@ -17,7 +17,7 @@
 #include<QTimer>
 
 ViewPort::ViewPort(QWidget *parent) : QWidget(parent)
-{	
+{
 	QGridLayout *layout = new QGridLayout(this);
     layout->setContentsMargins(0,0,0,0);
     Qt3DExtras::Qt3DWindow *view = new Qt3DExtras::Qt3DWindow();
@@ -47,12 +47,12 @@ ViewPort::ViewPort(QWidget *parent) : QWidget(parent)
 }
 
 void ViewPort::adjustView() {
-	if (!m_viewAdjust) return; 
+	if (!m_viewAdjust) return;
 	if (!m_camerasVisible && !m_setupVisible) {
 		camera->viewEntity(animalEntity);
 	}
 	else if (m_setupVisible && !m_camerasVisible) {
-		if (m_floor == nullptr) 
+		if (m_floor == nullptr)
 		{
 			camera->viewEntity(animalEntity);
 		}
@@ -166,7 +166,7 @@ void ViewPort::addCamera(QVector3D position, QVector3D pointingVector, QVector3D
 	float w = pointingVector.length() + QVector3D::dotProduct(cameraVect, pointingVector);
 	QQuaternion q(w,a);
 	q.normalize();
-	
+
 	cameraTransform->setTranslation(position-50*pointingVector);
 	cameraTransform->setRotation(q);
 
@@ -287,13 +287,13 @@ void ViewPort::update() {
 						transform->setRotation(q);
 						adjustView();
 						m_camMoveCounter -= 3;
-						m_skeletonEndPoints[id] = QPair(coordsA, coordsB);
+						m_skeletonEndPoints[id] = QPair<QVector3D,QVector3D>(coordsA, coordsB);
 
 					}
 				}
 				else {
 					m_skeletonEntities[id] = addJoint(coordsA, coordsB, m_skeletonThickness, QColor(150, 150, 150));
-					m_skeletonEndPoints[id] = QPair(coordsA, coordsB);
+					m_skeletonEndPoints[id] = QPair<QVector3D,QVector3D>(coordsA, coordsB);
 					adjustView();
 					m_camMoveCounter -= 3;
 				}
