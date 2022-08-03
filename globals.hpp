@@ -52,6 +52,7 @@ struct SkeletonComponent {
 Q_DECLARE_METATYPE(SkeletonComponent)
 
 
+
 struct DatasetConfig {
 	QString datasetName = "New Dataset";
 	QString datasetPath = ".";

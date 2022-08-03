@@ -82,6 +82,8 @@ ReprojectionWidget::ReprojectionWidget(QWidget *parent) : QWidget(parent) {
 
 
 void ReprojectionWidget::datasetLoadedSlot() {
+	m_currentImgSetIndex = 0;
+	m_currentFrameIndex = 0;
 	m_numCameras = Dataset::dataset->numCameras();
 	m_entitiesList = Dataset::dataset->entitiesList();
 	m_bodypartsList = Dataset::dataset->bodypartsList();

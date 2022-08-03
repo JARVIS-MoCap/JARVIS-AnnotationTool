@@ -380,7 +380,7 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPairCharuco(QList<QString> cameraP
         cv::aruco::detectMarkers(img1, board->dictionary, markerCorners1, markerIds1, charucoParams);
          if (markerIds1.size() > 5) {
              cv::aruco::interpolateCornersCharuco(markerCorners1, markerIds1, img1, board, charucoCorners1, charucoIds1);
-           if (charucoIds1.size() > 5) {
+           if (charucoIds1.size() > 8) {
                cv::Scalar color = cv::Scalar(255, 0, 0);
                patternFound1 = true;
              }
@@ -388,7 +388,7 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPairCharuco(QList<QString> cameraP
          cv::aruco::detectMarkers(img2, board->dictionary, markerCorners2, markerIds2, charucoParams);
           if (markerIds2.size() > 5) {
               cv::aruco::interpolateCornersCharuco(markerCorners2, markerIds2, img2, board, charucoCorners2, charucoIds2);
-            if (charucoIds2.size() > 5) {
+            if (charucoIds2.size() > 8) {
                 patternFound2 = true;
             }
           }
@@ -404,7 +404,7 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPairCharuco(QList<QString> cameraP
               }
             }
           }
-          if (commonIds.size() > 4) {
+          if (commonIds.size() > 8) {
             if (m_calibrationConfig->debug) {
               cv::Mat  imageCopy1, imageCopy2, debugImg;
               img1.copyTo(imageCopy1);

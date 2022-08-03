@@ -254,14 +254,15 @@ bool VideoCutterWindow::openVideos(QList<QString> videoPaths) {
 		{
 			cv::VideoCapture cap(path.toStdString());
 			int fc = cap.get(cv::CAP_PROP_FRAME_COUNT);
+			std::cout << fc << std::endl;
 			int fr = cap.get(cv::CAP_PROP_FPS);
 			if (frameCount == 0) frameCount = fc;
 			else if (frameCount != fc) {
-				return false;
+				//return false;
 			}
 			if (frameRate == 0) frameRate = fr;
 			else if (frameRate != fr) {
-				return false;
+				//return false;
 			}
 			cap.release();
 		}
@@ -276,15 +277,13 @@ bool VideoCutterWindow::openVideos(QList<QString> videoPaths) {
     rangeSlider->setMaximumPosition(m_frameCount*0.75);
 
 
-		//m_playlist = new QMediaPlaylist;
-		for (const auto& path : videoPaths) {
-			//m_playlist->addMedia(QUrl::fromLocalFile(QFileInfo(path).absoluteFilePath()));
-			m_cameraList.append(path.split('/').takeLast().split(".").takeFirst());
-		}
-		//player->setPlaylist(m_playlist);
-		//m_playlist->setCurrentIndex(1);
-		player->play();
-		player->pause();
+	for (const auto& path : videoPaths) {
+		m_playlist.append(QUrl::fromLocalFile(QFileInfo(path).absoluteFilePath()));
+		m_cameraList.append(path.split('/').takeLast().split(".").takeFirst());
+	}
+	player->setSource(m_playlist[0]);
+	player->play();
+	player->pause();
     updateTimeLabels();
     updateTimeWindowTable();
 		updateCameraListSlot();
@@ -665,8 +664,7 @@ void VideoCutterWindow::updateCameraListSlot() {
 void VideoCutterWindow::changeCameraViewSlot(int row, int) {
 	player->blockSignals(true);
 	player = new QMediaPlayer(this);
-	//player->setPlaylist(m_playlist);
-	//m_playlist->setCurrentIndex(row);
+	player->setSource(m_playlist[row]);
 	player->setVideoOutput(videoWidget);
 	connect(player, &QMediaPlayer::positionChanged, this, &VideoCutterWindow::playerPositionChangedSlot);
 	mainValueChangedSlot(rangeSlider->mainValue());

@@ -42,30 +42,30 @@ Q_DECLARE_METATYPE(ExportConfig)
 //     return in;
 // }
 
-QDataStream& operator<<(QDataStream& out, const TimeLineWindow& v) {
-    out << v.name << v.start << v.end;
-    return out;
-}
+// QDataStream& operator<<(QDataStream& out, const TimeLineWindow& v) {
+//     out << v.name << v.start << v.end;
+//     return out;
+// }
 
-QDataStream& operator>>(QDataStream& in, TimeLineWindow& v) {
-    in >> v.name;
-    in >> v.start;
-		in >> v.end;
-    return in;
-}
+// QDataStream& operator>>(QDataStream& in, TimeLineWindow& v) {
+//     in >> v.name;
+//     in >> v.start;
+// 		in >> v.end;
+//     return in;
+// }
 
-QDataStream& operator>>(QDataStream& in, ExportConfig& v) {
-    in >> v.trainingSetName;
-    in >> v.savePath;
-		in >> v.trainingSetType;
-    in >> v.validationFraction;
-    in >> v.shuffleBeforeSplit;
-    in >> v.useRandomShuffleSeed;
-    in >> v.shuffleSeed;
-    in >> v.entitiesList;
-    in >> v.keypointsList;
-    return in;
-}
+// QDataStream& operator>>(QDataStream& in, ExportConfig& v) {
+//     in >> v.trainingSetName;
+//     in >> v.savePath;
+// 		in >> v.trainingSetType;
+//     in >> v.validationFraction;
+//     in >> v.shuffleBeforeSplit;
+//     in >> v.useRandomShuffleSeed;
+//     in >> v.shuffleSeed;
+//     in >> v.entitiesList;
+//     in >> v.keypointsList;
+//     return in;
+// }
 
 QDataStream& operator<<(QDataStream& out, const SkeletonComponent& v) {
     out << v.name << v.keypointA << v.keypointB << v.length;
@@ -83,9 +83,8 @@ QDataStream& operator>>(QDataStream& in, SkeletonComponent& v) {
 void initPresets() {
   QSettings *settings = new QSettings();
   settings->beginGroup("presetInit");
-  if (!settings->value("presetInitialized").toBool()) {
-    std::cout << "Initializing Presets" << std::endl;
-    settings->setValue("presetInitialized", true);
+  if (!settings->value("presetInitialized_update").toBool()) {
+    settings->setValue("presetInitialized_update", true);
     settings->endGroup();
     settings->beginGroup("New Dataset Window");
 
@@ -171,7 +170,9 @@ void initPresets() {
     SkeletonComponent j20 = {"Joint 20", "Tail_Root", "Hip_Center", 0};
     QList<SkeletonComponent> skeletonItemsListRodent = {j1,j2,j3,j4,j5,j6,j7,j8,j9,
           j10,j11,j12,j13,j14,j15,j16,j17,j18,j19,j20};
+    std::cout << "HERE" << std::endl;
     settings->setValue("itemsList", QVariant::fromValue(skeletonItemsListRodent));
+    std::cout << "HDONE" << std::endl;
     settings->endGroup();
     settings->endGroup();
 
@@ -209,11 +210,17 @@ int main(int argc, char **argv) {
   // qRegisterMetaTypeStreamOperators<QMap<QString,bool> >("QMap<QString,bool>");
   // qRegisterMetaTypeStreamOperators<QList<QList<QPair<QString, bool>>>> ("QList<QList<QPair<QString, bool>>>");
   // qRegisterMetaTypeStreamOperators<QList<QPair<QString,bool>>> ("QList<QPair<QString,bool>>");
-  qRegisterMetaType<ExportConfig>("ExportConfig");
-	qRegisterMetaType<cv::Mat>("cv::Mat");
-  //qRegisterMetaType<SkeletonComponent>("SkeletonComponent");
+  qRegisterMetaType<ExportConfig>();
+  qRegisterMetaType<SkeletonComponent>();
+  qRegisterMetaType<QList<SkeletonComponent>>();
+  qRegisterMetaType< cv::Mat >();
+  qRegisterMetaType<QMap<QString,bool>>();
+  qRegisterMetaType<QList<QList<std::pair<QString,bool>>>>();
+  qRegisterMetaType<QList<QList<QString>>>();
+
   // qRegisterMetaTypeStreamOperators<QList<SkeletonComponent> >("QList<SkeletonComponent>");
-  qRegisterMetaType< cv::Mat >("cv::Mat");
+	//qRegisterMetaTypeStreamOperators<QList<QString> >("QList<QString>");
+
 
 	QApplication app (argc, argv);
 	app.setStyle(new DarkStyle);

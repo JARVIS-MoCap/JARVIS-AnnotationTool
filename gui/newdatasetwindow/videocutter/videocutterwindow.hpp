@@ -48,7 +48,7 @@ class VideoCutterWindow : public QWidget {
 		QSplitter *mainSplitter;
 
 		QMediaPlayer *player;
-		//QMediaPlaylist *m_playlist;
+		QList<QUrl> m_playlist;
 		QVideoWidget *videoWidget;
 		int m_duration;
 		int m_frameCount;
