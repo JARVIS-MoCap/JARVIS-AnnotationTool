@@ -254,15 +254,14 @@ bool VideoCutterWindow::openVideos(QList<QString> videoPaths) {
 		{
 			cv::VideoCapture cap(path.toStdString());
 			int fc = cap.get(cv::CAP_PROP_FRAME_COUNT);
-			std::cout << fc << std::endl;
 			int fr = cap.get(cv::CAP_PROP_FPS);
 			if (frameCount == 0) frameCount = fc;
 			else if (frameCount != fc) {
-				//return false;
+				return false;
 			}
 			if (frameRate == 0) frameRate = fr;
 			else if (frameRate != fr) {
-				//return false;
+				return false;
 			}
 			cap.release();
 		}

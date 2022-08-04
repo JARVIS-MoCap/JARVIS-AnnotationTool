@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 
-set (UBUNTU_VERSION 2004)
-
 project(AnnotationTool VERSION 1.1.0  LANGUAGES CXX)
 
 set (CMAKE_PREFIX_PATH "libs/Qt5/qt_install/lib/cmake/")
 find_package(Qt6 PATHS "libs/Qt5/qt_install/lib/cmake/" REQUIRED COMPONENTS Core Widgets Charts Multimedia MultimediaWidgets 3DCore 3DRender 3DExtras)
 qt_standard_project_setup()
+
+add_definitions("-DQT_DEBUG")
+
 
 if(NOT WIN32)
 	set(OpenCV_DIR "libs/OpenCV/opencv_install/lib/cmake/opencv4")
@@ -69,12 +70,13 @@ elseif (UNIX)
       globals.hpp
       gui/Qt-DarkStyle/darkstyle.qrc
   )
-
-  if(${UBUNTU_VERSION} STREQUAL "2004")
-    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_1.1-1_amd64_2004/usr/local/bin)
-  else()
-    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_1.1-1_amd64_1804/usr/local/bin)
-  endif()
+	if (${UBUNTU_VERSION})
+	  if(${UBUNTU_VERSION} STREQUAL "2004")
+	    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_1.1-1_amd64_2004/usr/local/bin)
+	  else()
+	    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_1.1-1_amd64_1804/usr/local/bin)
+	  endif()
+	endif()
 endif()
 
 target_compile_options(${PROJECT_NAME} PRIVATE)

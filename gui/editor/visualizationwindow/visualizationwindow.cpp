@@ -141,7 +141,7 @@ void VisualizationWindow::saveClickedSlot() {
 		}
 	}
 	else {
-		std::cout << "COULD NOT SAVE" << std::endl;
+		qCritical() << "Could not save Keypoints to file!";
 	}
 	saveFile.close();
 }
@@ -163,7 +163,7 @@ void VisualizationWindow::loadClickedSlot() {
 		saveFile.close();
 		for (int row = 1; row < fileText.size(); row++) {
 			if (fileText[row].size() != 5) {
-				std::cout << "COULD NOT LOAD! Wrong format" << std::endl;
+				qCritical() << "Could not load Keypoints! Wrong format!";
 				return;
 			}
 			QString name = fileText[row][0] + "/" + fileText[row][1];

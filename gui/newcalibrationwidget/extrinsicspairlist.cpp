@@ -76,7 +76,6 @@ void ExtrinsicsPairList::setItems(QList<QList<QString>> items) {
 
 void ExtrinsicsPairList::moveItemUpSlot() {
 	int row = itemSelectorList->currentRow();
-	std::cout << row << std ::endl;
 	if (row == -1) return;
 	QListWidgetItem *item = itemSelectorList->takeItem(row);
 	QListWidgetItem *seperatorItem = itemSelectorList->takeItem(row);
@@ -90,7 +89,6 @@ void ExtrinsicsPairList::moveItemUpSlot() {
 
 void ExtrinsicsPairList::moveItemDownSlot() {
 	int row = itemSelectorList->currentRow();
-	std::cout << row << std ::endl;
 	if (row == -1) return;
 	QListWidgetItem *item = itemSelectorList->takeItem(row);
 	QListWidgetItem *seperatorItem = itemSelectorList->takeItem(row);

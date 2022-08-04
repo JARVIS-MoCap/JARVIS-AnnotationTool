@@ -38,7 +38,6 @@ DatasetProgressInfoWindow::DatasetProgressInfoWindow(QWidget *parent) : QDialog(
 
 
 void DatasetProgressInfoWindow::recordingBeingProcessedChangedSlot(QString recording, QList<QString> cameras) {
-	std::cout << "recordingBeingProcessedChangedSlot " << cameras.size() << std::endl;
 	delete progressGroup;
 	progressGroup = new QGroupBox(this);
 	QGridLayout *progresslayout = new QGridLayout(progressGroup);

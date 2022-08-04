@@ -21,11 +21,13 @@
 #include "CoreFoundation/CoreFoundation.h"
 #endif
 
-//TODO: Maybe move these to glabels, seems to be the intended way
+//TODO: Maybe move these to globals, seems to be the intended way
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(RecordingItem)
 Q_DECLARE_METATYPE(TimeLineWindow)
 Q_DECLARE_METATYPE(ExportConfig)
+
+
 
 
 
@@ -170,9 +172,7 @@ void initPresets() {
     SkeletonComponent j20 = {"Joint 20", "Tail_Root", "Hip_Center", 0};
     QList<SkeletonComponent> skeletonItemsListRodent = {j1,j2,j3,j4,j5,j6,j7,j8,j9,
           j10,j11,j12,j13,j14,j15,j16,j17,j18,j19,j20};
-    std::cout << "HERE" << std::endl;
     settings->setValue("itemsList", QVariant::fromValue(skeletonItemsListRodent));
-    std::cout << "HDONE" << std::endl;
     settings->endGroup();
     settings->endGroup();
 
@@ -192,11 +192,25 @@ int main(int argc, char **argv) {
 			char path[PATH_MAX];
 			if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
 			{
-					std::cout << "CFURLGetFileSystemRepresentation Error" << std::endl;
+					QCritical() << "CFURLGetFileSystemRepresentation Error";
 			}
 			CFRelease(resourcesURL);
 			chdir(path);
 	#endif
+
+  qSetMessagePattern(QStringLiteral("%{time}"
+        //"%{appname}"
+        ": ["
+        "%{if-debug}D%{endif}"
+        "%{if-info}I%{endif}"
+        "%{if-warning}W%{endif}"
+        "%{if-critical}C%{endif}"
+        "%{if-fatal}F%{endif}"
+        "] "
+        "%{message}"
+        " ("
+        "%{function} - %{file}:%{line}"
+        ")"));
 
 	QCoreApplication::setOrganizationName("JARVIS-MoCap");
 	QCoreApplication::setOrganizationDomain("JARVIS-MoCap");
@@ -221,6 +235,8 @@ int main(int argc, char **argv) {
   // qRegisterMetaTypeStreamOperators<QList<SkeletonComponent> >("QList<SkeletonComponent>");
 	//qRegisterMetaTypeStreamOperators<QList<QString> >("QList<QString>");
 
+
+  qDebug() << "HELOOOO";
 
 	QApplication app (argc, argv);
 	app.setStyle(new DarkStyle);

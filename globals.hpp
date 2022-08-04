@@ -13,6 +13,7 @@
 #include <iostream>
 #include <stdint.h>
 #include <QCoreApplication>
+#include <QDebug>
 #include <QTime>
 #include <QToolButton>
 #include <QAction>

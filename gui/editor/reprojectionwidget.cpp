@@ -153,7 +153,7 @@ void ReprojectionWidget::initReprojectionClickedSlot() {
 	}
 	else {
 		if (!checkCalibParams(path)) {
-			std::cout << "WRONG CALIB FILES!" << std::endl;
+			qCritical() << "Wrong Calibration Files!";
 			m_calibExists = false;
 			return;
 		}
