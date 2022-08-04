@@ -3,7 +3,7 @@
 	url = https://github.com/mocapsetup/libcbdetect.git
 [submodule "libs/yaml-cpp"]
 	path = libs/yaml-cpp
-	url = git@github.com:jbeder/yaml-cpp.git
+	url = https://github.com/jbeder/yaml-cpp.git
 [submodule "libs/OpenCV/opencv"]
 	path = libs/OpenCV/opencv
 	url = https://github.com/opencv/opencv.git
