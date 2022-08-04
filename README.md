@@ -35,18 +35,23 @@ Next clone our repository with
 
      git clone --recursive https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool.git
      
-Go into the repository and create a build directory
+     
+Change to the repositories main directory
 
-    cd JARVIS-AnnotationTool && mkdir build && cd build
+     cd JARVIS-AnnotationTool
+     
+### Building and installing
+Build Qt and OpenCV using the provided setup script by runnning
+
+     sh setup.sh
+     
+Create and enter a build directory 
+
+    mkdir build && cd build
     
-### Building and installing 
-Run cmake (replace XX04 by either 2004 or 1804) depending on your Ubuntu Version.
+Run cmake to configure and build the AnnotationTool
 
-	cmake -DUBUNTU_VERSION=xx04 ..
-	
-Run make to build the tool (replace x by the number of available cores on your CPU)
-
-     make -jx
+	cmake .. && cmake --build . --parallel 8
      
 If you want to create a debian package go to the deployment folder and run (replace XX04 by your Ubuntu Version)
 
@@ -109,7 +114,7 @@ Run make to build the tool (replace x by the number of available cores on your C
 
     cmake --build . -j8
 	
-We currentlWe try to provide prebuild versions of all the libraries you will need to compile the tool. You only need to build them yourself incase they don't work for your OS or you want to use different versions than the ones we ship it with.y use the free version Advanced Installer to create our '.msi' installer files. This is not an optimal solution, so if you know how to build a better pipeline to build them please feel free to implement that!
+We currently use the free version Advanced Installer to create our '.msi' installer files. This is not an optimal solution, so if you know how to build a better pipeline to build them please feel free to implement that!
 
 <br><br>
 # Building OpenCV yourself
