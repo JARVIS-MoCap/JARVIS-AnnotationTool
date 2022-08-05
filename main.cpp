@@ -126,7 +126,7 @@ void initPresets() {
     SkeletonComponent pr2 = {"Joint 17", "Ring_P", "Middle_P", 0};
     SkeletonComponent pr3 = {"Joint 18", "Middle_P", "Index_P", 0};
     SkeletonComponent pr4 = {"Joint 19", "Index_P", "Thumb_M", 0};
-    SkeletonComponent w1 = {"Joint 20", "Pinky_P", "Pinky_P", 0};
+    SkeletonComponent w1 = {"Joint 20", "Pinky_P", "Wrist_U", 0};
     SkeletonComponent w2 = {"Joint 21", "Wrist_U", "Wrist_R", 0};
     SkeletonComponent w3 = {"Joint 22", "Wrist_R", "Thumb_P", 0};
     QList<SkeletonComponent> skeletonItemsList = {p1,p2,p3,r1,r2,r3,m1,m2,m3,
