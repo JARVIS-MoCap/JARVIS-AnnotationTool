@@ -123,4 +123,35 @@ We currently use the free version Advanced Installer to create our '.msi' instal
 - On MacOS: build [libjpeg turbo](https://github.com/libjpeg-turbo/libjpeg-turbo) from git (make sure to build Version 8!)
 
 <br><br>
-    
+
+# FAQ
+### Qt does not compile throwing 'CMake 3.21 or higher is required.'
+This will occur on Ubuntu 20.04 or earlier. To fix it install the latest cmake release with the following commands.
+1. Remove the old cmake install
+
+       sudo apt remove --purge --auto-remove cmake
+     
+2. Prepare install
+
+       sudo apt update && sudo apt install -y software-properties-common lsb-release && sudo apt clean all
+     
+3. Get kitware's signing key
+
+       wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+
+4. Add repo to list of sources
+
+       sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
+
+5. Install kitware-archive-keyring package:
+
+       sudo apt update && sudo apt install kitware-archive-keyring && sudo rm /etc/apt/trusted.gpg.d/kitware.gpg
+     
+6. Add public key
+
+       sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6AF7F09730B3F0A4
+
+7. Install cmake
+
+       sudo apt update && sudo apt install cmake
+   
