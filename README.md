@@ -154,4 +154,8 @@ This will occur on Ubuntu 20.04 or earlier. To fix it install the latest cmake r
 7. Install cmake
 
        sudo apt update && sudo apt install cmake
+       
+### Ubuntu 2204 additional libs:
+sudo apt-get install '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
+libwayland-dev
    
