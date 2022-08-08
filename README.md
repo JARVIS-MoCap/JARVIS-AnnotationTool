@@ -92,31 +92,34 @@ Run make to build the tool (replace x by the number of available cores on your C
      
 
 ## Windows
-Make sure you have a version of Visual Studio Code installed (If you plan to build the AcquisitionTool installed it is best to use VSCode 2015).
-Also make sure you have git installed and run the following in the git bash console:
+- Install a version of Visual Studio (tested on 2015 or newer). The latest versioon can be found [here](https://visualstudio.microsoft.com/)
+- Install Git for Windows from [here](https://gitforwindows.org/)
+- Install Strawberry Perl from [here](https://strawberryperl.com/)
 
 ### Cloning the repository
 Next clone our repository with 
 
      git clone --recursive https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool.git
      
-Go into the repository and create a build directory
+Change to the repositories main directory
 
-    cd JARVIS-AnnotationTool && mkdir build && cd build
+     cd JARVIS-AnnotationTool
 
 ### Building and installing 
-Switch to a VS Developer Command Prompt and run the following two commands to enable the 64bit built system:
+Switch to a **x64** VS Developer Command Prompt and run the setup batch file:
 
-    cd VC
-    vcvarsall.bat amd64
+    setup.bat
+
+Create a build directory
+
+    mkdir build && cd build
 
 Then run cmake
 
-    cmake -DCMAKE_BUILD_TYPE=Release .. -G "NMake Makefiles"
-	
-Run make to build the tool (replace x by the number of available cores on your CPU)
-
-    cmake --build . -j8
+    cmake -DCMAKE_BUILD_TYPE=RELEASE .. -G "Ninja" && cmake --build . --parallel 8
+    
+To run the AnnotationTool.exe without inistalling it you need to copy all opencv dlls to the build directory!
+    
 	
 We currently use the free version Advanced Installer to create our '.msi' installer files. This is not an optimal solution, so if you know how to build a better pipeline to build them please feel free to implement that!
 
