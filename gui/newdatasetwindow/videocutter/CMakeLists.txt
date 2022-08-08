@@ -15,8 +15,8 @@ target_include_directories(videocutter
 )
 
 target_link_libraries(videocutter
-  Qt5::Widgets
-  Qt5::Multimedia
-  Qt5::MultimediaWidgets
+  Qt::Widgets
+  Qt::Multimedia
+  Qt::MultimediaWidgets
 	src
 )

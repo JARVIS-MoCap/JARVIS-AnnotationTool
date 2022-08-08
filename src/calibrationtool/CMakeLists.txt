@@ -17,7 +17,7 @@ target_include_directories(calibrationtool
 
 
 target_link_libraries(calibrationtool
-  Qt5::Widgets
+  Qt::Widgets
   cbdetect
   opencv_core
   opencv_calib3d

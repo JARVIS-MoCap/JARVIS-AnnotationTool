@@ -19,12 +19,6 @@
 class ReprojectionTool : public QObject {
 	Q_OBJECT
 	public:
-		explicit ReprojectionTool(QList<QString> intrinsicsPaths,
-					QList<QString> extrinsicsPaths, int primaryIndex);
-		cv::Mat reconstructPoint3D(QList<QPointF> points, QList<int> camerasToUse);
-		QList<QPointF> reprojectPoint(cv::Mat point3D);
-
-	private:
 		typedef struct CameraIntrinics {
 			cv::Mat intrinsicMatrix;
 			cv::Mat distortionCoefficients;
@@ -38,7 +32,15 @@ class ReprojectionTool : public QObject {
 			cv::Mat essentialMatrix;
 			cv::Mat fundamentalMatrix;
 		} CameraExtrinsics;
+		explicit ReprojectionTool(QList<QString> intrinsicsPaths,
+					QList<QString> extrinsicsPaths, int primaryIndex);
+		cv::Mat reconstructPoint3D(QList<QPointF> points, QList<int> camerasToUse);
+		QList<QPointF> reprojectPoint(cv::Mat point3D);
+		QList<QString> cameraNames() {return m_cameraNames;};
+		QList<CameraExtrinsics> extrinsicsList() {return m_cameraExtrinsicsList;};
+		QList<CameraIntrinics> intrinsicsList() {return m_cameraIntrinsicsList;};
 
+	private:
 		void readIntrinsics(const QString& path,
 					CameraIntrinics& cameraIntrinics);
 
@@ -48,6 +50,8 @@ class ReprojectionTool : public QObject {
 		QList<CameraIntrinics> m_cameraIntrinsicsList;
 		int m_primaryIndex;
 		QList<CameraExtrinsics> m_cameraExtrinsicsList;
+
+		QList<QString> m_cameraNames;
 
 };
 

@@ -15,17 +15,19 @@
 KeypointWidget::KeypointWidget(QWidget *parent) : QWidget(parent) {
 	colorMap = new ColorMap(ColorMap::Jet);
 	keypointlayout = new QGridLayout(this);
-	keypointlayout->setMargin(0);
+	keypointlayout->setContentsMargins(0,0,0,0);
 	keypointlayout->setSpacing(20);
 
 	hideEntityWidget = new QWidget(this);
 	hideentitylayout = new QGridLayout(hideEntityWidget);
-	hideentitylayout->setMargin(0);
+	hideentitylayout->setContentsMargins(0,0,0,0);
 	QLabel *hideEntityLabel = new QLabel("Hide/Show Bodyparts");
 	hideEntityLabel->setFont(QFont("Sans Serif", 12, QFont::Bold));
 	hideentitylayout->addWidget(hideEntityLabel,0,0);
 
 	keypointlayout->addWidget(hideEntityWidget,0,0);
+
+	this->installEventFilter(this);
 
 
 	//--- SIGNAL-SLOT Connections ---//
@@ -38,14 +40,15 @@ KeypointWidget::KeypointWidget(QWidget *parent) : QWidget(parent) {
 
 
 void KeypointWidget::init() {
-	std::cout << entitiesList.size() << std::endl;
-
 	entitiesList.clear();
+	for (const auto box : hideEntitiesBoxesList) {
+		delete box;
+	}
 	hideEntitiesBoxesList.clear();
-
 	int i = 1;
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		QCheckBox *hideBox = new QCheckBox(entity,hideEntityWidget);
+		hideBox->installEventFilter(this);
 		hideBox->setChecked(true);
 		hideentitylayout->addWidget(hideBox,i++,0);
 		hideEntitiesBoxesList.append(hideBox);
@@ -53,7 +56,6 @@ void KeypointWidget::init() {
 		connect(hideBox, &QCheckBox::stateChanged, this, &KeypointWidget::hideEntitySlot);
 	}
 
-	keypointListMap.clear();
 
 	//delete keypointTabWidget;
 	keypointTabWidget = new QTabWidget(this);
@@ -63,6 +65,7 @@ void KeypointWidget::init() {
 																	"QTabBar::tab:selected,QTabBar::tab:hover{"
 																	"background-color: palette(alternate-base);}");
 	keypointlayout->addWidget(keypointTabWidget,1,0);
+	keypointListMap.clear();
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		KeypointListWidget *bodyPartsListWidget = new KeypointListWidget();
 		bodyPartsListWidget->setAlternatingRowColors(true);
@@ -83,7 +86,6 @@ void KeypointWidget::init() {
 		keypointTabWidget->addTab(bodyPartsListWidget, entity);
 		keypointListMap[entity] = bodyPartsListWidget;
 	}
-	std::cout <<  entitiesList[0].toStdString() << std::endl;
 	m_currentEntity = entitiesList[0];
 	connect(keypointTabWidget, &QTabWidget::currentChanged, this, &KeypointWidget::currentTabChangedSlot);
 	QColor color = colorMap->getColor(0, keypointListMap[m_currentEntity]->count());
@@ -254,7 +256,6 @@ void KeypointWidget::setKeypointsFromDatasetSlot() {
 
 void KeypointWidget::frameChangedSlot(int currentImgSetIndex, int currentFrameIndex) {
 	Dataset::dataset->save();
-	std::cout << "ImgSet: " << currentImgSetIndex << ", Frame: " << currentFrameIndex << std::endl;
 	m_currentImgSet = Dataset::dataset->imgSets()[currentImgSetIndex];
 	m_currentFrameIndex = currentFrameIndex;
 	setKeypointsFromDatasetSlot();

@@ -48,36 +48,42 @@ class IntrinsicsCalibrator : public QObject, public QRunnable {
 		void calibrationCanceledSlot();
 
 	private:
-    struct Intrinsics {
-      cv::Mat K;
-      cv::Mat D;
-    };
+		struct Intrinsics {
+		cv::Mat K;
+		cv::Mat D;
+		};
 
-		cv::Mat m_charucoPattern;
-		cv::Mat m_detectedPattern;
+			cv::Mat m_charucoPattern;
+			cv::Mat m_detectedPattern;
 
-    std::vector<cv::Point3f> m_checkerBoardPoints;
-    CalibrationConfig *m_calibrationConfig;
-		std::string m_parametersSavePath;
-		std::string m_cameraName;
-		int m_threadNumber;
-		bool m_interrupt = false;
-		QList<QString> m_validRecordingFormats = {"avi", "mp4", "mov", "wmv",
-																							"AVI", "MP4", "WMV"};
+		std::vector<cv::Point3f> m_checkerBoardPoints;
+		CalibrationConfig *m_calibrationConfig;
+			std::string m_parametersSavePath;
+			std::string m_cameraName;
+			int m_threadNumber;
+			bool m_interrupt = false;
+			QList<QString> m_validRecordingFormats = {"avi", "mp4", "mov", "wmv",
+																								"AVI", "MP4", "WMV"};
 
-		void run_standard();
-		void run_charuco();
+			void run_standard();
+			void run_charuco();
 
-		bool checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1);
-		cv::Point2i getPositionOfMarkerOnBoard(
-					std::vector< cv::Point2f>&cornersBoard,
-					std::vector<cv::Point2f>&markerCorners);
-		int matchPattern();
-		bool boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners,
-					std::vector<cv::Point2f> &corners);
-		QString getFormat(const QString& path, const QString& cameraName);
-		void saveCheckerboard(const cv::Mat &img,
-					const std::vector<cv::Point2f> &corners, int counter);
+			double intrinsicsCalibrationStep(
+						std::vector<std::vector<cv::Point2f>> &charucoCorners,
+						std::vector<std::vector<int>> &charucoIds,
+						cv::Ptr<cv::aruco::CharucoBoard> board,
+						cv::Size size, double thresholdFactor);
+
+			bool checkRotation(std::vector< cv::Point2f> &corners1, cv::Mat &img1);
+			cv::Point2i getPositionOfMarkerOnBoard(
+						std::vector< cv::Point2f>&cornersBoard,
+						std::vector<cv::Point2f>&markerCorners);
+			int matchPattern();
+			bool boardToCorners(cbdetect::Board &board, cbdetect::Corner &cbCorners,
+						std::vector<cv::Point2f> &corners);
+			QString getFormat(const QString& path, const QString& cameraName);
+			void saveCheckerboard(const cv::Mat &img,
+						const std::vector<cv::Point2f> &corners, int counter);
 };
 
 

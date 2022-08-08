@@ -13,6 +13,7 @@
 #include <iostream>
 #include <stdint.h>
 #include <QCoreApplication>
+#include <QDebug>
 #include <QTime>
 #include <QToolButton>
 #include <QAction>
@@ -50,6 +51,7 @@ struct SkeletonComponent {
 	float length;
 };
 Q_DECLARE_METATYPE(SkeletonComponent)
+
 
 
 struct DatasetConfig {

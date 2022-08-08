@@ -1,3 +1,6 @@
+add_subdirectory(visualizationwindow)
+
+
 add_library(editor
   editorwidget.hpp
   editorwidget.cpp
@@ -25,11 +28,13 @@ target_include_directories(editor
     PUBLIC
     ${PROJECT_SOURCE_DIR}
     ../
+    visualizationwindow
 )
 
 target_link_libraries(editor
-  Qt5::Widgets
-  Qt5::Charts
+  Qt::Widgets
+  Qt::Charts
   newdatasetwindow
 	src
+  visualizationwindow
 )

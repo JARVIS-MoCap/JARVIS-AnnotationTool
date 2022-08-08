@@ -68,26 +68,26 @@ NewDatasetWindow::NewDatasetWindow(QWidget *parent) : QWidget(parent, Qt::Window
 	QGridLayout *recordingslayout = new QGridLayout(recordingsBox);
 	recordingsTable = new RecordingsTable("Recordings", m_datasetConfig);
 	recordingslayout->addWidget(recordingsTable,0,0);
-	recordingslayout->setMargin(0);
+	recordingslayout->setContentsMargins(0,0,0,0);
 
 	QGroupBox *entitiesBox = new QGroupBox("Entities");
 	QGridLayout *entitieslayout = new QGridLayout(entitiesBox);
 	entitiesItemList = new ConfigurableItemList("Entities");
 	entitieslayout->addWidget(entitiesItemList,0,0);
-	entitieslayout->setMargin(0);
+	entitieslayout->setContentsMargins(0,0,0,0);
 
 	QGroupBox *skeletonBox = new QGroupBox("Skeleton");
 	QGridLayout *skeletonlayout = new QGridLayout(skeletonBox);
 	skeletonTable = new SkeletonTableWidget("Skeleton");
 	skeletonlayout->addWidget(skeletonTable,0,0);
-	skeletonlayout->setMargin(0);
+	skeletonlayout->setContentsMargins(0,0,0,0);
 
 	QGroupBox *keypointsBox = new QGroupBox("Keypoints");
 	QGridLayout *keypointslayout = new QGridLayout(keypointsBox);
 	keypointsItemList = new ConfigurableItemList("Keypoints");
 	connect(keypointsItemList, &ConfigurableItemList::itemsChanged, skeletonTable, &SkeletonTableWidget::setKeypointsListSlot);
 	keypointslayout->addWidget(keypointsItemList,0,0);
-	keypointslayout->setMargin(0);
+	keypointslayout->setContentsMargins(0,0,0,0);
 
 	QWidget *buttonBarWidget = new QWidget(this);
 	buttonBarWidget->setMaximumSize(100000,50);

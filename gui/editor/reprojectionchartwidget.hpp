@@ -37,6 +37,16 @@ class ReprojectionChartWidget : public QWidget {
 		QTabWidget *chartsTabWidget;
 		QMap<QString, ReprojectionChartView*> reprojectionChartViews;
 
+		bool eventFilter(QObject *target, QEvent *event)
+		{
+			if (event->type() == QKeyEvent::KeyPress)
+			{
+				event->ignore();
+				return true;
+			}
+			return QObject::eventFilter(target, event);
+		}
+
 	private slots:
 };
 

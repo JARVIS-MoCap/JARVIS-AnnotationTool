@@ -22,7 +22,7 @@ class ColorMap : public QObject {
 		QColor getColor(int index, int numElements) const;
 
 	private:
-		QString m_type;
+		ColorMapType m_type;
 		QColor m_color;
 		QVector<QColor> m_cmap;
 };

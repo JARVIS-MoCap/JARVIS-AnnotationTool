@@ -28,25 +28,30 @@ If you want to build the tool yourself here's a step by step guide on how to do 
 ### Installing the dependencies
 To be able to build the tool install all the dependencies with
 
-      sudo apt install build-essential libxcb-xinerama0 libdouble-conversion-dev gstreamer1.0-libav ffmpeg libxcb-xinput0 libpcre2-dev libeigen3-dev qt5-default libqt5charts5-dev libqt5serialport5-dev qtmultimedia5-dev
+      sudo apt install cmake git build-essential libxcb-xinerama0 libdouble-conversion-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-gl ffmpeg libxcb-xinput0 libpcre2-dev libeigen3-dev libgl-dev zlib1g-dev libfontconfig-dev libjpeg-dev libharfbuzz-dev '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev  
       
 ### Cloning the repository
 Next clone our repository with 
 
      git clone --recursive https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool.git
      
-Go into the repository and create a build directory
+     
+Change to the repositories main directory
 
-    cd JARVIS-AnnotationTool && mkdir build && cd build
+     cd JARVIS-AnnotationTool
+     
+### Building and installing
+Build Qt and OpenCV using the provided setup script by runnning
+
+     sh setup.sh
+     
+Create and enter a build directory 
+
+    mkdir build && cd build
     
-### Building and installing 
-Run cmake (replace XX04 by either 2004 or 1804) depending on your Ubuntu Version.
+Run cmake to configure and build the AnnotationTool
 
-	cmake -DUBUNTU_VERSION=xx04 ..
-	
-Run make to build the tool (replace x by the number of available cores on your CPU)
-
-     make -jx
+	cmake .. && cmake --build . --parallel 8
      
 If you want to create a debian package go to the deployment folder and run (replace XX04 by your Ubuntu Version)
 
@@ -113,130 +118,40 @@ We currently use the free version Advanced Installer to create our '.msi' instal
 
 <br><br>
 # Building OpenCV yourself
-We try to provide prebuild versions of all the libraries you will need to compile the tool. You only need to build them yourself incase they don't work for your OS or you want to use different versions than the ones we ship it with.
 
 ## Linux and MacOS
 - On MacOS: build [libjpeg turbo](https://github.com/libjpeg-turbo/libjpeg-turbo) from git (make sure to build Version 8!)
-- Get opencv and opencv_contrib from git with: 
-  
-      git clone https://github.com/opencv/opencv.git
-      git clone https://github.com/opencv/opencv_contrib.git
-      
-- Checkout desired version with: 
-  
-      cd opencv && git checkout 4.5.5 &&  cd ../opencv_contrib && git checkout 4.5.5 && cd ..
-
-- Make build directory:
-
-      mkdir build && cd build
-	
-- Configure with (set DCMAKE_INSTALL_PREFIX to the path you want to install it to):
-
-	    cmake -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TIFF=OFF -DWITH_TIFF=OFF -DBUILD_JPEG=OFF -DBUILD_ZLIB=OFF -DBUILD_WEBP=OFF -DBUILD_PNG=OFF -DWITH_OPENEXR=OFF -DWITH_OPENJPEG=OFF -DWITH_JASPER=OFF -DWITH_PROTOBUF=OFF -DWITH_QUIRC=OFF -DWITH_1394=OFF -DWITH_V4L=OFF  -DWITH_GSTREAMER=ON -DWITH_FFMPEG=ON -DWITH_GTK=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_LIST="core,calib3d,imgproc,videoio,aruco, gapi" -DCMAKE_INSTALL_PREFIX=../opencv_static -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ../opencv
-
- - Build and install OpenCV to the previously selected directory with:
- 
-       make -j8 && make install
-       
- - You can then either change the OpenCV_DIR paths to point to the directory you installed to or copy the files in the install directory to 
-
-        ${AnnotationTool_Directory}/libs/OpenCV_4.5.1/Ubuntu_xx04(MacOS)
-  
-  
-## Windows
-Make sure you have a version of Visual Studio Code installed (If you plan to build the AcquisitionTool installed it is best to use VSCode 2015)
-Also make sure you have git installed and run the following in the git bash console:
-
-- Get opencv and opencv_contrib from git with: 
-  
-      git clone https://github.com/opencv/opencv.git
-      git clone https://github.com/opencv/opencv_contrib.git
-      
-- Checkout desired version with: 
-  
-      cd opencv && git checkout 4.5.5 && cd ../opencv_contrib && git checkout 4.5.5 && cd ..
-      
-- Make build directory:
-
-      mkdir build
-
-- Switch to a VS Developer command prompt and run:
-
-      cd VC
-      vcvarsall.bat amd64
-
-- Navigate to your build directory
-
-- Configure with (set DCMAKE_INSTALL_PREFIX to the path you want to install it to):
-
-	    cmake -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TIFF=OFF -DWITH_TIFF=OFF -DBUILD_JPEG=OFF -DBUILD_ZLIB=OFF -DBUILD_WEBP=OFF -DBUILD_PNG=OFF -DWITH_OPENEXR=OFF -DWITH_OPENJPEG=OFF -DWITH_JASPER=OFF -DWITH_PROTOBUF=OFF -DWITH_QUIRC=OFF -DWITH_1394=OFF -DWITH_V4L=OFF  -DWITH_GSTREAMER=ON -DWITH_FFMPEG=ON -DWITH_GTK=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_LIST="core,calib3d,imgproc,videoio,aruco, gapi" -DCMAKE_INSTALL_PREFIX=../opencv_static -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ../opencv -G "NMake Makefiles"
-
- - Build and install OpenCV to the previously selected directory with:
- 
-       cmake --build . -j8
-       cmake --install .
-       
- - You can then either change the OpenCV_DIR paths to point to the directory you installed to or copy the files in the install directory to 
-
-        ${AnnotationTool_Directory}/libs/OpenCV_4.5.1/Windows
 
 <br><br>
-# Building QT5 yourself (only neccessary on MacOS and Windows):
-## MacOS
-- Get QT from git with: 
 
-      git clone git://code.qt.io/qt/qt5.git
-      
-- Checkout desired version with: 
+# FAQ
+### Qt does not compile throwing 'CMake 3.21 or higher is required.'
+This will occur on Ubuntu 20.04 or earlier. To fix it install the latest cmake release with the following commands.
+1. Remove the old cmake install
 
-      git checkout 5.15.2
+       sudo apt remove --purge --auto-remove cmake
+     
+2. Prepare install
 
-- Inside qt5 run 
+       sudo apt update && sudo apt install -y software-properties-common lsb-release && sudo apt clean all
+     
+3. Get kitware's signing key
 
-      ./init-repository
-      
-- Create build directory and go into it with:
+       wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
 
-      mkdir build && cd build
+4. Add repo to list of sources
 
-- Configure with (set prefix to the path you want to install it to):
+       sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
 
-      ../qt5/configure static -release -no-pch -prefix ../Qt5static_v5.15.2 -opensource -confirm-license -nomake tools -nomake tests -nomake examples -no-opengl -skip webengine -skip qt3d -skip qtandroidextras -skip qtcanvas3d -skip qtconnectivity -skip qtdatavis3d -skip qtdeclarative -skip qtdoc -skip qtgamepad -skip qtgraphicaleffects -skip qtlocation -skip qtmacextras -skip qtnetworkauth -skip qtpurchasing -skip qtquickcontrols -skip qtquickcontrols2 -skip qtscript -skip qtscxml -skip qtsensors -skip qtserialbus -skip qtquick3d -skip qtspeech -skip qttools -skip qtsensors -skip qttranslations -skip qtvirtualkeyboard -skip qtwayland -skip qtwebchannel -skip qtwebengine -skip qtwebsockets -skip qtwebview -skip qtwinextras -skip qtxmlpatterns  -skip qtwebglplugin -no-openssl -no-vulkan
-      
- - Build and install Qt to the previously selected directory with:
- 
-       make -j8 && make install
+5. Install kitware-archive-keyring package:
+
+       sudo apt update && sudo apt install kitware-archive-keyring && sudo rm /etc/apt/trusted.gpg.d/kitware.gpg
+     
+6. Add public key
+
+       sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6AF7F09730B3F0A4
+
+7. Install cmake
+
+       sudo apt update && sudo apt install cmake
        
- - You can then either change the QT_DIR paths to point to the directory you installed to or copy the files in the install directory to 
- 
-        ${AnnotationTool_Directory}/libs/Qt_5.15.2/MacOS
-  
- ## Windows
-- Get QT from git with: 
-
-      git clone git://code.qt.io/qt/qt5.git
-      
-- Checkout desired version with: 
-
-      git checkout 5.15.2
-
-- Inside qt5 run 
-
-      ./init-repository
-      
-- Create build directory and go into it with:
-
-      mkdir build && cd build
-
-- Configure with (set prefix to the path you want to install it to):
-
-      ../qt5/configure static -release -no-pch -prefix ../Qt5static_v5.15.2 -opensource -confirm-license -nomake tools -nomake tests -nomake examples -no-opengl -skip webengine -skip qt3d -skip qtandroidextras -skip qtcanvas3d -skip qtconnectivity -skip qtdatavis3d -skip qtdeclarative -skip qtdoc -skip qtgamepad -skip qtgraphicaleffects -skip qtlocation -skip qtmacextras -skip qtnetworkauth -skip qtpurchasing -skip qtquickcontrols -skip qtquickcontrols2 -skip qtscript -skip qtscxml -skip qtsensors -skip qtserialbus -skip qtquick3d -skip qtspeech -skip qttools -skip qtsensors -skip qttranslations -skip qtvirtualkeyboard -skip qtwayland -skip qtwebchannel -skip qtwebengine -skip qtwebsockets -skip qtwebview -skip qtwinextras -skip qtxmlpatterns  -skip qtwebglplugin -no-openssl -no-vulkan
-      
- - Build and install Qt to the previously selected directory with:
- 
-       nmake && nmake install
-       
- - You can then either change the QT_DIR paths to point to the directory you installed to or copy the files in the install directory to 
- 
-        ${AnnotationTool_Directory}/libs/Qt_5.15.2/MacOS
-    

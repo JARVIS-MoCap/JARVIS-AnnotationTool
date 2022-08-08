@@ -19,10 +19,10 @@ class Dataset : public QObject {
 	Q_OBJECT
 
 	public:
-		explicit Dataset(const QString& datasetFolder,
-			const QString& datasetBaseFolder, QList<QString> cameraNames = {},
-					QList<SkeletonComponent> skeleton = {},
-					QList<QString> segmentNames = {});
+		explicit Dataset(const QString &datasetFolder,
+						 const QString &datasetBaseFolder, QList<QString> cameraNames = {},
+						 QList<SkeletonComponent> skeleton = {},
+						 QList<QString> segmentNames = {}, bool annotateSetup = false, QList<QString> setupKeypoints = {});
 		static Dataset *dataset;
 		QList<ImgSet*> imgSets() {return m_imgSets;}
 		const QString& datasetFolder() {return m_datasetFolder;}
@@ -51,6 +51,8 @@ class Dataset : public QObject {
 		int m_numEntities;
 		QList <QString> m_cameraNames;
 		QList <SkeletonComponent> m_skeleton;
+		QList<QString> m_setupKeypointsList;
+		bool m_annotateSetup;
 		QList <QString> m_segmentNames;
 		QList<ImgSet*> m_imgSets;
 		QString m_scorer;

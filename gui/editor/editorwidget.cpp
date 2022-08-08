@@ -21,6 +21,9 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	leftSplitter = new QSplitter(Qt::Vertical,horizontalSplitter);
 	leftSplitter->hide();
 
+	visualizationWindow = new VisualizationWindow();
+	//visualizationWindow->show();
+
 	reprojectionWidget = new ReprojectionWidget(this);
 	datasetControlWidget = new DatasetControlWidget(this);
 	leftSplitter->addWidget(datasetControlWidget);
@@ -31,7 +34,7 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	imageViewerContainer = new QWidget(this);
 	imageViewerContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QGridLayout *containerlayout = new QGridLayout(imageViewerContainer);
-	containerlayout->setMargin(0);
+	containerlayout->setContentsMargins(0,0,0,0);
 	imageViewer = new ImageViewer();
 	imageViewer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	containerlayout->addWidget(imageViewer,0,0);
@@ -42,14 +45,17 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	keypointWidget->hide();
 
 	buttonWidget = new QWidget(mainSplitter);
+	buttonWidget->installEventFilter(this);
 	QGridLayout *buttonlayout = new QGridLayout(buttonWidget);
 	buttonlayout->setSpacing(20);
-	previousButton = new QPushButton("<< Previous");
-	previousButton->setMinimumSize(130,35);
+	previousButton = new QPushButton("<< Previous", buttonWidget);
+	previousButton->installEventFilter(this);
+	previousButton->setMinimumSize(130, 35);
 	previousButton->setMaximumSize(130,35);
 	previousButton->setEnabled(false);
 	connect(previousButton, &QPushButton::clicked, this, &EditorWidget::previousClickedSlot);
-	nextButton = new QPushButton("Next >>");
+	nextButton = new QPushButton("Next >>", buttonWidget);
+	nextButton->installEventFilter(this);
 	nextButton->setMinimumSize(130,35);
 	nextButton->setMaximumSize(130,35);
 	nextButton->setEnabled(false);
@@ -57,21 +63,24 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	QWidget *buttonSpacer1 = new QWidget(this);
 	buttonSpacer1->setMaximumSize(100,100);
 	buttonSpacer1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	zoomButton = new QPushButton("Zoom");
-	zoomButton->setIcon(QIcon::fromTheme("search"));
-	zoomButton->setCheckable(true);
-	zoomButton->setMinimumSize(130,35);
-	zoomButton->setMaximumSize(130,35);
-	connect(zoomButton, &QPushButton::toggled, this, &EditorWidget::zoomToggled);
-	connect(zoomButton, &QPushButton::toggled, this, &EditorWidget::zoomToggledSlot);
-	panButton = new QPushButton("Pan");
+	cropButton = new QPushButton("Crop", buttonWidget);
+	cropButton->installEventFilter(this);
+	cropButton->setIcon(QIcon::fromTheme("search"));
+	cropButton->setCheckable(true);
+	cropButton->setMinimumSize(130,35);
+	cropButton->setMaximumSize(130,35);
+	connect(cropButton, &QPushButton::toggled, this, &EditorWidget::cropToggled);
+	connect(cropButton, &QPushButton::toggled, this, &EditorWidget::cropToggledSlot);
+	panButton = new QPushButton("Pan", buttonWidget);
+	panButton->installEventFilter(this);
 	panButton->setIcon(QIcon::fromTheme("move"));
 	panButton->setCheckable(true);
 	panButton->setMinimumSize(130,35);
 	panButton->setMaximumSize(130,35);
 	connect(panButton, &QPushButton::toggled, this, &EditorWidget::panToggled);
 	connect(panButton, &QPushButton::toggled, this, &EditorWidget::panToggledSlot);
-	homeButton = new QPushButton("Home");
+	homeButton = new QPushButton("Home", buttonWidget);
+	homeButton->installEventFilter(this);
 	homeButton->setIcon(QIcon::fromTheme("home"));
 	homeButton->setMinimumSize(130,35);
 	homeButton->setMaximumSize(130,35);
@@ -80,35 +89,45 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	QWidget *buttonSpacer2 = new QWidget(this);
 	buttonSpacer2->setMaximumSize(100,100);
 	buttonSpacer2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	previousSetButton = new QPushButton("<< Previous Set");
+	previousSetButton = new QPushButton("<< Previous Set", buttonWidget);
+	previousSetButton->installEventFilter(this);
 	previousSetButton->setMinimumSize(160,35);
 	previousSetButton->setMaximumSize(160,35);
 	previousSetButton->setEnabled(false);
 	connect(previousSetButton, &QPushButton::clicked, this, &EditorWidget::previousSetClickedSlot);
-	nextSetButton = new QPushButton("Next Set >>");
+	nextSetButton = new QPushButton("Next Set >>", buttonWidget);
+	nextSetButton->installEventFilter(this);
 	nextSetButton->setMinimumSize(160,35);
 	nextSetButton->setMaximumSize(160,35);
 	nextSetButton->setEnabled(false);
 	connect(nextSetButton, &QPushButton::clicked, this, &EditorWidget::nextSetClickedSlot);
 	QWidget *buttonSpacer3 = new QWidget(this);
 	buttonSpacer3->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	quitButton = new QPushButton("Quit");
-	quitButton->setMinimumSize(130,35);
-	quitButton->setMaximumSize(130,35);
-	connect(quitButton, &QPushButton::clicked, this, &EditorWidget::quitClickedSlot);
+	saveSetupButton = new QPushButton("Save Setup", buttonWidget);
+	connect(saveSetupButton, &QPushButton::clicked, visualizationWindow, &VisualizationWindow::saveClickedSlot);
+	saveSetupButton->setIcon(QIcon::fromTheme("upload"));
+	saveSetupButton->installEventFilter(this);
+	saveSetupButton->setMinimumSize(130,35);
+	saveSetupButton->setMaximumSize(130,35);
+	saveSetupButton->hide();
+	show3DButton = new QPushButton("Viewer", buttonWidget);
+	show3DButton->setIcon(QIcon::fromTheme("3d"));
+	show3DButton->installEventFilter(this);
+	show3DButton->setMinimumSize(130,35);
+	show3DButton->setMaximumSize(130,35);
+	connect(show3DButton, &QPushButton::clicked, this, &EditorWidget::show3DClickedSlot);
 	buttonlayout->addWidget(previousButton,0,0);
 	buttonlayout->addWidget(nextButton,0,1);
 	buttonlayout->addWidget(buttonSpacer1,0,2);
-	buttonlayout->addWidget(zoomButton,0,3);
+	buttonlayout->addWidget(cropButton,0,3);
 	buttonlayout->addWidget(panButton,0,4);
 	buttonlayout->addWidget(homeButton,0,5);
 	buttonlayout->addWidget(buttonSpacer2,0,6);
 	buttonlayout->addWidget(previousSetButton,0,7);
 	buttonlayout->addWidget(nextSetButton,0,8);
 	buttonlayout->addWidget(buttonSpacer3,0,9);
-	buttonlayout->addWidget(quitButton,0,10);
-
-
+	buttonlayout->addWidget(saveSetupButton,0,10);
+	buttonlayout->addWidget(show3DButton,0,11);
 
 	horizontalSplitter->addWidget(leftSplitter);
 	horizontalSplitter->addWidget(imageViewerContainer);
@@ -130,16 +149,17 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(datasetControlWidget, &DatasetControlWidget::frameSelectionChanged, this, &EditorWidget::frameChangedSlot);
 	connect(datasetControlWidget, &DatasetControlWidget::imgSetChanged, this, &EditorWidget::imgSetChangedSlot);
 	connect(datasetControlWidget, &DatasetControlWidget::datasetLoaded, this, &EditorWidget::datasetLoadedSlot);
+	connect(imageViewer, &ImageViewer::brightnessChanged, this, &EditorWidget::brightnessChanged);
 
 
 	//<- Outgoing Signals
-	// connect(this, &EditorWidget::datasetLoaded, keypointWidget, &KeypointWidget::datasetLoadedSlot);
-	// connect(this, &EditorWidget::datasetLoaded, reprojectionWidget, &ReprojectionWidget::datasetLoadedSlot);
-  // connect(this, &EditorWidget::datasetLoaded, datasetControlWidget, &DatasetControlWidget::datasetLoadedSlot);
-	connect(this, &EditorWidget::zoomToggled, imageViewer, &ImageViewer::zoomToggledSlot);
+	connect(this, &EditorWidget::cropToggled, imageViewer, &ImageViewer::cropToggledSlot);
 	connect(this, &EditorWidget::panToggled, imageViewer, &ImageViewer::panToggledSlot);
 	connect(this, &EditorWidget::homeClicked, imageViewer, &ImageViewer::homeClickedSlot);
 	connect(this, &EditorWidget::imageTranformationChanged, imageViewer, &ImageViewer::imageTransformationChangedSlot);
+	connect(this, &EditorWidget::alwaysShowLabelsToggled, imageViewer, &ImageViewer::alwaysShowLabelsToggledSlot);
+	connect(this, &EditorWidget::labelFontColorChanged, imageViewer, &ImageViewer::labelFontColorChangedSlot);
+	connect(this, &EditorWidget::labelBackgroundColorChanged, imageViewer, &ImageViewer::labelBackgroundColorChangedSlot);
 	connect(this, &EditorWidget::keypointSizeChanged, imageViewer, &ImageViewer::keypointSizeChangedSlot);
 	connect(this, &EditorWidget::keypointShapeChanged, imageViewer, &ImageViewer::keypointShapeChangedSlot);
 	connect(this, &EditorWidget::colorMapChanged, imageViewer, &ImageViewer::colorMapChangedSlot);
@@ -160,6 +180,8 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(imageViewer, &ImageViewer::keypointChangedForReprojection, reprojectionWidget, &ReprojectionWidget::calculateReprojectionSlot);
 	connect(reprojectionWidget, &ReprojectionWidget::reprojectedPoints, keypointWidget, &KeypointWidget::setKeypointsFromDatasetSlot);
 	connect(reprojectionWidget, &ReprojectionWidget::reprojectionToolToggled, imageViewer, &ImageViewer::toggleReprojectionSlot);
+	connect(reprojectionWidget, &ReprojectionWidget::update3DCoords, visualizationWindow, &VisualizationWindow::update3DCoordsSlot);
+	connect(reprojectionWidget, &ReprojectionWidget::reprojectionToolUpdated, visualizationWindow, &VisualizationWindow::reprojectionToolUpdatedSlot);
 	connect(this, &EditorWidget::minViewsChanged, reprojectionWidget, &ReprojectionWidget::minViewsChangedSlot);
 	connect(this, &EditorWidget::errorThresholdChanged, reprojectionWidget, &ReprojectionWidget::errorThresholdChanged);
 	connect(this, &EditorWidget::boneLengthErrorThresholdChanged, reprojectionWidget, &ReprojectionWidget::boneLengthErrorThresholdChanged);
@@ -313,24 +335,24 @@ void EditorWidget::imgSetChangedSlot(int index) {
 }
 
 
-void EditorWidget::zoomToggledSlot(bool toggle) {
+void EditorWidget::cropToggledSlot(bool toggle) {
 	if (toggle) panButton->setChecked(false);
 }
 
 
 void EditorWidget::panToggledSlot(bool toggle) {
-	if (toggle) zoomButton->setChecked(false);
+	if (toggle) cropButton->setChecked(false);
 }
 
 
 void EditorWidget::homeClickedSlot() {
-	zoomButton->setChecked(false);
+	cropButton->setChecked(false);
 	panButton->setChecked(false);
 }
 
 
 void EditorWidget::zoomFinishedSlot() {
-	zoomButton->setChecked(false);
+	cropButton->setChecked(false);
 }
 
 
@@ -339,7 +361,13 @@ void EditorWidget::panFinishedSlot() {
 }
 
 
-void EditorWidget::datasetLoadedSlot() {
+void EditorWidget::datasetLoadedSlot(bool isSetupAnnotation) {
+	if (isSetupAnnotation) {
+		saveSetupButton->show();
+	}
+	else {
+		saveSetupButton->hide();
+	}
 	keypointWidget->init();
 	leftSplitter->show();
 	leftSplitter->setSizes({500,800});
@@ -348,8 +376,15 @@ void EditorWidget::datasetLoadedSlot() {
 	m_currentImgSetIndex = 0;
 	m_currentFrameIndex = 0;
 	imageViewer->setFrame(m_currentImgSet, m_currentFrameIndex);
-	nextButton->setEnabled(true);
-	nextSetButton->setEnabled(true);
+
+	if (m_currentImgSet->numCameras != 1)
+	{
+		nextButton->setEnabled(true);
+	}
+	if (Dataset::dataset->imgSets().size() > 1)
+	{
+		nextSetButton->setEnabled(true);
+	}
 	previousButton->setEnabled(false);
 	previousSetButton->setEnabled(false);
 	splitterMovedSlot(0,0);
@@ -360,7 +395,61 @@ void EditorWidget::datasetLoadedSlot() {
 	emit datasetLoaded();
 }
 
-void EditorWidget::quitClickedSlot() {
-	Dataset::dataset->save();
-	emit quitClicked();
+void EditorWidget::show3DClickedSlot() {
+	visualizationWindow->show();
+	visualizationWindow->opened();
+}
+
+void EditorWidget::keyPressEvent(QKeyEvent *e)
+{
+	int key = e->key();
+	if (key == 16777236 || key == 68)
+	{
+		nextClickedSlot();
+	}
+	else if (key == 16777234 || key == 65) {
+		previousClickedSlot();
+	}
+	if (key == 16777237 || key == 83)
+	{
+		if (e->modifiers() & Qt::ControlModifier)
+		{
+			int brightness = imageViewer->getBrightnessFactor();
+			if (brightness > 0)
+			{
+				brightness = std::max(brightness - 4, 0);
+			}
+			imageViewer->setBrightness(brightness);
+		}
+		else
+		{
+			nextSetClickedSlot();
+		}
+	}
+	else if (key == 16777235 || key == 87)
+	{
+		if (e->modifiers() & Qt::ControlModifier)
+		{
+			int brightness = imageViewer->getBrightnessFactor();
+			if (brightness < 200)
+			{
+				brightness = std::min(brightness + 4, 200);
+			}
+			imageViewer->setBrightness(brightness);
+		}
+		else
+		{
+			previousSetClickedSlot();
+		}
+	}
+	else if (key == 72) {
+		emit homeClicked();
+		homeClickedSlot();
+	}
+	else if (key == 67) {
+		bool toggled = cropButton->isChecked();
+		cropButton->setChecked(!toggled);
+		emit cropToggled(!toggled);
+		cropToggledSlot(!toggled);
+	}
 }

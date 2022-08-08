@@ -55,8 +55,8 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	configWidget->setStyleSheet("QWidget#exportConfigWidget{background-color: rgba(66,66,66,50%)}");
 	QGridLayout *configurationlayout = new QGridLayout(configWidget);
 	QGridLayout *configurationlayoutout = new QGridLayout(configurationBox);
-	configurationlayoutout->setMargin(3);
-	configurationlayout->setMargin(7);
+	configurationlayoutout->setContentsMargins(3,3,3,3);
+	configurationlayout->setContentsMargins(7,7,7,7);
 	configurationlayoutout->addWidget(configScrollArea);
 	configScrollArea->setWidgetResizable(true);
 	configScrollArea->setWidget(configWidget);
@@ -76,7 +76,7 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 				"\nOnly use this if you're creating pretraining datasets or you don't want to train a 3D model");
 	QWidget *trainingsetTypeWidget = new QWidget(configWidget);
 	QGridLayout *trainingsettypelayout = new QGridLayout(trainingsetTypeWidget);
-	trainingsettypelayout->setMargin(0);
+	trainingsettypelayout->setContentsMargins(0,0,0,0);
 	type3DButton = new QRadioButton("3D",this);
 	type3DButton->setChecked(true);
 	type2DButton = new QRadioButton("2D",this);
@@ -134,8 +134,8 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	summaryWidget->setStyleSheet("QWidget#exportConfigWidget{background-color: rgba(66,66,66,50%)}");
 	QGridLayout *summarylayout = new QGridLayout(summaryWidget);
 	QGridLayout *summarylayoutout = new QGridLayout(summaryBox);
-	summarylayoutout->setMargin(3);
-	summarylayout->setMargin(7);
+	summarylayoutout->setContentsMargins(3,3,3,3);
+	summarylayout->setContentsMargins(7,7,7,7);
 	summarylayoutout->addWidget(summaryScrollArea);
 	summaryScrollArea->setWidgetResizable(true);
 	summaryScrollArea->setWidget(summaryWidget);
@@ -183,11 +183,11 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 	listlayout->setRowStretch(0,2);
 	listlayout->setRowStretch(1,1);
 	listlayout->setRowStretch(2,2);
-	listlayout->setMargin(0);
+	listlayout->setContentsMargins(0,0,0,0);
 
 	QGroupBox *datasetListBox = new QGroupBox("Datasets", this);
 	QGridLayout *datasetlistlayout = new QGridLayout(datasetListBox);
-	datasetlistlayout->setMargin(0);
+	datasetlistlayout->setContentsMargins(0,0,0,0);
 	datasetList = new DatasetList(m_datasetExportItems, m_entities, m_keypoints, m_skeleton, datasetListBox);
 	connect(datasetList, &DatasetList::itemsChanged, this, &ExportTrainingsetWidget::datasetListChangedSlot);
 	datasetlistlayout->addWidget(datasetList,0,0);
@@ -195,14 +195,14 @@ ExportTrainingsetWidget::ExportTrainingsetWidget(QWidget *parent) : QWidget(pare
 
 	QGroupBox *entitiesListBox = new QGroupBox("Entities", this);
 	QGridLayout *enitieslistlayout = new QGridLayout(entitiesListBox);
-	enitieslistlayout->setMargin(0);
+	enitieslistlayout->setContentsMargins(0,0,0,0);
 	entitiesList = new CheckableItemList("Entities", entitiesListBox);
 	connect(entitiesList, &CheckableItemList::checkStateChanged, this, &ExportTrainingsetWidget::entitiesListChangedSlot);
 	enitieslistlayout->addWidget(entitiesList);
 
 	QGroupBox *keypointListBox = new QGroupBox("Keypoints", this);
 	QGridLayout *keypointlistlayout = new QGridLayout(keypointListBox);
-	keypointlistlayout->setMargin(0);
+	keypointlistlayout->setContentsMargins(0,0,0,0);
 	keypointsList = new CheckableItemList("Entities", keypointListBox);
 	connect(keypointsList, &CheckableItemList::checkStateChanged, this, &ExportTrainingsetWidget::keypointsListChangedSlot);
 	keypointlistlayout->addWidget(keypointsList);

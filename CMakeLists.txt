@@ -1,47 +1,21 @@
 cmake_minimum_required(VERSION 3.10)
 
-if (WIN32)
-  set(CMAKE_CXX_STANDARD 11)
-else()
-  set(CMAKE_CXX_STANDARD 17)
-endif()
 project(AnnotationTool VERSION 1.1.0  LANGUAGES CXX)
 
-if(APPLE)
-  set(OS_LIB_DIR "MacOS")
-elseif(WIN32)
-  set(OS_LIB_DIR "Windows")
-elseif(UNIX)
-  message ("System ${CMAKE_SYSTEM}")
-  if(${UBUNTU_VERSION} STREQUAL "2004")
-    set(OS_LIB_DIR "Ubuntu_2004")
-  else()
-    set(OS_LIB_DIR "Ubuntu_1804")
-  endif()
-endif()
+set (CMAKE_PREFIX_PATH "libs/Qt5/qt_install/lib/cmake/")
+find_package(Qt6 PATHS "libs/Qt5/qt_install/lib/cmake/" REQUIRED COMPONENTS Core Widgets Charts Multimedia MultimediaWidgets 3DCore 3DRender 3DExtras)
+qt_standard_project_setup()
 
-if (WIN32 OR APPLE)
-  set(Qt5_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5")
-  set(Qt5Core_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Core")
-  set(Qt5Widgets_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Widgets")
-  set(Qt5Charts_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Charts")
-  set(Qt5Multimedia_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5Multimedia")
-  set(Qt5MultimediaWidgets_DIR "libs/Qt_5.15.2/${OS_LIB_DIR}/lib/cmake/Qt5MultimediaWidgets")
-endif()
+add_definitions("-DQT_DEBUG")
 
-
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Charts REQUIRED)
-find_package(Qt5Multimedia REQUIRED)
-find_package(Qt5MultimediaWidgets REQUIRED)
-message (STATUS "QT DIRECTORY ${Qt5Core_DIR}")
 
 if(NOT WIN32)
-	set(OpenCV_DIR "libs/OpenCV_4.5.1/${OS_LIB_DIR}/lib/cmake/opencv4")
+	set(OpenCV_DIR "libs/OpenCV/opencv_install/lib/cmake/opencv4")
+	set(OpenCV_STATIC ON)
 else()
-	set(OpenCV_DIR "libs/OpenCV_4.5.1/${OS_LIB_DIR}")
+	set(OpenCV_DIR "libs/OpenCV/opencv_install")
 endif()
+
 find_package(OpenCV REQUIRED)
 message(STATUS "OPENCV_DIR ${OpenCV_DIR}")
 
@@ -52,10 +26,6 @@ set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "disable yaml contrib")
 
 add_subdirectory(libs/yaml-cpp/)
 
-
-find_package(OpenCV REQUIRED)
-
-
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -65,14 +35,9 @@ if (NOT (WIN32 OR APPLE))
 endif()
 
 
-# detect operating system and host processor
-message(STATUS "We are on a ${CMAKE_SYSTEM_NAME} system")
-message(STATUS "The host processor is ${CMAKE_HOST_SYSTEM_PROCESSOR}")
-
 add_subdirectory(libs)
 add_subdirectory(gui)
 add_subdirectory(src)
-
 
 if(APPLE)
 	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15")
@@ -105,12 +70,13 @@ elseif (UNIX)
       globals.hpp
       gui/Qt-DarkStyle/darkstyle.qrc
   )
-
-  if(${UBUNTU_VERSION} STREQUAL "2004")
-    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_1.1-1_amd64_2004/usr/local/bin)
-  else()
-    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_1.1-1_amd64_1804/usr/local/bin)
-  endif()
+	if (${UBUNTU_VERSION})
+	  if(${UBUNTU_VERSION} STREQUAL "2004")
+	    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_1.1-1_amd64_2004/usr/local/bin)
+	  else()
+	    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_1.1-1_amd64_1804/usr/local/bin)
+	  endif()
+	endif()
 endif()
 
 target_compile_options(${PROJECT_NAME} PRIVATE)
@@ -122,12 +88,13 @@ target_include_directories( ${PROJECT_NAME}
 
 
 target_link_libraries(${PROJECT_NAME}
-  Qt5::Widgets
-	Qt5::Charts
-  Qt5::Multimedia
-  Qt5::MultimediaWidgets
-  gui
-  src
-  darkstyle
-  yaml-cpp
+	Qt::Widgets
+	Qt::Charts
+	Qt::Multimedia
+	Qt::MultimediaWidgets
+
+	gui
+	src
+	darkstyle
+	yaml-cpp
 )

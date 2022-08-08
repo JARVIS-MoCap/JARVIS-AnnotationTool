@@ -19,13 +19,13 @@ Dataset * Dataset::dataset = nullptr;
 
 Dataset::Dataset(const QString& datasetFolder, const QString& datasetBaseFolder,
 			QList<QString> cameraNames, QList<SkeletonComponent> skeleton,
-			QList<QString> segmentNames) :
+			QList<QString> segmentNames, bool annotateSetup, QList<QString> setupKeypoints) :
 			m_datasetFolder(datasetFolder), m_datasetBaseFolder(datasetBaseFolder),
-			m_skeleton(skeleton), m_segmentNames(segmentNames) {
+			m_skeleton(skeleton), m_segmentNames(segmentNames), m_annotateSetup(annotateSetup), m_setupKeypointsList(setupKeypoints) {
 	m_colorMap = new ColorMap(ColorMap::Jet);
 	if (cameraNames.size() == 0) {
 		m_cameraNames = QDir(datasetFolder).entryList(QDir::AllDirs |
-																									QDir::NoDotAndDotDot);
+			QDir::NoDotAndDotDot);
 	}
 	else {
 		m_cameraNames = cameraNames;
@@ -46,14 +46,25 @@ Dataset::Dataset(const QString& datasetFolder, const QString& datasetBaseFolder,
 	int lineCount = 0;
 	m_scorer = saveFiles[0]->readLine().split(',')[1];
 	QList<QByteArray> cells = saveFiles[0]->readLine().split(',');
-	for (int i = 1; i < cells.size(); i+= 3) {
-		m_entityNameList.append(cells[i]);
-		if(!m_entitiesList.contains(cells[i])) m_entitiesList.append(cells[i]);
+	if (m_annotateSetup) {
+		m_entitiesList.append("Setup");
+		for (const auto & keypoint : m_setupKeypointsList) {
+		m_entityNameList.append("Setup");
+		m_keypointNameList.append(keypoint);
+		m_bodypartsList.append(keypoint);
+		}
+		cells = saveFiles[0]->readLine().split(',');
 	}
-	cells = saveFiles[0]->readLine().split(',');
-	for (int i = 1; i < cells.size(); i+= 3) {
-		m_keypointNameList.append(cells[i]);
-		if (!m_bodypartsList.contains(cells[i])) m_bodypartsList.append(cells[i]);
+	else {
+		for (int i = 1; i < cells.size(); i+= 3) {
+			m_entityNameList.append(cells[i]);
+			if(!m_entitiesList.contains(cells[i])) m_entitiesList.append(cells[i]);
+		}
+		cells = saveFiles[0]->readLine().split(',');
+		for (int i = 1; i < cells.size(); i+= 3) {
+			m_keypointNameList.append(cells[i]);
+			if (!m_bodypartsList.contains(cells[i])) m_bodypartsList.append(cells[i]);
+		}
 	}
 	saveFiles[0]->readLine();
 	for (int i = 1; i < m_numCameras; i++) {
@@ -62,7 +73,6 @@ Dataset::Dataset(const QString& datasetFolder, const QString& datasetBaseFolder,
 		saveFiles[i]->readLine();
 		saveFiles[i]->readLine();
 	}
-	std::cout << "HEREEE " << std::endl;
 	while (!saveFiles[0]->atEnd()) {
 		ImgSet *imgSet = new ImgSet();
 		imgSet->numCameras = m_numCameras;
@@ -75,31 +85,31 @@ Dataset::Dataset(const QString& datasetFolder, const QString& datasetBaseFolder,
 			GetImageSizeEx(frame->imagePath, &x,&y);
 			frame->imageDimensions = QSize(x,y);
 			frame->numKeypoints = m_keypointNameList.size();
-
 			for (int i = 0; i < m_keypointNameList.size(); i++) {
 				QColor color = m_colorMap->getColor(i%m_bodypartsList.size(),
-																						m_bodypartsList.size());
+							m_bodypartsList.size());
 
 				Keypoint *keypoint = new Keypoint(m_entityNameList[i],
-																					m_keypointNameList[i],
-																					color,
-																					QPointF(cells[3*i+1].toFloat(),
-																					cells[3*i+2].toFloat()));
+							m_keypointNameList[i],
+							color,
+							QPointF(cells[3*i+1].toFloat(),
+							cells[3*i+2].toFloat()));
 				keypoint->setFrameIndex(cam);
-				if (cells[3*i+3].toInt() == 0) {
-					keypoint->setState(NotAnnotated);
+				if (!m_annotateSetup) {
+					if (cells[3*i+3].toInt() == 0) {
+						keypoint->setState(NotAnnotated);
+					}
+					else if (cells[3*i+3].toInt() == 1) {
+						keypoint->setState(Annotated);
+					}
+					else if (cells[3*i+3].toInt() == 2) {
+						//keypoint->setState(Reprojected);
+						keypoint->setState(NotAnnotated);
+					}
+					else if (cells[3*i+3].toInt() == 3) {
+						keypoint->setState(Suppressed);
+					}
 				}
-				else if (cells[3*i+3].toInt() == 1) {
-					keypoint->setState(Annotated);
-				}
-				else if (cells[3*i+3].toInt() == 2) {
-					//keypoint->setState(Reprojected);
-					keypoint->setState(NotAnnotated);
-				}
-				else if (cells[3*i+3].toInt() == 3) {
-					keypoint->setState(Suppressed);
-				}
-
 				connect(keypoint, &Keypoint::stateChanged,
 								this, &Dataset::keypointStateChanged);
 
@@ -119,6 +129,7 @@ Dataset::Dataset(const QString& datasetFolder, const QString& datasetBaseFolder,
 
 
 void Dataset::save(const QString& datasetFolder) {
+	if (m_annotateSetup) return;
 	QString dataFolder = datasetFolder;
 	if (datasetFolder == "") dataFolder = m_datasetFolder;
 	QList<QFile*> saveFiles;

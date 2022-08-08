@@ -16,7 +16,6 @@
 #include <QStatusBar>
 #include <QMenuBar>
 
-
 //This is a global funciton, probably not ideal to have it here
 void createToolBarButton(QToolButton *button, QAction*action, QIcon icon,
 			bool enabled, bool checkable, QSize minSize) {
@@ -123,8 +122,8 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	//-> Incoming Signals
 	connect(mainBar, &MainBar::openSettingsWindow,
 					this, &MainWindow::openSettingsWindowSlot);
-	connect(editorWidget, &EditorWidget::quitClicked,
-					this, &MainWindow::quitClickedSlot);
+	// connect(editorWidget, &EditorWidget::quitClicked,
+	// 				this, &MainWindow::quitClickedSlot);
 	// connect(editorWidget, &EditorWidget::newSegmentLoaded,
 	// 				this, &MainWindow::datasetLoadedSlot);
 	connect(loadDatasetWindow, &LoadDatasetWindow::datasetLoaded,
@@ -137,6 +136,12 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 	//<-> Relayed Signals
 	connect(settingsWindow, &SettingsWindow::imageTranformationChanged,
 					editorWidget, &EditorWidget::imageTranformationChanged);
+	connect(settingsWindow, &SettingsWindow::alwaysShowLabelsToggled, 
+					editorWidget, &EditorWidget::alwaysShowLabelsToggled);
+	connect(settingsWindow, &SettingsWindow::labelFontColorChanged, 
+					editorWidget, &EditorWidget::labelFontColorChanged);
+	connect(settingsWindow, &SettingsWindow::labelBackroundColorChanged, 
+					editorWidget, &EditorWidget::labelBackgroundColorChanged);
 	connect(settingsWindow, &SettingsWindow::keypointSizeChanged,
 					editorWidget, &EditorWidget::keypointSizeChanged);
 	connect(settingsWindow, &SettingsWindow::keypointShapeChanged,
@@ -149,6 +154,7 @@ MainWindow::MainWindow(QMainWindow *parent) : QMainWindow(parent) {
 					editorWidget, &EditorWidget::errorThresholdChanged);
 	connect(settingsWindow, &SettingsWindow::boneLengthErrorThresholdChanged,
 					editorWidget, &EditorWidget::boneLengthErrorThresholdChanged);
+	connect(editorWidget, &EditorWidget::brightnessChanged, settingsWindow, &SettingsWindow::brightnessChangedSlot);
 	connect(editorWidget, &EditorWidget::datasetLoaded,
 					settingsWindow, &SettingsWindow::datasetLoadedSlot);
 }
@@ -180,9 +186,9 @@ void MainWindow::exportTrainingsetClickedSlot() {
 }
 
 
-void MainWindow::datasetLoadedSlot() {
+void MainWindow::datasetLoadedSlot(bool isSetupAnnotation) {
 	stackedWidget->setCurrentWidget(editorWidget);
-	editorWidget->datasetLoadedSlot();
+	editorWidget->datasetLoadedSlot(isSetupAnnotation);
 }
 
 

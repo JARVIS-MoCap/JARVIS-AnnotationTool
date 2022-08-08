@@ -15,6 +15,7 @@
 #include "imageviewer.hpp"
 #include "reprojectionwidget.hpp"
 #include "datasetcontrolwidget.hpp"
+#include "visualizationwindow.hpp"
 
 #include <QGridLayout>
 #include <QLabel>
@@ -36,27 +37,32 @@ class EditorWidget : public QWidget {
 
 	signals:
 		void datasetLoaded();
-		void zoomToggled(bool toggle);
+		void cropToggled(bool toggle);
 		void panToggled(bool toggle);
 		void homeClicked();
 		void quitClicked();
 		void newSegmentLoaded();
 		void frameChanged(int currentImgSetIndex, int currentFrameIndex);
 		void imageTranformationChanged(int hueFactor, int saturationFactor, int brightnessFactor, int contrastFactor);
+		void alwaysShowLabelsToggled(bool always_visible);
+		void labelFontColorChanged(QColor color);
+		void labelBackgroundColorChanged(QColor color);
 		void keypointSizeChanged(int value);
 		void keypointShapeChanged(const QString& entity, KeypointShape shape);
 		void colorMapChanged(const QString& entity, ColorMap::ColorMapType type, QColor color);
 		void minViewsChanged(int val);
 		void errorThresholdChanged(float val);
 		void boneLengthErrorThresholdChanged(float val);
+		void brightnessChanged(int brightnessFactor);
 
 	public slots:
 		void splitterMovedSlot(int pos, int index);
-		void datasetLoadedSlot();
+		void datasetLoadedSlot(bool isSetupAnnotation);
 		void frameChangedSlot(int index);
 		void imgSetChangedSlot(int index);
 
 	private:
+		void keyPressEvent(QKeyEvent *e);
 		QSplitter *mainSplitter;
 		QSplitter *horizontalSplitter;
 
@@ -67,33 +73,45 @@ class EditorWidget : public QWidget {
 		QWidget *imageViewerContainer;
 		ImageViewer *imageViewer;
 
+		VisualizationWindow *visualizationWindow;
 
 		KeypointWidget *keypointWidget;
 		QWidget  *buttonWidget;
 		QPushButton *previousButton;
 		QPushButton *nextButton;
-		QPushButton *zoomButton;
+		QPushButton *cropButton;
 		QPushButton *panButton;
 		QPushButton *homeButton;
 		QPushButton *previousSetButton;
 		QPushButton *nextSetButton;
-		QPushButton *quitButton;
+		QPushButton *saveSetupButton;
+		QPushButton *show3DButton;
 
 		ImgSet *m_currentImgSet;
 		int m_currentImgSetIndex;
 		int m_currentFrameIndex;
 
+		bool eventFilter(QObject *target, QEvent *event)
+		{
+			if (event->type() == QKeyEvent::KeyPress)
+			{
+				event->ignore();
+				return true;
+			}
+			return QObject::eventFilter(target, event);
+		}
+
 	private slots:
 		void previousClickedSlot();
 		void nextClickedSlot();
-		void zoomToggledSlot(bool);
+		void cropToggledSlot(bool);
 		void panToggledSlot(bool);
 		void homeClickedSlot();
 		void previousSetClickedSlot();
 		void nextSetClickedSlot();
 		void zoomFinishedSlot();
 		void panFinishedSlot();
-		void quitClickedSlot();
+		void show3DClickedSlot();
 };
 
 #endif

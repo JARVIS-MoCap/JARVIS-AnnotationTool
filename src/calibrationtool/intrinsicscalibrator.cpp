@@ -170,8 +170,9 @@ void IntrinsicsCalibrator::run_standard() {
 
   cv::Mat K, D;
   std::vector< cv::Mat > rvecs, tvecs;
+  cv::Mat stdDI, stdDE, errs;
   double repro_error = calibrateCamera(objectPoints, imagePoints, size,
-    K, D, rvecs, tvecs,
+    K, D, rvecs, tvecs, stdDI, stdDE, errs,
     cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST,
     cv::TermCriteria(cv::TermCriteria::MAX_ITER |
       cv::TermCriteria::EPS, 100, 1e-7));
@@ -254,7 +255,7 @@ void IntrinsicsCalibrator::run_charuco() {
              std::vector<cv::Point2f> charucoCorners;
              std::vector<int> charucoIds;
              cv::aruco::interpolateCornersCharuco(markerCorners, markerIds, img, board, charucoCorners, charucoIds);
-         if (charucoIds.size() > 5) {
+         if (charucoIds.size() > 8) {
              charucoCornersAll.push_back(charucoCorners);
              charucoIdsAll.push_back(charucoIds);
              if (m_calibrationConfig->debug) {
@@ -293,15 +294,64 @@ void IntrinsicsCalibrator::run_charuco() {
     charucoCorners.push_back(charucoCornersAll[(int)k]);
   }
 
+  std::cout << "Number Images for Stage 1: " <<
+      charucoCorners.size() << std::endl;
+
+  double mean_repro_error = intrinsicsCalibrationStep(charucoCorners, charucoIds,
+        board, size, 1.25);
+  std::cout << "Mean Reprojection Error after Stage 1: " <<
+        mean_repro_error << std::endl;
+  std::cout << "Number Images for Stage 2: " <<
+        charucoCorners.size() << std::endl;
+
+  mean_repro_error = intrinsicsCalibrationStep(charucoCorners, charucoIds,
+      board, size, 1.5);
+  std::cout << "Mean Reprojection Error after Stage 2: " <<
+        mean_repro_error << std::endl;
+  std::cout << "Number Images for Stage 3: " <<
+        charucoCorners.size() << std::endl;
+
   cv::Mat K, D;
   std::vector< cv::Mat > rvecs, tvecs;
-  double repro_error = cv::aruco::calibrateCameraCharuco(charucoCornersAll,
-        charucoIdsAll, board, size, K,
-        D, rvecs, tvecs, cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST,
+  cv::Mat stdDI, stdDE, errs;
+  double repro_error = cv::aruco::calibrateCameraCharuco(charucoCorners,
+        charucoIds, board, size, K,
+        D, rvecs, tvecs, stdDI, stdDE, errs,
+        cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_SAME_FOCAL_LENGTH,
         cv::TermCriteria(cv::TermCriteria::MAX_ITER |
         cv::TermCriteria::EPS, 100, 1e-7));
 
   emit finishedIntrinsics(K, D, repro_error, m_threadNumber);
+}
+
+
+double IntrinsicsCalibrator::intrinsicsCalibrationStep(
+      std::vector<std::vector<cv::Point2f>> &charucoCorners,
+      std::vector<std::vector<int>> &charucoIds,
+      cv::Ptr<cv::aruco::CharucoBoard> board,
+      cv::Size size, double thresholdFactor) {
+  cv::Mat K, D;
+  std::vector< cv::Mat > rvecs, tvecs;
+  cv::Mat stdDI, stdDE, errs;
+  double mean_repro_error = cv::aruco::calibrateCameraCharuco(charucoCorners,
+        charucoIds, board, size, K,
+        D, rvecs, tvecs, stdDI, stdDE, errs,
+        cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_SAME_FOCAL_LENGTH,
+        cv::TermCriteria(cv::TermCriteria::MAX_ITER |
+        cv::TermCriteria::EPS, 75, 1e-6));
+
+  std::vector<std::vector<cv::Point2f>> charucoCorners_2;
+  std::vector<std::vector<int>>  charucoIds_2;
+  for (int i = 0; i < errs.size[0]; i++) {
+    if (errs.at<double>(i) <
+          thresholdFactor * mean_repro_error) {
+      charucoCorners_2.push_back(charucoCorners[i]);
+      charucoIds_2.push_back(charucoIds[i]);
+    }
+  }
+  charucoCorners = charucoCorners_2;
+  charucoIds = charucoIds_2;
+  return mean_repro_error;
 }
 
 QString IntrinsicsCalibrator::getFormat(const QString& path,
@@ -314,6 +364,7 @@ QString IntrinsicsCalibrator::getFormat(const QString& path,
 	}
 	return usedFormat;
 }
+
 
 
 bool IntrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1,

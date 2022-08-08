@@ -14,7 +14,7 @@
 
 BoneLengthChartWidget::BoneLengthChartWidget(QWidget *parent) : QWidget(parent) {
 	QGridLayout *layout = new QGridLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0,0,0,0);
 
 	chartsTabWidget = new QTabWidget(this);
 	chartsTabWidget->setStyleSheet("QTabBar::tab{padding:4px 6px;"
@@ -38,6 +38,7 @@ void BoneLengthChartWidget::datasetLoadedSlot() {
 	chartsTabWidget->clear();
 	for (const auto& entity : Dataset::dataset->entitiesList()) {
 		BoneLengthChartView * chart = new BoneLengthChartView();
+		chart->installEventFilter(this);
 		connect(this, &BoneLengthChartWidget::boneLengthErrorThresholdChanged, chart, &BoneLengthChartView::boneLengthErrorThresholdChangedSlot);
 		boneLengthChartViews[entity] = chart;
 		chart->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);

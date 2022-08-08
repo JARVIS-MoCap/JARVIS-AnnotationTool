@@ -15,5 +15,5 @@ target_include_directories(trainingsetexporter
 )
 
 target_link_libraries(trainingsetexporter
-  Qt5::Widgets
+  Qt::Widgets
 )

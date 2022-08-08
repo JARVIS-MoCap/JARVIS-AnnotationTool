@@ -14,7 +14,7 @@
 
 YesNoRadioWidget::YesNoRadioWidget(QWidget *parent) : QWidget(parent) {
 	QGridLayout *layout = new QGridLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0,0,0,0);
 	yesButton = new QRadioButton("Yes",this);
 	connect(yesButton, &QRadioButton::toggled, this, &YesNoRadioWidget::stateChanged);
 	noButton = new QRadioButton("No",this);

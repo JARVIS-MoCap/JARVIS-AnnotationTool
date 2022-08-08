@@ -27,7 +27,7 @@ DatasetList::DatasetList(QList<DatasetExportItem> &datasetExportItems,
 			m_entities(entities), m_keypoints(keypoints), m_skeleton(skeleton) {
 	m_currentPath = QDir::homePath();
 	QGridLayout *layout = new QGridLayout(this);
-	layout->setMargin(3);
+	layout->setContentsMargins(3,3,3,3);
 
 	itemSelectorList = new QListWidget(this);
 	itemSelectorList->setFont(QFont("Sans Serif", 12));

@@ -21,7 +21,7 @@
 #include "CoreFoundation/CoreFoundation.h"
 #endif
 
-//TODO: Maybe move these to glabels, seems to be the intended way
+//TODO: Maybe move these to globals, seems to be the intended way
 Q_DECLARE_METATYPE(QList<int>)
 Q_DECLARE_METATYPE(RecordingItem)
 Q_DECLARE_METATYPE(TimeLineWindow)
@@ -29,43 +29,45 @@ Q_DECLARE_METATYPE(ExportConfig)
 
 
 
-// QDatastream declarations for Signal/Slot system
-QDataStream& operator<<(QDataStream& out, const RecordingItem& v) {
-    out << v.name << v.path << v.timeLineList;
-    return out;
-}
 
-QDataStream& operator>>(QDataStream& in, RecordingItem& v) {
-    in >> v.name;
-    in >> v.path;
-		in >> v.timeLineList;
-    return in;
-}
 
-QDataStream& operator<<(QDataStream& out, const TimeLineWindow& v) {
-    out << v.name << v.start << v.end;
-    return out;
-}
+// // QDatastream declarations for Signal/Slot system
+// QDataStream& operator<<(QDataStream& out, const RecordingItem& v) {
+//     out << v.name << v.path << v.timeLineList;
+//     return out;
+// }
 
-QDataStream& operator>>(QDataStream& in, TimeLineWindow& v) {
-    in >> v.name;
-    in >> v.start;
-		in >> v.end;
-    return in;
-}
+// QDataStream& operator>>(QDataStream& in, RecordingItem& v) {
+//     in >> v.name;
+//     in >> v.path;
+// 		in >> v.timeLineList;
+//     return in;
+// }
 
-QDataStream& operator>>(QDataStream& in, ExportConfig& v) {
-    in >> v.trainingSetName;
-    in >> v.savePath;
-		in >> v.trainingSetType;
-    in >> v.validationFraction;
-    in >> v.shuffleBeforeSplit;
-    in >> v.useRandomShuffleSeed;
-    in >> v.shuffleSeed;
-    in >> v.entitiesList;
-    in >> v.keypointsList;
-    return in;
-}
+// QDataStream& operator<<(QDataStream& out, const TimeLineWindow& v) {
+//     out << v.name << v.start << v.end;
+//     return out;
+// }
+
+// QDataStream& operator>>(QDataStream& in, TimeLineWindow& v) {
+//     in >> v.name;
+//     in >> v.start;
+// 		in >> v.end;
+//     return in;
+// }
+
+// QDataStream& operator>>(QDataStream& in, ExportConfig& v) {
+//     in >> v.trainingSetName;
+//     in >> v.savePath;
+// 		in >> v.trainingSetType;
+//     in >> v.validationFraction;
+//     in >> v.shuffleBeforeSplit;
+//     in >> v.useRandomShuffleSeed;
+//     in >> v.shuffleSeed;
+//     in >> v.entitiesList;
+//     in >> v.keypointsList;
+//     return in;
+// }
 
 QDataStream& operator<<(QDataStream& out, const SkeletonComponent& v) {
     out << v.name << v.keypointA << v.keypointB << v.length;
@@ -83,9 +85,8 @@ QDataStream& operator>>(QDataStream& in, SkeletonComponent& v) {
 void initPresets() {
   QSettings *settings = new QSettings();
   settings->beginGroup("presetInit");
-  if (!settings->value("presetInitialized").toBool()) {
-    std::cout << "Initializing Presets" << std::endl;
-    settings->setValue("presetInitialized", true);
+  if (!settings->value("presetInitialized_update").toBool()) {
+    settings->setValue("presetInitialized_update", true);
     settings->endGroup();
     settings->beginGroup("New Dataset Window");
 
@@ -125,7 +126,7 @@ void initPresets() {
     SkeletonComponent pr2 = {"Joint 17", "Ring_P", "Middle_P", 0};
     SkeletonComponent pr3 = {"Joint 18", "Middle_P", "Index_P", 0};
     SkeletonComponent pr4 = {"Joint 19", "Index_P", "Thumb_M", 0};
-    SkeletonComponent w1 = {"Joint 20", "Pinky_P", "Pinky_P", 0};
+    SkeletonComponent w1 = {"Joint 20", "Pinky_P", "Wrist_U", 0};
     SkeletonComponent w2 = {"Joint 21", "Wrist_U", "Wrist_R", 0};
     SkeletonComponent w3 = {"Joint 22", "Wrist_R", "Thumb_P", 0};
     QList<SkeletonComponent> skeletonItemsList = {p1,p2,p3,r1,r2,r3,m1,m2,m3,
@@ -191,29 +192,51 @@ int main(int argc, char **argv) {
 			char path[PATH_MAX];
 			if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
 			{
-					std::cout << "CFURLGetFileSystemRepresentation Error" << std::endl;
+					QCritical() << "CFURLGetFileSystemRepresentation Error";
 			}
 			CFRelease(resourcesURL);
 			chdir(path);
 	#endif
 
+  qSetMessagePattern(QStringLiteral("%{time}"
+        //"%{appname}"
+        ": ["
+        "%{if-debug}D%{endif}"
+        "%{if-info}I%{endif}"
+        "%{if-warning}W%{endif}"
+        "%{if-critical}C%{endif}"
+        "%{if-fatal}F%{endif}"
+        "] "
+        "%{message}"
+        " ("
+        "%{function} - %{file}:%{line}"
+        ")"));
+
 	QCoreApplication::setOrganizationName("JARVIS-MoCap");
 	QCoreApplication::setOrganizationDomain("JARVIS-MoCap");
 	QCoreApplication::setApplicationName("Annotation Tool");
 
-	qRegisterMetaTypeStreamOperators<QList<QString> >("QList<QString>");
-  qRegisterMetaTypeStreamOperators<QList<QList<QString>>>("QList<QList<QString>>");
-  qRegisterMetaTypeStreamOperators<QMap<int,int> >("QMap<int,int>");
-	qRegisterMetaTypeStreamOperators<QList<RecordingItem> >("QList<RecordingItem>");
-  qRegisterMetaTypeStreamOperators<QMap<QString, double> >("QMap<QString, double>");
-  qRegisterMetaTypeStreamOperators<QMap<QString,bool> >("QMap<QString,bool>");
-  qRegisterMetaTypeStreamOperators<QList<QList<QPair<QString, bool>>>> ("QList<QList<QPair<QString, bool>>>");
-  qRegisterMetaTypeStreamOperators<QList<QPair<QString,bool>>> ("QList<QPair<QString,bool>>");
-  qRegisterMetaType<ExportConfig>("ExportConfig");
-	qRegisterMetaType<cv::Mat>("cv::Mat");
-  //qRegisterMetaType<SkeletonComponent>("SkeletonComponent");
-  qRegisterMetaTypeStreamOperators<QList<SkeletonComponent> >("QList<SkeletonComponent>");
-  qRegisterMetaType< cv::Mat >("cv::Mat");
+	// qRegisterMetaTypeStreamOperators<QList<QString> >("QList<QString>");
+  // qRegisterMetaTypeStreamOperators<QList<QList<QString>>>("QList<QList<QString>>");
+  // qRegisterMetaTypeStreamOperators<QMap<int,int> >("QMap<int,int>");
+	// qRegisterMetaTypeStreamOperators<QList<RecordingItem> >("QList<RecordingItem>");
+  // qRegisterMetaTypeStreamOperators<QMap<QString, double> >("QMap<QString, double>");
+  // qRegisterMetaTypeStreamOperators<QMap<QString,bool> >("QMap<QString,bool>");
+  // qRegisterMetaTypeStreamOperators<QList<QList<QPair<QString, bool>>>> ("QList<QList<QPair<QString, bool>>>");
+  // qRegisterMetaTypeStreamOperators<QList<QPair<QString,bool>>> ("QList<QPair<QString,bool>>");
+  qRegisterMetaType<ExportConfig>();
+  qRegisterMetaType<SkeletonComponent>();
+  qRegisterMetaType<QList<SkeletonComponent>>();
+  qRegisterMetaType< cv::Mat >();
+  qRegisterMetaType<QMap<QString,bool>>();
+  qRegisterMetaType<QList<QList<std::pair<QString,bool>>>>();
+  qRegisterMetaType<QList<QList<QString>>>();
+
+  // qRegisterMetaTypeStreamOperators<QList<SkeletonComponent> >("QList<SkeletonComponent>");
+	//qRegisterMetaTypeStreamOperators<QList<QString> >("QList<QString>");
+
+
+  qDebug() << "HELOOOO";
 
 	QApplication app (argc, argv);
 	app.setStyle(new DarkStyle);

@@ -21,7 +21,7 @@
 RecordingsTable::RecordingsTable(QString name, DatasetConfig *datasetConfig, QWidget *parent) :
 			QWidget(parent), m_name(name), m_datasetConfig(datasetConfig) {
 	QGridLayout *layout = new QGridLayout(this);
-	layout->setMargin(3);
+	layout->setContentsMargins(3,3,3,3);
 	m_errorMsg = new QErrorMessage(this);
 
 	m_currentDir = QDir(QDir::homePath());

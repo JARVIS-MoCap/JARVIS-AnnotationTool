@@ -17,7 +17,7 @@ target_include_directories(datasetcreator
 )
 
 target_link_libraries(datasetcreator
-  Qt5::Widgets
+  Qt::Widgets
   opencv_core
   opencv_calib3d
   opencv_videoio

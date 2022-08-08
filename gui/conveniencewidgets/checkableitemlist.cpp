@@ -21,7 +21,7 @@
 CheckableItemList::CheckableItemList(QString name, QWidget *parent) :
 			QWidget(parent), m_name(name) {
 	QGridLayout *layout = new QGridLayout(this);
-	layout->setMargin(3);
+	layout->setContentsMargins(3,3,3,3);
 
 	itemSelectorList = new QListWidget(this);
 	itemSelectorList->setFont(QFont("Sans Serif", 12));

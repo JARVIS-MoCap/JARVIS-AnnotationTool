@@ -31,6 +31,12 @@ class ImageViewer : public QWidget {
 		void fitToScreen();
 		void setSize(int w, int h) {m_size = QSize(w,h);}
 		QSize sizeHint() const override {return m_size;}
+		int getHueFactor() {return m_hueFactor;};
+		int getSaturationFactor() {return m_saturationFactor;};
+		int getBrightnessFactor() {return m_brightnessFactor;};
+		int getContrastFactor() {return m_contrastFactor;};
+		void setBrightness(int brightnessFactor);
+
 
 	signals:
 		void zoomFinished();
@@ -40,11 +46,12 @@ class ImageViewer : public QWidget {
 		void keypointCorrected(Keypoint *keypoint);
 		void alreadyAnnotated(bool isSuppressed);
 		void keypointChangedForReprojection(int imgSetIndex, int frameIndex);
+		void brightnessChanged(int brightnessFactor);
 
 	public slots:
 		void setFrame(ImgSet *imgSet, int frameIndex);
 		void updateViewer();
-		void zoomToggledSlot(bool toggle);
+		void cropToggledSlot(bool toggle);
 		void panToggledSlot(bool toggle);
 		void homeClickedSlot();
 		void currentEntityChangedSlot(const QString& entity);
@@ -52,6 +59,10 @@ class ImageViewer : public QWidget {
 		void toggleEntityVisibleSlot(const QString& entity, bool toggle);
 		void toggleReprojectionSlot(bool toggle);
 		void imageTransformationChangedSlot(int hueFactor, int saturationFactor, int brightnessFactor, int contrastFactor);
+		void alwaysShowLabelsToggledSlot(bool always_visible);
+		void labelFontColorChangedSlot(QColor color);
+		void labelBackgroundColorChangedSlot(QColor color);
+
 		void keypointSizeChangedSlot(int size);
 		void keypointShapeChangedSlot(const QString& entity, KeypointShape shape);
 		void colorMapChangedSlot(const QString& entity, ColorMap::ColorMapType type, QColor color);
@@ -92,6 +103,9 @@ class ImageViewer : public QWidget {
 		int m_saturationFactor = 100;
 		int m_brightnessFactor = 100;
 		int m_contrastFactor = 100;
+		bool m_labelAlwaysVisible = false;
+		QColor m_labelFontColor = QColor(255,255,255);
+		QColor m_labelBackgroundColor = QColor(34, 36, 40,200);
 		QMap<QString, KeypointShape> m_entityToKeypointShapeMap;
 		int m_keypointSize = 8;
 		ColorMap *m_defaultColormap;
@@ -102,6 +116,7 @@ class ImageViewer : public QWidget {
 		void mouseDoubleClickEvent(QMouseEvent *event);
 		void mouseMoveEvent(QMouseEvent *event);
 		void mouseReleaseEvent(QMouseEvent *);
+		void wheelEvent(QWheelEvent *event);
 };
 
 #endif

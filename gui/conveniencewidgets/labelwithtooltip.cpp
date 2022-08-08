@@ -12,7 +12,7 @@
 
 LabelWithToolTip::LabelWithToolTip(QString name, QString toolTip, QWidget *parent) : QWidget(parent) {
 	QGridLayout *layout = new QGridLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0,0,0,0);
 	QLabel *label = new QLabel(name);
 	QWidget *spacer = new QWidget(this);
 	spacer->setMinimumSize(20,0);

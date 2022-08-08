@@ -17,7 +17,7 @@
 TimeLine::TimeLine(const QList<TimeLineWindow> &timeLineWindows, QWidget *parent) : m_timeLineWindows(timeLineWindows) {
   QGridLayout *layout = new QGridLayout(this);
   m_frameCount = 1000;
-  layout->setMargin(0);
+  layout->setContentsMargins(0,0,0,0);
   timeLineLabel = new QLabel();
   timeLineImage = QImage(m_frameCount, 1, QImage::Format_RGB888);
   layout->addWidget(timeLineLabel, 0,0);
@@ -81,7 +81,7 @@ void TimeLine::wheelEvent(QWheelEvent *event) {
     emit offsetAndZoomChanged(m_offset, m_zoom);
   }
   else {
-    float side_weight = event->pos().rx();
+    float side_weight = event->position().rx();
     float old_zoom = m_zoom;
     if (numDegrees.ry() > 0) m_zoom *= 1.2;
     else if (numDegrees.ry() < 0) m_zoom /= 1.2;
@@ -99,7 +99,7 @@ void TimeLine::wheelEvent(QWheelEvent *event) {
 
 RangeOverview::RangeOverview(QWidget *parent) {
   QGridLayout *layout = new QGridLayout(this);
-  layout->setMargin(0);
+  layout->setContentsMargins(0,0,0,0);
   rangeLabel = new QLabel();
   layout->addWidget(rangeLabel,0,0);
 }

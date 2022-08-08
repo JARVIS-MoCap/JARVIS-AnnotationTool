@@ -25,7 +25,7 @@ target_include_directories(newcalibrationwidget
 )
 
 target_link_libraries(newcalibrationwidget
-  Qt5::Widgets
+  Qt::Widgets
 	src
   gui
   calibrationtool

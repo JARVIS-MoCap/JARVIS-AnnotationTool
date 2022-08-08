@@ -21,8 +21,8 @@ target_include_directories(exporttrainingset
 )
 
 target_link_libraries(exporttrainingset
-  Qt5::Widgets
-  Qt5::Charts
+  Qt::Widgets
+  Qt::Charts
 	src
   conveniencewidgets
   trainingsetexporter

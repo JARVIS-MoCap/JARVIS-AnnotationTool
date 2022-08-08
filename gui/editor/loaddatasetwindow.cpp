@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include "loaddatasetwindow.hpp"
+#include "configurableitemlist.hpp"
 
 #include <QGridLayout>
 #include <QLineEdit>
@@ -76,6 +77,14 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
 	QWidget *buttonWidget = new QWidget(this);
 	buttonWidget->setMaximumSize(10000,50);
 	QGridLayout *buttonlayout = new QGridLayout(buttonWidget);
+	buttonlayout->setContentsMargins(3,3,0,0);
+	annotateSetupButton = new QPushButton("Annotate Setup", this);
+	annotateSetupButton->setMinimumSize(40,40);
+	annotateSetupButton->setIcon(QIcon::fromTheme("floor"));
+	annotateSetupButton->setEnabled(false);
+	connect(annotateSetupButton, &QPushButton::clicked,
+		this, &LoadDatasetWindow::annotateSetupButtonClicked);
+
 	QWidget *spacer = new QWidget(buttonWidget);
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	loadDatasetButton = new QPushButton("Load Dataset");
@@ -91,9 +100,10 @@ LoadDatasetWindow::LoadDatasetWindow(QWidget *parent) : QDialog(parent) {
 	connect(cancelButton, &QPushButton::clicked,
 			this, &LoadDatasetWindow::reject);
 
-	buttonlayout->addWidget(spacer,0,0);
-	buttonlayout->addWidget(cancelButton,0,1);
-	buttonlayout->addWidget(loadDatasetButton,0,2);
+	buttonlayout->addWidget(annotateSetupButton,0,0);
+	buttonlayout->addWidget(spacer,0,1);
+	buttonlayout->addWidget(cancelButton,0,2);
+	buttonlayout->addWidget(loadDatasetButton,0,3);
 
 	loaddatasetlayout->addWidget(datasetFileBox,0,0,1,2);
 	loaddatasetlayout->addWidget(datasetSegmentBox,1,0);
@@ -157,6 +167,7 @@ void LoadDatasetWindow::datasetFileEditedSlot(const QString &path) {
 		m_segments.clear();
 		selectedSegmentEdit->setText("");
 		loadDatasetButton->setEnabled(false);
+		annotateSetupButton->setEnabled(false);
 		loadDatasetButton->setToolTip("Load a dataset and select a segment to annotate first!");
 		datasetSegmentsTree->blockSignals(true);
 		datasetSegmentsTree->clear();
@@ -170,9 +181,9 @@ void LoadDatasetWindow::loadDatasetClickedSlot() {
 		QDir baseDir = QFileInfo(datasetFileEdit->text()).absoluteDir();
 		QString baseDirPath = baseDir.absolutePath();
 		Dataset::dataset = new Dataset(m_datasetFolder, baseDirPath,
-									   m_cameraNames, m_skeleton, m_segments);
+									   m_cameraNames, m_skeleton, m_segments, false);
 		if (Dataset::dataset->loadSuccessfull()) {
-			emit datasetLoaded();
+			emit datasetLoaded(false);
 			this->close();
 		}
 		else {
@@ -200,6 +211,7 @@ void LoadDatasetWindow::updateDatasetSegmentTree() {
 	m_segments.clear();
 	selectedSegmentEdit->setText("");
 	loadDatasetButton->setEnabled(false);
+	annotateSetupButton->setEnabled(false);
 	loadDatasetButton->setToolTip("Load a dataset and select a segment to annotate first!");
 	datasetSegmentsTree->blockSignals(true);
 	datasetSegmentsTree->clear();
@@ -226,6 +238,7 @@ void LoadDatasetWindow::updateDatasetSegmentTree() {
 
 void LoadDatasetWindow::datasetSegmentChangedSlot(QTreeWidgetItem *current, QTreeWidgetItem *previous) {
 	loadDatasetButton->setEnabled(true);
+	annotateSetupButton->setEnabled(true);
 	loadDatasetButton->setToolTip("");
 	if (current->flags() & Qt::ItemIsSelectable) {
 		if (current->parent() != nullptr) {
@@ -291,5 +304,55 @@ void LoadDatasetWindow::currentItemChangedSlot(QListWidgetItem *current,
 	}
 	if (previous != nullptr) {
 		previous->setBackground(QColor(34, 36, 40));
+	}
+}
+
+
+void LoadDatasetWindow::annotateSetupButtonClicked() {
+	QDialog *dialog = new QDialog(this);
+	dialog->setWindowTitle("Configure Setup Keypoints");
+	dialog->setMinimumSize(500,500);
+
+	QGridLayout *dialoglayout = new QGridLayout(dialog);
+	QPushButton *acceptButton = new QPushButton("Load Dataset", dialog);
+	acceptButton->setMinimumSize(40,40);
+	acceptButton->setIcon(QIcon::fromTheme("download"));
+	connect(acceptButton, &QPushButton::clicked,
+		dialog, &QDialog::accept);
+	QPushButton *cancelButton = new QPushButton("Cancel", dialog);
+	cancelButton->setMinimumSize(40,40);
+	cancelButton->setIcon(QIcon::fromTheme("discard"));
+	connect(cancelButton, &QPushButton::clicked,
+			dialog, &QDialog::reject);
+	QGroupBox *listBox = new QGroupBox("Keypoints");
+	QGridLayout *listboxlayout = new QGridLayout(listBox);
+	listboxlayout->setContentsMargins(0,0,0,0);
+	ConfigurableItemList * keypointList = new ConfigurableItemList("Setup Keypoints", listBox);
+	listboxlayout->addWidget(keypointList,0,0);
+	dialoglayout->addWidget(listBox,0,0,1,2);
+	dialoglayout->addWidget(cancelButton,1,0);
+	dialoglayout->addWidget(acceptButton,1,1);
+
+	int success = dialog->exec();
+	if (success) {
+		QList<QString> keypoints = keypointList->getItems();
+		if (keypoints.size() == 0) {
+			QErrorMessage errorMessage(dialog);
+     		errorMessage.showMessage("Please specify at least one Keypoint!");
+      		errorMessage.exec();
+			return;
+		}
+		QDir baseDir = QFileInfo(datasetFileEdit->text()).absoluteDir();
+		QString baseDirPath = baseDir.absolutePath();
+		Dataset::dataset = new Dataset(m_datasetFolder, baseDirPath,
+									   m_cameraNames, {}, m_segments, true, keypoints);
+		if (Dataset::dataset->loadSuccessfull()) {
+			emit datasetLoaded(true);
+			this->close();
+		}
+		else {
+			QErrorMessage *msg = new QErrorMessage(this);
+			msg->showMessage("Folder is not a valid Dataset Folder.");
+		}
 	}
 }

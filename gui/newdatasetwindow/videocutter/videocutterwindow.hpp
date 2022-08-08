@@ -20,7 +20,7 @@
 #include <QLabel>
 #include <QSettings>
 #include <QMediaPlayer>
-#include <QMediaPlaylist>
+//#include <QMediaPlaylist>
 #include <QVideoWidget>
 #include <QTableWidget>
 #include <QDoubleSpinBox>
@@ -48,11 +48,12 @@ class VideoCutterWindow : public QWidget {
 		QSplitter *mainSplitter;
 
 		QMediaPlayer *player;
-		QMediaPlaylist *m_playlist;
+		QList<QUrl> m_playlist;
 		QVideoWidget *videoWidget;
 		int m_duration;
 		int m_frameCount;
 		int m_frameRate;
+		QString m_recordingsPath;
 		RangeOverview *rangeOverview;
 
 		ctkRangeSlider *rangeSlider;
@@ -84,6 +85,7 @@ class VideoCutterWindow : public QWidget {
 		QList<TimeLineWindow> m_timeLineWindows;
 		QList<TimeLineWindow> m_initialTimeLineWindows;
 		QList<TimeLineWindow> m_savedTimeLineWindows;
+
 
 
 		int m_mainValue = 0, m_maximumValue = 0, m_minimumValue = 0;

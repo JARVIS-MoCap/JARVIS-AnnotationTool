@@ -32,7 +32,7 @@ class DatasetControlWidget : public QWidget {
 	signals:
 		void frameSelectionChanged(int index);
 		void imgSetChanged(int index);
-		void datasetLoaded();
+		void datasetLoaded(bool isSetupAnnotation);
 
 	public slots:
 		void datasetLoadedSlot();
@@ -54,6 +54,16 @@ class DatasetControlWidget : public QWidget {
 		int *m_annotatedCounts;
 		int m_totalCount;
 		QString m_currentSegment;
+
+		bool eventFilter(QObject *target, QEvent *event)
+		{
+			if (event->type() == QKeyEvent::KeyPress)
+			{
+				event->ignore();
+				return true;
+			}
+			return QObject::eventFilter(target, event);
+		}
 
 	private slots:
 		void selectionChangedSlot(int row,int);
