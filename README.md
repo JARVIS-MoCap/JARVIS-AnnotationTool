@@ -32,7 +32,7 @@ On Debian based systems (e.g. Ubuntu and Mint) run the follwing command:
       
 On Arch based systems (e.g. Manjaro) run the following command:
 
-      sudo pacman -S 
+      sudo pacman -S base-devel git cmake double-conversion gst-libav gst-plugins-good gst-plugins-base ffmpeg eigen zlib libjpeg fontconfig harfbuzz
       
 ### Cloning the repository
 Next clone our repository with 
