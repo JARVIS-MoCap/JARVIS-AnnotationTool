@@ -52,7 +52,7 @@ then
         -skip qtwebchannel -skip qtwebengine -skip qtwebsockets \
         -skip qtwebview -skip qtwinextras -skip qtxmlpatterns -skip qtwebglplugin \
         -no-openssl -skip qtlottie -skip qtmqtt -skip qtopcua -skip qtquicktimeline \
-        -skip qtquick3d
+        -skip qtquick3d -skip qtquick3dphysics
 
   cmake --build . --parallel 8
   cmake --install .
