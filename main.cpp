@@ -236,8 +236,6 @@ int main(int argc, char **argv) {
 	//qRegisterMetaTypeStreamOperators<QList<QString> >("QList<QString>");
 
 
-  qDebug() << "HELOOOO";
-
 	QApplication app (argc, argv);
 	app.setStyle(new DarkStyle);
 
