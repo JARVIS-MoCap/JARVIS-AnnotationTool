@@ -192,7 +192,7 @@ int main(int argc, char **argv) {
 			char path[PATH_MAX];
 			if (!CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX))
 			{
-					QCritical() << "CFURLGetFileSystemRepresentation Error";
+					std::cout << "CFURLGetFileSystemRepresentation Error" << std::endl;
 			}
 			CFRelease(resourcesURL);
 			chdir(path);

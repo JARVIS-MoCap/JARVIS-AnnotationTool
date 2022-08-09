@@ -11,7 +11,7 @@ cmake --install .
 cd ../../
 
 cd Qt5/qt5
-perl init-repository -f --module-subset=qtbase,qtsvg,qtmultimedia,qttools,qttranslations,qtdoc,qtrepotools,qtqa,qtwayland,qt3d,qtimageformats,qtserialbus,qtserialport,qtcharts,qtdatavis3d,qtshadertools
+perl init-repository -f --module-subset=qtbase,qtsvg,qtmultimedia,qttools,qttranslations,qtdoc,qtrepotools,qtqa,qt3d,qtimageformats,qtserialbus,qtserialport,qtcharts,qtdatavis3d,qtshadertools
 cd ..
 mkdir build
 cd build
