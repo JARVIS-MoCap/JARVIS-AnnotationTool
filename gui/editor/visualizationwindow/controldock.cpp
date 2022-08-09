@@ -25,7 +25,7 @@ ControlDock::ControlDock(QWidget *parent) : QDockWidget(parent) {
 	camerabuttonlayout->setSpacing(2);
 
 	Spoiler *displaySettingsWidget = new Spoiler("Settings", 300, mainWidget);
-	QGridLayout *displaysettingslayout = new QGridLayout(displaySettingsWidget);
+	QGridLayout *displaysettingslayout = new QGridLayout();
 	QLabel *keypointSizeLabel = new QLabel("Keypoint Size");
 	keypointSizeBox = new QSpinBox(mainWidget);
 	keypointSizeBox->setValue(5);

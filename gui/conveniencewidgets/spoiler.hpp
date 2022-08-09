@@ -8,11 +8,11 @@
 class Spoiler : public QWidget {
     Q_OBJECT
 private:
-    QGridLayout mainLayout;
+    QGridLayout *mainLayout;
     QToolButton toggleButton;
     QFrame headerLine;
     QParallelAnimationGroup toggleAnimation;
-    QScrollArea contentArea;
+    QScrollArea *contentArea;
     int animationDuration{300};
 public:
     explicit Spoiler(const QString & title = "", const int animationDuration = 300, QWidget *parent = 0);
