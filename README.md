@@ -13,7 +13,7 @@ It then uses live updating reprojection-error statistics to make the process of 
 
 **Installing our prebuild packages is easy!** Just go to **[our downloads page](https://jarvis-mocap.github.io/jarvis-docs//2021-10-29-downloads.html)** and grab the installer for your operating system. We currently support Windows, MacOS and Ubuntu 20.04/18.04. Installers for the current and previous versions can also be found under [Releases](https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool/releases).
 
-If you want to build the tool yourself here's a step by step guide on how to do it. If the prebuild OpenCV, Qt and yaml-cpp libraries we ship it with don't work for you there's a guide on how to [build the dependencies](#building-opencv-qt5-and-yaml-cpp-yourself) at the bottom of this page. (Please note that the guide is currently not verified, please let us know if you run into any issues!)
+If you want to build the tool yourself here's a step by step guide on how to do it.
 
 <p align="center">
 <img src="docs/Annotation_Tool_Vid.gif" alt="banner" width="75%"/>
@@ -30,7 +30,7 @@ On Debian based systems (e.g. Ubuntu and Mint) run the follwing command:
 
       sudo apt install cmake git build-essential libxcb-xinerama0 libdouble-conversion-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-gl ffmpeg libxcb-xinput0 libpcre2-dev libeigen3-dev libgl-dev zlib1g-dev libfontconfig-dev libjpeg-dev libharfbuzz-dev '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev  
       
-On Arch based systems (e.g. Manjaro) run the following command:
+On Arch based systems (e.g. Manjaro) run the following command (Currently there is a problem with building Qt6 on Arch based systems):
 
       sudo pacman -S base-devel git cmake double-conversion gst-libav gst-plugins-good gst-plugins-base ffmpeg eigen zlib libjpeg fontconfig harfbuzz
       
@@ -92,31 +92,34 @@ Run make to build the tool (replace x by the number of available cores on your C
      
 
 ## Windows
-Make sure you have a version of Visual Studio Code installed (If you plan to build the AcquisitionTool installed it is best to use VSCode 2015).
-Also make sure you have git installed and run the following in the git bash console:
+- Install a version of Visual Studio (tested on 2015 or newer). The latest versioon can be found [here](https://visualstudio.microsoft.com/)
+- Install Git for Windows from [here](https://gitforwindows.org/)
+- Install Strawberry Perl from [here](https://strawberryperl.com/)
 
 ### Cloning the repository
 Next clone our repository with 
 
      git clone --recursive https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool.git
      
-Go into the repository and create a build directory
+Change to the repositories main directory
 
-    cd JARVIS-AnnotationTool && mkdir build && cd build
+     cd JARVIS-AnnotationTool
 
 ### Building and installing 
-Switch to a VS Developer Command Prompt and run the following two commands to enable the 64bit built system:
+Switch to a **x64** VS Developer Command Prompt and run the setup batch file:
 
-    cd VC
-    vcvarsall.bat amd64
+    setup.bat
+
+Create a build directory
+
+    mkdir build && cd build
 
 Then run cmake
 
-    cmake -DCMAKE_BUILD_TYPE=Release .. -G "NMake Makefiles"
-	
-Run make to build the tool (replace x by the number of available cores on your CPU)
-
-    cmake --build . -j8
+    cmake -DCMAKE_BUILD_TYPE=RELEASE .. -G "Ninja" && cmake --build . --parallel 8
+    
+To run the AnnotationTool.exe without inistalling it you need to copy all opencv dlls to the build directory!
+    
 	
 We currently use the free version Advanced Installer to create our '.msi' installer files. This is not an optimal solution, so if you know how to build a better pipeline to build them please feel free to implement that!
 
