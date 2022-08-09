@@ -23,6 +23,7 @@
 #include <QSlider>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QTabWidget>
 
 
 class SettingsWindow : public QWidget {
@@ -50,6 +51,7 @@ class SettingsWindow : public QWidget {
 		void brightnessChangedSlot(int brightnessFactor);
 
 	private:
+		bool m_initialized = false;
 		void loadSettings();
 		QImage createColorMapPreview(ColorMap::ColorMapType type,
 					QColor color = QColor(0,0,255));
@@ -62,7 +64,9 @@ class SettingsWindow : public QWidget {
 
 
 		QSettings *settings;
-		QGroupBox *imageSettingsBox;
+		QTabWidget *tabWidget;
+
+		QWidget *imageSettingsWidget;
 		QCheckBox *grayScaleToggle;
 		QSlider *hueSlider;
 		QSpinBox *hueBox;
@@ -77,7 +81,7 @@ class SettingsWindow : public QWidget {
 		QSpinBox *contrastBox;
 		QPushButton *contrastResetButton;
 
-		QGroupBox *annotationSettingsBox;
+		QWidget *annotationSettingsWidget;
 		QSpinBox *keypointSizeEdit;
 		QCheckBox *alwaysShowLabelsCheckbox;
 		QPushButton *fontColorChooserButton;
@@ -94,10 +98,13 @@ class SettingsWindow : public QWidget {
 		QList<QPushButton*> colorChooserButtonsList;
 		QList<QColor> colorsList;
 		QList<QWidget*> singleEntityWidgetList;
-		QGroupBox *reprojectionSettingsBox;
+
+		QWidget *reprojectionSettingsWidget;
 		QSpinBox *minViewsEdit;
 		QDoubleSpinBox *errorThresholdEdit;
 		QDoubleSpinBox *boneLengthErrorThresholdEdit;
+
+		QWidget *infoWidget;
 
 	private slots:
 		void imageTranformationChangedSlot();

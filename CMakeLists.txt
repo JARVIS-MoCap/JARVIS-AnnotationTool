@@ -3,9 +3,39 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(AnnotationTool VERSION 1.1.0  LANGUAGES CXX)
 
+# Version String
+# Get the current working branch
+execute_process(
+    COMMAND git rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_BRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# Get the latest commit hash
+execute_process(
+    COMMAND git rev-parse --short HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_COMMIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+# Get working tree status (dirty)
+execute_process(
+  COMMAND git diff --quiet
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  RESULT_VARIABLE GIT_DIRTY_RET
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+if(GIT_DIRTY_RET)
+  set(VERSION_STRING "(git)${GIT_BRANCH}:${GIT_COMMIT_HASH}-dirty")
+else()
+  set(VERSION_STRING "git ${GIT_BRANCH}:${GIT_COMMIT_HASH}")
+endif()
+add_definitions("-DVERSION_STRING=\"${VERSION_STRING}\"")
+message(STATUS "VERSION_STRING " ${VERSION_STRING})
+
+
 set (CMAKE_PREFIX_PATH "libs/Qt5/qt_install/lib/cmake/")
-find_package(Qt6 PATHS "libs/Qt5/qt_install/lib/cmake/" REQUIRED COMPONENTS Core Widgets Charts Multimedia MultimediaWidgets 3DCore 3DRender 3DExtras)
-qt_standard_project_setup()
+find_package(Qt6  QUIET PATHS "libs/Qt5/qt_install/lib/cmake/" REQUIRED COMPONENTS Core Widgets Charts Multimedia MultimediaWidgets 3DCore 3DRender 3DExtras)
 
 add_definitions("-DQT_DEBUG")
 

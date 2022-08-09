@@ -14,14 +14,14 @@
 
 
 SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
-	this->resize(600,750);
-	this->setMinimumSize(500,700);
+	this->resize(600,350);
+	this->setMinimumSize(500,300);
 	settings = new QSettings();
 	setWindowTitle("Settings");
 	QGridLayout *settingslayout = new QGridLayout(this);
 
-	imageSettingsBox = new QGroupBox("Image Settings");
-	QGridLayout *imagesettingslayout = new QGridLayout(imageSettingsBox);
+	imageSettingsWidget = new QWidget();
+	QGridLayout *imagesettingslayout = new QGridLayout(imageSettingsWidget);
 	QLabel *grayScaleLabel = new QLabel("Display as Grayscale");
 	grayScaleToggle = new QCheckBox();
 	grayScaleToggle->setMinimumSize(30,30);
@@ -42,8 +42,6 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 					hueBox, &QSpinBox::setValue);
 	connect(hueBox, QOverload<int>::of(&QSpinBox::valueChanged),
 					hueSlider, &QSlider::setValue);
-	connect(hueBox, QOverload<int>::of(&QSpinBox::valueChanged),
-					this, &SettingsWindow::imageTranformationChangedSlot);
 	connect(hueResetButton, &QPushButton::clicked,
 					this, &SettingsWindow::hueResetClickedSlot);
 	QLabel *saturationLabel = new QLabel("Saturation");
@@ -61,8 +59,6 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 					saturationBox, &QSpinBox::setValue);
 	connect(saturationBox, QOverload<int>::of(&QSpinBox::valueChanged),
 					saturationSlider, &QSlider::setValue);
-	connect(saturationBox, QOverload<int>::of(&QSpinBox::valueChanged),
-					this, &SettingsWindow::imageTranformationChangedSlot);
 	connect(saturationResetButton, &QPushButton::clicked,
 					this, &SettingsWindow::saturationResetClickedSlot);
 	QLabel *brightnessLabel = new QLabel("Brightness");
@@ -80,8 +76,6 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 					brightnessBox, &QSpinBox::setValue);
 	connect(brightnessBox, QOverload<int>::of(&QSpinBox::valueChanged),
 					brightnessSlider, &QSlider::setValue);
-	connect(brightnessBox, QOverload<int>::of(&QSpinBox::valueChanged),
-					this, &SettingsWindow::imageTranformationChangedSlot);
 	connect(brightnessResetButton, &QPushButton::clicked,
 					this, &SettingsWindow::brightnessResetClickedSlot);
 		QLabel *contrastLabel = new QLabel("Contrast");
@@ -104,6 +98,9 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 		connect(contrastResetButton, &QPushButton::clicked,
 						this, &SettingsWindow::contrastResetClickedSlot);
 
+	QWidget *imageSpacer = new QWidget();
+	imageSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
 	imagesettingslayout->addWidget(grayScaleLabel, 0,0);
 	imagesettingslayout->addWidget(grayScaleToggle,0,1,1,3);
 	imagesettingslayout->addWidget(hueLabel,1,0);
@@ -122,11 +119,13 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	imagesettingslayout->addWidget(contrastSlider,4,1);
 	imagesettingslayout->addWidget(contrastBox,4,2);
 	imagesettingslayout->addWidget(contrastResetButton,4,3);
+	imagesettingslayout->addWidget(imageSpacer,5,0,1,3);
 
 
-	annotationSettingsBox = new QGroupBox("Keypoint Label Settings");
+
+	annotationSettingsWidget = new QWidget();
 	QGridLayout *annotationsettingslayout =
-				new QGridLayout(annotationSettingsBox);
+				new QGridLayout(annotationSettingsWidget);
 
 	QLabel *alwaysShowLabelLabel = new QLabel("Always show Labels");
 	alwaysShowLabelsCheckbox = new QCheckBox();
@@ -157,12 +156,12 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	backgroundColorPreview->setPixmap(QPixmap::fromImage(backgroundColorImage).scaled(200, 20));
 
 	QLabel *keypointSizeLabel = new QLabel("Keypoint Label Size");
-	keypointSizeEdit = new QSpinBox(annotationSettingsBox);
+	keypointSizeEdit = new QSpinBox(annotationSettingsWidget);
 	keypointSizeEdit->setRange(1,200);
 	keypointSizeEdit->setValue(8);
 	connect(keypointSizeEdit, QOverload<int>::of(&QSpinBox::valueChanged),
 					this, &SettingsWindow::keypointSizeChanged);
-	entitySettingsWidget = new QWidget(annotationSettingsBox);
+	entitySettingsWidget = new QWidget(annotationSettingsWidget);
 	entitysettingslayout = new QGridLayout(entitySettingsWidget);
 	annotationsettingslayout->addWidget(alwaysShowLabelLabel,0,0);
 	annotationsettingslayout->addWidget(alwaysShowLabelsCheckbox,0,1);
@@ -176,11 +175,11 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	annotationsettingslayout->addWidget(keypointSizeEdit,3,1);
 	annotationsettingslayout->addWidget(entitySettingsWidget,4,0,1,2);
 
-	reprojectionSettingsBox = new QGroupBox("Reprojection Settings");
+	reprojectionSettingsWidget = new QWidget();
 	QGridLayout *reprojectionsettingslayout =
-				new QGridLayout(reprojectionSettingsBox);
+				new QGridLayout(reprojectionSettingsWidget);
 	QLabel *minViewsLabel = new QLabel("Min Annotated Views");
-	minViewsEdit = new QSpinBox(reprojectionSettingsBox);
+	minViewsEdit = new QSpinBox(reprojectionSettingsWidget);
 	minViewsEdit->setRange(2,12);
 	minViewsEdit->setValue(2);
 	connect(minViewsEdit, QOverload<int>::of(&QSpinBox::valueChanged),
@@ -198,17 +197,46 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QWidget(parent, Qt::Window) {
 	connect(boneLengthErrorThresholdEdit,
 					QOverload<double>::of(&QDoubleSpinBox::valueChanged),
 					this, &SettingsWindow::boneLengthErrorThresholdChangedSlot);
+	QWidget *reproSpacer = new QWidget();
+	reproSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	
 	reprojectionsettingslayout->addWidget(minViewsLabel,0,0);
 	reprojectionsettingslayout->addWidget(minViewsEdit,0,1);
 	reprojectionsettingslayout->addWidget(errorThresholdLabel,1,0);
 	reprojectionsettingslayout->addWidget(errorThresholdEdit,1,1);
 	reprojectionsettingslayout->addWidget(boneLengthErrorThresholdLabel,2,0);
 	reprojectionsettingslayout->addWidget(boneLengthErrorThresholdEdit,2,1);
+	reprojectionsettingslayout->addWidget(reproSpacer,3,0,1,2);
+
+	infoWidget = new QWidget();
+    QLabel *versionLabel = new QLabel("Version:");
+    QLabel *versionText = new QLabel(this);
+    versionText->setFont(QFont("Sans Serif", 12, QFont::Bold));
+    versionText->setText(VERSION_STRING);
+    versionText->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    versionText->setCursor(QCursor(Qt::IBeamCursor));
+	QGridLayout *infolayout = new QGridLayout(infoWidget);
+	QLabel *licenceText = new QLabel("Published under the LGPL v2.1 (2022)");
+		QWidget *infoSpacer = new QWidget();
+	infoSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	infolayout->addWidget(versionLabel,0,0);
+	infolayout->addWidget(versionText,0,1);
+	infolayout->addWidget(infoSpacer,1,0,1,2);
+	infolayout->addWidget(licenceText,2,0,1,2);
 
 
-	settingslayout->addWidget(imageSettingsBox,0,0);
-	settingslayout->addWidget(annotationSettingsBox,1,0);
-	settingslayout->addWidget(reprojectionSettingsBox,2,0);
+	tabWidget = new QTabWidget(this);
+	tabWidget->addTab(imageSettingsWidget, "Image");
+	tabWidget->addTab(annotationSettingsWidget, "Annotation");
+	tabWidget->addTab(reprojectionSettingsWidget, "Reprojection");
+	tabWidget->addTab(infoWidget, "Info");
+
+
+
+	settingslayout->addWidget(tabWidget,0,0);
+	// settingslayout->addWidget(imageSettingsWidget,0,0);
+	// settingslayout->addWidget(annotationSettingsWidget,1,0);
+	// settingslayout->addWidget(reprojectionSettingsWidget,2,0);
 
 	loadSettings();
 }
@@ -295,6 +323,17 @@ void SettingsWindow::datasetLoadedSlot() {
 		emit alwaysShowLabelsToggled(alwaysShowLabelsCheckbox->checkState() == Qt::Checked);
 		emit labelBackroundColorChanged(m_labelBackgroundColor);
 		emit labelFontColorChanged(m_labelFontColor);
+
+	if (!m_initialized) {
+		m_initialized = true;
+		connect(hueBox, QOverload<int>::of(&QSpinBox::valueChanged),
+				this, &SettingsWindow::imageTranformationChangedSlot);
+		connect(saturationBox, QOverload<int>::of(&QSpinBox::valueChanged),
+				this, &SettingsWindow::imageTranformationChangedSlot);
+		connect(brightnessBox, QOverload<int>::of(&QSpinBox::valueChanged),
+				this, &SettingsWindow::imageTranformationChangedSlot);
+		imageTranformationChangedSlot();
+	}
 
 }
 
