@@ -34,7 +34,7 @@ cd ../../
 
 cd Qt5/qt5
 pwd
-./init-repository -f --module-subset=qtbase,qtsvg,qtmultimedia,qttools,qttranslations,qtdoc,qtrepotools,qtqa,qtwayland,qt3d,qtimageformats,qtserialbus,qtserialport,qtcharts,qtdatavis3d,qtshadertools
+./init-repository -f --module-subset=qtbase,qtsvg,qtmultimedia,qttools,qttranslations,qtdoc,qtrepotools,qtqa,qt3d,qtimageformats,qtserialbus,qtserialport,qtcharts,qtdatavis3d,qtshadertools
 cd ..
 mkdir build
 cd build
