@@ -116,7 +116,7 @@ Create a build directory
 
 Then run cmake
 
-    cmake -DCMAKE_BUILD_TYPE=RELEASE .. -G "Ninja" && cmake --build . --parallel 8
+    cmake -DCMAKE_BUILD_TYPE=RELEASE .. -G "Ninja" && cmake --build . --parallel 8 --config Release
     
 To run the AnnotationTool.exe without inistalling it you need to copy all opencv dlls to the build directory!
     
