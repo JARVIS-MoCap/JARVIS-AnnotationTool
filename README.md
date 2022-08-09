@@ -26,15 +26,15 @@ If you want to build the tool yourself here's a step by step guide on how to do 
 ## Linux
 
 ### Installing the dependencies
-On Debian based systems (e.g. Ubuntu and Mint) run the follwing command:
+On **Debian** based systems (e.g. Ubuntu and Mint) run the follwing command:
 
       sudo apt install cmake git build-essential libxcb-xinerama0 libdouble-conversion-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-gl ffmpeg libxcb-xinput0 libpcre2-dev libeigen3-dev libgl-dev zlib1g-dev libfontconfig-dev libjpeg-dev libharfbuzz-dev '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev  
       
-On Arch based systems (e.g. Manjaro) run the following command (Currently there is a problem with building Qt6 on Arch based systems):
+On **Arch** based systems (e.g. Manjaro) run the following command (Currently there is a problem with building Qt6 on Arch based systems):
 
       sudo pacman -S base-devel git cmake double-conversion gst-libav gst-plugins-good gst-plugins-base ffmpeg eigen zlib libjpeg fontconfig harfbuzz
       
-### Cloning the repository
+#### Cloning the repository
 Next clone our repository with 
 
      git clone --recursive https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool.git
@@ -44,7 +44,7 @@ Change to the repositories main directory
 
      cd JARVIS-AnnotationTool
      
-### Building and installing
+#### Building and installing
 Build Qt and OpenCV using the provided setup script by runnning
 
      sh setup.sh
@@ -70,25 +70,33 @@ If you want to remove it run
      sudo dpkg -r AnnotationTool
 
 ## MacOS 
-Make sure you have all the necessary build tools (like cmake) installed.
+- Initialize the Xcode tools by running the following command in the terminal:
 
-### Cloning the repository
+      xcode-select --install
+
+- Install cmake (either using Homebrew or by downloading it from [here](https://cmake.org/download/)
+
+#### Cloning the repository
 Next clone our repository with 
 
      git clone --recursive https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool.git
      
-Go into the repository and create a build directory
+Change to the repositories main directory
 
-    cd JARVIS-AnnotationTool && mkdir build && cd build
+     cd JARVIS-AnnotationTool
+     
+#### Building and installing
+Build Qt and OpenCV using the provided setup script by runnning
+
+     sh setup.sh
+     
+Create and enter a build directory 
+
+    mkdir build && cd build
     
-### Building and installing 
-Run cmake (replace XX04 by either 2004 or 1804) depending on your Ubuntu Version.
+Run cmake to configure and build the AnnotationTool
 
-    cmake ..
-	
-Run make to build the tool (replace x by the number of available cores on your CPU)
-
-     make -jx
+	cmake .. && cmake --build . --parallel 8
      
 
 ## Windows
@@ -96,7 +104,7 @@ Run make to build the tool (replace x by the number of available cores on your C
 - Install Git for Windows from [here](https://gitforwindows.org/)
 - Install Strawberry Perl from [here](https://strawberryperl.com/)
 
-### Cloning the repository
+#### Cloning the repository
 Next clone our repository with 
 
      git clone --recursive https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool.git
@@ -105,7 +113,7 @@ Change to the repositories main directory
 
      cd JARVIS-AnnotationTool
 
-### Building and installing 
+#### Building and installing 
 Switch to a **x64** VS Developer Command Prompt and run the setup batch file:
 
     setup.bat
@@ -123,13 +131,6 @@ To run the AnnotationTool.exe without inistalling it you need to copy all opencv
 	
 We currently use the free version Advanced Installer to create our '.msi' installer files. This is not an optimal solution, so if you know how to build a better pipeline to build them please feel free to implement that!
 
-<br><br>
-# Building OpenCV yourself
-
-## Linux and MacOS
-- On MacOS: build [libjpeg turbo](https://github.com/libjpeg-turbo/libjpeg-turbo) from git (make sure to build Version 8!)
-
-<br><br>
 
 # FAQ
 ### Qt does not compile throwing 'CMake 3.21 or higher is required.'
