@@ -139,7 +139,7 @@ bool ReprojectionWidget::checkCalibParams(const QString &path) {
 void ReprojectionWidget::initReprojectionClickedSlot() {
 	QString path = Dataset::dataset->datasetBaseFolder() + "/CalibrationParameters";
 	if (!m_calibExists) {
-		QString newCalibPath = QFileDialog::getExistingDirectory(this, "Select CalibrationParameters Path", m_parameterDir.path());
+		QString newCalibPath = QFileDialog::getExistingDirectory(this, "Select CalibrationParameters Path", QDir::homePath());
 		if (path == "" || !checkCalibParams(newCalibPath)) return;
 		QDir dir;
 		dir.mkpath(path);
