@@ -397,6 +397,7 @@ void EditorWidget::datasetLoadedSlot(bool isSetupAnnotation) {
 
 void EditorWidget::show3DClickedSlot() {
 	visualizationWindow->show();
+	visualizationWindow->raise();
 	visualizationWindow->opened();
 }
 
