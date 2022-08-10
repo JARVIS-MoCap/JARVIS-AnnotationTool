@@ -310,7 +310,9 @@ void ViewPort::update() {
 		}
 		}
 	}
-	m_center = m_center / count;
+	if (count != 0) {
+		m_center = m_center / count;
+	}
 }
 
 void ViewPort::toggleCamerasSlot(bool toggle) {
