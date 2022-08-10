@@ -87,12 +87,14 @@ if(APPLE)
   set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_ICONFILE ${ICON_NAME})
 
 elseif(WIN32)
+  set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/IconThemes/DarkIconTheme/appicon.rc")
   add_executable(${PROJECT_NAME}
       main.cpp
       globals.hpp
       gui/Qt-DarkStyle/darkstyle.qrc
+      ${APP_ICON_RESOURCE_WINDOWS}
   )
-
+  
 elseif (UNIX)
   set(CMAKE_INSTALL_RPATH /usr/local/lib/JARVIS-AnnotationTool;)
   add_executable(${PROJECT_NAME}
