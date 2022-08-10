@@ -1,49 +1,40 @@
 ;--------------------------------
-;Include Modern UI
-
   !include "MUI2.nsh"
   !include x64.nsh
-
-
 ;--------------------------------
 ;General
 
-  ;Properly display all languages
   Unicode true
 
-  ;Define name of the product
-  !define PRODUCT "JARVIS AnnotationTool"
+  !define APPNAME "AnnotationTool"
+  !define COMPANYNAME "JARVIS Mocap"
+  # These three must be integers
+  !define VERSIONMAJOR 1
+  !define VERSIONMINOR 2
+  !define VERSIONBUILD 0
 
-  ;Define optional URL that will be opened after the installation was successful
-  !define AFTER_INSTALLATION_URL "https://github.com/AnonymerNiklasistanonym/NsiWindowsInstallerExamples"
+  !define HELPURL "https://jarvis-mocap.github.io/jarvis-docs/" # "Support Information" link
+  !define ABOUTURL "https://jarvis-mocap.github.io/jarvis-docs/" # "Publisher" link
 
-
-  ;Define the main name of the installer
-  Name "${PRODUCT}"
 
   ;Define the directory where the installer should be saved
-  OutFile "${PRODUCT}_Installer.exe"
-
+  OutFile "AnnotationTool_Installer_Windows_${VERSIONMAJOR}_${VERSIONMINOR}_${VERSIONBUILD}.exe"
 
   ;Define the default installation folder (Windows ProgramFiles example)
-  InstallDir "$PROGRAMFILES64\JARVIS\${PRODUCT}"
+  InstallDir "$PROGRAMFILES64\${COMPANYNAME}\${APPNAME}"
 
-  ;Define optional a directory for program files that change (Windows AppData example)
-  !define INSTDIR_DATA "$APPDATA\${PRODUCT}"
-
+  Name "${COMPANYNAME} - ${APPNAME}"
+  Icon "..\IconThemes\DarkIconTheme\hand.ico"
 
   ;Request rights if you want to install the program to program files
   RequestExecutionLevel admin
-
-  ;Properly display all languages
-  Unicode true
 
   ;Show 'console' in installer and uninstaller
   ShowInstDetails "show"
   ShowUninstDetails "show"
 
   ;Get installation folder from registry if available
-  InstallDirRegKey HKLM "Software\${PRODUCT}" ""
+  InstallDirRegKey HKLM "Software\${APPNAME}" ""
 
 
 ;--------------------------------
@@ -56,24 +47,21 @@
   !define MUI_LANGDLL_ALLLANGUAGES
 
   ;Use optional a custom icon:
-  !define MUI_ICON "example_icon_installer.ico" # for the Installer
-  !define MUI_UNICON "example_icon_uninstaller.ico" # for the later created UnInstaller
+  !define MUI_ICON "installer_icon.ico" # for the Installer
+  !define MUI_UNICON "uinstaller_icon.ico" # for the later created UnInstaller
 
   ;Use optional a custom picture for the 'Welcome' and 'Finish' page:
   !define MUI_HEADERIMAGE_RIGHT
-  !define MUI_WELCOMEFINISHPAGE_BITMAP "example_picture_installer.bmp"  # for the Installer
-  !define MUI_UNWELCOMEFINISHPAGE_BITMAP "example_picture_uninstaller.bmp"  # for the later created UnInstaller
-
-  ;Optional no descripton for all components
-  !define MUI_COMPONENTSPAGE_NODESC
-
+  !define MUI_WELCOMEFINISHPAGE_BITMAP "image_installer.bmp"  # for the Installer
+  !define MUI_UNWELCOMEFINISHPAGE_BITMAP "image_uninstaller.bmp"  # for the later created UnInstaller
 
 ;--------------------------------
 ;Pages
 
   ;For the installer
-  !insertmacro MUI_PAGE_WELCOME # simply remove this and other pages if you don't want it
+  !insertmacro MUI_PAGE_WELCOME
   !insertmacro MUI_PAGE_LICENSE "..\LICENSE" # link to an ANSI encoded license file
+  !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
   !insertmacro MUI_PAGE_FINISH
 
@@ -194,24 +182,31 @@ Section "Main Component"
   File "..\libs\Windows\dlls\zlib1__.dll"
 
   File /a /r "..\IconThemes"
-
+  File "..\IconThemes\DarkIconTheme\hand.ico"
 
   ;Store installation folder in registry
-  WriteRegStr HKLM "Software\${PRODUCT}" "" $INSTDIR
+  WriteRegStr HKLM "Software\${APPNAME}" "" $INSTDIR
 
   ;Registry information for add/remove programs
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "DisplayName" "${PRODUCT}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "UninstallString" '"$INSTDIR\${PRODUCT}_uninstall.exe"'
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "NoModify" 1
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}" "NoRepair" 1
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "DisplayName" "${COMPANYNAME} - ${APPNAME}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "InstallLocation" "$\"$INSTDIR$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "DisplayIcon" "$\"$INSTDIR\hand.ico$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "Publisher" "$\"${COMPANYNAME}$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "HelpLink" "$\"${HELPURL}$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "URLInfoAbout" "$\"${ABOUTURL}$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "DisplayVersion" "$\"${VERSIONMAJOR}.${VERSIONMINOR}.${VERSIONBUILD}$\""
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "VersionMajor" ${VERSIONMAJOR}
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "VersionMinor" ${VERSIONMINOR}
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "NoModify" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "NoRepair" 1
 
   ;Create optional start menu shortcut for uninstaller and Main component
-  CreateDirectory "$SMPROGRAMS\${PRODUCT}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT}\AnnotationTool.lnk" "$INSTDIR\AnnotationTool.exe" "" "$INSTDIR\AnnotationTool.exe" 0
-  CreateShortCut "$SMPROGRAMS\${PRODUCT}\Uninstall ${PRODUCT}.lnk" "$INSTDIR\${PRODUCT}_uninstall.exe" "" "$INSTDIR\${PRODUCT}_uninstall.exe" 0
+  CreateShortCut "$SMPROGRAMS\AnnotationTool.lnk" "$INSTDIR\AnnotationTool.exe" "" "$INSTDIR\hand.ico"
 
   ;Create uninstaller
-  WriteUninstaller "${PRODUCT}_uninstall.exe"
+  WriteUninstaller "uninstall.exe"
 
 SectionEnd
 
@@ -221,21 +216,17 @@ SectionEnd
 Section "Uninstall"
 
   ;Remove all registry keys
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
-  DeleteRegKey HKLM "Software\${PRODUCT}"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}"
+  DeleteRegKey HKLM "Software\${APPNAME}"
 
   ;Delete the installation directory + all files in it
   ;Add 'RMDir /r "$INSTDIR\folder\*.*"' for every folder you have added additionaly
   RMDir /r "$INSTDIR\*.*"
   RMDir "$INSTDIR"
 
-  ;Delete the appdata directory + files
-  RMDir /r "${INSTDIR_DATA}\*.*"
-  RMDir "${INSTDIR_DATA}"
-
   ;Delete Start Menu Shortcuts
-  Delete "$SMPROGRAMS\${PRODUCT}\*.*"
-  RmDir  "$SMPROGRAMS\${PRODUCT}"
+  Delete "$SMPROGRAMS\${APPNAME}\*.*"
+  RmDir  "$SMPROGRAMS\${APPNAME}"
 
 SectionEnd
 
