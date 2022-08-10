@@ -59,6 +59,45 @@ ExtrinsicsCalibrator::ExtrinsicsCalibrator(CalibrationConfig *calibrationConfig,
 
 
 void ExtrinsicsCalibrator::run() {
+  if (m_calibrationConfig->boardType == "Standard" || m_calibrationConfig->boardType == "ChAruco") {
+    run_standard();
+  }
+  else {
+    run_charuco();
+  }
+}
+
+void ExtrinsicsCalibrator::run_standard() {
+  int numCameras = m_cameraPair.size();
+  Extrinsics extrinsics1, extrinsics2;
+  double mean_repro_error;
+
+  if (numCameras == 2) {
+    if (!calibrateExtrinsicsPair(m_cameraPair, extrinsics1, mean_repro_error)) {
+      return;
+    }
+    emit finishedExtrinsics(extrinsics1.R, extrinsics1.T, mean_repro_error, m_threadNumber);
+    if (m_interrupt) return;
+  }
+
+  else if (numCameras == 3) {
+    QList<QString> cameraPair1 = {m_cameraPair[0], m_cameraPair[1]};
+    QList<QString> cameraPair2 = {m_cameraPair[1], m_cameraPair[2]};
+    bool success1 = calibrateExtrinsicsPair(cameraPair1, extrinsics1, mean_repro_error);
+    bool success2 = calibrateExtrinsicsPair(cameraPair2, extrinsics2, mean_repro_error);
+    if (!success1 || !success2) {
+      return;
+    }
+    if (m_interrupt) return;
+    cv::Mat T1_t = extrinsics1.R.t() * extrinsics1.T;
+    cv::Mat T2_t = extrinsics2.R.t() * extrinsics2.T;
+    cv::Mat R = extrinsics2.R*extrinsics1.R;
+    cv::Mat T = R*(T1_t + extrinsics1.R.t()*T2_t);
+    emit finishedExtrinsics(R, T, mean_repro_error, m_threadNumber);
+  }
+}
+
+void ExtrinsicsCalibrator::run_charuco() {
   int numCameras = m_cameraPair.size();
   Extrinsics extrinsics1, extrinsics2;
   double mean_repro_error;

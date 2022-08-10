@@ -35,6 +35,8 @@ class ExtrinsicsCalibrator : public QObject, public QRunnable {
 	public:
 		explicit ExtrinsicsCalibrator(CalibrationConfig *calibrationConfig, QMap<QString, QMap<QString, cv::Mat>> intrinsicParameters, QList<QString> cameraPair, int threadNumber);
 		void run();
+		void run_standard();
+		void run_charuco();
 
 	signals:
 		void extrinsicsProgress(int counter, int frameCount, int threadNumber);
