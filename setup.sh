@@ -11,22 +11,55 @@ case "${unameOut}" in
 esac
 echo ${machine}
 
+
+
+if [ "${machine}" = "Mac" ];
+then
+  cd libs/LibJPEG-turbo
+  mkdir build
+  cd build
+  cmake -DCMAKE_INSTALL_PREFIX=../libjpeg-turbo-install -DWITH_JPEG8=1 ../libjpeg-turbo
+  cmake --build . --parallel 8
+  cmake --install .
+  cd ../../..
+fi
+
+
 cd libs/OpenCV
 mkdir build
 cd build
 
+if [ "${machine}" = "Linux" ];
+then
+  cmake -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DCMAKE_BUILD_TYPE=RELEASE \
+        -DBUILD_TIFF=OFF -DWITH_TIFF=OFF -DBUILD_JPEG=OFF -DBUILD_ZLIB=OFF \
+        -DBUILD_WEBP=OFF -DBUILD_PNG=OFF -DWITH_OPENEXR=OFF -DWITH_OPENJPEG=OFF \
+        -DWITH_JASPER=OFF -DWITH_PROTOBUF=OFF -DWITH_QUIRC=OFF -DWITH_1394=OFF \
+        -DWITH_V4L=OFF  -DWITH_GSTREAMER=ON -DWITH_FFMPEG=ON -DWITH_GTK=OFF \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DBUILD_LIST="core,calib3d,imgproc,videoio,aruco, gapi" \
+        -DCMAKE_INSTALL_PREFIX=../opencv_install \
+        -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ../opencv
+  cmake --build . --parallel 24
+  cmake --install .
+fi
 
-cmake -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DCMAKE_BUILD_TYPE=RELEASE \
-      -DBUILD_TIFF=OFF -DWITH_TIFF=OFF -DBUILD_JPEG=OFF -DBUILD_ZLIB=OFF \
-      -DBUILD_WEBP=OFF -DBUILD_PNG=OFF -DWITH_OPENEXR=OFF -DWITH_OPENJPEG=OFF \
-      -DWITH_JASPER=OFF -DWITH_PROTOBUF=OFF -DWITH_QUIRC=OFF -DWITH_1394=OFF \
-      -DWITH_V4L=OFF  -DWITH_GSTREAMER=ON -DWITH_FFMPEG=ON -DWITH_GTK=OFF \
-      -DBUILD_SHARED_LIBS=OFF \
-      -DBUILD_LIST="core,calib3d,imgproc,videoio,aruco, gapi" \
-      -DCMAKE_INSTALL_PREFIX=../opencv_install \
-      -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ../opencv
-cmake --build . --parallel 8
-cmake --install .
+if [ "${machine}" = "Mac" ];
+then
+  cmake -DOPENCV_ENABLE_ALLOCATOR_STATS=OFF -DCMAKE_BUILD_TYPE=RELEASE \
+        -DBUILD_TIFF=OFF -DWITH_TIFF=OFF -DWITH_JPEG=ON -DBUILD_JPEG=OFF \
+        -DJPEG_INCLUDE_DIR=/Users/thueser/Documents/JARVIS-AnnotationTool/libs/LibJPEG-turbo/libjpeg-turbo-install/include \
+        -DJPEG_LIBRARY=/Users/thueser/Documents/JARVIS-AnnotationTool/libs/LibJPEG-turbo/libjpeg-turbo-install/lib/libturbojpeg.a -DBUILD_ZLIB=OFF \
+        -DBUILD_WEBP=OFF -DBUILD_PNG=OFF -DWITH_OPENEXR=OFF -DWITH_OPENJPEG=OFF \
+        -DWITH_JASPER=OFF -DWITH_PROTOBUF=OFF -DWITH_QUIRC=OFF -DWITH_1394=OFF \
+        -DWITH_V4L=OFF  -DWITH_GSTREAMER=ON -DWITH_FFMPEG=ON -DWITH_GTK=OFF \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DBUILD_LIST="core,calib3d,imgproc,videoio,aruco, gapi" \
+        -DCMAKE_INSTALL_PREFIX=../opencv_install \
+        -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ../opencv
+  cmake --build . --parallel 24
+  cmake --install .
+fi
 
 
 cd ../../
@@ -51,7 +84,7 @@ cd build
       -no-openssl -skip qtlottie -skip qtmqtt -skip qtopcua -skip qtquicktimeline \
       -skip qtquick3d -skip qtquick3dphysics -skip qtwayland
 
-cmake --build . --parallel 8
+cmake --build . --parallel 24
 cmake --install .
 
 cd ../../../

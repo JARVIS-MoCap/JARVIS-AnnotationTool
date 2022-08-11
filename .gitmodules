@@ -13,3 +13,6 @@
 [submodule "libs/Qt5/qt5"]
 	path = libs/Qt5/qt5
 	url = git://code.qt.io/qt/qt5.git
+[submodule "libs/LibJPEG-turbo/libjpeg-turbo"]
+	path = libs/LibJPEG-turbo/libjpeg-turbo
+	url = https://github.com/libjpeg-turbo/libjpeg-turbo.git
