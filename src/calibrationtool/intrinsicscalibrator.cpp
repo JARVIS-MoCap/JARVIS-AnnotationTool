@@ -168,6 +168,23 @@ void IntrinsicsCalibrator::run_standard() {
     objectPoints.push_back(objectPointsAll[(int)k]);
   }
 
+  std::cout << "Number Images for Stage 1: " <<
+      imagePoints.size() << std::endl;
+
+  double mean_repro_error = intrinsicsCalibrationStep(objectPoints, imagePoints,
+        size, 1.25);
+  std::cout << "Mean Reprojection Error after Stage 1: " <<
+        mean_repro_error << std::endl;
+  std::cout << "Number Images for Stage 2: " <<
+        imagePoints.size() << std::endl;
+
+  mean_repro_error = intrinsicsCalibrationStep(objectPoints, imagePoints,
+      size, 1.5);
+  std::cout << "Mean Reprojection Error after Stage 2: " <<
+        mean_repro_error << std::endl;
+  std::cout << "Number Images for Stage 3: " <<
+        imagePoints.size() << std::endl;
+
   cv::Mat K, D;
   std::vector< cv::Mat > rvecs, tvecs;
   cv::Mat stdDI, stdDE, errs;
@@ -175,9 +192,34 @@ void IntrinsicsCalibrator::run_standard() {
     K, D, rvecs, tvecs, stdDI, stdDE, errs,
     cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST,
     cv::TermCriteria(cv::TermCriteria::MAX_ITER |
-      cv::TermCriteria::EPS, 100, 1e-7));
+    cv::TermCriteria::EPS, 100, 1e-7));
 
   emit finishedIntrinsics(K, D, repro_error, m_threadNumber);
+}
+
+double IntrinsicsCalibrator::intrinsicsCalibrationStep(std::vector<std::vector<cv::Point3f>> &objectPoints,
+      std::vector<std::vector<cv::Point2f>> &imagePoints, cv::Size size, double thresholdFactor) {
+  cv::Mat K, D;
+  std::vector< cv::Mat > rvecs, tvecs;
+  cv::Mat stdDI, stdDE, errs;
+  double mean_repro_error = calibrateCamera(objectPoints, imagePoints, size,
+    K, D, rvecs, tvecs, stdDI, stdDE, errs,
+    cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST,
+    cv::TermCriteria(cv::TermCriteria::MAX_ITER |
+    cv::TermCriteria::EPS, 75, 1e-6));
+
+  std::vector<std::vector<cv::Point3f>>  objectPoints_2;
+  std::vector<std::vector<cv::Point2f>>  imagePoints_2;
+  for (int i = 0; i < errs.size[0]; i++) {
+    if (errs.at<double>(i) <
+          thresholdFactor * mean_repro_error) {
+      objectPoints_2.push_back(objectPoints[i]);
+      imagePoints_2.push_back(imagePoints[i]);
+    }
+  }
+  objectPoints = objectPoints_2;
+  imagePoints = imagePoints_2;
+  return mean_repro_error;
 }
 
 
@@ -297,14 +339,14 @@ void IntrinsicsCalibrator::run_charuco() {
   std::cout << "Number Images for Stage 1: " <<
       charucoCorners.size() << std::endl;
 
-  double mean_repro_error = intrinsicsCalibrationStep(charucoCorners, charucoIds,
+  double mean_repro_error = intrinsicsCalibrationStepCharuco(charucoCorners, charucoIds,
         board, size, 1.25);
   std::cout << "Mean Reprojection Error after Stage 1: " <<
         mean_repro_error << std::endl;
   std::cout << "Number Images for Stage 2: " <<
         charucoCorners.size() << std::endl;
 
-  mean_repro_error = intrinsicsCalibrationStep(charucoCorners, charucoIds,
+  mean_repro_error = intrinsicsCalibrationStepCharuco(charucoCorners, charucoIds,
       board, size, 1.5);
   std::cout << "Mean Reprojection Error after Stage 2: " <<
         mean_repro_error << std::endl;
@@ -325,7 +367,7 @@ void IntrinsicsCalibrator::run_charuco() {
 }
 
 
-double IntrinsicsCalibrator::intrinsicsCalibrationStep(
+double IntrinsicsCalibrator::intrinsicsCalibrationStepCharuco(
       std::vector<std::vector<cv::Point2f>> &charucoCorners,
       std::vector<std::vector<int>> &charucoIds,
       cv::Ptr<cv::aruco::CharucoBoard> board,

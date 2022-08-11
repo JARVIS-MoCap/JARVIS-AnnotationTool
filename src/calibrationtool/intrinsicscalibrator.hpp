@@ -69,6 +69,11 @@ class IntrinsicsCalibrator : public QObject, public QRunnable {
 			void run_charuco();
 
 			double intrinsicsCalibrationStep(
+						std::vector<std::vector<cv::Point3f>> &objectPoints,
+      					std::vector<std::vector<cv::Point2f>> &imagePoints, 
+						cv::Size size, double thresholdFactor);
+
+			double intrinsicsCalibrationStepCharuco(
 						std::vector<std::vector<cv::Point2f>> &charucoCorners,
 						std::vector<std::vector<int>> &charucoIds,
 						cv::Ptr<cv::aruco::CharucoBoard> board,
