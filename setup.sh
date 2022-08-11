@@ -31,14 +31,14 @@ cmake --install .
 
 cd ../../
 
-cd Qt/qt
+cd Qt5/qt5
 pwd
 ./init-repository -f --module-subset=qtbase,qtsvg,qtmultimedia,qttools,qttranslations,qtdoc,qtrepotools,qtqa,qt3d,qtimageformats,qtserialbus,qtserialport,qtcharts,qtdatavis3d,qtshadertools
 cd ..
 mkdir build
 cd build
 
-../qt/configure -static -release -no-pch -prefix ../qt_install -opensource \
+../qt5/configure -static -release -no-pch -prefix ../qt_install -opensource \
       -confirm-license -nomake tools -nomake tests -nomake examples \
       -skip webengine -skip qtandroidextras -skip qtconnectivity  \
       -skip qtdeclarative -skip qtdoc -skip qtgamepad -skip qtgraphicaleffects \

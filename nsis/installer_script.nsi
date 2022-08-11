@@ -180,6 +180,14 @@ Section "Main Component"
   File "..\libs\Windows\dlls\libwebpmux-3__.dll"
   File "..\libs\Windows\dlls\libwinpthread-1.dll"
   File "..\libs\Windows\dlls\zlib1__.dll"
+  FILE "..\libs\Windows\dlls\MSVCP140.dll"
+  FILE "..\libs\Windows\dlls\MSVCP140_1.dll"
+  FILE "..\libs\Windows\dlls\MSVCP140_2.dll"
+  FILE "..\libs\Windows\dlls\vcruntime140.dll"
+  FILE "..\libs\Windows\dlls\vcruntime140_1.dll"
+  FILE "..\libs\Windows\dlls\concrt140.dll"
+
+
 
   File /a /r "..\IconThemes"
   File "..\IconThemes\DarkIconTheme\hand.ico"

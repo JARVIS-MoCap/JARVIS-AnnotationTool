@@ -94,7 +94,7 @@ elseif(WIN32)
       gui/Qt-DarkStyle/darkstyle.qrc
       ${APP_ICON_RESOURCE_WINDOWS}
   )
-  
+
 elseif (UNIX)
   set(CMAKE_INSTALL_RPATH /usr/local/lib/JARVIS-AnnotationTool;)
   add_executable(${PROJECT_NAME}
@@ -104,9 +104,9 @@ elseif (UNIX)
   )
 	if (${UBUNTU_VERSION})
 	  if(${UBUNTU_VERSION} STREQUAL "2004")
-	    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_1.1-1_amd64_2004/usr/local/bin)
+	    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_1.2-1_amd64_2004/usr/local/bin)
 	  else()
-	    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_1.1-1_amd64_1804/usr/local/bin)
+	    install(TARGETS ${PROJECT_NAME} DESTINATION ${PROJECT_SOURCE_DIR}/deployment/deb_packages/JARVIS-AnnotationTool_1.2-1_amd64_1804/usr/local/bin)
 	  endif()
 	endif()
 endif()
