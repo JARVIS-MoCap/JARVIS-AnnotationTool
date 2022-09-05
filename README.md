@@ -28,7 +28,7 @@ If you want to build the tool yourself here's a step by step guide on how to do 
 #### Installing the dependencies
 On **Debian** based systems (e.g. Ubuntu and Mint) run the follwing command:
 
-      sudo apt install cmake git build-essential libxcb-xinerama0 libdouble-conversion-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-gl ffmpeg libxcb-xinput0 libpcre2-dev libeigen3-dev libgl-dev zlib1g-dev libfontconfig-dev libjpeg-dev libharfbuzz-dev '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev  
+      sudo apt install cmake git build-essential libxcb-xinerama0 libdouble-conversion-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-gl ffmpeg libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libxcb-xinput0 libpcre2-dev libeigen3-dev libgl-dev zlib1g-dev libfontconfig-dev libjpeg-dev libharfbuzz-dev '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev  
 
 **Important:** If you're using Ubuntu 18.04 or 20.04 updating CMake is required. See the [FAQ](https://github.com/JARVIS-MoCap/JARVIS-AnnotationTool#faq) section for instructions.<br>
 <br>
