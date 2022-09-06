@@ -168,7 +168,7 @@ This will occur on Ubuntu 20.04 or earlier. To fix it install the latest cmake r
        
        
 # Contact
-The toolbox was developed at the **Neurobiology Lab of the German Primate Center ([DPZ](https://www.dpz.eu/de/startseite.html))**.
+JARVIS was developed at the **Neurobiology Lab of the German Primate Center ([DPZ](https://www.dpz.eu/de/startseite.html))**.
 If you have any questions or other inquiries related to JARVIS please contact:
 
 Timo Hüser - [@hueser_timo](https://mobile.twitter.com/hueser_timo) - timo.hueser@gmail.com
