@@ -40,7 +40,7 @@ then
         -DBUILD_LIST="core,calib3d,imgproc,videoio,aruco, gapi" \
         -DCMAKE_INSTALL_PREFIX=../opencv_install \
         -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ../opencv
-  cmake --build . --parallel 24
+  cmake --build . --parallel 8
   cmake --install .
 fi
 
@@ -84,7 +84,7 @@ cd build
       -no-openssl -skip qtlottie -skip qtmqtt -skip qtopcua -skip qtquicktimeline \
       -skip qtquick3d -skip qtquick3dphysics -skip qtwayland
 
-cmake --build . --parallel 24
+cmake --build . --parallel 8
 cmake --install .
 
 cd ../../../
