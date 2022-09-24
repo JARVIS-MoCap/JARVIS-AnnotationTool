@@ -157,13 +157,13 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	LabelWithToolTip *widthLabel = new LabelWithToolTip("  Pattern Width",
 				"Does not count the outer edge of the pattern. Make sure the visualization matches your board!");
 	widthEdit = new QSpinBox();
-	widthEdit->setRange(0,20);
+	widthEdit->setRange(0,35);
 	widthEdit->setValue(9);
 	connect(widthEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &NewCalibrationWidget::checkerBoardPatternChangesSlot);
 	LabelWithToolTip *heightLabel = new LabelWithToolTip("  Pattern Height",
 			"Does not count the outer edge of the pattern. Make sure the visualization matches your board!");
 	heightEdit = new QSpinBox();
-	heightEdit->setRange(0,20);
+	heightEdit->setRange(0,35);
 	heightEdit->setValue(6);
 	connect(heightEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &NewCalibrationWidget::checkerBoardPatternChangesSlot);
 	LabelWithToolTip *sideLengthLabel = new LabelWithToolTip("  Side Length [mm]",
