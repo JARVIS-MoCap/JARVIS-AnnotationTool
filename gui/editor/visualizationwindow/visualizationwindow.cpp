@@ -55,9 +55,12 @@ void VisualizationWindow::opened() {
 }
 
 void VisualizationWindow::viewInitSlot() {
-	viewPort->toggleCamerasSlot(false);
-	cameraViewChangedSlot(0);
+    viewPort->update();
+    viewPort->toggleCamerasSlot(false);
+    cameraViewChangedSlot(0);
 }
+
+
 
 void VisualizationWindow::update3DCoordsSlot(QMap<QString, QVector3D> coords3D)
 {
@@ -175,4 +178,8 @@ void VisualizationWindow::loadClickedSlot() {
 	if (coords.size() == 0) return;
 	viewPort->addSetup(coords, 10, QColor(100,164,32), QColor(32,100,164), 0.4, true);
 
+}
+
+void VisualizationWindow::closeEvent(QCloseEvent *event) {
+    viewPort->reset();
 }

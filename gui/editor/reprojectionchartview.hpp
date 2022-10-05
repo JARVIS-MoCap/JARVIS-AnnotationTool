@@ -34,6 +34,9 @@ class ReprojectionChartView : public QChartView {
 		std::vector<double> *m_reproErrors;
 		QList<QBarSeries*> m_barSeriesList;
 
+		QChart *chart;
+		QValueAxis *axisY;
+
 	private slots:
 		void onHoverSlot();
 };

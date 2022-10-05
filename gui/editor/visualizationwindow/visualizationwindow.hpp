@@ -19,19 +19,17 @@
 
 #include <opencv2/core.hpp>
 
-#include <QPushButton>
-#include <QSpinBox>
-#include <QLabel>
-#include <QGridLayout>
-#include <QSettings>
-#include <QGroupBox>
-#include <QSpinBox>
-#include <QSlider>
 #include <QCheckBox>
+#include <QCloseEvent>
 #include <QComboBox>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QLabel>
 #include <QMainWindow>
-
-
+#include <QPushButton>
+#include <QSettings>
+#include <QSlider>
+#include <QSpinBox>
 
 class VisualizationWindow : public QMainWindow
 {
@@ -68,6 +66,7 @@ class VisualizationWindow : public QMainWindow
 			void cameraMovedSlot();
 			void cameraViewChangedSlot(int index);
 			void viewInitSlot();
+			void closeEvent(QCloseEvent *event);
 
 };
 

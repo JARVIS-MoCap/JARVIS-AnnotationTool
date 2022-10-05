@@ -352,6 +352,7 @@ void ImageViewer::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void ImageViewer::wheelEvent(QWheelEvent *event) {
+	if (event->angleDelta().y() == 0) return;
 	QPointF zoomCenter = event->position();
 	int scroll_direction = event->angleDelta().y() / abs(event->angleDelta().y());
 	float zoom = 1.0 + scroll_direction * 0.2;

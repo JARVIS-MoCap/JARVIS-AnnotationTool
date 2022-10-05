@@ -34,6 +34,9 @@ class BoneLengthChartView : public QChartView {
 		std::vector<double> *m_boneLengthErrors;
 		QList<QBarSeries*> m_barSeriesList;
 
+		QChart *chart;
+		QValueAxis *axisY;
+
 	private slots:
 		void onHoverSlot();
 };

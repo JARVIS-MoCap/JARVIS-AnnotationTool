@@ -11,6 +11,14 @@
 
 
 BoneLengthChartView::BoneLengthChartView() {
+    chart = new QChart();
+    chart->setTheme(QChart::ChartThemeDark);
+    chart->setBackgroundBrush(QBrush(QColor(34, 36, 40)));
+    chart->legend()->setVisible(false);
+
+    axisY = new QValueAxis();
+    chart->addAxis(axisY, Qt::AlignLeft);
+    this->setChart(chart);
 }
 
 
@@ -21,24 +29,19 @@ void BoneLengthChartView::update(std::vector<double> *boneLengthErrors, int sele
 	if (m_boneLengthErrors == nullptr) {
 		return;
 	}
-	QChart *chart = new QChart();
-	chart->setTheme(QChart::ChartThemeDark);
-	chart->setBackgroundBrush(QBrush(QColor(34, 36, 40)));
-	chart->legend()->setVisible(false);
+	chart->removeAllSeries();
+
 	if (selectedIndex != -1) {
 		chart->setTitle(Dataset::dataset->skeleton()[selectedIndex].name);
 	}
 	else {
 		chart->setTitle(" ");
 	}
-	this->setChart(chart);
 	if (m_boneLengthErrors->size() != 0) {
 		float maxValue = *std::max_element(m_boneLengthErrors->begin(), m_boneLengthErrors->end());
 		float minValue = *std::min_element(m_boneLengthErrors->begin(), m_boneLengthErrors->end());
 		float range = std::max(-minValue, maxValue);
-		QValueAxis *axisY = new QValueAxis();
 		axisY->setRange(0,range);
-		chart->addAxis(axisY, Qt::AlignLeft);
 
 		int count = 0;
 		m_barSeriesList.clear();
