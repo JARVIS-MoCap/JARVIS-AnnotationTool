@@ -498,10 +498,10 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPairCharuco(QList<QString> cameraP
   }
 
   Intrinsics i1,i2;
-	i1.K = m_intrinsicParameters[m_cameraPair[0]]["K"];
-	i1.D = m_intrinsicParameters[m_cameraPair[0]]["D"];
-	i2.K = m_intrinsicParameters[m_cameraPair[1]]["K"];
-	i2.D = m_intrinsicParameters[m_cameraPair[1]]["D"];
+	i1.K = m_intrinsicParameters[cameraPair[0]]["K"];
+	i1.D = m_intrinsicParameters[cameraPair[0]]["D"];
+	i2.K = m_intrinsicParameters[cameraPair[1]]["K"];
+	i2.D = m_intrinsicParameters[cameraPair[1]]["D"];
 
   mean_repro_error = stereoCalibrationStep(objectPoints, imagePoints1,
         imagePoints2, i1,i2,e, size, 1.4);
