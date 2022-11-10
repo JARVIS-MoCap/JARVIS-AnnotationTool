@@ -232,8 +232,18 @@ void IntrinsicsCalibrator::run_charuco() {
 	int iteration = 0;
 	int skipIndex;
 
-  cv::Ptr<cv::aruco::Dictionary> dictionary =
-    cv::aruco::getPredefinedDictionary(m_calibrationConfig->charucoPatternIdx);
+  cv::Ptr<cv::aruco::Dictionary> dictionary;
+
+  if (m_calibrationConfig->charucoPatternIdx == 21) {
+      dictionary =
+          cv::aruco::Dictionary::create(m_calibrationConfig->patternWidth *
+                                            m_calibrationConfig->patternHeight,
+                                        m_calibrationConfig->patternSize);
+  }
+  else {
+    dictionary = cv::aruco::getPredefinedDictionary(m_calibrationConfig->charucoPatternIdx);
+  }
+
   cv::Ptr<cv::aruco::CharucoBoard> board =
   cv::aruco::CharucoBoard::create(m_calibrationConfig->patternWidth,
   m_calibrationConfig->patternHeight, m_calibrationConfig->patternSideLength,
@@ -297,18 +307,24 @@ void IntrinsicsCalibrator::run_charuco() {
              std::vector<cv::Point2f> charucoCorners;
              std::vector<int> charucoIds;
              cv::aruco::interpolateCornersCharuco(markerCorners, markerIds, img, board, charucoCorners, charucoIds);
-         if (charucoIds.size() > 8) {
-             charucoCornersAll.push_back(charucoCorners);
-             charucoIdsAll.push_back(charucoIds);
-             if (m_calibrationConfig->debug) {
-               img.copyTo(imageCopy);
-               cv::Scalar color = cv::Scalar(255, 0, 255);
-               cv::aruco::drawDetectedCornersCharuco(imageCopy, charucoCorners, charucoIds, color);
-               cv::aruco::drawDetectedMarkers(imageCopy, markerCorners, markerIds);
-               cv::imwrite(m_parametersSavePath + "/debug/Intrinsics/" + m_cameraName +
-               "/Frame_" + QString::number(counter).toStdString() + ".jpg", imageCopy);
+             if (charucoIds.size() > m_calibrationConfig->patternHeight-1 &&
+                 charucoIds.size() > m_calibrationConfig->patternWidth-1) {
+                 charucoCornersAll.push_back(charucoCorners);
+                 charucoIdsAll.push_back(charucoIds);
+                 if (m_calibrationConfig->debug) {
+                     img.copyTo(imageCopy);
+                     cv::Scalar color = cv::Scalar(255, 0, 255);
+                     cv::aruco::drawDetectedCornersCharuco(
+                         imageCopy, charucoCorners, charucoIds, color);
+                     cv::aruco::drawDetectedMarkers(imageCopy, markerCorners,
+                                                    markerIds);
+                     cv::imwrite(m_parametersSavePath + "/debug/Intrinsics/" +
+                                     m_cameraName + "/Frame_" +
+                                     QString::number(counter).toStdString() +
+                                     ".jpg",
+                                 imageCopy);
+                 }
              }
-           }
         }
 	      emit intrinsicsProgress(counter * (skipIndex + 1), frameCount,
 	            m_threadNumber);
@@ -336,22 +352,22 @@ void IntrinsicsCalibrator::run_charuco() {
     charucoCorners.push_back(charucoCornersAll[(int)k]);
   }
 
-  std::cout << "Number Images for Stage 1: " <<
+  std::cout << m_cameraName << ": Number Images for Stage 1: " <<
       charucoCorners.size() << std::endl;
 
   double mean_repro_error = intrinsicsCalibrationStepCharuco(charucoCorners, charucoIds,
         board, size, 1.25);
-  std::cout << "Mean Reprojection Error after Stage 1: " <<
+  std::cout << m_cameraName << ": Mean Reprojection Error after Stage 1: " <<
         mean_repro_error << std::endl;
   std::cout << "Number Images for Stage 2: " <<
         charucoCorners.size() << std::endl;
 
   mean_repro_error = intrinsicsCalibrationStepCharuco(charucoCorners, charucoIds,
       board, size, 1.5);
-  std::cout << "Mean Reprojection Error after Stage 2: " <<
-        mean_repro_error << std::endl;
-  std::cout << "Number Images for Stage 3: " <<
-        charucoCorners.size() << std::endl;
+  std::cout << m_cameraName << ": Mean Reprojection Error after Stage 2: "
+            << mean_repro_error << std::endl;
+  std::cout << m_cameraName << ": Number Images for Stage 3: "
+            << charucoCorners.size() << std::endl;
 
   cv::Mat K, D;
   std::vector< cv::Mat > rvecs, tvecs;

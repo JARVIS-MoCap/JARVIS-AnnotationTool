@@ -149,17 +149,25 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 				"DICT_5X5_1000","DICT_6X6_50","DICT_6X6_100","DICT_6X6_250",
 				"DICT_6X6_1000","DICT_7X7_50","DICT_7X7_100","DICT_7X7_250",
 				"DICT_7X7_1000","DICT_ARUCO_ORIGINAL","DICT_APRILTAG_16h5",
-				"DICT_APRILTAG_25h9","DICT_APRILTAG_36h10","DICT_APRILTAG_36h11"});
+				"DICT_APRILTAG_25h9","DICT_APRILTAG_36h10","DICT_APRILTAG_36h11", "None"});
 	charucoPatternCombo->setCurrentIndex(8);
 	charucoPatternCombo->hide();
 	charucoPatternLabel->hide();
+	connect(charucoPatternCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NewCalibrationWidget::charucoPatternChangedSlot);
+
+	patternSizeLabel = new LabelWithToolTip("  Pattern Size", "Aruco Marker \"Bit\" sidelength");
+	patternSizeEdit = new QSpinBox();
+	patternSizeEdit->setRange(4, 7);
+	patternSizeEdit->setValue(6);
+	patternSizeLabel->hide();
+	patternSizeEdit->hide();
 
 	LabelWithToolTip *widthLabel = new LabelWithToolTip("  Pattern Width",
-				"Does not count the outer edge of the pattern. Make sure the visualization matches your board!");
+			"Does not count the outer edge of the pattern. Make sure the visualization matches your board!");
 	widthEdit = new QSpinBox();
-	widthEdit->setRange(0,35);
-	widthEdit->setValue(9);
-	connect(widthEdit, QOverload<int>::of(&QSpinBox::valueChanged), this, &NewCalibrationWidget::checkerBoardPatternChangesSlot);
+	widthEdit->setRange(0, 35);
+	widthEdit->setValue(6);
+
 	LabelWithToolTip *heightLabel = new LabelWithToolTip("  Pattern Height",
 			"Does not count the outer edge of the pattern. Make sure the visualization matches your board!");
 	heightEdit = new QSpinBox();
@@ -194,6 +202,8 @@ NewCalibrationWidget::NewCalibrationWidget(QWidget *parent) : QWidget(parent) {
 	checkerboardwidgetlayout->addWidget(boardTypeCombo,i++,1);
 	checkerboardwidgetlayout->addWidget(charucoPatternLabel,i,0);
 	checkerboardwidgetlayout->addWidget(charucoPatternCombo,i++,1);
+	checkerboardwidgetlayout->addWidget(patternSizeLabel, i, 0);
+	checkerboardwidgetlayout->addWidget(patternSizeEdit, i++, 1);
 	checkerboardwidgetlayout->addWidget(widthLabel,i,0);
 	checkerboardwidgetlayout->addWidget(widthEdit,i++,1);
 	checkerboardwidgetlayout->addWidget(heightLabel,i,0);
@@ -417,6 +427,7 @@ void NewCalibrationWidget::calibrateClickedSlot() {
 	m_calibrationConfig->debug = saveDebugRadioWidget->state();
 	m_calibrationConfig->boardType = boardTypeCombo->currentText();
 	m_calibrationConfig->charucoPatternIdx = charucoPatternCombo->currentIndex();
+	m_calibrationConfig->patternSize = patternSizeEdit->value();
 	m_calibrationConfig->patternWidth = widthEdit->value();
 	m_calibrationConfig->patternHeight = heightEdit->value();
 	m_calibrationConfig->patternSideLength = sideLengthEdit->value();
@@ -660,6 +671,17 @@ void NewCalibrationWidget::boardTypeChangedSlot(int val) {
 		charucoPatternLabel->hide();
 		markerLengthEdit->hide();
 		markerLengthLabel->hide();
+	}
+}
+
+void NewCalibrationWidget::charucoPatternChangedSlot(int index) {
+	if (index == 21) {
+		patternSizeLabel->show();
+		patternSizeEdit->show();
+	}
+	else {
+		patternSizeLabel->hide();
+		patternSizeEdit->hide();
 	}
 }
 

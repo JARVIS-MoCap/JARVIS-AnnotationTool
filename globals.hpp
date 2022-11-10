@@ -103,6 +103,7 @@ struct CalibrationConfig {
 	int patternHeight;
 	double patternSideLength;
 	double markerSideLength;
+	int patternSize;
 	QList<QString> cameraNames;
 	QList<QList<QString>> cameraPairs;
 	bool single_primary = false;

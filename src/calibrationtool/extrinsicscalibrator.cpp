@@ -318,8 +318,18 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPair(QList<QString> cameraPair,
 bool ExtrinsicsCalibrator::calibrateExtrinsicsPairCharuco(QList<QString> cameraPair,
       Extrinsics &e, double &mean_repro_error) {
 
-  cv::Ptr<cv::aruco::Dictionary> dictionary =
-  cv::aruco::getPredefinedDictionary(m_calibrationConfig->charucoPatternIdx);
+  cv::Ptr<cv::aruco::Dictionary> dictionary;
+
+  if (m_calibrationConfig->charucoPatternIdx == 21) {
+      dictionary =
+          cv::aruco::Dictionary::create(m_calibrationConfig->patternWidth *
+                                            m_calibrationConfig->patternHeight,
+                                        m_calibrationConfig->patternSize);
+  }
+  else {
+    dictionary = cv::aruco::getPredefinedDictionary(m_calibrationConfig->charucoPatternIdx);
+  }
+
   cv::Ptr<cv::aruco::CharucoBoard> board =
   cv::aruco::CharucoBoard::create(m_calibrationConfig->patternWidth,
   m_calibrationConfig->patternHeight, 0.04f, 0.02f, dictionary);
@@ -417,19 +427,21 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPairCharuco(QList<QString> cameraP
         std::vector<cv::Point2f> charucoCorners1, charucoCorners2;
         std::vector<int> charucoIds1,charucoIds2;
         cv::aruco::detectMarkers(img1, board->dictionary, markerCorners1, markerIds1, charucoParams);
-         if (markerIds1.size() > 5) {
+        if (markerIds1.size() > 5) {
              cv::aruco::interpolateCornersCharuco(markerCorners1, markerIds1, img1, board, charucoCorners1, charucoIds1);
-           if (charucoIds1.size() > 8) {
-               cv::Scalar color = cv::Scalar(255, 0, 0);
-               patternFound1 = true;
+        if (charucoIds1.size() > m_calibrationConfig->patternHeight - 1 &&
+            charucoIds1.size() > m_calibrationConfig->patternWidth - 1) {
+                 cv::Scalar color = cv::Scalar(255, 0, 0);
+                 patternFound1 = true;
              }
          }
          cv::aruco::detectMarkers(img2, board->dictionary, markerCorners2, markerIds2, charucoParams);
           if (markerIds2.size() > 5) {
               cv::aruco::interpolateCornersCharuco(markerCorners2, markerIds2, img2, board, charucoCorners2, charucoIds2);
-            if (charucoIds2.size() > 8) {
-                patternFound2 = true;
-            }
+              if (charucoIds2.size() > m_calibrationConfig->patternHeight - 1 &&
+                  charucoIds2.size() > m_calibrationConfig->patternWidth - 1) {
+                  patternFound2 = true;
+              }
           }
 	      if (patternFound1 && patternFound2) {
           std::vector<cv::Point2f> commonCorners1, commonCorners2;
@@ -443,30 +455,39 @@ bool ExtrinsicsCalibrator::calibrateExtrinsicsPairCharuco(QList<QString> cameraP
               }
             }
           }
-          if (commonIds.size() > 8) {
-            if (m_calibrationConfig->debug) {
-              cv::Mat  imageCopy1, imageCopy2, debugImg;
-              img1.copyTo(imageCopy1);
-              img2.copyTo(imageCopy2);
-              cv::Scalar color = cv::Scalar(255, 0, 255);
-              cv::aruco::drawDetectedMarkers(imageCopy1, markerCorners1, markerIds1);
-              cv::aruco::drawDetectedCornersCharuco(imageCopy1, charucoCorners1, charucoIds1, color);
-              cv::aruco::drawDetectedMarkers(imageCopy2, markerCorners2, markerIds2);
-              cv::aruco::drawDetectedCornersCharuco(imageCopy2, charucoCorners2, charucoIds2, color);
-              cv::resize(imageCopy2, imageCopy2, imageCopy1.size());
-              cv::Mat matArray[] = {imageCopy1, imageCopy2};
-              cv::hconcat(matArray, 2, debugImg);
-              cv::imwrite(m_parametersSavePath + "/debug/Extrinsics/" +
-                    cameraPair[0].toStdString() + "_" + cameraPair[1].toStdString() +
-                    "/Frame_" + QString::number(counter).toStdString() + ".jpg", debugImg);
-            }
-            std::vector<cv::Point3f> objectPointsDetected;
-            for (int i = 0; i < commonIds.size(); i++) {
-              objectPointsDetected.push_back(checkerBoardPoints.at(commonIds.at(i)));
-            }
-            imagePointsAll1.push_back(commonCorners1);
-            imagePointsAll2.push_back(commonCorners2);
-            objectPointsAll.push_back(objectPointsDetected);
+          if (commonIds.size() > m_calibrationConfig->patternHeight - 1 &&
+              commonIds.size() > m_calibrationConfig->patternWidth - 1) {
+              if (m_calibrationConfig->debug) {
+                  cv::Mat imageCopy1, imageCopy2, debugImg;
+                  img1.copyTo(imageCopy1);
+                  img2.copyTo(imageCopy2);
+                  cv::Scalar color = cv::Scalar(255, 0, 255);
+                  cv::aruco::drawDetectedMarkers(imageCopy1, markerCorners1,
+                                                 markerIds1);
+                  cv::aruco::drawDetectedCornersCharuco(
+                      imageCopy1, charucoCorners1, charucoIds1, color);
+                  cv::aruco::drawDetectedMarkers(imageCopy2, markerCorners2,
+                                                 markerIds2);
+                  cv::aruco::drawDetectedCornersCharuco(
+                      imageCopy2, charucoCorners2, charucoIds2, color);
+                  cv::resize(imageCopy2, imageCopy2, imageCopy1.size());
+                  cv::Mat matArray[] = {imageCopy1, imageCopy2};
+                  cv::hconcat(matArray, 2, debugImg);
+                  cv::imwrite(m_parametersSavePath + "/debug/Extrinsics/" +
+                                  cameraPair[0].toStdString() + "_" +
+                                  cameraPair[1].toStdString() + "/Frame_" +
+                                  QString::number(counter).toStdString() +
+                                  ".jpg",
+                              debugImg);
+              }
+              std::vector<cv::Point3f> objectPointsDetected;
+              for (int i = 0; i < commonIds.size(); i++) {
+                  objectPointsDetected.push_back(
+                      checkerBoardPoints.at(commonIds.at(i)));
+              }
+              imagePointsAll1.push_back(commonCorners1);
+              imagePointsAll2.push_back(commonCorners2);
+              objectPointsAll.push_back(objectPointsDetected);
           }
         }
 	      emit extrinsicsProgress(counter*(skipIndex+1), frameCount,

@@ -71,6 +71,9 @@ class NewCalibrationWidget : public QWidget {
 		LabelWithToolTip *charucoPatternLabel;
 		QComboBox *charucoPatternCombo;
 
+		LabelWithToolTip *patternSizeLabel;
+		QSpinBox *patternSizeEdit;
+
 		QSpinBox *widthEdit;
 		QSpinBox *heightEdit;
 		QDoubleSpinBox *sideLengthEdit;
@@ -110,8 +113,9 @@ class NewCalibrationWidget : public QWidget {
 		void sperateRadioStateChangedSlot(bool state);
 		void checkerBoardPatternChangesSlot(int val);
 		void boardTypeChangedSlot(int val);
+		void charucoPatternChangedSlot(int index);
 
-		void intrinsicsPathChangedSlot(const QString &path);
+        void intrinsicsPathChangedSlot(const QString &path);
 };
 
 #endif
