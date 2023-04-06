@@ -186,9 +186,9 @@ void MainWindow::exportTrainingsetClickedSlot() {
 }
 
 
-void MainWindow::datasetLoadedSlot(bool isSetupAnnotation) {
+void MainWindow::datasetLoadedSlot(bool isSetupAnnotation, QString selectedSegment) {
 	stackedWidget->setCurrentWidget(editorWidget);
-	editorWidget->datasetLoadedSlot(isSetupAnnotation);
+	editorWidget->datasetLoadedSlot(isSetupAnnotation, selectedSegment);
 }
 
 

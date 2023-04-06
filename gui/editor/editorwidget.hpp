@@ -36,7 +36,7 @@ class EditorWidget : public QWidget {
 		explicit EditorWidget(QWidget *parent = nullptr);
 
 	signals:
-		void datasetLoaded();
+		void datasetLoaded(QString selectedSegment);
 		void cropToggled(bool toggle);
 		void panToggled(bool toggle);
 		void homeClicked();
@@ -57,7 +57,7 @@ class EditorWidget : public QWidget {
 
 	public slots:
 		void splitterMovedSlot(int pos, int index);
-		void datasetLoadedSlot(bool isSetupAnnotation);
+		void datasetLoadedSlot(bool isSetupAnnotation, QString selectedSegment);
 		void frameChangedSlot(int index);
 		void imgSetChangedSlot(int index);
 

@@ -361,7 +361,7 @@ void EditorWidget::panFinishedSlot() {
 }
 
 
-void EditorWidget::datasetLoadedSlot(bool isSetupAnnotation) {
+void EditorWidget::datasetLoadedSlot(bool isSetupAnnotation, QString selectedSegment) {
 	if (isSetupAnnotation) {
 		saveSetupButton->show();
 	}
@@ -390,9 +390,9 @@ void EditorWidget::datasetLoadedSlot(bool isSetupAnnotation) {
 	splitterMovedSlot(0,0);
 	keypointWidget->datasetLoadedSlot();
 	reprojectionWidget->datasetLoadedSlot();
-	datasetControlWidget->datasetLoadedSlot();
+	datasetControlWidget->datasetLoadedSlot(selectedSegment);
 	connect(Dataset::dataset, &Dataset::keypointStateChanged, datasetControlWidget, &DatasetControlWidget::keypointStateChangedSlot);
-	emit datasetLoaded();
+	emit datasetLoaded(selectedSegment);
 }
 
 void EditorWidget::show3DClickedSlot() {

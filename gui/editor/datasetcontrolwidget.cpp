@@ -78,7 +78,7 @@ DatasetControlWidget::DatasetControlWidget(QWidget *parent) : QWidget(parent) {
 }
 
 
-void DatasetControlWidget::datasetLoadedSlot() {
+void DatasetControlWidget::datasetLoadedSlot(QString selectedSegment) {
 	int currentIndex = 0;
 	int segmentIndex;
 	segmentCombo->blockSignals(true);
@@ -88,8 +88,10 @@ void DatasetControlWidget::datasetLoadedSlot() {
 		segmentCombo->addItem(segment);
 		if (Dataset::dataset->datasetFolder().contains(segment))
 		{
-			segmentIndex = currentIndex;
-			m_currentSegment = segment;
+		    if(segment==selectedSegment) {
+			    segmentIndex = currentIndex;
+			    m_currentSegment = segment;
+			}
 		}
 		currentIndex++;
 	}
@@ -212,5 +214,5 @@ void DatasetControlWidget::segmentChangedSlot(const QString& segment) {
 	m_currentImgSetIndex = 0;
 	frameSetEdit->setText(QString::number(m_currentImgSetIndex+1));
 	totalFrameSetLabel->setText(QString::number(Dataset::dataset->imgSets().length()));
-	emit datasetLoaded(false);
+	emit datasetLoaded(false, segment);
 }
