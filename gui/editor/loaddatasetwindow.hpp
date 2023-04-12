@@ -34,7 +34,7 @@ class LoadDatasetWindow : public QDialog {
 		explicit LoadDatasetWindow(QWidget *parent = nullptr);
 
 	signals:
-		void datasetLoaded(bool isSetupAnnotation);
+		void datasetLoaded(bool isSetupAnnotation, QString selectedSegment);
 
 	private:
 		QSettings *settings;

@@ -56,7 +56,7 @@ class MainWindow : public QMainWindow {
 		void newDatasetClickedSlot();
 		void newCalibrationClickedSlot();
 		void exportTrainingsetClickedSlot();
-		void datasetLoadedSlot(bool isSetupAnnotation);
+		void datasetLoadedSlot(bool isSetupAnnotation, QString selectedSegment);
 		void exitToMainPageSlot();
 };
 

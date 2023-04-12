@@ -32,10 +32,10 @@ class DatasetControlWidget : public QWidget {
 	signals:
 		void frameSelectionChanged(int index);
 		void imgSetChanged(int index);
-		void datasetLoaded(bool isSetupAnnotation);
+		void datasetLoaded(bool isSetupAnnotation, QString selectedSegment);
 
 	public slots:
-		void datasetLoadedSlot();
+		void datasetLoadedSlot(QString selectedSegment);
 		void frameChangedSlot(int imgSetIndex, int frameIndex);
 		void keypointStateChangedSlot(KeypointState state,
 					KeypointState previousSate, int frameIndex);

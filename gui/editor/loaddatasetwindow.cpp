@@ -183,7 +183,7 @@ void LoadDatasetWindow::loadDatasetClickedSlot() {
 		Dataset::dataset = new Dataset(m_datasetFolder, baseDirPath,
 									   m_cameraNames, m_skeleton, m_segments, false);
 		if (Dataset::dataset->loadSuccessfull()) {
-			emit datasetLoaded(false);
+			emit datasetLoaded(false, selectedSegmentEdit->text());
 			this->close();
 		}
 		else {
@@ -347,7 +347,7 @@ void LoadDatasetWindow::annotateSetupButtonClicked() {
 		Dataset::dataset = new Dataset(m_datasetFolder, baseDirPath,
 									   m_cameraNames, {}, m_segments, true, keypoints);
 		if (Dataset::dataset->loadSuccessfull()) {
-			emit datasetLoaded(true);
+			emit datasetLoaded(true, selectedSegmentEdit->text());
 			this->close();
 		}
 		else {
