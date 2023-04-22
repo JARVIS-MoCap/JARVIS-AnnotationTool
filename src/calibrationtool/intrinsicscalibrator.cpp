@@ -33,16 +33,27 @@ IntrinsicsCalibrator::IntrinsicsCalibrator(CalibrationConfig *calibrationConfig,
   m_parametersSavePath = (m_calibrationConfig->calibrationSetPath + "/" +
         m_calibrationConfig->calibrationSetName).toStdString();
 
-  m_charucoPattern = cv::Mat(cv::Size( m_calibrationConfig->patternWidth+1,
+  m_charucoPattern1 = cv::Mat(cv::Size( m_calibrationConfig->patternWidth+1,
+        m_calibrationConfig->patternHeight+1), CV_32SC1);
+  m_charucoPattern2 = cv::Mat(cv::Size( m_calibrationConfig->patternWidth+1,
         m_calibrationConfig->patternHeight+1), CV_32SC1);
   m_detectedPattern = cv::Mat(cv::Size( m_calibrationConfig->patternWidth+1,
         m_calibrationConfig->patternHeight+1), CV_32SC1);
-  m_charucoPattern = -1;
+  m_charucoPattern1 = -1;
+  m_charucoPattern2 = -1;
   int id_count = 0;
   for (int i = 0; i < m_calibrationConfig->patternWidth+1; i++) {
     for (int j = 0; j <  m_calibrationConfig->patternHeight+1; j++) {
       if ((i+j)%2 != 0) {
-        m_charucoPattern.at<int>(j,i) = id_count;
+        m_charucoPattern1.at<int>(j,i) = id_count;
+        id_count++;
+      }
+    }
+  }
+  for (int i = 0; i < m_calibrationConfig->patternWidth+1; i++) {
+    for (int j = 0; j <  m_calibrationConfig->patternHeight+1; j++) {
+      if ((i+j)%2 != 0) {
+        m_charucoPattern2.at<int>(j,i) = id_count;
         id_count++;
       }
     }
@@ -244,25 +255,35 @@ void IntrinsicsCalibrator::run_charuco() {
     dictionary = cv::aruco::getPredefinedDictionary(m_calibrationConfig->charucoPatternIdx);
   }
 
-  cv::Ptr<cv::aruco::CharucoBoard> board =
-  cv::aruco::CharucoBoard::create(m_calibrationConfig->patternWidth,
-  m_calibrationConfig->patternHeight, m_calibrationConfig->patternSideLength,
-        m_calibrationConfig->markerSideLength, dictionary);
-  cv::Ptr<cv::aruco::DetectorParameters> charucoParams =
-  cv::aruco::DetectorParameters::create();
+  cv::Ptr<cv::aruco::CharucoBoard> boardFront = cv::aruco::CharucoBoard::create(m_calibrationConfig->patternWidth,
+                                                                            m_calibrationConfig->patternHeight,
+                                                                            m_calibrationConfig->patternSideLength,
+                                                                            m_calibrationConfig->markerSideLength, dictionary);
+
+  cv::Ptr<cv::aruco::CharucoBoard> boardBack = cv::aruco::CharucoBoard::create(m_calibrationConfig->patternWidth,
+                                                                            m_calibrationConfig->patternHeight,
+                                                                            m_calibrationConfig->patternSideLength,
+                                                                            m_calibrationConfig->markerSideLength, dictionary);
+
+  for(int i=0; i<boardBack->ids.size(); i++) {
+    boardBack->ids[i] += boardFront->ids.size();
+  }
+  cv::Ptr<cv::aruco::DetectorParameters> charucoParams = cv::aruco::DetectorParameters::create();
 
   cv::Mat imageCopy;
   if (m_calibrationConfig->debug) {
     cv::Mat boardImage;
-    board->draw(cv::Size(600, 500), boardImage, 10, 1);
-    cv::imwrite(m_parametersSavePath + "/debug/BoardPreview.jpg", boardImage);
+    boardFront->draw(cv::Size(600, 500), boardImage, 10, 1);
+    cv::imwrite(m_parametersSavePath + "/debug/BoardPreviewFront.jpg", boardImage);
+    boardBack->draw(cv::Size(600, 500), boardImage, 10, 1);
+    cv::imwrite(m_parametersSavePath + "/debug/BoardPreviewBack.jpg", boardImage);
   }
 
   std::vector<std::vector<int>> charucoIdsAll, charucoIds;
   std::vector<std::vector<cv::Point2f>> charucoCornersAll, charucoCorners;
+  cv::Ptr<cv::aruco::CharucoBoard> detected_board;
 
-
-	while (charucoIdsAll.size() < m_calibrationConfig->framesForIntrinsics) {
+  while (charucoIdsAll.size() < m_calibrationConfig->framesForIntrinsics) {
 		cv::VideoCapture cap(m_calibrationConfig->intrinsicsPath.toStdString() + "/" +
 												 m_cameraName + "." + format.toStdString());
 		int frameCount = cap.get(cv::CAP_PROP_FRAME_COUNT);
@@ -299,14 +320,21 @@ void IntrinsicsCalibrator::run_charuco() {
 	      size = img.size();
 	      int frameIndex = cap.get(cv::CAP_PROP_POS_FRAMES);
 	      cap.set(cv::CAP_PROP_POS_FRAMES, frameIndex+skipIndex);
-	      if (frameIndex > frameCount) read_success = false;
-        std::vector<int> markerIds;
-        std::vector<std::vector<cv::Point2f>> markerCorners;
-        cv::aruco::detectMarkers(img, board->dictionary, markerCorners, markerIds, charucoParams);
-         if (markerIds.size() > 5) {
+	      if (frameIndex > frameCount) {
+	        read_success = false;
+	      }
+          std::vector<int> markerIds;
+          std::vector<std::vector<cv::Point2f>> markerCorners;
+          cv::aruco::detectMarkers(img, boardFront->dictionary, markerCorners, markerIds, charucoParams);
+          if (markerIds.size() > 0 && markerIds[0]<35) {
+             detected_board = boardFront;
+          } else {
+             detected_board = boardBack;
+          }
+          if (markerIds.size() > 5) {
              std::vector<cv::Point2f> charucoCorners;
              std::vector<int> charucoIds;
-             cv::aruco::interpolateCornersCharuco(markerCorners, markerIds, img, board, charucoCorners, charucoIds);
+             cv::aruco::interpolateCornersCharuco(markerCorners, markerIds, img, detected_board, charucoCorners, charucoIds);
              if (charucoIds.size() > m_calibrationConfig->patternHeight-1 &&
                  charucoIds.size() > m_calibrationConfig->patternWidth-1) {
                  charucoCornersAll.push_back(charucoCorners);
@@ -356,14 +384,14 @@ void IntrinsicsCalibrator::run_charuco() {
       charucoCorners.size() << std::endl;
 
   double mean_repro_error = intrinsicsCalibrationStepCharuco(charucoCorners, charucoIds,
-        board, size, 1.25);
+        detected_board, size, 1.25);
   std::cout << m_cameraName << ": Mean Reprojection Error after Stage 1: " <<
         mean_repro_error << std::endl;
   std::cout << "Number Images for Stage 2: " <<
         charucoCorners.size() << std::endl;
 
   mean_repro_error = intrinsicsCalibrationStepCharuco(charucoCorners, charucoIds,
-      board, size, 1.5);
+      detected_board, size, 1.5);
   std::cout << m_cameraName << ": Mean Reprojection Error after Stage 2: "
             << mean_repro_error << std::endl;
   std::cout << m_cameraName << ": Number Images for Stage 3: "
@@ -373,7 +401,7 @@ void IntrinsicsCalibrator::run_charuco() {
   std::vector< cv::Mat > rvecs, tvecs;
   cv::Mat stdDI, stdDE, errs;
   double repro_error = cv::aruco::calibrateCameraCharuco(charucoCorners,
-        charucoIds, board, size, K,
+        charucoIds, detected_board, size, K,
         D, rvecs, tvecs, stdDI, stdDE, errs,
         cv::CALIB_FIX_K3 | cv::CALIB_ZERO_TANGENT_DIST | cv::CALIB_SAME_FOCAL_LENGTH,
         cv::TermCriteria(cv::TermCriteria::MAX_ITER |
@@ -499,20 +527,39 @@ bool IntrinsicsCalibrator::checkRotation(std::vector< cv::Point2f> &corners1,
 int IntrinsicsCalibrator::matchPattern() {
   int unrotCount = 0;
   int rotCount = 0;
+  int nMatched = 0;
   for (int i = 0; i < m_calibrationConfig->patternWidth+1; i++) {
     for (int j = 0; j <  m_calibrationConfig->patternHeight+1; j++) {
-      if (m_charucoPattern.at<int>(j,i) != -1) {
-        if (m_charucoPattern.at<int>(j,i) == m_detectedPattern.at<int>(j,i) ||
-              m_charucoPattern.at<int>(j,i) == m_detectedPattern.at<int>(j,i)) {
+      if (m_charucoPattern1.at<int>(j,i) != -1) {
+        if (m_charucoPattern1.at<int>(j,i) == m_detectedPattern.at<int>(j,i)) {
+          unrotCount++;
+          nMatched++;
+        }
+        if ((m_charucoPattern1.at<int>(j,i) ==
+              m_detectedPattern.at<int>(m_calibrationConfig->patternHeight-j,
+              m_calibrationConfig->patternWidth-i))) {
+          rotCount++;
+          nMatched++;
+
+        }
+      }
+    }
+  }
+  if (nMatched==0) {
+  for (int i = 0; i < m_calibrationConfig->patternWidth+1; i++) {
+    for (int j = 0; j <  m_calibrationConfig->patternHeight+1; j++) {
+      if (m_charucoPattern2.at<int>(j,i) != -1) {
+        if (m_charucoPattern2.at<int>(j,i) == m_detectedPattern.at<int>(j,i)) {
           unrotCount++;
         }
-        if ((m_charucoPattern.at<int>(j,i) ==
+        if ((m_charucoPattern2.at<int>(j,i) ==
               m_detectedPattern.at<int>(m_calibrationConfig->patternHeight-j,
               m_calibrationConfig->patternWidth-i))) {
           rotCount++;
         }
       }
     }
+  }
   }
   if (unrotCount == rotCount) {
     return 0;
