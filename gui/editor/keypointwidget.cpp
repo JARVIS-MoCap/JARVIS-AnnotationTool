@@ -200,6 +200,12 @@ void KeypointWidget::hideEntitySlot(int toggle) {
 	}
 }
 
+void KeypointWidget::toggleHideAll() {
+        m_allHidden = !m_allHidden;
+        for (const auto &box : hideEntitiesBoxesList) {
+			box->setChecked(!m_allHidden);
+		}
+}
 
 void KeypointWidget::currentTabChangedSlot(int index) {
 	m_currentEntity = entitiesList[index];

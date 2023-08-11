@@ -452,5 +452,8 @@ void EditorWidget::keyPressEvent(QKeyEvent *e)
 		cropButton->setChecked(!toggled);
 		emit cropToggled(!toggled);
 		cropToggledSlot(!toggled);
-	}
+        } 
+	else if (key == 16777248) {
+			keypointWidget->toggleHideAll();
+		}
 }

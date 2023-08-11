@@ -109,6 +109,7 @@ class KeypointWidget : public QWidget {
 	public:
 		explicit KeypointWidget(QWidget *parent = nullptr);
 		void init();
+		void toggleHideAll();
 
 	signals:
 		void updateViewer();
@@ -151,6 +152,7 @@ class KeypointWidget : public QWidget {
 
 		ImgSet *m_currentImgSet;
 		int m_currentFrameIndex;
+		bool m_allHidden = false;
 
 		bool eventFilter(QObject *target, QEvent *event)
 		{
