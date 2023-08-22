@@ -166,6 +166,8 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(this, &EditorWidget::frameChanged, keypointWidget, &KeypointWidget::frameChangedSlot);
 	connect(this, &EditorWidget::frameChanged, reprojectionWidget, &ReprojectionWidget::calculateReprojectionSlot);
 	connect(this, &EditorWidget::frameChanged, datasetControlWidget, &DatasetControlWidget::frameChangedSlot);
+	connect(this, &EditorWidget::cmdRPressed, keypointWidget, &KeypointWidget::toggleCurrentKeypointSlot);
+	connect(this, &EditorWidget::cmdEPressed, keypointWidget, &KeypointWidget::skipCurrentKeypointSlot);
 
 	//<-> Relayed Signals
 	connect(datasetControlWidget, &DatasetControlWidget::datasetLoaded, this, &EditorWidget::newSegmentLoaded);
@@ -456,4 +458,10 @@ void EditorWidget::keyPressEvent(QKeyEvent *e)
 	else if (key == 16777248) {
 			keypointWidget->toggleHideAll();
 		}
+	else if ((key == Qt::Key_R) && (e->modifiers() & Qt::ControlModifier)){
+		emit cmdRPressed();  // will suppress currently selected keypoint
+	}
+	else if ((key == Qt::Key_E) && (e->modifiers() & Qt::ControlModifier)){
+		emit cmdEPressed();  // will skip currently selected keypoint
+	}
 }

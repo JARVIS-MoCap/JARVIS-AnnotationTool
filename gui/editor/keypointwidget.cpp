@@ -73,6 +73,8 @@ void KeypointWidget::init() {
 		connect(bodyPartsListWidget, &KeypointListWidget::removeKeypoint, this, &KeypointWidget::removeKeypointSlot);
 		connect(bodyPartsListWidget, &KeypointListWidget::suppressKeypoint, this, &KeypointWidget::suppressKeypointSlot);
 		connect(bodyPartsListWidget, &KeypointListWidget::unsuppressKeypoint, this, &KeypointWidget::unsuppressKeypointSlot);
+		// connect(bodyPartsListWidget, &KeypointListWidget::toggleCurrentKeypoint, this, &KeypointWidget::toggleCurrentKeypointSlot);
+		connect(bodyPartsListWidget, &KeypointListWidget::afterToggleSuppression, this, &KeypointWidget::afterToggleSuppressionSlot);
 
 		for (const auto& bp : Dataset::dataset->bodypartsList()) {
 			QListWidgetItem * bpItem = new QListWidgetItem();
@@ -166,6 +168,52 @@ void KeypointWidget::suppressKeypointSlot(int row) {
 	emit updateViewer();
 }
 
+
+// we have to do this back and forth dance because the keypointListWidget handles
+// suppression (or not) of keypoints. maybe a way to do it all from here, rather than having a method?
+// but the method seems generically useful. The downside is then we have to come back and 
+// update the viewer in a separate slot, so we're sure to not update the current row before the toggle occurs.
+void KeypointWidget::toggleCurrentKeypointSlot() {
+	
+	// figure out which keypointList is currently active
+	KeypointListWidget* keypointList = keypointListMap[m_currentEntity];
+	
+	// call the toggleCurrentKeypointSuppression method of this keypointList
+	// maybe this should be a signal + slot
+	keypointList->toggleCurrentKeypointSuppression();
+}
+
+void KeypointWidget::afterToggleSuppressionSlot() {
+	
+	KeypointListWidget* keypointList = keypointListMap[m_currentEntity];
+
+	// advance the row to the next keypoint, if possible
+	if (keypointList->currentRow() < keypointList->count()-1) {
+		keypointList->setCurrentRow(keypointList->currentRow()+1);
+		
+		// update the viewer accordingly
+		QColor color = colorMap->getColor(keypointList->currentRow(), keypointList->count());
+		m_currentBodypart = keypointList->item(keypointList->currentRow())->text();
+		emit currentBodypartChanged(m_currentBodypart, color);
+		emit updateViewer();
+	}
+}
+
+void KeypointWidget::skipCurrentKeypointSlot(){
+	// figure out which keypointList is currently active
+	KeypointListWidget* keypointList = keypointListMap[m_currentEntity];
+	
+	// advance the row to the next keypoint, if possible
+	if (keypointList->currentRow() < keypointList->count()-1) {
+		keypointList->setCurrentRow(keypointList->currentRow()+1);
+		
+		// update the viewer accordingly
+		QColor color = colorMap->getColor(keypointList->currentRow(), keypointList->count());
+		m_currentBodypart = keypointList->item(keypointList->currentRow())->text();
+		emit currentBodypartChanged(m_currentBodypart, color);
+		emit updateViewer();
+	}
+}
 
 void KeypointWidget::unsuppressKeypointSlot(int row) {
 	QListWidget* keypointList = keypointListMap[m_currentEntity];

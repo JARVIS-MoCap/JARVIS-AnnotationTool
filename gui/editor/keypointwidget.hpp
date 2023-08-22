@@ -40,11 +40,29 @@ class KeypointListWidget : public QListWidget {
 		void clearSupressed() {
 			m_suppressedList.clear();
 		}
+		// bool isSuppressed(int row) {
+			// return m_suppressedList.contains(row);
+		// }
+
+		void toggleCurrentKeypointSuppression(){
+			int current = this->currentRow();
+			bool isSuppressed = m_suppressedList.contains(current);
+			if (isSuppressed) {
+				m_suppressedList.removeAll(current);
+				emit unsuppressKeypoint(current);
+			}
+			else {
+				m_suppressedList.append(current);
+				emit suppressKeypoint(current);
+			}
+			emit afterToggleSuppression();
+		}
 
 	signals:
 		void removeKeypoint(int row);
 		void suppressKeypoint(int row);
 		void unsuppressKeypoint(int row);
+		void afterToggleSuppression();
 
 	private:
 		QList<int> m_suppressedList = {};
@@ -131,6 +149,9 @@ class KeypointWidget : public QWidget {
 		void unsuppressKeypointSlot(int row);
 		void frameChangedSlot(int currentImgSetIndex, int currentFrameIndex);
 		void setKeypointsFromDatasetSlot();
+		void toggleCurrentKeypointSlot();
+		void afterToggleSuppressionSlot();
+		void skipCurrentKeypointSlot();
 
 	private:
 		ColorMap *colorMap;
