@@ -55,14 +55,14 @@ class KeypointListWidget : public QListWidget {
 				m_suppressedList.append(current);
 				emit suppressKeypoint(current);
 			}
-			emit afterToggleSuppression();
+			emit advanceCurrentKeypoint();
 		}
 
 	signals:
 		void removeKeypoint(int row);
 		void suppressKeypoint(int row);
 		void unsuppressKeypoint(int row);
-		void afterToggleSuppression();
+		void advanceCurrentKeypoint();
 
 	private:
 		QList<int> m_suppressedList = {};
@@ -150,8 +150,7 @@ class KeypointWidget : public QWidget {
 		void frameChangedSlot(int currentImgSetIndex, int currentFrameIndex);
 		void setKeypointsFromDatasetSlot();
 		void toggleCurrentKeypointSlot();
-		void afterToggleSuppressionSlot();
-		void skipCurrentKeypointSlot();
+		void advanceCurrentKeypointSlot();
 
 	private:
 		ColorMap *colorMap;

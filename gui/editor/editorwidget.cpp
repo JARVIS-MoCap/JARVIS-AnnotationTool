@@ -167,7 +167,7 @@ EditorWidget::EditorWidget(QWidget *parent) : QWidget(parent) {
 	connect(this, &EditorWidget::frameChanged, reprojectionWidget, &ReprojectionWidget::calculateReprojectionSlot);
 	connect(this, &EditorWidget::frameChanged, datasetControlWidget, &DatasetControlWidget::frameChangedSlot);
 	connect(this, &EditorWidget::cmdRPressed, keypointWidget, &KeypointWidget::toggleCurrentKeypointSlot);
-	connect(this, &EditorWidget::cmdEPressed, keypointWidget, &KeypointWidget::skipCurrentKeypointSlot);
+	connect(this, &EditorWidget::cmdEPressed, keypointWidget, &KeypointWidget::advanceCurrentKeypointSlot);
 
 	//<-> Relayed Signals
 	connect(datasetControlWidget, &DatasetControlWidget::datasetLoaded, this, &EditorWidget::newSegmentLoaded);
