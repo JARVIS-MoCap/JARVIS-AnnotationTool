@@ -646,6 +646,7 @@ bool VideoCutterWindow::loadSegmentation() {
 			msg->showMessage("Could not open segmentation savefile...");
 			return false;
 	}
+	return true;
 }
 
 void VideoCutterWindow::updateCameraListSlot() {
