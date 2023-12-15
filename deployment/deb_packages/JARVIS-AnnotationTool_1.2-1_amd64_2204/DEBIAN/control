@@ -1,6 +1,0 @@
-Package: AnnotationTool
-Version: 1.2
-Architecture: amd64
-Maintainer: Timo Hueser <timo.hueser@gmail.com>
-Description: Annotation Tool for the JARVIS 3D tracking toolbox.
-Depends: libxcb-xinerama0, libdouble-conversion-dev, gstreamer1.0-libav, ffmpeg, libxcb-xinput0, libpcre2-dev, libeigen3-dev, libopengl0
