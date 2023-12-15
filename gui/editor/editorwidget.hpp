@@ -54,6 +54,8 @@ class EditorWidget : public QWidget {
 		void errorThresholdChanged(float val);
 		void boneLengthErrorThresholdChanged(float val);
 		void brightnessChanged(int brightnessFactor);
+		void cmdRPressed();  // toggle keypoint suppression
+		void cmdEPressed();  // skip keypoint without any action
 
 	public slots:
 		void splitterMovedSlot(int pos, int index);
