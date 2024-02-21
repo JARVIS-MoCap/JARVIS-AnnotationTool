@@ -59,7 +59,8 @@ class ExtrinsicsCalibrator : public QObject, public QRunnable {
       cv::Mat F;
     };
 
-		cv::Mat m_charucoPattern;
+		cv::Mat m_charucoPattern1;
+		cv::Mat m_charucoPattern2;
 		cv::Mat m_detectedPattern;
 
     std::vector<cv::Point3f> m_checkerBoardPoints;
